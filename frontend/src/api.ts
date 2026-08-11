@@ -279,7 +279,7 @@ function summarizePlayers(index: SeasonIndex, round: number): { players: Player[
       expectedPoints: expected,
       p10Points: expected == null ? null : expected * 0.7,
       p90Points: expected == null ? null : expected * 1.24,
-      value: expected == null ? null : expected / player.priceM,
+      value: player.priceM > 0 && player.priceM < 999 ? value.points / player.priceM : null,
       availability,
     };
   });
@@ -456,7 +456,7 @@ function sortPlayers(players: Player[], sort: string, direction: "asc" | "desc")
   });
 }
 
-function playerDetail(index: SeasonIndex, playerId: string, round: number): PlayerDetail {
+function playerDetail(index: SeasonIndex, playerId: string): PlayerDetail {
   const player = index.players.get(playerId);
   if (!player) throw new Error("Spieler wurde in dieser Saison nicht gefunden.");
   const team = index.teams.get(player.teamId);
@@ -491,6 +491,7 @@ function playerDetail(index: SeasonIndex, playerId: string, round: number): Play
       pointsJoker: score.pointsJoker,
     }];
   }).sort((left, right) => left.matchday - right.matchday);
+  const seasonPoints = games.reduce((sum, game) => sum + game.points, 0);
   return {
     id: player.id,
     name: player.name,
@@ -503,8 +504,8 @@ function playerDetail(index: SeasonIndex, playerId: string, round: number): Play
     transfermarktUrl: `https://www.transfermarkt.de/schnellsuche/ergebnis/schnellsuche?query=${encodeURIComponent(player.name)}`,
     position: player.position,
     priceM: player.priceM,
-    matchdayPoints: games.filter((game) => game.matchday === round).reduce((sum, game) => sum + game.points, 0),
-    pointsThroughMatchday: games.filter((game) => game.matchday <= round).reduce((sum, game) => sum + game.points, 0),
+    seasonPoints,
+    value: player.priceM > 0 && player.priceM < 999 ? seasonPoints / player.priceM : null,
     games,
   };
 }
@@ -625,7 +626,7 @@ export const api = {
       .filter((player) => !query || player.name.toLocaleLowerCase("de").includes(query) || player.team.toLocaleLowerCase("de").includes(query)), params.get("sort") ?? "points", direction);
     return { items: filtered.slice(offset, offset + limit), nextOffset: offset + limit < filtered.length ? offset + limit : null };
   }), signal),
-  player: (playerId: string, params: URLSearchParams, signal?: AbortSignal) => abortable(loadSeason(params).then((index) => playerDetail(index, playerId, selectedRound(params, index.season))), signal),
+  player: (playerId: string, params: URLSearchParams, signal?: AbortSignal) => abortable(loadSeason(params).then((index) => playerDetail(index, playerId)), signal),
   teams: (params: URLSearchParams, signal?: AbortSignal) => abortable(loadSeason(params).then((index) => buildTeamScores(index, { kind: "all" })), signal),
   team: (teamId: string, params: URLSearchParams, signal?: AbortSignal) => abortable(loadSeason(params).then((index) => teamDetail(index, teamId)), signal),
   bestEleven: (params: URLSearchParams, signal?: AbortSignal) => abortable(loadSeason(params).then((index) => bestEleven(index, params.get("scope") === "season" ? "season" : "matchday", selectedRound(params, index.season))), signal),

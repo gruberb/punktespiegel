@@ -23,7 +23,7 @@ flowchart LR
 | --- | --- |
 | `punktespiegel-data` | Quellverträge prüfen, historische Kaderzuordnung rekonstruieren und statische Snapshots schreiben |
 | Saisonartefakte | Normalisierte Teams, Spieler, Spieltage, Spiele und Punkteaktionen einer Liga-Saison |
-| `catalog.json` | Kleine Einstiegdatei mit Liga-, Saison- und Aktualitätsmetadaten |
+| `catalog.json` | Kleine Einstiegdatei mit Liga-, Saison-, Aktualitäts- und Mannschaftszugehörigkeitsmetadaten |
 | React/Vite | Filter, Navigation, Tabellen, Detailseiten und sämtliche Aggregationen |
 | GitHub Pages/Nginx | Unveränderte statische Dateien ausliefern |
 
@@ -39,6 +39,8 @@ Jede Datei unter `frontend/public/data/seasons` enthält:
 
 `schemaVersion` schützt den Browser vor inkompatiblen Artefakten. Der Generator lädt vorhandene abgeschlossene Saisons nur, wenn sie denselben Vertrag verwenden; andernfalls verlangt er ausdrücklich `--refresh-all`.
 
+Der Katalog enthält außerdem je Liga-Saison die IDs der teilnehmenden Vereine sowie einen kompakten Spielerindex. Damit können Mannschafts- und Spielerprofile beim Saisonwechsel automatisch die damalige Liga wählen, ohne zunächst mehrere große Saisondateien laden zu müssen. Bei einem ligenübergreifenden Transfer innerhalb derselben Saison bleibt ein direkter Einstieg in die gewählte Liga erhalten; beim Wechsel aus einer anderen Saison wird der aktive beziehungsweise einsatzstärkste Saisonabschnitt gewählt.
+
 Die Darstellung berechnet daraus deterministisch:
 
 - kumulierte und einzelne Spieltagsranglisten,
@@ -49,7 +51,7 @@ Die Darstellung berechnet daraus deterministisch:
 
 ## Sharding und Übertragung
 
-Die Daten sind nach Liga-Saison statt nach der gesamten Historie geshardet. Ein Seitenaufruf lädt zunächst nur den etwa 2 KB großen Katalog und anschließend genau die ausgewählte Saison. Die Saisondateien sind unkomprimiert ungefähr 4–5 MB groß, werden durch HTTP-Gzip wegen der wiederholten Feldnamen aber typischerweise auf etwa 180–250 KB reduziert. Ein Wechsel innerhalb derselben Saison nutzt den Browsercache.
+Die Daten sind nach Liga-Saison statt nach der gesamten Historie geshardet. Ein Seitenaufruf lädt zunächst den Katalog mit dem Profilindex und anschließend genau die ausgewählte Saison. Der Katalog ist unkomprimiert ungefähr 590 KB und per HTTP-Gzip etwa 66 KB groß. Die Saisondateien sind unkomprimiert ungefähr 4–5 MB groß, werden durch HTTP-Gzip wegen der wiederholten Feldnamen aber typischerweise auf etwa 180–250 KB reduziert. Ein Wechsel innerhalb derselben Saison nutzt den Browsercache.
 
 Noch feinere Spieler- oder Spieltagsshards würden die Zahl der Netzwerkanfragen und die Komplexität der Navigation erhöhen, ohne für diesen Datenumfang einen messbaren Vorteil zu bringen.
 

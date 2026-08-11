@@ -10,6 +10,8 @@ export type Catalog = {
     roundCount: number;
     latestRound: number;
     dataState: string;
+    teamIds: string[];
+    players: { id: string; active: boolean; appearances: number; points: number }[];
   }[];
 };
 
@@ -167,8 +169,8 @@ export type PlayerDetail = {
   transfermarktUrl: string;
   position: Position;
   priceM: number;
-  matchdayPoints: number;
-  pointsThroughMatchday: number;
+  seasonPoints: number;
+  value: number | null;
   games: PlayerGame[];
 };
 

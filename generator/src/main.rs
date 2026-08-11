@@ -63,6 +63,17 @@ struct CatalogSeason {
     round_count: i32,
     latest_round: i32,
     data_state: String,
+    team_ids: Vec<String>,
+    players: Vec<CatalogPlayer>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct CatalogPlayer {
+    id: String,
+    active: bool,
+    appearances: i32,
+    points: i32,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -85,6 +96,34 @@ struct StaticSeason {
 }
 
 impl StaticSeason {
+    fn catalog_players(&self) -> Vec<CatalogPlayer> {
+        let mut players = self
+            .players
+            .iter()
+            .map(|player| {
+                (
+                    player.id.clone(),
+                    CatalogPlayer {
+                        id: player.id.clone(),
+                        active: player.active,
+                        appearances: 0,
+                        points: 0,
+                    },
+                )
+            })
+            .collect::<BTreeMap<_, _>>();
+        for score in &self.scores {
+            let Some(player) = players.get_mut(&score.player_id) else {
+                continue;
+            };
+            player.points += score.total_points;
+            if score_counts_as_appearance(score) {
+                player.appearances += 1;
+            }
+        }
+        players.into_values().collect()
+    }
+
     fn catalog_entry(&self, current_year: i32) -> CatalogSeason {
         let data_state = if self.latest_round >= self.round_count {
             "complete"
@@ -93,6 +132,13 @@ impl StaticSeason {
         } else {
             "partial"
         };
+        let mut team_ids = self
+            .teams
+            .iter()
+            .map(|team| team.id.clone())
+            .collect::<Vec<_>>();
+        team_ids.sort();
+        team_ids.dedup();
         CatalogSeason {
             id: self.id.clone(),
             league_code: self.league_code.clone(),
@@ -101,8 +147,25 @@ impl StaticSeason {
             round_count: self.round_count,
             latest_round: self.latest_round,
             data_state: data_state.to_owned(),
+            team_ids,
+            players: self.catalog_players(),
         }
     }
+}
+
+fn score_counts_as_appearance(score: &StaticScore) -> bool {
+    score.grade.is_some_and(|grade| grade > 0)
+        || score.total_points != 0
+        || score.goals != 0
+        || score.assists != 0
+        || score.points_clean_sheet != 0
+        || score.points_grade != 0
+        || score.points_goals != 0
+        || score.points_cards != 0
+        || score.points_assists != 0
+        || score.points_starter != 0
+        || score.points_mvp != 0
+        || score.points_joker != 0
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -890,11 +953,21 @@ fn validate_output(output: &Path) -> anyhow::Result<()> {
     for entry in catalog.seasons {
         let path = season_path(output, &entry.id);
         let season = read_season(&path)?;
+        let mut catalog_team_ids = season
+            .teams
+            .iter()
+            .map(|team| team.id.clone())
+            .collect::<Vec<_>>();
+        catalog_team_ids.sort();
+        catalog_team_ids.dedup();
+        let catalog_players = season.catalog_players();
         if season.id != entry.id
             || season.league_code != entry.league_code
             || season.start_year != entry.start_year
             || season.round_count != entry.round_count
             || season.latest_round != entry.latest_round
+            || entry.team_ids != catalog_team_ids
+            || entry.players != catalog_players
         {
             bail!("Katalog und Saisondatei widersprechen sich: {}", entry.id);
         }
@@ -964,5 +1037,29 @@ mod tests {
             photo_url: None,
         };
         assert!(serde_json::to_string(&player).unwrap().contains("999.0"));
+    }
+
+    #[test]
+    fn catalog_appearance_ignores_empty_score_rows() {
+        let mut score = StaticScore {
+            match_id: "match".to_owned(),
+            player_id: "player".to_owned(),
+            team_id: "team".to_owned(),
+            total_points: 0,
+            grade: Some(0),
+            goals: 0,
+            assists: 0,
+            points_clean_sheet: 0,
+            points_grade: 0,
+            points_goals: 0,
+            points_cards: 0,
+            points_assists: 0,
+            points_starter: 0,
+            points_mvp: 0,
+            points_joker: 0,
+        };
+        assert!(!score_counts_as_appearance(&score));
+        score.points_starter = 4;
+        assert!(score_counts_as_appearance(&score));
     }
 }

@@ -7,6 +7,9 @@ Alle wesentlichen Änderungen an Punktespiegel werden in dieser Datei dokumentie
 ### Hinzugefügt
 
 - Datenschutzfreundliche Seitenaufrufmessung mit Plausible Analytics.
+- Saisonübergreifende Mannschafts- und Spielerprofile mit automatischer Auswahl der damaligen Liga.
+- Saisonpunkte, historischer Marktwert und Punkte-pro-Million-Wert im Spielerprofil sowie eine Wert-Spalte im Spielerpool.
+- Lokal ausgelieferte Noto-Sans-Variable-Font für Oberfläche, Überschriften und Zahlen.
 
 ## [1.0.0] – 2026-08-10
 
