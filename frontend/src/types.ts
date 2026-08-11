@@ -47,11 +47,7 @@ export type Player = {
   roundMvpAwards: number;
   jokerAwards: number;
   roundJokerAwards: number;
-  expectedPoints: number | null;
-  p10Points: number | null;
-  p90Points: number | null;
   value: number | null;
-  availability: number | null;
 };
 
 export type TeamPlayerScore = {

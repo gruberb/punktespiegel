@@ -26,7 +26,7 @@ type NavView = Exclude<View, "player" | "team">;
 type Filters = { league: string; season: string; round: string };
 type ViewLocation = { view: View; filters: Filters; playerId: string | null; teamId: string | null; scrollY: number };
 type TeamMetric = "overall" | "goalkeeper" | "defence" | "midfield" | "forward";
-type PlayerSort = "name" | "position" | "price" | "round" | "points" | "grade" | "goals" | "assists" | "forecast" | "value";
+type PlayerSort = "name" | "position" | "price" | "round" | "points" | "grade" | "goals" | "assists" | "value";
 
 const positionName: Record<Position, string> = {
   GK: "Torwart",
@@ -160,7 +160,6 @@ export default function App() {
   const selectedSeason = view === "overview" ? latestPublishedSeason : view === "team" ? selectedTeamSeason : view === "player" ? selectedPlayerSeason : requestedSeason;
   const roundCount = selectedSeason?.roundCount ?? (filters.league === "0003" ? 38 : 34);
   const latestRound = selectedSeason?.latestRound ?? 0;
-  const currentSeason = requestedSeason?.startYear === newestSeason?.startYear;
   const teamSelectionPending = Boolean(selectedTeamSeason)
     && (filters.league !== selectedTeamSeason?.leagueCode || filters.season !== String(selectedTeamSeason?.startYear));
   const playerSelectionPending = Boolean(selectedPlayerSeason)
@@ -430,7 +429,7 @@ export default function App() {
                 : dashboardLoading || !dashboard ? <LoadingState />
                   : <Overview data={dashboard} onView={setView} onPlayer={openPlayer} onTeam={openTeam} />
             )}
-            {view === "players" && <PlayersView filters={filters} currentSeason={currentSeason} onPlayer={openPlayer} />}
+            {view === "players" && <PlayersView filters={filters} onPlayer={openPlayer} />}
             {view === "player" && playerId && (playerSelectionPending ? <LoadingState /> : <PlayerDetailView filters={filters} playerId={playerId} backLabel={backLabel} onBack={() => goBack("players")} onTeam={openTeam} />)}
             {view === "teams" && <TeamsView filters={filters} onTeam={openTeam} />}
             {view === "team" && teamId && (teamSelectionPending ? <LoadingState /> : <TeamDetailView filters={filters} teamId={teamId} backLabel={backLabel} onBack={() => goBack("teams")} onPlayer={openPlayer} onTeam={openTeam} />)}
@@ -670,7 +669,7 @@ function ArchiveBestEleven({ eleven, onPlayer }: { eleven: BestEleven; onPlayer:
   return <article className="archive-card archive-wide archive-eleven"><div className="detail-head"><div><p className="kicker">Nur dieser Spieltag</p><h2>Beste Elf · Spieltag {eleven.matchday}</h2><p>Die elf punktstärksten Spieler in einer zulässigen Formation.</p></div><div className="best-summary"><strong>{eleven.points}</strong><span>Punkte</span><b>{eleven.formation}</b></div></div><div className="best-pitch compact-pitch">{(["FWD", "MID", "DEF", "GK"] as Position[]).map((position) => <div className="best-row" key={position}>{grouped[position].map((player) => <BestPlayerCard key={player.id} player={player} onClick={() => onPlayer(player.id)} />)}</div>)}</div></article>;
 }
 
-function PlayersView({ filters, currentSeason, onPlayer }: { filters: Filters; currentSeason: boolean; onPlayer: (id: string) => void }) {
+function PlayersView({ filters, onPlayer }: { filters: Filters; onPlayer: (id: string) => void }) {
   const [query, setQuery] = useState("");
   const [position, setPosition] = useState("");
   const [sort, setSort] = useState<PlayerSort>("points");
@@ -738,10 +737,7 @@ function PlayersView({ filters, currentSeason, onPlayer }: { filters: Filters; c
               <SortableHead label="Tore" column="goals" active={sort} direction={direction} onSort={sortBy} numeric />
               <SortableHead label="Vorlagen" column="assists" active={sort} direction={direction} onSort={sortBy} numeric />
               <SortableHead label="Ø-Note" column="grade" active={sort} direction={direction} onSort={sortBy} numeric />
-              {currentSeason && <SortableHead label="Prognose" column="forecast" active={sort} direction={direction} onSort={sortBy} numeric />}
-              {currentSeason && <th className="num">Spanne P10–P90</th>}
               <SortableHead label="Wert · Pkt. / Mio. €" column="value" active={sort} direction={direction} onSort={sortBy} numeric />
-              {currentSeason && <th>Verfügbarkeit</th>}
             </tr></thead>
             <tbody>
               {players.map((player, index) => (
@@ -754,10 +750,7 @@ function PlayersView({ filters, currentSeason, onPlayer }: { filters: Filters; c
                   <td className="num">{player.goals}</td>
                   <td className="num">{player.assists}</td>
                   <td className="num">{player.averageGrade?.toFixed(2) ?? "—"}</td>
-                  {currentSeason && <td className="num">{formatNumber(player.expectedPoints)}</td>}
-                  {currentSeason && <td className="num">{player.p10Points == null || player.p90Points == null ? "—" : `${Math.round(player.p10Points)}–${Math.round(player.p90Points)}`}</td>}
                   <td className="num">{formatPlayerValue(player.value)}</td>
-                  {currentSeason && <td><Availability value={player.availability} /></td>}
                 </tr>
               ))}
             </tbody>
@@ -1141,12 +1134,6 @@ function PositionTag({ position }: { position: Position }) {
   return <span className={`position-tag pos-${position.toLowerCase()}`}>{positionName[position]}</span>;
 }
 
-function Availability({ value }: { value: number | null }) {
-  if (value == null) return <>—</>;
-  return <div className="availability"><span>{Math.round(value * 100)}%</span><i><b style={{ width: `${value * 100}%` }} /></i></div>;
-}
-
-function formatNumber(value: number | null) { return value == null ? "—" : Math.round(value); }
 function formatPlayerValue(value: number | null) { return value == null ? "—" : value.toFixed(1); }
 function formatMarketValue(valueInMillions: number) { return valueInMillions >= 999 ? "–" : `€${valueInMillions.toFixed(1)}m`; }
 function formatPenalty(value: number) { return value < 0 ? `−${Math.abs(value)}` : String(value); }

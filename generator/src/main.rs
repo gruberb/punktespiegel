@@ -16,7 +16,7 @@ use tokio::sync::Semaphore;
 use crate::media::{kicker_player_photo_url, kicker_team_logo_url};
 
 const BASE_URL: &str = "https://www.kicker-libero.de";
-const SCHEMA_VERSION: u32 = 1;
+const SCHEMA_VERSION: u32 = 2;
 
 #[derive(Debug, Parser)]
 #[command(about = "Erzeugt die statischen Punktespiegel-Datendateien")]
@@ -198,7 +198,6 @@ struct StaticPlayer {
     price_m: f64,
     active: bool,
     selectable: bool,
-    prior_season_points: i32,
     photo_url: Option<String>,
 }
 
@@ -268,8 +267,6 @@ struct UpstreamPlayer {
     team_id: String,
     position: String,
     market_value: i32,
-    #[serde(default)]
-    rating: i32,
     #[serde(default)]
     active: bool,
 }
@@ -709,7 +706,6 @@ fn build_static_season(
                 price_m: f64::from(player.market_value) / 1_000_000.0,
                 active: player.active || appeared,
                 selectable: appeared || player.active,
-                prior_season_points: player.rating,
             })
         })
         .collect::<Vec<_>>();
@@ -1033,7 +1029,6 @@ mod tests {
             price_m: 999.0,
             active: true,
             selectable: true,
-            prior_season_points: 0,
             photo_url: None,
         };
         assert!(serde_json::to_string(&player).unwrap().contains("999.0"));

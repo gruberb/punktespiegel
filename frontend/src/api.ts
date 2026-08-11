@@ -44,7 +44,6 @@ type StaticPlayer = {
   priceM: number;
   active: boolean;
   selectable: boolean;
-  priorSeasonPoints: number;
   photoUrl: string | null;
 };
 type StaticMatch = {
@@ -140,7 +139,7 @@ function loadSeason(params: URLSearchParams): Promise<SeasonIndex> {
   let pending = seasonCache.get(id);
   if (!pending) {
     pending = loadJson<StaticSeason>(asset(`data/seasons/${id}.json`)).then((season) => {
-      if (season.schemaVersion !== 1) throw new Error("Die Datendatei verwendet einen unbekannten Vertrag.");
+      if (season.schemaVersion !== 2) throw new Error("Die Datendatei verwendet einen unbekannten Vertrag.");
       return {
         season,
         teams: new Map(season.teams.map((team) => [team.id, team])),
@@ -237,13 +236,9 @@ function summarizePlayers(index: SeasonIndex, round: number): { players: Player[
     metrics.set(score.playerId, value);
   }
 
-  const current = index.season.startYear === currentSeasonStartYear();
   const players = index.season.players.filter((player) => player.selectable).map((player): Player => {
     const value = metrics.get(player.id) ?? emptyAccumulator();
     const team = index.teams.get(player.teamId);
-    const forecastable = current && player.active && player.priceM > 0 && player.priceM <= 100;
-    const expected = forecastable ? player.priorSeasonPoints * 0.82 + 34 : null;
-    const availability = forecastable ? Math.min(0.94, Math.max(0.55, 0.54 + player.priorSeasonPoints / 650)) : null;
     return {
       id: player.id,
       name: player.name,
@@ -276,11 +271,7 @@ function summarizePlayers(index: SeasonIndex, round: number): { players: Player[
       roundMvpAwards: value.roundMvpAwards,
       jokerAwards: value.jokerAwards,
       roundJokerAwards: value.roundJokerAwards,
-      expectedPoints: expected,
-      p10Points: expected == null ? null : expected * 0.7,
-      p90Points: expected == null ? null : expected * 1.24,
       value: player.priceM > 0 && player.priceM < 999 ? value.points / player.priceM : null,
-      availability,
     };
   });
   return { players, appearances: new Map([...metrics].map(([id, value]) => [id, value.appearances])) };
@@ -448,7 +439,6 @@ function sortPlayers(players: Player[], sort: string, direction: "asc" | "desc")
       if (sort === "grade") return player.averageGrade;
       if (sort === "goals") return player.goals;
       if (sort === "assists") return player.assists;
-      if (sort === "forecast") return player.expectedPoints;
       if (sort === "value") return player.value;
       return player.observedPoints;
     };

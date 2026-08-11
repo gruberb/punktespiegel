@@ -4,6 +4,10 @@ Alle wesentlichen Änderungen an Punktespiegel werden in dieser Datei dokumentie
 
 ## [Unreleased]
 
+### Entfernt
+
+- Unbelegte Prognose-, P10–P90- und Verfügbarkeitswerte aus Spielerpool und Datenvertrag.
+
 ### Hinzugefügt
 
 - Datenschutzfreundliche Seitenaufrufmessung mit Plausible Analytics.

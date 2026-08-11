@@ -183,11 +183,6 @@ tbody tr:hover { background: #fbfcf9; }
 .pos-def { background: var(--blue); color: #496a70; }
 .pos-mid { background: var(--sage); color: #496b53; }
 .pos-fwd { background: var(--peach); color: #835f4b; }
-.availability { display: flex; align-items: center; gap: 8px; }
-.availability span { width: 31px; }
-.availability i { width: 48px; height: 5px; overflow: hidden; border-radius: 5px; background: #e8ebe5; }
-.availability b { display: block; height: 100%; border-radius: inherit; background: var(--green); }
-
 .history-rank { color: #a8afa8; font: 500 12px "Noto Sans", ui-sans-serif, sans-serif; font-variant-numeric: tabular-nums; }
 .history-view { display: grid; gap: 18px; }
 .history-toolbar { position: sticky; top: 88px; z-index: 25; justify-self: end; display: flex; align-items: stretch; margin-top: -190px; margin-bottom: 190px; overflow: hidden; border: 1px solid #cfd8cf; border-radius: 14px; background: rgba(255, 254, 250, .96); box-shadow: 0 14px 34px rgba(47, 67, 53, .12); backdrop-filter: blur(16px); }
