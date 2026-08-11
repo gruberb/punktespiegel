@@ -22,9 +22,11 @@ import type {
   TeamMatchContributor,
   TeamPlayerScore,
   TeamScore,
+  TopPlayerAnalysis,
+  TopPlayers,
 } from "./types";
 
-type View = "overview" | "players" | "player" | "teams" | "team" | "history" | "best" | "manager";
+type View = "overview" | "players" | "player" | "teams" | "team" | "history" | "top" | "manager";
 type NavView = Exclude<View, "player" | "team">;
 type Filters = { league: string; season: string; round: string };
 type ViewLocation = { view: View; filters: Filters; playerId: string | null; teamId: string | null; scrollY: number };
@@ -42,7 +44,7 @@ const nav: { id: NavView; label: string }[] = [
   { id: "players", label: "Spieler" },
   { id: "teams", label: "Mannschaften" },
   { id: "history", label: "Historie" },
-  { id: "best", label: "Beste Elf" },
+  { id: "top", label: "Top Players" },
   { id: "manager", label: "Fantasy Team" },
 ];
 const teamMetrics: { key: TeamMetric; label: string; short: string; leaders: keyof TeamLeaders }[] = [
@@ -72,7 +74,7 @@ function initialView(): View {
   const value = params.get("view");
   if (value === "player" && !params.get("player")) return "players";
   if (value === "team" && !params.get("team")) return "teams";
-  return (["overview", "players", "player", "teams", "team", "history", "best", "manager"] as View[]).includes(value as View)
+  return (["overview", "players", "player", "teams", "team", "history", "top", "manager"] as View[]).includes(value as View)
     ? (value as View)
     : "overview";
 }
@@ -130,7 +132,7 @@ function viewBackLabel(view: View) {
     teams: "zu den Mannschaften",
     team: "zur Mannschaft",
     history: "zur Historie",
-    best: "zur besten Elf",
+    top: "zu den Top Players",
     manager: "zum Fantasy Team",
   } satisfies Record<View, string>)[view];
 }
@@ -406,8 +408,8 @@ export default function App() {
         ? "Die besten Saisons vergleichen und jeden Spieltag im Archiv nachvollziehen."
         : view === "manager"
           ? "Eine datenbasierte Mannschaft mit Prognose und den tatsächlich erzielten Saisonpunkten."
-        : view === "best"
-          ? "Die punktstärkste Elf einer ganzen Saison oder eines einzelnen Spieltags."
+        : view === "top"
+          ? "Die stärksten Spieler nach Position — mit Schnitt, Erfahrung und beobachtbarem Saisontrend."
           : "Spieltagswert und Saisonstand direkt nebeneinander.";
   const navActive: NavView = view === "player" ? "players" : view === "team" ? "teams" : view;
   const previousView = backStack.at(-1)?.view;
@@ -436,7 +438,7 @@ export default function App() {
             <h1>{title}</h1>
             <p>{description}</p>
           </div>
-          {view !== "history" && <div className="selectors">
+          {view !== "history" && view !== "top" && <div className="selectors">
             {view !== "team" && view !== "player" && <label><span>Liga</span><select value={filters.league} onChange={(event) => updateFilter("league", event.target.value)}>{catalog?.leagues.map((league) => <option value={league.code} key={league.code}>{league.name}</option>)}</select></label>}
             {view === "team"
               ? <label><span>Saison</span><select value={selectedTeamSeason?.startYear ?? filters.season} onChange={(event) => updateTeamSeason(event.target.value)}>{teamSeasons.map((season) => <option value={season.startYear} key={season.id}>{season.displayName}</option>)}</select></label>
@@ -467,7 +469,7 @@ export default function App() {
             {view === "teams" && <TeamsView filters={filters} onTeam={openTeam} />}
             {view === "team" && teamId && (teamSelectionPending ? <LoadingState /> : <TeamDetailView filters={filters} teamId={teamId} backLabel={backLabel} onBack={() => goBack("teams")} onPlayer={openPlayer} onTeam={openTeam} />)}
             {view === "history" && <HistoryView filters={filters} leagues={catalog.leagues} seasons={seasons} onFilter={updateFilter} onPlayer={openPlayerAt} onTeam={openTeamAt} />}
-            {view === "best" && <BestElevenView filters={filters} roundCount={roundCount} latestRound={Math.max(1, latestRound)} onPlayer={openPlayer} />}
+            {view === "top" && <TopPlayersView filters={filters} leagues={catalog.leagues} seasons={seasons} onFilter={updateFilter} onPlayer={openPlayer} />}
             {view === "manager" && <ManagerPicksView filters={filters} onPlayer={openPlayer} />}
             <footer className="data-footnote"><span>Datenbasis</span>Auf Basis öffentlicher kicker-Daten und der Wertungen der kicker Manager-Liga. Stand: importierter Datenbestand.</footer>
           </>
@@ -1238,46 +1240,80 @@ function FloatingScorePopover({ anchorRef, open, id, className, preferredWidth, 
   );
 }
 
-function BestElevenView({ filters, roundCount, latestRound, onPlayer }: { filters: Filters; roundCount: number; latestRound: number; onPlayer: (id: string) => void }) {
-  const [scope, setScope] = useState<"season" | "matchday">("season");
-  const [round, setRound] = useState(latestRound);
-  const [eleven, setEleven] = useState<BestEleven | null>(null);
+function TopPlayersView({ filters, leagues, seasons, onFilter, onPlayer }: { filters: Filters; leagues: Catalog["leagues"]; seasons: Catalog["seasons"]; onFilter: (key: keyof Filters, value: string) => void; onPlayer: (id: string) => void }) {
+  const [data, setData] = useState<TopPlayers | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  useEffect(() => {
-    setRound(latestRound);
-  }, [filters.league, filters.season, latestRound]);
+
   useEffect(() => {
     const controller = new AbortController();
-    const params = scopeQuery({ ...filters, round: String(round) });
-    params.set("scope", scope);
     setLoading(true);
     setError(null);
-    api.bestEleven(params, controller.signal)
-      .then(setEleven)
-      .catch((reason: Error) => { if (!isAbort(reason)) { setEleven(null); setError(reason.message); } })
+    api.topPlayers(scopeQuery(filters, false), controller.signal)
+      .then(setData)
+      .catch((reason: Error) => { if (!isAbort(reason)) { setData(null); setError(reason.message); } })
       .finally(() => setLoading(false));
     return () => controller.abort();
-  }, [filters.league, filters.season, round, scope]);
-  const scopeControls = <div className="best-scope-controls"><div className="scope-switch" role="group" aria-label="Zeitraum für die beste Elf"><button className={scope === "season" ? "active" : ""} onClick={() => setScope("season")}>Gesamte Saison</button><button className={scope === "matchday" ? "active" : ""} onClick={() => setScope("matchday")}>Spieltag</button></div>{scope === "matchday" && <label><span>Spieltag</span><select value={round} onChange={(event) => setRound(Number(event.target.value))}>{Array.from({ length: Math.min(roundCount, Math.max(latestRound, 1)) }, (_, index) => index + 1).map((matchday) => <option value={matchday} key={matchday}>{matchday}</option>)}</select></label>}</div>;
-  if (loading) return <section className="best-view"><div className="best-control-bar">{scopeControls}</div><LoadingState /></section>;
-  if (error || !eleven) return <section className="best-view"><div className="best-control-bar">{scopeControls}</div><section className="detail-section"><Empty message={scope === "matchday" ? `Für Spieltag ${round} lässt sich noch keine vollständige beste Elf berechnen.` : "Für diese Saison lässt sich noch keine vollständige beste Elf berechnen."} /></section></section>;
-  const grouped = groupBestEleven(eleven.players);
-  const isSeason = eleven.scope === "season";
-  return (
-    <div className="best-view">
-      <div className="best-control-bar">{scopeControls}</div>
-      <section className="detail-section best-eleven-section">
-        <div className="detail-head"><div><p className="kicker">{isSeason ? "Gesamte Saison" : "Nur dieser Spieltag"}</p><h2>{isSeason ? "Beste Elf · Gesamte Saison" : `Beste Elf · Spieltag ${eleven.matchday}`}</h2><p>{isSeason ? "Die punktstärkste Elf über alle importierten Spieltage." : "Die punktstärkste Elf aus den Wertungen dieses Spieltags."}</p></div><div className="best-summary"><strong>{eleven.points}</strong><span>Punkte</span><b>{eleven.formation}</b></div></div>
-        <div className="best-pitch">
-          {(["FWD", "MID", "DEF", "GK"] as Position[]).map((position) => (
-            <div className="best-row" key={position}>
-              {grouped[position].map((player) => <BestPlayerCard key={player.id} player={player} onClick={() => onPlayer(player.id)} />)}
-            </div>
-          ))}
-        </div>
-      </section>
+  }, [filters.league, filters.season]);
+
+  const controls = (
+    <div className="selectors top-player-selectors">
+      <label><span>Liga</span><select value={filters.league} onChange={(event) => onFilter("league", event.target.value)}>{leagues.map((league) => <option value={league.code} key={league.code}>{league.name}</option>)}</select></label>
+      <label><span>Saison</span><select value={filters.season} onChange={(event) => onFilter("season", event.target.value)}>{seasons.map((season) => <option value={season.startYear} key={season.id}>{season.displayName}</option>)}</select></label>
     </div>
+  );
+
+  return (
+    <div className="top-players-view">
+      <section className="detail-section top-players-intro">
+        <div>
+          <p className="kicker">Saisonvergleich</p>
+          <h2>Leistung mit Kontext</h2>
+          <p>Die Rangfolge folgt den gesammelten Punkten der Auswahl. Schnitt und Trend verwenden nur abgeschlossene Saisons; laufende Zwischenstände werden nicht hochgerechnet.</p>
+        </div>
+        {controls}
+        {data && <div className="top-players-context"><strong>{data.context.season}</strong><span>{data.context.latestRound > 0 ? data.context.dataState === "complete" ? "vollständige Saison" : `bis Spieltag ${data.context.latestRound}` : "noch ohne Spieltagsdaten"}</span></div>}
+      </section>
+      {error ? <ErrorState message={error} /> : loading || !data ? <LoadingState /> : (
+        <div className="top-player-pairs">
+          <TopPlayerGroup title="Best Players · Defensive" positions={["GK", "DEF"]} players={data.positions} onPlayer={onPlayer} />
+          <TopPlayerGroup title="Best Players · Offensive" positions={["MID", "FWD"]} players={data.positions} onPlayer={onPlayer} />
+        </div>
+      )}
+      <p className="top-players-note">Die Signale beruhen ausschließlich auf importierten kicker-Wertungen aus Bundesliga, 2. Bundesliga und 3. Liga. Für Wechsel aus anderen Ligen wird keine erfundene Potenzialprognose angezeigt.</p>
+    </div>
+  );
+}
+
+function TopPlayerGroup({ title, positions, players, onPlayer }: { title: string; positions: Position[]; players: TopPlayers["positions"]; onPlayer: (id: string) => void }) {
+  return (
+    <section className="detail-section top-player-group">
+      <div className="top-player-group-head"><div><p className="kicker">Top 15 je Position</p><h2>{title}</h2></div><span>Punkte · Erfahrung · Trend</span></div>
+      <div className="top-player-columns">
+        {positions.map((position) => (
+          <section key={position}>
+            <h3>{positionName[position]}</h3>
+            {players[position].length ? <ol>{players[position].map((player, index) => <li key={player.id}><TopPlayerRow player={player} rank={index + 1} onClick={() => onPlayer(player.id)} /></li>)}</ol> : <Empty message="Für diese Position liegen noch keine Punkte vor." />}
+          </section>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function TopPlayerRow({ player, rank, onClick }: { player: TopPlayerAnalysis; rank: number; onClick: () => void }) {
+  const historyLabel = player.history.map((season) => `${season.season} · ${season.league}: ${season.points} Punkte`).join("\n");
+  const maxPoints = Math.max(1, ...player.history.map((season) => Math.max(0, season.points)));
+  return (
+    <button onClick={onClick} title={historyLabel}>
+      <span className="rank">{rank}</span>
+      <PlayerPortrait name={player.name} url={player.photoUrl} teamCode={player.teamCode} teamLogoUrl={player.logoUrl} />
+      <span className="top-player-copy"><strong>{player.name}</strong><small>{player.team}</small><em>{player.signal}</em></span>
+      <span className="top-player-history" aria-label={historyLabel || "Keine Vergleichssaison"}>
+        {player.history.map((season) => <i key={`${season.season}-${season.league}`} style={{ height: `${Math.max(12, Math.round((Math.max(0, season.points) / maxPoints) * 100))}%` }} />)}
+      </span>
+      <span className={`top-player-points ${player.trend}`}><strong>{player.points}</strong><small>Pkt.</small></span>
+    </button>
   );
 }
 

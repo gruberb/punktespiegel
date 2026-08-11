@@ -1,6 +1,6 @@
 # Punktespiegel
 
-Punktespiegel ist ein statisches React-Dashboard für öffentliche Fußball- und Fantasy-Wertungen. Die Auswertungen basieren auf kicker-Daten und den Regeln der kicker Manager-Liga. Spieler, Mannschaften, historische Ranglisten, Spieltagsdetails und die beste Elf werden vollständig im Browser berechnet.
+Punktespiegel ist ein statisches React-Dashboard für öffentliche Fußball- und Fantasy-Wertungen. Die Auswertungen basieren auf kicker-Daten und den Regeln der kicker Manager-Liga. Spieler, Mannschaften, historische Ranglisten, saisonübergreifende Top-Player-Signale, Spieltagsdetails und die beste Elf werden vollständig im Browser berechnet.
 
 Es gibt keinen Laufzeitserver, keine Datenbank und keine Anmeldung. Rust wird ausschließlich als Build-Werkzeug eingesetzt: Der Generator prüft die öffentlichen Quelldaten und schreibt eine kompakte JSON-Datei je Liga und Saison. Dadurch kann die fertige Website direkt auf GitHub Pages laufen.
 

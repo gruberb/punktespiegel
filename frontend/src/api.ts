@@ -18,6 +18,8 @@ import type {
   TeamMatchContributor,
   TeamPlayerScore,
   TeamScore,
+  TopPlayerAnalysis,
+  TopPlayers,
 } from "./types";
 import { recommendManagerSquad } from "./manager-model";
 
@@ -696,6 +698,100 @@ function bestEleven(index: SeasonIndex, scope: "matchday" | "season", round: num
   return { scope, matchday: scope === "matchday" ? round : null, ...best };
 }
 
+function topPlayers(index: SeasonIndex, catalog: StaticCatalog): TopPlayers {
+  const selectedCatalogSeason = catalog.seasons.find((season) => season.id === index.season.id);
+  const leagueName = catalog.leagues.find((league) => league.code === index.season.leagueCode)?.name ?? index.season.leagueName;
+  const latestRound = Math.max(1, index.season.latestRound);
+  const { players } = summarizePlayers(index, latestRound);
+
+  function historyFor(playerId: string) {
+    const candidates = catalog.seasons.flatMap((season) => {
+      if (season.startYear > index.season.startYear) return [];
+      const membership = season.players.find((player) => player.id === playerId);
+      if (!membership || membership.appearances < 1) return [];
+      return [{
+        startYear: season.startYear,
+        season: season.displayName,
+        leagueCode: season.leagueCode,
+        league: catalog.leagues.find((league) => league.code === season.leagueCode)?.name ?? season.leagueCode,
+        points: membership.points,
+        appearances: membership.appearances,
+        active: membership.active,
+        dataState: season.dataState,
+      }];
+    }).sort((left, right) => left.startYear - right.startYear
+      || Number(right.active) - Number(left.active)
+      || right.appearances - left.appearances
+      || right.points - left.points);
+    const byYear = new Map<number, (typeof candidates)[number]>();
+    for (const candidate of candidates) if (!byYear.has(candidate.startYear)) byYear.set(candidate.startYear, candidate);
+    return [...byYear.values()];
+  }
+
+  function analyze(player: Player): TopPlayerAnalysis {
+    const history = historyFor(player.id);
+    const leagueHistory = history.filter((season) => season.leagueCode === index.season.leagueCode);
+    const completedLeagueHistory = leagueHistory.filter((season) => season.dataState === "complete");
+    const completedHistory = history.filter((season) => season.dataState === "complete");
+    const comparison = completedLeagueHistory.length >= 2 ? completedLeagueHistory : completedHistory;
+    const recent = comparison.slice(-2);
+    const trendDelta = recent.length === 2 ? recent[1].points - recent[0].points : null;
+    const trend = trendDelta == null ? "new" : trendDelta >= 15 ? "up" : trendDelta <= -15 ? "down" : "steady";
+    const averagePoints = completedLeagueHistory.length
+      ? Math.round(completedLeagueHistory.reduce((sum, season) => sum + season.points, 0) / completedLeagueHistory.length)
+      : null;
+    const priorHistory = history.filter((season) => season.startYear < index.season.startYear);
+    const priorSeason = priorHistory.at(-1);
+    let growthStreak = 1;
+    for (let cursor = comparison.length - 1; cursor > 0 && comparison[cursor].points > comparison[cursor - 1].points; cursor -= 1) growthStreak += 1;
+
+    let signal: string;
+    if (!priorSeason) {
+      signal = "Neu im Datensatz · noch keine Vergleichssaison";
+    } else if (priorSeason.leagueCode !== index.season.leagueCode) {
+      signal = `Neu aus ${priorSeason.league} · dort zuletzt ${priorSeason.points} Pkt.`;
+    } else if (growthStreak >= 3) {
+      signal = `${growthStreak} Saisons in Folge verbessert · zuletzt ${trendDelta != null && trendDelta >= 0 ? "+" : ""}${trendDelta ?? 0} Pkt.`;
+    } else if (averagePoints != null) {
+      const trendLabel = trendDelta == null ? "noch ohne Trend" : trend === "up" ? `zuletzt +${trendDelta}` : trend === "down" ? `zuletzt ${trendDelta}` : `zuletzt ${trendDelta >= 0 ? "+" : ""}${trendDelta}`;
+      signal = `${leagueHistory.length} Saison${leagueHistory.length === 1 ? "" : "s"} in ${leagueName} · Ø ${averagePoints} · ${trendLabel}`;
+    } else {
+      signal = `${leagueHistory.length} Saison${leagueHistory.length === 1 ? "" : "s"} in ${leagueName} · noch kein vollständiger Schnitt`;
+    }
+
+    return {
+      id: player.id,
+      name: player.name,
+      team: player.team,
+      teamCode: player.teamCode,
+      logoUrl: player.logoUrl,
+      photoUrl: player.photoUrl,
+      position: player.position,
+      points: player.observedPoints,
+      averagePoints,
+      trend,
+      signal,
+      history: history.slice(-5).map((season) => ({ season: season.season, league: season.league, points: season.points })),
+    };
+  }
+
+  const analyzed = players.filter((player) => player.observedPoints !== 0).map(analyze);
+  const positions = (Object.fromEntries((['GK', 'DEF', 'MID', 'FWD'] as Position[]).map((position) => [
+    position,
+    analyzed.filter((player) => player.position === position)
+      .sort((left, right) => right.points - left.points || (right.averagePoints ?? -Infinity) - (left.averagePoints ?? -Infinity) || left.name.localeCompare(right.name, "de"))
+      .slice(0, 15),
+  ])) as Record<Position, TopPlayerAnalysis[]>);
+  return {
+    context: {
+      season: index.season.displayName,
+      latestRound: index.season.latestRound,
+      dataState: selectedCatalogSeason?.dataState ?? "current",
+    },
+    positions,
+  };
+}
+
 export const api = {
   catalog: (signal?: AbortSignal) => abortable(catalogCache.then(({ leagues, seasons }) => ({ leagues, seasons })), signal),
   dashboard: (params: URLSearchParams, signal?: AbortSignal) => abortable(loadSeason(params).then((index): Dashboard => {
@@ -727,6 +823,7 @@ export const api = {
   teams: (params: URLSearchParams, signal?: AbortSignal) => abortable(loadSeason(params).then((index) => buildTeamScores(index, { kind: "all" })), signal),
   team: (teamId: string, params: URLSearchParams, signal?: AbortSignal) => abortable(loadSeason(params).then((index) => teamDetail(index, teamId)), signal),
   bestEleven: (params: URLSearchParams, signal?: AbortSignal) => abortable(loadSeason(params).then((index) => bestEleven(index, params.get("scope") === "season" ? "season" : "matchday", selectedRound(params, index.season))), signal),
+  topPlayers: (params: URLSearchParams, signal?: AbortSignal): Promise<TopPlayers> => abortable(Promise.all([loadSeason(params), catalogCache]).then(([index, catalog]) => topPlayers(index, catalog)), signal),
   managerPicks: (params: URLSearchParams, mode: ManagerMode, signal?: AbortSignal): Promise<ManagerRecommendation> => abortable(Promise.all([loadSeason(params), catalogCache])
     .then(([index, catalog]) => recommendManagerSquad(catalog, index.season, mode)), signal),
 };

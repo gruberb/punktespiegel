@@ -331,3 +331,33 @@ export type BestEleven = {
   points: number;
   players: BestElevenPlayer[];
 };
+
+export type TopPlayerSeason = {
+  season: string;
+  league: string;
+  points: number;
+};
+
+export type TopPlayerAnalysis = {
+  id: string;
+  name: string;
+  team: string;
+  teamCode: string;
+  logoUrl: string | null;
+  photoUrl: string | null;
+  position: Position;
+  points: number;
+  averagePoints: number | null;
+  trend: "up" | "steady" | "down" | "new";
+  signal: string;
+  history: TopPlayerSeason[];
+};
+
+export type TopPlayers = {
+  context: {
+    season: string;
+    latestRound: number;
+    dataState: string;
+  };
+  positions: Record<Position, TopPlayerAnalysis[]>;
+};

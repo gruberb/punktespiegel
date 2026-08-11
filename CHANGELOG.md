@@ -4,6 +4,17 @@ Alle wesentlichen Änderungen an Punktespiegel werden in dieser Datei dokumentie
 
 ## [Unreleased]
 
+## [1.2.0] – 2026-08-11
+
+### Hinzugefügt
+
+- Neuer Bereich „Top Players“ mit den 15 punktstärksten Spielern je Position, Saisonschnitt, Erfahrung, jüngstem Trend und transparenten Hinweisen für Ligawechsler oder fehlende Historie.
+
+### Geändert
+
+- Die eigenständige „Beste Elf“ wurde mit dem bestehenden Spieltagsarchiv in der Historie zusammengeführt.
+- Das Fantasy Team verwendet ein deutlich kompakteres Positionsraster und dichtere Spielerkarten.
+
 ## [1.1.0] – 2026-08-11
 
 ### Hinzugefügt
@@ -46,3 +57,4 @@ Alle wesentlichen Änderungen an Punktespiegel werden in dieser Datei dokumentie
 
 [1.0.0]: https://github.com/gruberb/punktespiegel/releases/tag/v1.0.0
 [1.1.0]: https://github.com/gruberb/punktespiegel/releases/tag/v1.1.0
+[1.2.0]: https://github.com/gruberb/punktespiegel/releases/tag/v1.2.0
