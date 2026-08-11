@@ -4,6 +4,12 @@ Alle wesentlichen Änderungen an Punktespiegel werden in dieser Datei dokumentie
 
 ## [Unreleased]
 
+## [1.2.2] – 2026-08-11
+
+### Geändert
+
+- Die Fantasy-Team-Startelf wird positionsweise in vier vollbreiten Zeilen statt in einem unausgewogenen 2×2-Raster dargestellt.
+
 ## [1.2.1] – 2026-08-11
 
 ### Geändert
@@ -66,3 +72,4 @@ Alle wesentlichen Änderungen an Punktespiegel werden in dieser Datei dokumentie
 [1.1.0]: https://github.com/gruberb/punktespiegel/releases/tag/v1.1.0
 [1.2.0]: https://github.com/gruberb/punktespiegel/releases/tag/v1.2.0
 [1.2.1]: https://github.com/gruberb/punktespiegel/releases/tag/v1.2.1
+[1.2.2]: https://github.com/gruberb/punktespiegel/releases/tag/v1.2.2
