@@ -2,6 +2,12 @@
 
 Alle wesentlichen Änderungen an Punktespiegel werden in dieser Datei dokumentiert.
 
+## [Unreleased]
+
+### Hinzugefügt
+
+- Datenschutzfreundliche Seitenaufrufmessung mit Plausible Analytics.
+
 ## [1.0.0] – 2026-08-10
 
 ### Hinzugefügt
