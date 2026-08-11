@@ -1,0 +1,8 @@
+[workspace]
+members = ["generator"]
+resolver = "2"
+
+[workspace.package]
+edition = "2024"
+license = "MIT"
+version = "1.0.0"

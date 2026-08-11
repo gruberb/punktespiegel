@@ -1,0 +1,11 @@
+name: punktespiegel
+
+services:
+  web:
+    pull_policy: build
+    build:
+      context: .
+      dockerfile: Dockerfile.web
+    ports:
+      - "${WEB_PORT:-3000}:80"
+    restart: unless-stopped

@@ -1,0 +1,244 @@
+export type Position = "GK" | "DEF" | "MID" | "FWD";
+
+export type Catalog = {
+  leagues: { code: string; name: string }[];
+  seasons: {
+    id: string;
+    leagueCode: string;
+    startYear: number;
+    displayName: string;
+    roundCount: number;
+    latestRound: number;
+    dataState: string;
+  }[];
+};
+
+export type Player = {
+  id: string;
+  name: string;
+  team: string;
+  teamCode: string;
+  logoUrl: string | null;
+  photoUrl: string | null;
+  position: Position;
+  priceM: number;
+  roundPoints: number;
+  observedPoints: number;
+  averageGrade: number | null;
+  roundGrade: number | null;
+  gradedMatches: number;
+  goals: number;
+  roundGoals: number;
+  assists: number;
+  roundAssists: number;
+  cleanSheets: number;
+  roundCleanSheets: number;
+  starterPoints: number;
+  roundStarterPoints: number;
+  cardPoints: number;
+  roundCardPoints: number;
+  yellowRedCards: number;
+  roundYellowRedCards: number;
+  redCards: number;
+  roundRedCards: number;
+  mvpAwards: number;
+  roundMvpAwards: number;
+  jokerAwards: number;
+  roundJokerAwards: number;
+  expectedPoints: number | null;
+  p10Points: number | null;
+  p90Points: number | null;
+  value: number | null;
+  availability: number | null;
+};
+
+export type TeamPlayerScore = {
+  id: string;
+  name: string;
+  position: Position;
+  points: number;
+};
+
+export type TeamLeaders = {
+  overall: TeamPlayerScore[];
+  goalkeeper: TeamPlayerScore[];
+  defence: TeamPlayerScore[];
+  midfield: TeamPlayerScore[];
+  forward: TeamPlayerScore[];
+};
+
+export type TeamScore = {
+  id: string;
+  name: string;
+  code: string;
+  logoUrl: string | null;
+  overall: number;
+  goalkeeper: number;
+  defence: number;
+  midfield: number;
+  forward: number;
+  sampleSize: number;
+  topPlayers: TeamLeaders;
+};
+
+export type Dashboard = {
+  context: {
+    league: string;
+    season: string;
+    round: number;
+    lastSyncedAt: string | null;
+    playerCount: number;
+  };
+  leaderboards: {
+    overall: Player[];
+    positions: Record<Position, Player[]>;
+    grades: Player[];
+    goals: Player[];
+    assists: Player[];
+    cleanSheets: Player[];
+    starterPoints: Player[];
+    cardDeductions: Player[];
+    mvpAwards: Player[];
+    jokerAwards: Player[];
+  };
+  matchdayLeaderboards: Dashboard["leaderboards"];
+  seasonTeams: TeamScore[];
+  matchdayTeams: TeamScore[];
+};
+
+export type HistoricalPlayer = {
+  id: string;
+  name: string;
+  team: string;
+  teamCode: string;
+  logoUrl: string | null;
+  photoUrl: string | null;
+  position: Position;
+  points: number;
+  averageGrade: number | null;
+  gradedMatches: number;
+  goals: number;
+  assists: number;
+};
+
+export type History = {
+  leaderboards: {
+    overall: HistoricalPlayer[];
+    positions: Record<Position, HistoricalPlayer[]>;
+    grades: HistoricalPlayer[];
+    goals: HistoricalPlayer[];
+    assists: HistoricalPlayer[];
+  };
+};
+
+export type PlayerGame = {
+  matchday: number;
+  scheduledAt: string | null;
+  opponentId: string;
+  opponent: string;
+  opponentCode: string;
+  opponentLogoUrl: string | null;
+  venue: "Home" | "Away";
+  homeScore: number | null;
+  awayScore: number | null;
+  points: number;
+  grade: number | null;
+  goals: number;
+  assists: number;
+  pointsCleanSheet: number;
+  pointsGrade: number;
+  pointsGoals: number;
+  pointsCards: number;
+  pointsAssists: number;
+  pointsStarter: number;
+  pointsMvp: number;
+  pointsJoker: number;
+};
+
+export type PlayerDetail = {
+  id: string;
+  name: string;
+  teamId: string;
+  team: string;
+  teamCode: string;
+  logoUrl: string | null;
+  photoUrl: string | null;
+  kickerUrl: string;
+  transfermarktUrl: string;
+  position: Position;
+  priceM: number;
+  matchdayPoints: number;
+  pointsThroughMatchday: number;
+  games: PlayerGame[];
+};
+
+export type TeamDetailPlayer = {
+  id: string;
+  name: string;
+  position: Position;
+  points: number;
+  photoUrl: string | null;
+};
+
+export type TeamMatchContributor = {
+  id: string;
+  name: string;
+  position: Position;
+  points: number;
+  photoUrl: string | null;
+};
+
+export type TeamDetailMatch = {
+  matchday: number;
+  scheduledAt: string | null;
+  opponentId: string;
+  opponent: string;
+  opponentCode: string;
+  opponentLogoUrl: string | null;
+  venue: "Home" | "Away";
+  homeScore: number | null;
+  awayScore: number | null;
+  totalPoints: number;
+  goalkeeperPoints: number;
+  defencePoints: number;
+  midfieldPoints: number;
+  forwardPoints: number;
+  gradePoints: number;
+  goalPoints: number;
+  assistPoints: number;
+  cleanSheetPoints: number;
+  starterPoints: number;
+  cardPoints: number;
+  yellowRedCards: number;
+  redCards: number;
+  mvpPoints: number;
+  jokerPoints: number;
+  players: TeamMatchContributor[];
+};
+
+export type TeamDetail = {
+  id: string;
+  name: string;
+  code: string;
+  logoUrl: string | null;
+  players: TeamDetailPlayer[];
+  matches: TeamDetailMatch[];
+};
+
+export type BestElevenPlayer = {
+  id: string;
+  name: string;
+  team: string;
+  teamCode: string;
+  logoUrl: string | null;
+  position: Position;
+  points: number;
+};
+
+export type BestEleven = {
+  scope: "matchday" | "season";
+  matchday: number | null;
+  formation: string;
+  points: number;
+  players: BestElevenPlayer[];
+};

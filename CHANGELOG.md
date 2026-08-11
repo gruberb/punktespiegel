@@ -1,0 +1,22 @@
+# Changelog
+
+Alle wesentlichen Änderungen an Punktespiegel werden in dieser Datei dokumentiert.
+
+## [1.0.0] – 2026-08-10
+
+### Hinzugefügt
+
+- Statisches React-Dashboard für Bundesliga, 2. Bundesliga und 3. Liga.
+- Saison-, Spieltags-, Spieler-, Mannschafts- und Best-Elf-Auswertungen.
+- Verlinkte Spieler- und Mannschaftsprofile mit detaillierter Punkteaufschlüsselung.
+- Rust-Datencompiler für öffentliche kicker-Daten und Wertungen der kicker Manager-Liga.
+- Statische, nach Liga und Saison getrennte JSON-Snapshots ohne Laufzeitdatenbank.
+- Automatische GitHub-Pages-Bereitstellung und tägliche Datenaktualisierung um 12:15 Uhr deutscher Zeit.
+- Responsive Gestaltung, Web-App-Manifest sowie App- und Website-Icons.
+
+### Geändert
+
+- Der Überblick verwendet automatisch die neueste Saison mit veröffentlichten Spieltagsdaten.
+- Alle öffentlichen Assets verwenden GitHub-Pages-kompatible relative Pfade.
+
+[1.0.0]: https://github.com/gruberb/punktespiegel/releases/tag/v1.0.0

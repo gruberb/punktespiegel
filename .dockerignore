@@ -1,0 +1,13 @@
+.git
+.github
+target
+node_modules
+frontend/dist
+generator
+docs
+README.md
+Cargo.toml
+Cargo.lock
+compose.yaml
+.env
+.DS_Store
