@@ -60,10 +60,10 @@ jobs:
           npm run build
 
       - name: Pages konfigurieren
-        uses: actions/configure-pages@v5
+        uses: actions/configure-pages@v6
 
       - name: Pages-Artefakt hochladen
-        uses: actions/upload-pages-artifact@v4
+        uses: actions/upload-pages-artifact@v5
         with:
           path: frontend/dist
 
@@ -77,4 +77,4 @@ jobs:
     steps:
       - name: GitHub Pages aktualisieren
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
