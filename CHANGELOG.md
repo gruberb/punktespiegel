@@ -4,6 +4,13 @@ Alle wesentlichen Änderungen an Punktespiegel werden in dieser Datei dokumentie
 
 ## [Unreleased]
 
+## [1.2.1] – 2026-08-11
+
+### Geändert
+
+- „Top Players“ verwendet nun ausschließlich den kaufbaren Spielerpool der neuesten Saison und ordnet ihn mit abgeschlossenen Leistungen vor dem Saisonstart ein.
+- Der Spielerpool lässt sich nach Vorsaison, Saisonschnitt, Preis-Leistung, Trend und Marktwert sortieren; Spieler ohne importierte Historie bleiben sichtbar.
+
 ## [1.2.0] – 2026-08-11
 
 ### Hinzugefügt
@@ -58,3 +65,4 @@ Alle wesentlichen Änderungen an Punktespiegel werden in dieser Datei dokumentie
 [1.0.0]: https://github.com/gruberb/punktespiegel/releases/tag/v1.0.0
 [1.1.0]: https://github.com/gruberb/punktespiegel/releases/tag/v1.1.0
 [1.2.0]: https://github.com/gruberb/punktespiegel/releases/tag/v1.2.0
+[1.2.1]: https://github.com/gruberb/punktespiegel/releases/tag/v1.2.1

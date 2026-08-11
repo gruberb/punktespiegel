@@ -346,9 +346,15 @@ export type TopPlayerAnalysis = {
   logoUrl: string | null;
   photoUrl: string | null;
   position: Position;
-  points: number;
+  priceM: number;
+  previousSeason: string | null;
+  previousLeague: string | null;
+  previousPoints: number | null;
   averagePoints: number | null;
+  value: number | null;
+  seasons: number;
   trend: "up" | "steady" | "down" | "new";
+  trendDelta: number | null;
   signal: string;
   history: TopPlayerSeason[];
 };
@@ -356,8 +362,8 @@ export type TopPlayerAnalysis = {
 export type TopPlayers = {
   context: {
     season: string;
-    latestRound: number;
-    dataState: string;
+    cutoffSeason: string | null;
+    playerCount: number;
   };
   positions: Record<Position, TopPlayerAnalysis[]>;
 };

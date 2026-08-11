@@ -486,10 +486,11 @@ tbody tr:hover { background: #fbfcf9; }
 .top-player-columns { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
 .top-player-columns > section { min-width: 0; }
 .top-player-columns > section + section { padding-left: 18px; border-left: 1px solid var(--line-soft); }
-.top-player-columns h3 { margin: 0 0 8px; color: var(--soft-ink); font-size: 11px; font-weight: 680; }
+.top-player-columns h3 { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin: 0 0 8px; color: var(--soft-ink); font-size: 11px; font-weight: 680; }
+.top-player-columns h3 span { color: var(--muted); font-size: 8px; font-weight: 560; }
 .top-player-columns ol { max-height: 730px; overflow-y: auto; list-style: none; padding: 0 5px 0 0; margin: 0; scrollbar-color: #cdd7cd transparent; }
 .top-player-columns li { border-top: 1px solid var(--line-soft); }
-.top-player-columns li > button { width: 100%; min-height: 71px; display: grid; grid-template-columns: 20px 38px minmax(0, 1fr) 29px 40px; align-items: center; gap: 7px; padding: 7px 2px; border: 0; background: transparent; color: var(--ink); text-align: left; }
+.top-player-columns li > button { width: 100%; min-height: 71px; display: grid; grid-template-columns: 20px 38px minmax(125px, 1fr) 31px 56px 52px 44px 57px; align-items: center; gap: 6px; padding: 7px 2px; border: 0; background: transparent; color: var(--ink); text-align: left; }
 .top-player-columns li > button:hover { background: #fafcf8; }
 .top-player-columns .player-photo { width: 36px; height: 42px; border-radius: 9px; }
 .top-player-copy { min-width: 0; }
@@ -499,11 +500,12 @@ tbody tr:hover { background: #fbfcf9; }
 .top-player-copy em { margin-top: 5px; color: var(--green-deep); font-size: 7px; font-style: normal; }
 .top-player-history { height: 27px; display: flex; align-items: end; justify-content: center; gap: 2px; }
 .top-player-history i { width: 3px; min-height: 3px; border-radius: 3px 3px 0 0; background: #a9c1ad; }
-.top-player-points { display: grid; justify-items: end; }
-.top-player-points strong { color: var(--green-deep); font-size: 14px; font-variant-numeric: tabular-nums; }
-.top-player-points small { color: var(--muted); font-size: 7px; }
-.top-player-points.up strong { color: #347252; }
-.top-player-points.down strong { color: #8e685d; }
+.top-player-stat { min-width: 0; display: grid; justify-items: end; line-height: 1.15; white-space: nowrap; }
+.top-player-stat strong { max-width: 100%; overflow: hidden; color: var(--green-deep); font-size: 11px; font-variant-numeric: tabular-nums; text-overflow: ellipsis; }
+.top-player-stat small { max-width: 100%; margin-top: 3px; overflow: hidden; color: var(--muted); font-size: 6px; text-overflow: ellipsis; }
+.top-player-previous strong { font-size: 14px; }
+.top-player-previous.up strong { color: #347252; }
+.top-player-previous.down strong { color: #8e685d; }
 .top-players-note { margin: -3px 2px 0; color: var(--muted); font-size: 8px; line-height: 1.55; }
 
 .data-footnote { display: flex; align-items: baseline; gap: 10px; padding: 22px 5px 0; color: var(--muted); font-size: 9px; line-height: 1.5; }
@@ -586,6 +588,9 @@ tbody tr:hover { background: #fbfcf9; }
   .top-players-intro { grid-template-columns: 1fr; }
   .top-player-selectors { width: 100%; }
   .top-players-context { grid-column: auto; }
+  .top-player-columns { grid-template-columns: 1fr; }
+  .top-player-columns > section + section { padding: 14px 0 0; border-top: 1px solid var(--line-soft); border-left: 0; }
+  .top-player-columns ol { max-height: 570px; }
   .manager-toolbar { align-items: flex-start; flex-direction: column; }
   .manager-position-groups { grid-template-columns: 1fr; }
   .manager-stats { grid-template-columns: repeat(2, 1fr); }
@@ -628,9 +633,10 @@ tbody tr:hover { background: #fbfcf9; }
   .team-match-total { grid-column: 3; }
   .position-breakdown-values { grid-template-columns: repeat(2, 1fr); }
   .archive-head h2 { font-size: 32px; }
-  .top-player-columns { grid-template-columns: 1fr; }
-  .top-player-columns > section + section { padding: 14px 0 0; border-top: 1px solid var(--line-soft); border-left: 0; }
-  .top-player-columns ol { max-height: 570px; }
+  .top-player-group-head { align-items: start; flex-direction: column; }
+  .top-player-columns li > button { grid-template-columns: 18px 34px minmax(90px, 1fr) 50px 45px; gap: 5px; }
+  .top-player-columns .player-photo { width: 32px; height: 38px; }
+  .top-player-history, .top-player-average, .top-player-value { display: none; }
   .manager-summary-section, .manager-lineup, .fantasy-matchdays { padding: 18px; }
   .manager-stats { grid-template-columns: 1fr; }
   .manager-stats > span { border-top: 1px solid var(--line); border-left: 0; }

@@ -699,14 +699,11 @@ function bestEleven(index: SeasonIndex, scope: "matchday" | "season", round: num
 }
 
 function topPlayers(index: SeasonIndex, catalog: StaticCatalog): TopPlayers {
-  const selectedCatalogSeason = catalog.seasons.find((season) => season.id === index.season.id);
   const leagueName = catalog.leagues.find((league) => league.code === index.season.leagueCode)?.name ?? index.season.leagueName;
-  const latestRound = Math.max(1, index.season.latestRound);
-  const { players } = summarizePlayers(index, latestRound);
 
   function historyFor(playerId: string) {
     const candidates = catalog.seasons.flatMap((season) => {
-      if (season.startYear > index.season.startYear) return [];
+      if (season.startYear >= index.season.startYear || season.dataState !== "complete") return [];
       const membership = season.players.find((player) => player.id === playerId);
       if (!membership || membership.appearances < 1) return [];
       return [{
@@ -717,7 +714,6 @@ function topPlayers(index: SeasonIndex, catalog: StaticCatalog): TopPlayers {
         points: membership.points,
         appearances: membership.appearances,
         active: membership.active,
-        dataState: season.dataState,
       }];
     }).sort((left, right) => left.startYear - right.startYear
       || Number(right.active) - Number(left.active)
@@ -728,65 +724,76 @@ function topPlayers(index: SeasonIndex, catalog: StaticCatalog): TopPlayers {
     return [...byYear.values()];
   }
 
-  function analyze(player: Player): TopPlayerAnalysis {
+  function analyze(player: StaticPlayer): TopPlayerAnalysis | null {
+    const team = index.teams.get(player.teamId);
+    if (!team) return null;
     const history = historyFor(player.id);
     const leagueHistory = history.filter((season) => season.leagueCode === index.season.leagueCode);
-    const completedLeagueHistory = leagueHistory.filter((season) => season.dataState === "complete");
-    const completedHistory = history.filter((season) => season.dataState === "complete");
-    const comparison = completedLeagueHistory.length >= 2 ? completedLeagueHistory : completedHistory;
+    const comparison = leagueHistory.length >= 2 ? leagueHistory : history;
     const recent = comparison.slice(-2);
     const trendDelta = recent.length === 2 ? recent[1].points - recent[0].points : null;
     const trend = trendDelta == null ? "new" : trendDelta >= 15 ? "up" : trendDelta <= -15 ? "down" : "steady";
-    const averagePoints = completedLeagueHistory.length
-      ? Math.round(completedLeagueHistory.reduce((sum, season) => sum + season.points, 0) / completedLeagueHistory.length)
+    const averagePoints = history.length
+      ? Math.round(history.reduce((sum, season) => sum + season.points, 0) / history.length)
       : null;
-    const priorHistory = history.filter((season) => season.startYear < index.season.startYear);
-    const priorSeason = priorHistory.at(-1);
+    const priorSeason = history.at(-1);
     let growthStreak = 1;
     for (let cursor = comparison.length - 1; cursor > 0 && comparison[cursor].points > comparison[cursor - 1].points; cursor -= 1) growthStreak += 1;
 
     let signal: string;
     if (!priorSeason) {
-      signal = "Neu im Datensatz · noch keine Vergleichssaison";
+      signal = "Neu im Datensatz · keine importierte Vorsaison";
     } else if (priorSeason.leagueCode !== index.season.leagueCode) {
-      signal = `Neu aus ${priorSeason.league} · dort zuletzt ${priorSeason.points} Pkt.`;
+      signal = `Neu in ${leagueName} · ${priorSeason.points} Pkt. in ${priorSeason.league}`;
     } else if (growthStreak >= 3) {
       signal = `${growthStreak} Saisons in Folge verbessert · zuletzt ${trendDelta != null && trendDelta >= 0 ? "+" : ""}${trendDelta ?? 0} Pkt.`;
     } else if (averagePoints != null) {
       const trendLabel = trendDelta == null ? "noch ohne Trend" : trend === "up" ? `zuletzt +${trendDelta}` : trend === "down" ? `zuletzt ${trendDelta}` : `zuletzt ${trendDelta >= 0 ? "+" : ""}${trendDelta}`;
-      signal = `${leagueHistory.length} Saison${leagueHistory.length === 1 ? "" : "s"} in ${leagueName} · Ø ${averagePoints} · ${trendLabel}`;
+      signal = `${history.length} Saison${history.length === 1 ? "" : "s"} im Archiv · Ø ${averagePoints} · ${trendLabel}`;
     } else {
-      signal = `${leagueHistory.length} Saison${leagueHistory.length === 1 ? "" : "s"} in ${leagueName} · noch kein vollständiger Schnitt`;
+      signal = "Noch keine abgeschlossene Vergleichssaison";
     }
 
     return {
       id: player.id,
       name: player.name,
-      team: player.team,
-      teamCode: player.teamCode,
-      logoUrl: player.logoUrl,
+      team: team.name,
+      teamCode: team.code,
+      logoUrl: team.logoUrl,
       photoUrl: player.photoUrl,
       position: player.position,
-      points: player.observedPoints,
+      priceM: player.priceM,
+      previousSeason: priorSeason?.season ?? null,
+      previousLeague: priorSeason?.league ?? null,
+      previousPoints: priorSeason?.points ?? null,
       averagePoints,
+      value: averagePoints != null && player.priceM > 0 ? averagePoints / player.priceM : null,
+      seasons: history.length,
       trend,
+      trendDelta,
       signal,
       history: history.slice(-5).map((season) => ({ season: season.season, league: season.league, points: season.points })),
     };
   }
 
-  const analyzed = players.filter((player) => player.observedPoints !== 0).map(analyze);
+  const analyzed = index.season.players
+    .filter((player) => player.active && player.selectable && player.priceM >= 0 && player.priceM < 999)
+    .flatMap((player) => {
+      const result = analyze(player);
+      return result ? [result] : [];
+    });
   const positions = (Object.fromEntries((['GK', 'DEF', 'MID', 'FWD'] as Position[]).map((position) => [
     position,
     analyzed.filter((player) => player.position === position)
-      .sort((left, right) => right.points - left.points || (right.averagePoints ?? -Infinity) - (left.averagePoints ?? -Infinity) || left.name.localeCompare(right.name, "de"))
-      .slice(0, 15),
+      .sort((left, right) => (right.previousPoints ?? -Infinity) - (left.previousPoints ?? -Infinity) || (right.averagePoints ?? -Infinity) - (left.averagePoints ?? -Infinity) || left.name.localeCompare(right.name, "de")),
   ])) as Record<Position, TopPlayerAnalysis[]>);
+  const cutoffSeason = catalog.seasons.filter((season) => season.startYear < index.season.startYear && season.dataState === "complete")
+    .sort((left, right) => right.startYear - left.startYear)[0]?.displayName ?? null;
   return {
     context: {
       season: index.season.displayName,
-      latestRound: index.season.latestRound,
-      dataState: selectedCatalogSeason?.dataState ?? "current",
+      cutoffSeason,
+      playerCount: analyzed.length,
     },
     positions,
   };

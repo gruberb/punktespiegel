@@ -32,6 +32,7 @@ type Filters = { league: string; season: string; round: string };
 type ViewLocation = { view: View; filters: Filters; playerId: string | null; teamId: string | null; scrollY: number };
 type TeamMetric = "overall" | "goalkeeper" | "defence" | "midfield" | "forward";
 type PlayerSort = "name" | "position" | "price" | "round" | "points" | "grade" | "goals" | "assists" | "value";
+type TopPlayerSort = "previous" | "average" | "value" | "trend" | "price";
 
 const positionName: Record<Position, string> = {
   GK: "Torwart",
@@ -171,7 +172,7 @@ export default function App() {
   const selectedPlayerSeason = playerSeasonCandidates.find((season) => season.leagueCode === filters.league && String(season.startYear) === filters.season)
     ?? playerSeasons.find((season) => String(season.startYear) === filters.season)
     ?? playerSeasons[0];
-  const selectedSeason = view === "overview" ? latestPublishedSeason : view === "manager" ? newestSeason : view === "team" ? selectedTeamSeason : view === "player" ? selectedPlayerSeason : requestedSeason;
+  const selectedSeason = view === "overview" ? latestPublishedSeason : view === "manager" || view === "top" ? newestSeason : view === "team" ? selectedTeamSeason : view === "player" ? selectedPlayerSeason : requestedSeason;
   const roundCount = selectedSeason?.roundCount ?? (filters.league === "0003" ? 38 : 34);
   const latestRound = selectedSeason?.latestRound ?? 0;
   const teamSelectionPending = Boolean(selectedTeamSeason)
@@ -197,10 +198,10 @@ export default function App() {
   }, [view, filters.league, filters.season, latestPublishedSeason?.startYear, latestPublishedSeason?.latestRound]);
 
   useEffect(() => {
-    if (view !== "manager" || !newestSeason || filters.season === String(newestSeason.startYear)) return;
+    if ((view !== "manager" && view !== "top") || !newestSeason || filters.season === String(newestSeason.startYear)) return;
     const next = { ...filters, season: String(newestSeason.startYear), round: String(Math.max(1, newestSeason.latestRound)) };
     setFilters(next);
-    syncUrl(next, "manager", null, null);
+    syncUrl(next, view, null, null);
   }, [view, filters.league, filters.season, newestSeason?.startYear, newestSeason?.latestRound]);
 
   useEffect(() => {
@@ -328,7 +329,7 @@ export default function App() {
   function setView(next: NavView) {
     const nextFilters = next === "overview" && latestPublishedSeason
       ? { ...filters, season: String(latestPublishedSeason.startYear), round: String(Math.max(1, latestPublishedSeason.latestRound)) }
-      : next === "manager" && newestSeason
+      : (next === "manager" || next === "top") && newestSeason
         ? { ...filters, season: String(newestSeason.startYear), round: String(Math.max(1, newestSeason.latestRound)) }
       : next === "history" && requestedSeason
         ? { ...filters, round: String(Math.max(1, requestedSeason.latestRound)) }
@@ -409,7 +410,7 @@ export default function App() {
         : view === "manager"
           ? "Eine datenbasierte Mannschaft mit Prognose und den tatsächlich erzielten Saisonpunkten."
         : view === "top"
-          ? "Die stärksten Spieler nach Position — mit Schnitt, Erfahrung und beobachtbarem Saisontrend."
+          ? `Der kaufbare Spielerpool für ${newestSeason?.displayName ?? "die aktuelle Saison"} — eingeordnet mit allen abgeschlossenen Leistungen bis zum Saisonstart.`
           : "Spieltagswert und Saisonstand direkt nebeneinander.";
   const navActive: NavView = view === "player" ? "players" : view === "team" ? "teams" : view;
   const previousView = backStack.at(-1)?.view;
@@ -469,7 +470,7 @@ export default function App() {
             {view === "teams" && <TeamsView filters={filters} onTeam={openTeam} />}
             {view === "team" && teamId && (teamSelectionPending ? <LoadingState /> : <TeamDetailView filters={filters} teamId={teamId} backLabel={backLabel} onBack={() => goBack("teams")} onPlayer={openPlayer} onTeam={openTeam} />)}
             {view === "history" && <HistoryView filters={filters} leagues={catalog.leagues} seasons={seasons} onFilter={updateFilter} onPlayer={openPlayerAt} onTeam={openTeamAt} />}
-            {view === "top" && <TopPlayersView filters={filters} leagues={catalog.leagues} seasons={seasons} onFilter={updateFilter} onPlayer={openPlayer} />}
+            {view === "top" && <TopPlayersView filters={filters} leagues={catalog.leagues} onFilter={updateFilter} onPlayer={openPlayer} />}
             {view === "manager" && <ManagerPicksView filters={filters} onPlayer={openPlayer} />}
             <footer className="data-footnote"><span>Datenbasis</span>Auf Basis öffentlicher kicker-Daten und der Wertungen der kicker Manager-Liga. Stand: importierter Datenbestand.</footer>
           </>
@@ -1240,10 +1241,11 @@ function FloatingScorePopover({ anchorRef, open, id, className, preferredWidth, 
   );
 }
 
-function TopPlayersView({ filters, leagues, seasons, onFilter, onPlayer }: { filters: Filters; leagues: Catalog["leagues"]; seasons: Catalog["seasons"]; onFilter: (key: keyof Filters, value: string) => void; onPlayer: (id: string) => void }) {
+function TopPlayersView({ filters, leagues, onFilter, onPlayer }: { filters: Filters; leagues: Catalog["leagues"]; onFilter: (key: keyof Filters, value: string) => void; onPlayer: (id: string) => void }) {
   const [data, setData] = useState<TopPlayers | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [sort, setSort] = useState<TopPlayerSort>("previous");
 
   useEffect(() => {
     const controller = new AbortController();
@@ -1259,7 +1261,13 @@ function TopPlayersView({ filters, leagues, seasons, onFilter, onPlayer }: { fil
   const controls = (
     <div className="selectors top-player-selectors">
       <label><span>Liga</span><select value={filters.league} onChange={(event) => onFilter("league", event.target.value)}>{leagues.map((league) => <option value={league.code} key={league.code}>{league.name}</option>)}</select></label>
-      <label><span>Saison</span><select value={filters.season} onChange={(event) => onFilter("season", event.target.value)}>{seasons.map((season) => <option value={season.startYear} key={season.id}>{season.displayName}</option>)}</select></label>
+      <label><span>Sortierung</span><select value={sort} onChange={(event) => setSort(event.target.value as TopPlayerSort)}>
+        <option value="previous">Punkte Vorsaison</option>
+        <option value="average">Saisonschnitt</option>
+        <option value="value">Preis-Leistung</option>
+        <option value="trend">Jüngster Trend</option>
+        <option value="price">Marktwert</option>
+      </select></label>
     </div>
   );
 
@@ -1267,33 +1275,40 @@ function TopPlayersView({ filters, leagues, seasons, onFilter, onPlayer }: { fil
     <div className="top-players-view">
       <section className="detail-section top-players-intro">
         <div>
-          <p className="kicker">Saisonvergleich</p>
-          <h2>Leistung mit Kontext</h2>
-          <p>Die Rangfolge folgt den gesammelten Punkten der Auswahl. Schnitt und Trend verwenden nur abgeschlossene Saisons; laufende Zwischenstände werden nicht hochgerechnet.</p>
+          <p className="kicker">Fantasy-Auswahl · aktueller Spielerpool</p>
+          <h2>{data ? `Spieler für ${data.context.season}` : "Spieler für die neue Saison"}</h2>
+          <p>Alle aktuell kaufbaren Spieler, eingeordnet anhand ihrer abgeschlossenen Saisons vor dem Saisonstart. Punkte der neuen Saison und Hochrechnungen fließen hier bewusst nicht ein.</p>
         </div>
         {controls}
-        {data && <div className="top-players-context"><strong>{data.context.season}</strong><span>{data.context.latestRound > 0 ? data.context.dataState === "complete" ? "vollständige Saison" : `bis Spieltag ${data.context.latestRound}` : "noch ohne Spieltagsdaten"}</span></div>}
+        {data && <div className="top-players-context"><strong>{data.context.playerCount} kaufbare Spieler</strong><span>{data.context.cutoffSeason ? `Leistungsdaten bis einschließlich ${data.context.cutoffSeason}` : "noch keine abgeschlossene Vorsaison importiert"}</span></div>}
       </section>
       {error ? <ErrorState message={error} /> : loading || !data ? <LoadingState /> : (
         <div className="top-player-pairs">
-          <TopPlayerGroup title="Best Players · Defensive" positions={["GK", "DEF"]} players={data.positions} onPlayer={onPlayer} />
-          <TopPlayerGroup title="Best Players · Offensive" positions={["MID", "FWD"]} players={data.positions} onPlayer={onPlayer} />
+          <TopPlayerGroup title="Torwart & Abwehr" positions={["GK", "DEF"]} players={data.positions} sort={sort} onPlayer={onPlayer} />
+          <TopPlayerGroup title="Mittelfeld & Sturm" positions={["MID", "FWD"]} players={data.positions} sort={sort} onPlayer={onPlayer} />
         </div>
       )}
-      <p className="top-players-note">Die Signale beruhen ausschließlich auf importierten kicker-Wertungen aus Bundesliga, 2. Bundesliga und 3. Liga. Für Wechsel aus anderen Ligen wird keine erfundene Potenzialprognose angezeigt.</p>
+      <p className="top-players-note">Keine Punkte der neuen Saison und keine Prognose: Auch Spieler ohne importierte Historie bleiben sichtbar. Die Einordnung verwendet ausschließlich abgeschlossene kicker-Wertungen aus Bundesliga, 2. Bundesliga und 3. Liga.</p>
     </div>
   );
 }
 
-function TopPlayerGroup({ title, positions, players, onPlayer }: { title: string; positions: Position[]; players: TopPlayers["positions"]; onPlayer: (id: string) => void }) {
+function TopPlayerGroup({ title, positions, players, sort, onPlayer }: { title: string; positions: Position[]; players: TopPlayers["positions"]; sort: TopPlayerSort; onPlayer: (id: string) => void }) {
+  const sortLabel: Record<TopPlayerSort, string> = {
+    previous: "Punkte der letzten abgeschlossenen Saison",
+    average: "Punkte im Schnitt je abgeschlossener Saison",
+    value: "Schnittpunkte je Mio. € Marktwert",
+    trend: "Veränderung zwischen den letzten zwei Saisons",
+    price: "Aktueller Marktwert",
+  };
   return (
     <section className="detail-section top-player-group">
-      <div className="top-player-group-head"><div><p className="kicker">Top 15 je Position</p><h2>{title}</h2></div><span>Punkte · Erfahrung · Trend</span></div>
+      <div className="top-player-group-head"><div><p className="kicker">Kaufbare Spieler</p><h2>{title}</h2></div><span>{sortLabel[sort]}</span></div>
       <div className="top-player-columns">
         {positions.map((position) => (
           <section key={position}>
-            <h3>{positionName[position]}</h3>
-            {players[position].length ? <ol>{players[position].map((player, index) => <li key={player.id}><TopPlayerRow player={player} rank={index + 1} onClick={() => onPlayer(player.id)} /></li>)}</ol> : <Empty message="Für diese Position liegen noch keine Punkte vor." />}
+            <h3>{positionName[position]} <span>{players[position].length}</span></h3>
+            {players[position].length ? <ol>{sortTopPlayers(players[position], sort).map((player, index) => <li key={player.id}><TopPlayerRow player={player} rank={index + 1} onClick={() => onPlayer(player.id)} /></li>)}</ol> : <Empty message="Für diese Position sind keine kaufbaren Spieler importiert." />}
           </section>
         ))}
       </div>
@@ -1312,9 +1327,25 @@ function TopPlayerRow({ player, rank, onClick }: { player: TopPlayerAnalysis; ra
       <span className="top-player-history" aria-label={historyLabel || "Keine Vergleichssaison"}>
         {player.history.map((season) => <i key={`${season.season}-${season.league}`} style={{ height: `${Math.max(12, Math.round((Math.max(0, season.points) / maxPoints) * 100))}%` }} />)}
       </span>
-      <span className={`top-player-points ${player.trend}`}><strong>{player.points}</strong><small>Pkt.</small></span>
+      <span className="top-player-stat top-player-price"><strong>{formatMarketValue(player.priceM)}</strong><small>Marktwert</small></span>
+      <span className={`top-player-stat top-player-previous ${player.trend}`}><strong>{player.previousPoints ?? "—"}</strong><small>{player.previousSeason ?? "Vorsaison"}</small></span>
+      <span className="top-player-stat top-player-average"><strong>{player.averagePoints ?? "—"}</strong><small>Ø Pkt.</small></span>
+      <span className="top-player-stat top-player-value"><strong>{formatPlayerValue(player.value)}</strong><small>Pkt./Mio.</small></span>
     </button>
   );
+}
+
+function sortTopPlayers(players: TopPlayerAnalysis[], sort: TopPlayerSort) {
+  function metric(player: TopPlayerAnalysis) {
+    if (sort === "previous") return player.previousPoints ?? -Infinity;
+    if (sort === "average") return player.averagePoints ?? -Infinity;
+    if (sort === "value") return player.value ?? -Infinity;
+    if (sort === "trend") return player.trendDelta ?? -Infinity;
+    return player.priceM;
+  }
+  return [...players].sort((left, right) => metric(right) - metric(left)
+    || (right.previousPoints ?? -Infinity) - (left.previousPoints ?? -Infinity)
+    || left.name.localeCompare(right.name, "de"));
 }
 
 function BestPlayerCard({ player, onClick }: { player: BestElevenPlayer; onClick: () => void }) {
