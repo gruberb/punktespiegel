@@ -21,9 +21,19 @@ import type {
   TopPlayerAnalysis,
   TopPlayers,
 } from "./types";
-import { recommendManagerSquad } from "./manager-model";
-
 type StaticCatalog = Catalog & { schemaVersion: number; generatedAt: string };
+
+type StaticManagerRecommendation = {
+  schemaVersion: number;
+  modelVersion: number;
+  generatedAt: string;
+  source: {
+    catalogGeneratedAt: string;
+    seasonGeneratedAt: string;
+    seasonId: string;
+  };
+  recommendation: ManagerRecommendation;
+};
 
 type StaticNews = {
   schemaVersion: number;
@@ -131,6 +141,7 @@ const newsCache = loadJson<StaticNews>(asset("data/news.json")).catch((): Static
   players: {},
 }));
 const seasonCache = new Map<string, Promise<SeasonIndex>>();
+const managerRecommendationCache = new Map<string, Promise<ManagerRecommendation>>();
 
 function asset(path: string) {
   return `${import.meta.env.BASE_URL}${path}`;
@@ -168,6 +179,24 @@ function loadSeason(params: URLSearchParams): Promise<SeasonIndex> {
       };
     });
     seasonCache.set(id, pending);
+  }
+  return pending;
+}
+
+function loadManagerRecommendation(params: URLSearchParams, mode: ManagerMode) {
+  const league = params.get("league") ?? "0001";
+  const year = params.get("season") ?? String(currentSeasonStartYear());
+  const id = `se-k${league}${year}`;
+  const cacheKey = `${id}:${mode}`;
+  let pending = managerRecommendationCache.get(cacheKey);
+  if (!pending) {
+    pending = loadJson<StaticManagerRecommendation>(asset(`data/recommendations/${id}-${mode}.json`)).then((artifact) => {
+      if (artifact.schemaVersion !== 1 || artifact.modelVersion !== 1 || artifact.source.seasonId !== id) {
+        throw new Error("Die Kaderempfehlung verwendet einen unbekannten Vertrag.");
+      }
+      return artifact.recommendation;
+    });
+    managerRecommendationCache.set(cacheKey, pending);
   }
   return pending;
 }
@@ -831,6 +860,5 @@ export const api = {
   team: (teamId: string, params: URLSearchParams, signal?: AbortSignal) => abortable(loadSeason(params).then((index) => teamDetail(index, teamId)), signal),
   bestEleven: (params: URLSearchParams, signal?: AbortSignal) => abortable(loadSeason(params).then((index) => bestEleven(index, params.get("scope") === "season" ? "season" : "matchday", selectedRound(params, index.season))), signal),
   topPlayers: (params: URLSearchParams, signal?: AbortSignal): Promise<TopPlayers> => abortable(Promise.all([loadSeason(params), catalogCache]).then(([index, catalog]) => topPlayers(index, catalog)), signal),
-  managerPicks: (params: URLSearchParams, mode: ManagerMode, signal?: AbortSignal): Promise<ManagerRecommendation> => abortable(Promise.all([loadSeason(params), catalogCache])
-    .then(([index, catalog]) => recommendManagerSquad(catalog, index.season, mode)), signal),
+  managerPicks: (params: URLSearchParams, mode: ManagerMode, signal?: AbortSignal): Promise<ManagerRecommendation> => abortable(loadManagerRecommendation(params, mode), signal),
 };

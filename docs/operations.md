@@ -43,6 +43,14 @@ Nützliche Optionen:
 
 Ein vollständiger Lauf ist für Erstaufbau oder historische Korrekturen gedacht. Der tägliche Lauf ruft nur die aktuelle und gegebenenfalls eine noch unvollständige Vorsaison ab.
 
+Anschließend werden die sechs aktuellen Kaderempfehlungen aus genau diesem Datenstand erzeugt:
+
+```bash
+npm run generate:recommendations
+```
+
+Der Befehl schreibt je Liga und Modus ein versioniertes JSON nach `frontend/public/data/recommendations`. Die normalen Befehle `npm run dev` und `npm run build` führen ihn automatisch aus.
+
 ## CI
 
 `.github/workflows/ci.yml` prüft bei Push, Pull Request und manuellem Start:
@@ -73,9 +81,10 @@ Der Workflow:
 
 1. checkt das Repository aus,
 2. aktualisiert die laufenden Saisondateien,
-3. baut React,
-4. lädt `frontend/dist` als Pages-Artefakt hoch,
-5. ersetzt die Website nur nach einem vollständig erfolgreichen Build.
+3. berechnet Classic und Interactive für alle drei Ligen,
+4. baut React,
+5. lädt `frontend/dist` als Pages-Artefakt hoch,
+6. ersetzt die Website nur nach einem vollständig erfolgreichen Build.
 
 Es gibt kein `DATABASE_URL`-Secret. Der Workflow schreibt auch nicht zurück in den Branch und bläht deshalb die Git-Historie nicht täglich auf.
 

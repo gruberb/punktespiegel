@@ -1,7 +1,9 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import test from "node:test";
 import { leagueProjectionFactor, recommendManagerSquad } from "./manager-model.ts";
-import type { Catalog, Position } from "./types.ts";
+import type { ManagerSeason } from "./manager-model.ts";
+import type { Catalog, ManagerMode, Position } from "./types.ts";
 
 const positions: Position[] = ["GK", "DEF", "MID", "FWD"];
 const teams = Array.from({ length: 10 }, (_, index) => ({ id: `team-${index}`, name: `Team ${index}`, code: `T${index}`, logoUrl: null }));
@@ -97,3 +99,52 @@ test("tracks actual points for the recommended starting eleven by matchday", () 
   assert.equal(result.currentStartingPoints, 55);
   assert.ok(result.players.every((player) => player.currentPoints === 5));
 });
+
+const publishedCatalog = JSON.parse(readFileSync(new URL("../public/data/catalog.json", import.meta.url), "utf8")) as Catalog;
+const publishedExpectations: Record<string, { spentM: number; points: number; formation: string }> = {
+  "0001:classic": { spentM: 30, points: 1876, formation: "4-4-2" },
+  "0001:interactive": { spentM: 42.5, points: 2149, formation: "3-5-2" },
+  "0002:classic": { spentM: 7.5, points: 2053, formation: "4-4-2" },
+  "0002:interactive": { spentM: 10, points: 2271, formation: "3-4-3" },
+  "0003:classic": { spentM: 4, points: 2221, formation: "4-4-2" },
+  "0003:interactive": { spentM: 5.95, points: 2354, formation: "5-4-1" },
+};
+
+for (const league of ["0001", "0002", "0003"]) {
+  for (const mode of ["classic", "interactive"] as ManagerMode[]) {
+    test(`published ${league} ${mode} recommendation is valid and stable`, () => {
+      const publishedSeason = JSON.parse(readFileSync(new URL(`../public/data/seasons/se-k${league}2026.json`, import.meta.url), "utf8")) as ManagerSeason;
+      const result = recommendManagerSquad(publishedCatalog, publishedSeason, mode);
+      const artifact = JSON.parse(readFileSync(new URL(`../public/data/recommendations/se-k${league}2026-${mode}.json`, import.meta.url), "utf8")) as {
+        schemaVersion: number;
+        modelVersion: number;
+        source: { seasonId: string };
+        recommendation: unknown;
+      };
+      const expectation = publishedExpectations[`${league}:${mode}`];
+      assert.equal(artifact.schemaVersion, 1);
+      assert.equal(artifact.modelVersion, 1);
+      assert.equal(artifact.source.seasonId, `se-k${league}2026`);
+      assert.deepEqual(artifact.recommendation, result);
+      assert.deepEqual(
+        { spentM: result.spentM, points: result.projectedStartingPoints, formation: result.formation },
+        expectation,
+      );
+      assert.equal(new Set(result.players.map((player) => player.id)).size, result.players.length);
+      assert.equal(result.players.length, result.rules.squadSize);
+      assert.equal(result.players.filter((player) => player.role === "start").length, 11);
+      assert.ok(result.spentM <= result.budgetM);
+      for (const position of positions) {
+        assert.equal(result.players.filter((player) => player.position === position).length, result.rules.positions[position]);
+        const starters = result.players.filter((player) => player.position === position && player.role === "start");
+        const reserves = result.players.filter((player) => player.position === position && player.role === "reserve");
+        assert.ok(Math.min(...starters.map((player) => player.projectedPoints)) >= Math.max(...reserves.map((player) => player.projectedPoints)));
+      }
+      if (result.rules.maxFromTeam != null) {
+        const teamCounts = new Map<string, number>();
+        result.players.forEach((player) => teamCounts.set(player.teamId, (teamCounts.get(player.teamId) ?? 0) + 1));
+        assert.ok([...teamCounts.values()].every((count) => count <= result.rules.maxFromTeam!));
+      }
+    });
+  }
+}

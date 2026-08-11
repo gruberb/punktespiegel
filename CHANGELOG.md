@@ -4,6 +4,19 @@ Alle wesentlichen Änderungen an Punktespiegel werden in dieser Datei dokumentie
 
 ## [Unreleased]
 
+## [1.3.0] – 2026-08-11
+
+### Hinzugefügt
+
+- Build-Schritt für sechs statische Kaderempfehlungen: Bundesliga, 2. Bundesliga und 3. Liga jeweils für Classic und Interactive.
+- Regressionstests für Budget, Formation, Positionsquoten, Vereinslimit und die veröffentlichten Empfehlungen aller sechs Kombinationen.
+
+### Geändert
+
+- Der Kaderplaner verwendet nun eine exakte dynamische Optimierung über den vollständigen kaufbaren Spielerpool statt einer begrenzten heuristischen Suche.
+- Kaderempfehlungen werden nach dem Datenimport einmalig in CI oder lokal berechnet und anschließend als kleine, versionierte JSON-Artefakte geladen.
+- Frontend-Tests sind jetzt Teil des regulären CI-Laufs.
+
 ## [1.2.2] – 2026-08-11
 
 ### Geändert
@@ -73,3 +86,4 @@ Alle wesentlichen Änderungen an Punktespiegel werden in dieser Datei dokumentie
 [1.2.0]: https://github.com/gruberb/punktespiegel/releases/tag/v1.2.0
 [1.2.1]: https://github.com/gruberb/punktespiegel/releases/tag/v1.2.1
 [1.2.2]: https://github.com/gruberb/punktespiegel/releases/tag/v1.2.2
+[1.3.0]: https://github.com/gruberb/punktespiegel/releases/tag/v1.3.0

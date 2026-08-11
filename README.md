@@ -1,6 +1,6 @@
 # Punktespiegel
 
-Punktespiegel ist ein statisches React-Dashboard für öffentliche Fußball- und Fantasy-Wertungen. Die Auswertungen basieren auf kicker-Daten und den Regeln der kicker Manager-Liga. Spieler, Mannschaften, historische Ranglisten, saisonübergreifende Top-Player-Signale, Spieltagsdetails und die beste Elf werden vollständig im Browser berechnet.
+Punktespiegel ist ein statisches React-Dashboard für öffentliche Fußball- und Fantasy-Wertungen. Die Auswertungen basieren auf kicker-Daten und den Regeln der kicker Manager-Liga. Tabellen, Profile und historische Vergleiche werden aus statischen Saisonartefakten im Browser berechnet; die sechs rechenintensiveren Kaderempfehlungen entstehen einmal im Build und werden ebenfalls als statisches JSON ausgeliefert.
 
 Es gibt keinen Laufzeitserver, keine Datenbank und keine Anmeldung. Rust wird ausschließlich als Build-Werkzeug eingesetzt: Der Generator prüft die öffentlichen Quelldaten und schreibt eine kompakte JSON-Datei je Liga und Saison. Dadurch kann die fertige Website direkt auf GitHub Pages laufen.
 
@@ -39,6 +39,14 @@ cargo run --locked -p punktespiegel-data -- --refresh-all
 
 Der Datenbestand ist nach Liga und Saison getrennt. Der Browser lädt nicht alle Jahre auf einmal. Die 15 enthaltenen Saisons benötigen zusammen ungefähr 54 MB im Repository; eine vollständige Saison wird mit üblicher HTTP-Kompression auf ungefähr 180–250 KB übertragen.
 
+Nach einem Datenimport lassen sich die Kaderempfehlungen für alle drei Ligen und beide Modi separat neu berechnen:
+
+```bash
+npm run generate:recommendations
+```
+
+`npm run dev` und `npm run build` führen diesen Schritt automatisch aus.
+
 ## GitHub Pages
 
 `.github/workflows/pages.yml` erzeugt täglich um 12:15 Uhr deutscher Zeit die aktuelle Saison, baut React und stellt ausschließlich das fertige Pages-Artefakt unter <https://gruberb.github.io/punktespiegel/> bereit. Der Workflow benötigt weder PostgreSQL noch Repository-Secrets. Ein manueller Lauf kann bei Bedarf auch alle abgeschlossenen Saisons neu erzeugen.
@@ -64,6 +72,8 @@ docker compose build web
 - `frontend/`: React-Anwendung und statischer Datenadapter.
 - `frontend/public/data/catalog.json`: unterstützte Ligen und Saisons.
 - `frontend/public/data/seasons/`: ein normalisierter Snapshot je Liga-Saison.
+- `frontend/public/data/recommendations/`: vorberechnete Classic- und Interactive-Empfehlungen der neuesten Saison.
+- `scripts/generate-manager-recommendations.ts`: deterministischer Offline-Optimierer für diese sechs Artefakte.
 - `.github/workflows/`: CI sowie täglicher Pages-Datenbuild.
 - `docs/`: Architektur, Betrieb und Architekturentscheidung.
 

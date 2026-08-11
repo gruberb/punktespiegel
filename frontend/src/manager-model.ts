@@ -40,7 +40,16 @@ type ManagerRules = {
 };
 
 type Candidate = Omit<ManagerPickPlayer, "role" | "currentPoints"> & { projectionWeight: number };
-type BeamState = { selected: Candidate[]; spentCents: number; teamCounts: Map<string, number>; lastCandidateIndex: number; score: number };
+type SquadRole = "start" | "reserve";
+type PlanPick = { player: Candidate; role: SquadRole };
+type PlanPath = { pick: PlanPick; previous: PlanPath | null };
+type PlanOption = {
+  spentCents: number;
+  score: number;
+  startingPoints: number;
+  path: PlanPath | null;
+};
+type OptimizedRoster = PlanOption & { formation: Formation; picks: PlanPick[] };
 
 const positionOrder: Position[] = ["GK", "DEF", "MID", "FWD"];
 const formations: Formation[] = [
@@ -183,106 +192,187 @@ function buildCandidates(catalog: Catalog, season: ManagerSeason, rules: Manager
   });
 }
 
-function shortlist(candidates: Candidate[], count: number) {
-  const unique = new Map<string, Candidate>();
-  const take = (items: Candidate[], limit: number) => items.slice(0, Math.max(limit, count + 4)).forEach((player) => unique.set(player.id, player));
-  take([...candidates].sort((left, right) => right.projectedPoints - left.projectedPoints), 18);
-  take([...candidates].sort((left, right) => right.projectedPoints / Math.max(0.05, right.priceM) - left.projectedPoints / Math.max(0.05, left.priceM)), 14);
-  take([...candidates].sort((left, right) => left.priceM - right.priceM || right.projectedPoints - left.projectedPoints), 10);
-  take([...candidates].sort((left, right) => right.appearancesUsed - left.appearancesUsed || right.projectedPoints - left.projectedPoints), 8);
-  return [...unique.values()].sort((left, right) => right.projectedPoints - left.projectedPoints || left.priceM - right.priceM);
+const emptyPlan = (): PlanOption => ({ spentCents: 0, score: 0, startingPoints: 0, path: null });
+
+function comparePlan(left: PlanOption, right: PlanOption) {
+  const scoreDifference = left.score - right.score;
+  if (Math.abs(scoreDifference) > 1e-9) return scoreDifference;
+  const starterDifference = left.startingPoints - right.startingPoints;
+  if (Math.abs(starterDifference) > 1e-9) return starterDifference;
+  return right.spentCents - left.spentCents;
 }
 
-function formationSelection(players: Candidate[], formationsToCheck: Formation[]) {
-  let best: { formation: Formation; starters: Candidate[]; points: number } | null = null;
-  for (const formation of formationsToCheck) {
-    const starters = positionOrder.flatMap((position) => players.filter((player) => player.position === position)
-      .sort((left, right) => right.projectedPoints - left.projectedPoints)
-      .slice(0, formation[position]));
-    const expectedCount = Object.values(formation).reduce((sum, count) => sum + count, 0);
-    if (starters.length !== expectedCount) continue;
-    const points = starters.reduce((sum, player) => sum + player.projectedPoints, 0);
-    if (!best || points > best.points) best = { formation, starters, points };
+function reserveScore(player: Candidate, rules: ManagerRules) {
+  return player.projectedPoints * rules.reserveWeight * (0.7 + player.projectionWeight * 0.3);
+}
+
+function addPick(option: PlanOption, player: Candidate, role: SquadRole, rules: ManagerRules): PlanOption {
+  const starterPoints = role === "start" ? player.projectedPoints : 0;
+  const reservePoints = role === "reserve" ? reserveScore(player, rules) : 0;
+  return {
+    spentCents: option.spentCents + Math.round(player.priceM * 100),
+    score: option.score + starterPoints + reservePoints,
+    startingPoints: option.startingPoints + starterPoints,
+    path: { pick: { player, role }, previous: option.path },
+  };
+}
+
+function combinePlans(left: PlanOption, right: PlanOption): PlanOption {
+  let path = left.path;
+  const rightPicks: PlanPick[] = [];
+  for (let node = right.path; node; node = node.previous) rightPicks.push(node.pick);
+  for (let index = rightPicks.length - 1; index >= 0; index -= 1) path = { pick: rightPicks[index], previous: path };
+  return {
+    spentCents: left.spentCents + right.spentCents,
+    score: left.score + right.score,
+    startingPoints: left.startingPoints + right.startingPoints,
+    path,
+  };
+}
+
+function planPicks(path: PlanPath | null) {
+  const picks: PlanPick[] = [];
+  for (let node = path; node; node = node.previous) picks.push(node.pick);
+  return picks.reverse();
+}
+
+function paretoFrontier(options: PlanOption[], budgetCents: number) {
+  const bestAtCost = new Map<number, PlanOption>();
+  for (const option of options) {
+    if (option.spentCents > budgetCents) continue;
+    const existing = bestAtCost.get(option.spentCents);
+    if (!existing || comparePlan(option, existing) > 0) bestAtCost.set(option.spentCents, option);
   }
-  return best;
-}
-
-function rosterObjective(players: Candidate[], rules: ManagerRules) {
-  const selection = formationSelection(players, rules.formations);
-  if (!selection) {
-    return positionOrder.reduce((total, position) => {
-      const ordered = players.filter((player) => player.position === position).sort((left, right) => right.projectedPoints - left.projectedPoints);
-      const formationCounts = rules.formations.map((formation) => formation[position]).sort((left, right) => left - right);
-      const likelyStarterCount = formationCounts[Math.floor(formationCounts.length / 2)] ?? 0;
-      return total + ordered.reduce((sum, player, index) => sum + player.projectedPoints * (index < likelyStarterCount ? 1 : rules.reserveWeight), 0);
-    }, 0);
+  const ordered = [...bestAtCost.values()].sort((left, right) => left.spentCents - right.spentCents || comparePlan(right, left));
+  const frontier: PlanOption[] = [];
+  let best: PlanOption | null = null;
+  for (const option of ordered) {
+    if (best && comparePlan(option, best) <= 0) continue;
+    frontier.push(option);
+    best = option;
   }
-  const starterIds = new Set(selection?.starters.map((player) => player.id) ?? []);
-  const starterPoints = selection.points;
-  const reservePoints = players.filter((player) => !starterIds.has(player.id))
-    .reduce((sum, player) => sum + player.projectedPoints * rules.reserveWeight * (0.7 + player.projectionWeight * 0.3), 0);
-  return starterPoints + reservePoints;
+  return frontier;
 }
 
-function trimBeam(states: BeamState[], width = 1400) {
-  states.sort((left, right) => right.score - left.score || left.spentCents - right.spentCents);
-  const perCost = new Map<number, number>();
-  const result: BeamState[] = [];
-  for (const state of states) {
-    const bucket = Math.round(state.spentCents / 10);
-    const seen = perCost.get(bucket) ?? 0;
-    if (seen >= 3) continue;
-    perCost.set(bucket, seen + 1);
-    result.push(state);
-    if (result.length >= width) break;
+function mergeFrontier(target: Map<number, PlanOption[]>, countCode: number, additions: PlanOption[], budgetCents: number) {
+  target.set(countCode, paretoFrontier([...(target.get(countCode) ?? []), ...additions], budgetCents));
+}
+
+function optimizePosition(
+  candidates: Candidate[],
+  starterCount: number,
+  reserveCount: number,
+  rules: ManagerRules,
+  budgetCents: number,
+  trackedTeams: Map<string, number>,
+  teamLimit: number,
+) {
+  const reserveBase = reserveCount + 1;
+  const teamBase = teamLimit + 1;
+  const teamStateCount = teamBase ** trackedTeams.size;
+  let states = new Map<number, PlanOption[]>([[0, [emptyPlan()]]]);
+  for (const player of candidates) {
+    const next = new Map([...states].map(([code, options]) => [code, [...options]]));
+    for (const [code, options] of states) {
+      const roleCode = Math.floor(code / teamStateCount);
+      const teamCode = code % teamStateCount;
+      const starters = Math.floor(roleCode / reserveBase);
+      const reserves = roleCode % reserveBase;
+      const trackedTeam = trackedTeams.get(player.teamId);
+      const teamMultiplier = trackedTeam == null ? 0 : teamBase ** trackedTeam;
+      if (trackedTeam != null && Math.floor(teamCode / teamMultiplier) % teamBase >= teamLimit) continue;
+      if (starters < starterCount && reserves === 0) {
+        mergeFrontier(next, code + reserveBase * teamStateCount + teamMultiplier, options.map((option) => addPick(option, player, "start", rules)), budgetCents);
+      }
+      if (starters === starterCount && reserves < reserveCount) {
+        mergeFrontier(next, code + teamStateCount + teamMultiplier, options.map((option) => addPick(option, player, "reserve", rules)), budgetCents);
+      }
+    }
+    states = next;
+  }
+  const targetRoleCode = starterCount * reserveBase + reserveCount;
+  const result = new Map<number, PlanOption[]>();
+  for (const [code, options] of states) {
+    if (Math.floor(code / teamStateCount) !== targetRoleCode) continue;
+    result.set(code % teamStateCount, options);
   }
   return result;
 }
 
-function optimizeRoster(candidates: Candidate[], rules: ManagerRules) {
-  const budgetCents = Math.round(rules.budgetM * 100);
-  const pools = new Map(positionOrder.map((position) => [position, shortlist(candidates.filter((player) => player.position === position), rules.positions[position])]));
-  for (const position of positionOrder) {
-    if ((pools.get(position)?.length ?? 0) < rules.positions[position]) throw new Error(`Nicht genug verfügbare Spieler für ${position}.`);
+function teamCodesFit(left: number, right: number, trackedTeamCount: number, teamLimit: number) {
+  const base = teamLimit + 1;
+  for (let index = 0; index < trackedTeamCount; index += 1) {
+    const multiplier = base ** index;
+    if (Math.floor(left / multiplier) % base + Math.floor(right / multiplier) % base > teamLimit) return false;
   }
-  const minimumRemainingCost = (positionIndex: number, selectedInPosition: number, lastCandidateIndex: number) => positionOrder.slice(positionIndex)
-    .reduce((total, position, offset) => {
-      const needed = rules.positions[position] - (offset === 0 ? selectedInPosition : 0);
-      const available = offset === 0 ? (pools.get(position) ?? []).slice(lastCandidateIndex + 1) : (pools.get(position) ?? []);
-      const cheapest = [...available].sort((left, right) => left.priceM - right.priceM).slice(0, needed);
-      if (cheapest.length < needed) return Number.POSITIVE_INFINITY;
-      return total + cheapest.reduce((sum, player) => sum + Math.round(player.priceM * 100), 0);
-    }, 0);
-  let states: BeamState[] = [{ selected: [], spentCents: 0, teamCounts: new Map(), lastCandidateIndex: -1, score: 0 }];
-  for (const [positionIndex, position] of positionOrder.entries()) {
-    const pool = pools.get(position) ?? [];
-    states = states.map((state) => ({ ...state, lastCandidateIndex: -1 }));
-    for (let slot = 0; slot < rules.positions[position]; slot += 1) {
-      const expanded: BeamState[] = [];
-      for (const state of states) {
-        for (let index = state.lastCandidateIndex + 1; index < pool.length; index += 1) {
-          const player = pool[index];
-          const playerCost = Math.round(player.priceM * 100);
-          if (state.spentCents + playerCost + minimumRemainingCost(positionIndex, slot + 1, index) > budgetCents) continue;
-          const teamCount = state.teamCounts.get(player.teamId) ?? 0;
-          if (rules.maxFromTeam != null && teamCount >= rules.maxFromTeam) continue;
-          const teamCounts = new Map(state.teamCounts);
-          teamCounts.set(player.teamId, teamCount + 1);
-          const selected = [...state.selected, player];
-          expanded.push({
-            selected,
-            spentCents: state.spentCents + playerCost,
-            teamCounts,
-            lastCandidateIndex: index,
-            score: rosterObjective(selected, rules),
-          });
+  return true;
+}
+
+function optimizeTrackedTeams(
+  candidates: Candidate[],
+  rules: ManagerRules,
+  formation: Formation,
+  budgetCents: number,
+  trackedTeamIds: string[],
+) {
+  const teamLimit = rules.maxFromTeam ?? Object.values(rules.positions).reduce((sum, count) => sum + count, 0);
+  const trackedTeams = new Map(trackedTeamIds.map((teamId, index) => [teamId, index]));
+  let combined = new Map<number, PlanOption[]>([[0, [emptyPlan()]]]);
+  for (const position of positionOrder) {
+    const pool = candidates.filter((player) => player.position === position)
+      .sort((left, right) => right.projectedPoints - left.projectedPoints || reserveScore(left, rules) - reserveScore(right, rules));
+    const reserveCount = rules.positions[position] - formation[position];
+    const positionPlans = optimizePosition(pool, formation[position], reserveCount, rules, budgetCents, trackedTeams, teamLimit);
+    const next = new Map<number, PlanOption[]>();
+    for (const [currentTeamCode, currentPlans] of combined) {
+      for (const [positionTeamCode, plans] of positionPlans) {
+        if (!teamCodesFit(currentTeamCode, positionTeamCode, trackedTeams.size, teamLimit)) continue;
+        const additions: PlanOption[] = [];
+        for (const current of currentPlans) {
+          for (const positionPlan of plans) {
+            if (current.spentCents + positionPlan.spentCents > budgetCents) break;
+            additions.push(combinePlans(current, positionPlan));
+          }
         }
+        if (additions.length) mergeFrontier(next, currentTeamCode + positionTeamCode, additions, budgetCents);
       }
-      states = trimBeam(expanded);
-      if (!states.length) throw new Error("Mit den verfügbaren Marktwerten lässt sich kein gültiger Kader bilden.");
+    }
+    combined = next;
+  }
+  return [...combined.values()].flat().reduce<PlanOption | null>((best, option) => !best || comparePlan(option, best) > 0 ? option : best, null);
+}
+
+function optimizeFormation(candidates: Candidate[], rules: ManagerRules, formation: Formation, budgetCents: number) {
+  const trackedTeamIds: string[] = [];
+  while (true) {
+    const option = optimizeTrackedTeams(candidates, rules, formation, budgetCents, trackedTeamIds);
+    if (!option || rules.maxFromTeam == null) return option;
+    const teamCounts = new Map<string, number>();
+    for (const pick of planPicks(option.path)) teamCounts.set(pick.player.teamId, (teamCounts.get(pick.player.teamId) ?? 0) + 1);
+    const newViolations = [...teamCounts]
+      .filter(([teamId, count]) => count > rules.maxFromTeam! && !trackedTeamIds.includes(teamId))
+      .map(([teamId]) => teamId);
+    if (!newViolations.length) return option;
+    trackedTeamIds.push(...newViolations);
+  }
+}
+
+function optimizeRoster(candidates: Candidate[], rules: ManagerRules): OptimizedRoster {
+  const budgetCents = Math.round(rules.budgetM * 100);
+  for (const position of positionOrder) {
+    if (candidates.filter((player) => player.position === position).length < rules.positions[position]) {
+      throw new Error(`Nicht genug verfügbare Spieler für ${position}.`);
     }
   }
-  return states.sort((left, right) => right.score - left.score)[0];
+  let best: OptimizedRoster | null = null;
+  for (const formation of rules.formations) {
+    const option = optimizeFormation(candidates, rules, formation, budgetCents);
+    if (!option) continue;
+    const optimized = { ...option, formation, picks: planPicks(option.path) };
+    if (!best || comparePlan(optimized, best) > 0) best = optimized;
+  }
+  if (!best) throw new Error("Mit den verfügbaren Marktwerten lässt sich kein gültiger Kader bilden.");
+  return best;
 }
 
 function formationLabel(formation: Formation) {
@@ -293,9 +383,6 @@ export function recommendManagerSquad(catalog: Catalog, season: ManagerSeason, m
   const rules = managerRules(mode, season.leagueCode);
   const candidates = buildCandidates(catalog, season, rules);
   const state = optimizeRoster(candidates, rules);
-  const selection = formationSelection(state.selected, rules.formations);
-  if (!selection) throw new Error("Für den empfohlenen Kader konnte keine gültige Startelf gebildet werden.");
-  const starterIds = new Set(selection.starters.map((player) => player.id));
   const matchRounds = new Map(season.matches.map((match) => [match.id, match.round]));
   const pointsByRoundAndPlayer = new Map<string, number>();
   const currentPointsByPlayer = new Map<string, number>();
@@ -306,7 +393,7 @@ export function recommendManagerSquad(catalog: Catalog, season: ManagerSeason, m
     pointsByRoundAndPlayer.set(key, (pointsByRoundAndPlayer.get(key) ?? 0) + score.totalPoints);
     currentPointsByPlayer.set(score.playerId, (currentPointsByPlayer.get(score.playerId) ?? 0) + score.totalPoints);
   }
-  const players = state.selected.map((player): ManagerPickPlayer => ({
+  const players = state.picks.map(({ player, role }): ManagerPickPlayer => ({
     id: player.id,
     name: player.name,
     teamId: player.teamId,
@@ -322,7 +409,7 @@ export function recommendManagerSquad(catalog: Catalog, season: ManagerSeason, m
     seasonsUsed: player.seasonsUsed,
     appearancesUsed: player.appearancesUsed,
     promotionAdjusted: player.promotionAdjusted,
-    role: starterIds.has(player.id) ? "start" : "reserve",
+    role,
   })).sort((left, right) => positionOrder.indexOf(left.position) - positionOrder.indexOf(right.position)
     || Number(right.role === "start") - Number(left.role === "start")
     || right.projectedPoints - left.projectedPoints);
@@ -361,8 +448,8 @@ export function recommendManagerSquad(catalog: Catalog, season: ManagerSeason, m
     budgetM: rules.budgetM,
     spentM,
     remainingM: Math.round((rules.budgetM - spentM) * 100) / 100,
-    formation: formationLabel(selection.formation),
-    projectedStartingPoints: Math.round(selection.points),
+    formation: formationLabel(state.formation),
+    projectedStartingPoints: Math.round(state.startingPoints),
     currentStartingPoints: matchdays.reduce((sum, matchday) => sum + matchday.totalPoints, 0),
     matchdays,
     generatedAt: season.generatedAt,

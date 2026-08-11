@@ -52,7 +52,7 @@ Die Darstellung berechnet daraus deterministisch:
 
 ## Kaderprognose
 
-Der Kaderplaner läuft vollständig im Browser auf den bereits veröffentlichten Saisonartefakten. Er gewichtet bis zu fünf Spielzeiten nach Aktualität, Verfügbarkeit und Stichprobengröße. Der aktuelle kicker-Marktwert dient als redaktioneller Prior für Spieler mit wenig Historie. Anschließend sucht eine begrenzte kombinatorische Optimierung den punktstärksten Kader unter Budget-, Positions-, Formations- und Vereinsregeln.
+Der Kaderplaner läuft beim statischen Build auf den bereits erzeugten Saisonartefakten. Er gewichtet bis zu fünf Spielzeiten nach Aktualität, Verfügbarkeit und Stichprobengröße. Der aktuelle kicker-Marktwert dient als redaktioneller Prior für Spieler mit wenig Historie. Anschließend berechnet eine exakte dynamische Optimierung den global punktstärksten Kader unter Budget-, Positions-, Formations- und Vereinsregeln. Pareto-Fronten verwerfen ausschließlich nachweislich dominierte Zwischenstände; Vereinslimits werden per Constraint Generation so lange ergänzt, bis das exakte Optimum alle Regeln erfüllt. Dasselbe Verfahren erzeugt je ein kleines JSON für Bundesliga, 2. Bundesliga und 3. Liga sowie Classic und Interactive. Der Browser lädt nur das zur Auswahl passende Ergebnis und führt selbst keine Kaderoptimierung aus.
 
 Die ausgegebenen Punkte sind Erwartungswerte und werden im UI ausdrücklich als Prognose gekennzeichnet. Das Verfahren nutzt keine privaten Managerdaten und behauptet nicht, den späteren Siegerkader sicher vorherzusagen.
 

@@ -62,6 +62,9 @@ jobs:
       - name: Typen prüfen
         run: npm run typecheck
 
+      - name: Frontend-Tests ausführen
+        run: npm test --workspace frontend
+
       - name: Produktions-Build erstellen
         run: npm run build
 
