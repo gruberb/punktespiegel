@@ -13,6 +13,8 @@ use reqwest::{Client, StatusCode};
 use serde::{Deserialize, Serialize};
 use tokio::sync::Semaphore;
 
+mod news;
+
 use crate::media::{kicker_player_photo_url, kicker_team_logo_url};
 
 const BASE_URL: &str = "https://www.kicker-libero.de";
@@ -33,6 +35,8 @@ struct Args {
     refresh_all: bool,
     #[arg(long)]
     validate_only: bool,
+    #[arg(long)]
+    news_only: bool,
     #[arg(long, default_value_t = 8)]
     concurrency: usize,
 }
@@ -397,6 +401,23 @@ async fn main() -> anyhow::Result<()> {
     let client = Client::builder()
         .user_agent("Punktespiegel/0.2 (static public football data dashboard)")
         .build()?;
+    if args.news_only {
+        let season_directory = args.output.join("seasons");
+        let mut seasons = std::fs::read_dir(&season_directory)
+            .with_context(|| format!("{} lesen", season_directory.display()))?
+            .filter_map(Result::ok)
+            .filter(|entry| {
+                entry
+                    .path()
+                    .extension()
+                    .is_some_and(|extension| extension == "json")
+            })
+            .map(|entry| read_season(&entry.path()))
+            .collect::<anyhow::Result<Vec<_>>>()?;
+        seasons.sort_by_key(|season| (season.league_code.clone(), season.start_year));
+        news::refresh_news(&client, &args.output, &seasons, current_year).await?;
+        return Ok(());
+    }
     let targets = build_targets(&args.leagues, args.start_year, current_year)?;
 
     std::fs::create_dir_all(args.output.join("seasons"))
@@ -461,6 +482,11 @@ async fn main() -> anyhow::Result<()> {
         catalog.seasons.len(),
         args.output.display()
     );
+    if let Err(error) = news::refresh_news(&client, &args.output, &completed, current_year).await {
+        eprintln!(
+            "Nachrichtenabgleich fehlgeschlagen; vorhandener Stand bleibt erhalten: {error:#}"
+        );
+    }
     Ok(())
 }
 

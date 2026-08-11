@@ -2,6 +2,7 @@ import { useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from "re
 import type { ReactNode, RefObject } from "react";
 import { createPortal } from "react-dom";
 import { api } from "./api";
+import { initialAvailableRound, latestAvailableRound } from "./rounds";
 import type {
   BestEleven,
   BestElevenPlayer,
@@ -9,6 +10,8 @@ import type {
   Dashboard,
   HistoricalPlayer,
   History,
+  ManagerMode,
+  ManagerRecommendation,
   Player,
   PlayerDetail,
   PlayerGame,
@@ -21,7 +24,7 @@ import type {
   TeamScore,
 } from "./types";
 
-type View = "overview" | "players" | "player" | "teams" | "team" | "history" | "best";
+type View = "overview" | "players" | "player" | "teams" | "team" | "history" | "best" | "manager";
 type NavView = Exclude<View, "player" | "team">;
 type Filters = { league: string; season: string; round: string };
 type ViewLocation = { view: View; filters: Filters; playerId: string | null; teamId: string | null; scrollY: number };
@@ -40,6 +43,7 @@ const nav: { id: NavView; label: string }[] = [
   { id: "teams", label: "Mannschaften" },
   { id: "history", label: "Historie" },
   { id: "best", label: "Beste Elf" },
+  { id: "manager", label: "Fantasy Team" },
 ];
 const teamMetrics: { key: TeamMetric; label: string; short: string; leaders: keyof TeamLeaders }[] = [
   { key: "overall", label: "Gesamt", short: "GES", leaders: "overall" },
@@ -58,12 +62,17 @@ function initialFilters(): Filters {
   return { league, season: params.get("season") ?? "2026", round: String(round) };
 }
 
+function requestedInitialRound() {
+  const params = new URLSearchParams(window.location.search);
+  return params.has("round") ? Number(params.get("round")) : null;
+}
+
 function initialView(): View {
   const params = new URLSearchParams(window.location.search);
   const value = params.get("view");
   if (value === "player" && !params.get("player")) return "players";
   if (value === "team" && !params.get("team")) return "teams";
-  return (["overview", "players", "player", "teams", "team", "history", "best"] as View[]).includes(value as View)
+  return (["overview", "players", "player", "teams", "team", "history", "best", "manager"] as View[]).includes(value as View)
     ? (value as View)
     : "overview";
 }
@@ -122,6 +131,7 @@ function viewBackLabel(view: View) {
     team: "zur Mannschaft",
     history: "zur Historie",
     best: "zur besten Elf",
+    manager: "zum Fantasy Team",
   } satisfies Record<View, string>)[view];
 }
 
@@ -137,6 +147,8 @@ export default function App() {
   const [dashboardError, setDashboardError] = useState<string | null>(null);
   const [dashboardLoading, setDashboardLoading] = useState(false);
   const navigationToken = useRef(0);
+  const initialRoundRequest = useRef(requestedInitialRound());
+  const initialRoundResolved = useRef(false);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -157,7 +169,7 @@ export default function App() {
   const selectedPlayerSeason = playerSeasonCandidates.find((season) => season.leagueCode === filters.league && String(season.startYear) === filters.season)
     ?? playerSeasons.find((season) => String(season.startYear) === filters.season)
     ?? playerSeasons[0];
-  const selectedSeason = view === "overview" ? latestPublishedSeason : view === "team" ? selectedTeamSeason : view === "player" ? selectedPlayerSeason : requestedSeason;
+  const selectedSeason = view === "overview" ? latestPublishedSeason : view === "manager" ? newestSeason : view === "team" ? selectedTeamSeason : view === "player" ? selectedPlayerSeason : requestedSeason;
   const roundCount = selectedSeason?.roundCount ?? (filters.league === "0003" ? 38 : 34);
   const latestRound = selectedSeason?.latestRound ?? 0;
   const teamSelectionPending = Boolean(selectedTeamSeason)
@@ -166,11 +178,28 @@ export default function App() {
     && (filters.league !== selectedPlayerSeason?.leagueCode || filters.season !== String(selectedPlayerSeason?.startYear));
 
   useEffect(() => {
+    if (initialRoundResolved.current || !selectedSeason) return;
+    initialRoundResolved.current = true;
+    const round = String(initialAvailableRound(selectedSeason, initialRoundRequest.current));
+    if (round === filters.round) return;
+    const next = { ...filters, round };
+    setFilters(next);
+    syncUrl(next, view, playerId, teamId);
+  }, [selectedSeason?.id]);
+
+  useEffect(() => {
     if (view !== "overview" || !latestPublishedSeason || filters.season === String(latestPublishedSeason.startYear)) return;
     const next = { ...filters, season: String(latestPublishedSeason.startYear), round: String(Math.max(1, latestPublishedSeason.latestRound)) };
     setFilters(next);
     syncUrl(next, "overview", null, null);
   }, [view, filters.league, filters.season, latestPublishedSeason?.startYear, latestPublishedSeason?.latestRound]);
+
+  useEffect(() => {
+    if (view !== "manager" || !newestSeason || filters.season === String(newestSeason.startYear)) return;
+    const next = { ...filters, season: String(newestSeason.startYear), round: String(Math.max(1, newestSeason.latestRound)) };
+    setFilters(next);
+    syncUrl(next, "manager", null, null);
+  }, [view, filters.league, filters.season, newestSeason?.startYear, newestSeason?.latestRound]);
 
   useEffect(() => {
     if (view !== "team" || !teamId || !selectedTeamSeason) return;
@@ -261,8 +290,8 @@ export default function App() {
       if (defaultSeason) next.season = String(defaultSeason.startYear);
     }
     const season = catalog?.seasons.find((item) => item.leagueCode === next.league && String(item.startYear) === next.season);
-    if (season) next.round = view === "history" && (key === "league" || key === "season")
-      ? String(Math.max(1, season.latestRound))
+    if (season) next.round = key === "league" || key === "season"
+      ? String(latestAvailableRound(season))
       : String(Math.min(Number(next.round), season.roundCount));
     setFilters(next);
     syncUrl(next, view, playerId, teamId);
@@ -297,6 +326,8 @@ export default function App() {
   function setView(next: NavView) {
     const nextFilters = next === "overview" && latestPublishedSeason
       ? { ...filters, season: String(latestPublishedSeason.startYear), round: String(Math.max(1, latestPublishedSeason.latestRound)) }
+      : next === "manager" && newestSeason
+        ? { ...filters, season: String(newestSeason.startYear), round: String(Math.max(1, newestSeason.latestRound)) }
       : next === "history" && requestedSeason
         ? { ...filters, round: String(Math.max(1, requestedSeason.latestRound)) }
         : filters;
@@ -373,6 +404,8 @@ export default function App() {
         ? "Kader, Spieltagspunkte und ihre Zusammensetzung im Detail."
       : view === "history"
         ? "Die besten Saisons vergleichen und jeden Spieltag im Archiv nachvollziehen."
+        : view === "manager"
+          ? "Eine datenbasierte Mannschaft mit Prognose und den tatsächlich erzielten Saisonpunkten."
         : view === "best"
           ? "Die punktstärkste Elf einer ganzen Saison oder eines einzelnen Spieltags."
           : "Spieltagswert und Saisonstand direkt nebeneinander.";
@@ -409,7 +442,7 @@ export default function App() {
               ? <label><span>Saison</span><select value={selectedTeamSeason?.startYear ?? filters.season} onChange={(event) => updateTeamSeason(event.target.value)}>{teamSeasons.map((season) => <option value={season.startYear} key={season.id}>{season.displayName}</option>)}</select></label>
               : view === "player"
                 ? <label><span>Saison</span><select value={selectedPlayerSeason?.startYear ?? filters.season} onChange={(event) => updatePlayerSeason(event.target.value)}>{playerSeasons.map((season) => <option value={season.startYear} key={season.id}>{season.displayName}</option>)}</select></label>
-              : view !== "overview" && <label><span>Saison</span><select value={filters.season} onChange={(event) => updateFilter("season", event.target.value)}>{seasons.map((season) => <option value={season.startYear} key={season.id}>{season.displayName}</option>)}</select></label>}
+              : view !== "overview" && view !== "manager" && <label><span>Saison</span><select value={filters.season} onChange={(event) => updateFilter("season", event.target.value)}>{seasons.map((season) => <option value={season.startYear} key={season.id}>{season.displayName}</option>)}</select></label>}
             {showMatchday && (
               <label>
                 <span>Spieltag</span>
@@ -435,6 +468,7 @@ export default function App() {
             {view === "team" && teamId && (teamSelectionPending ? <LoadingState /> : <TeamDetailView filters={filters} teamId={teamId} backLabel={backLabel} onBack={() => goBack("teams")} onPlayer={openPlayer} onTeam={openTeam} />)}
             {view === "history" && <HistoryView filters={filters} leagues={catalog.leagues} seasons={seasons} onFilter={updateFilter} onPlayer={openPlayerAt} onTeam={openTeamAt} />}
             {view === "best" && <BestElevenView filters={filters} roundCount={roundCount} latestRound={Math.max(1, latestRound)} onPlayer={openPlayer} />}
+            {view === "manager" && <ManagerPicksView filters={filters} onPlayer={openPlayer} />}
             <footer className="data-footnote"><span>Datenbasis</span>Auf Basis öffentlicher kicker-Daten und der Wertungen der kicker Manager-Liga. Stand: importierter Datenbestand.</footer>
           </>
         )}
@@ -794,13 +828,19 @@ function PlayerDetailView({ filters, playerId, backLabel, onBack, onTeam, onSeas
           <span><strong>{formatPlayerValue(detail.value)}</strong><small>Wert · Pkt. / Mio. €</small></span>
         </div>
       </header>
+      <PlayerNewsSection news={detail.news} kickerNewsUrl={detail.kickerNewsUrl} />
       <section className="player-seasons">
-        <h3>Punkte nach Saison</h3>
+        <div className="section-copy"><h3>Punkte nach Saison</h3><p>Verein, Einsätze und benotete Spiele je Saison.</p></div>
         <div className="table-shell player-season-table">
-          <table><thead><tr><th>Jahr</th><th>Liga</th><th className="num">Gesamtpunkte</th></tr></thead>
+          <table><thead><tr><th>Jahr</th><th>Verein</th><th>Liga</th><th className="num">Einsätze</th><th className="num">Benotet</th><th className="num">Gesamtpunkte</th></tr></thead>
             <tbody>{detail.seasons.map((season) => (
               <tr key={season.startYear} className={`clickable-row ${season.startYear === detail.startYear ? "selected" : ""}`} tabIndex={0} onClick={() => onSeason(season.startYear)} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") onSeason(season.startYear); }}>
-                <td><strong>{season.season}</strong></td><td>{season.league}</td><td className="num primary-num">{season.points}</td>
+                <td><strong>{season.season}</strong></td>
+                <td><span className="season-team-list">{season.teams.map((team) => <span key={team.id}><TeamLogo code={team.code} url={team.logoUrl} /><strong>{team.name}</strong></span>)}</span></td>
+                <td>{season.league}</td>
+                <td className="num">{season.appearances}</td>
+                <td className="num">{season.gradedAppearances}</td>
+                <td className="num primary-num">{season.points}</td>
               </tr>
             ))}</tbody>
           </table>
@@ -813,6 +853,136 @@ function PlayerDetailView({ filters, playerId, backLabel, onBack, onTeam, onSeas
         </table>
       </div>
     </section>
+  );
+}
+
+function PlayerNewsSection({ news, kickerNewsUrl }: { news: PlayerDetail["news"]; kickerNewsUrl: string }) {
+  return (
+    <section className="player-news" aria-labelledby="player-news-title">
+      <div className="section-copy news-heading">
+        <div><p className="kicker">Medienbeobachtung</p><h3 id="player-news-title">In den Nachrichten</h3></div>
+        <div className="news-actions">
+          {news.generatedAt && <span>Stand {formatDate(news.generatedAt)}</span>}
+          <a href={kickerNewsUrl} target="_blank" rel="noreferrer">Alle kicker-Spieler-News ↗</a>
+        </div>
+      </div>
+      {news.articles.length ? (
+        <ol className="news-list">
+          {news.articles.map((article) => (
+            <li key={article.url}>
+              <a href={article.url} target="_blank" rel="noreferrer">
+                <span><time dateTime={article.publishedAt}>{formatDate(article.publishedAt)}</time><b>{article.source}</b></span>
+                <strong>{article.title}</strong>
+                <small>{article.domain} ↗</small>
+              </a>
+            </li>
+          ))}
+        </ol>
+      ) : <p className="news-empty">Im automatischen Nachrichtenfeed wurden keine passenden Überschriften gefunden. Das vollständige kicker-Spielerarchiv ist über den Link oben erreichbar.</p>}
+    </section>
+  );
+}
+
+function ManagerPicksView({ filters, onPlayer }: { filters: Filters; onPlayer: (id: string) => void }) {
+  const [mode, setMode] = useState<ManagerMode>("classic");
+  const [recommendation, setRecommendation] = useState<ManagerRecommendation | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    setLoading(true);
+    setError(null);
+    api.managerPicks(scopeQuery(filters, false), mode, controller.signal)
+      .then(setRecommendation)
+      .catch((reason: Error) => { if (!isAbort(reason)) setError(reason.message); })
+      .finally(() => setLoading(false));
+    return () => controller.abort();
+  }, [filters.league, filters.season, mode]);
+
+  if (error) return <ErrorState message={error} />;
+  const starters = recommendation?.players.filter((player) => player.role === "start") ?? [];
+  const reserves = recommendation?.players.filter((player) => player.role === "reserve") ?? [];
+  return (
+    <div className="manager-view">
+      <div className="manager-toolbar">
+        <div className="scope-switch" aria-label="Spielmodus">
+          <button className={mode === "classic" ? "active" : ""} onClick={() => setMode("classic")}>Classic</button>
+          <button className={mode === "interactive" ? "active" : ""} onClick={() => setMode("interactive")}>Interactive</button>
+        </div>
+        <p>{mode === "classic" ? "15 Spieler · feste 4-4-2-Aufstellung" : "22 Spieler · beste der sieben erlaubten Formationen"}</p>
+      </div>
+      {loading || !recommendation ? <LoadingState /> : (
+        <>
+          <section className="detail-section manager-summary-section">
+            <div className="detail-head">
+              <div><p className="kicker">Modellvorschlag · {recommendation.season}</p><h2>Fantasy Team</h2><p>Optimiert nach Punkteprognose sowie Positions-, Formations- und Vereinsregeln. Prognosen sind Erwartungswerte, keine Garantie.</p></div>
+              <span>{recommendation.leagueName}</span>
+            </div>
+            <div className="manager-stats">
+              <span><strong>{recommendation.formation}</strong><small>Startformation</small></span>
+              <span><strong>{recommendation.projectedStartingPoints}</strong><small>Projizierte Punkte</small></span>
+              <span><strong>{recommendation.currentStartingPoints}</strong><small>Aktuelle Punkte{recommendation.matchdays.length ? ` · bis Spieltag ${recommendation.matchdays.at(-1)?.matchday}` : ""}</small></span>
+            </div>
+          </section>
+          <div className="manager-squad-grid">
+            <section className="detail-section manager-lineup">
+              <div className="section-copy"><p className="kicker">Startelf</p><h3>Formation {recommendation.formation}</h3></div>
+              <div className="manager-position-groups">
+                {(["GK", "DEF", "MID", "FWD"] as Position[]).map((position) => (
+                  <section key={position}><h4>{positionName[position]}</h4><div>{starters.filter((player) => player.position === position).map((player) => <ManagerPlayerCard key={player.id} player={player} onClick={() => onPlayer(player.id)} />)}</div></section>
+                ))}
+              </div>
+              <section className="manager-reserves manager-reserves-inline">
+                <div className="section-copy"><p className="kicker">Reserve</p><h3>Ersatzbank</h3></div>
+                <ol>{reserves.map((player) => <li key={player.id}><ManagerPlayerRow player={player} onClick={() => onPlayer(player.id)} /></li>)}</ol>
+              </section>
+            </section>
+          </div>
+          <section className="detail-section fantasy-matchdays">
+            <div className="section-copy"><p className="kicker">Saisonverlauf</p><h3>Punkte je Spieltag</h3><p>Gesamt- und Positionspunkte auf einen Blick. Aufklappen zeigt die Einzelwerte der Startelf.</p></div>
+            {recommendation.matchdays.length ? (
+              <div className="fantasy-matchday-list">
+                {recommendation.matchdays.map((matchday) => <FantasyMatchdayCard key={matchday.matchday} matchday={matchday} onPlayer={onPlayer} />)}
+              </div>
+            ) : <p className="fantasy-matchdays-empty">Für diese Saison sind noch keine Spieltagspunkte verfügbar.</p>}
+          </section>
+        </>
+      )}
+    </div>
+  );
+}
+
+function ManagerPlayerCard({ player, onClick }: { player: ManagerRecommendation["players"][number]; onClick: () => void }) {
+  return <button className="manager-player-card" onClick={onClick}><PlayerPortrait name={player.name} url={player.photoUrl} teamCode={player.teamCode} teamLogoUrl={player.logoUrl} /><span><strong>{player.name}</strong><small>{player.team}</small></span><b>{player.currentPoints} Pkt.<small>aktuell</small></b>{player.promotionAdjusted && <em>Ligastufe korrigiert</em>}</button>;
+}
+
+function ManagerPlayerRow({ player, onClick }: { player: ManagerRecommendation["players"][number]; onClick: () => void }) {
+  const confidence = ({ high: "hoch", medium: "mittel", low: "gering" } as const)[player.confidence];
+  return <button onClick={onClick}><PlayerPortrait name={player.name} url={player.photoUrl} teamCode={player.teamCode} teamLogoUrl={player.logoUrl} /><span><strong>{player.name}</strong><small>{positionName[player.position]} · {player.team}{player.promotionAdjusted ? " · Ligastufe korrigiert" : ""}</small></span><span><b>{player.currentPoints}</b><small>Aktuell</small></span><em className={`confidence ${player.confidence}`}>{confidence}</em></button>;
+}
+
+function FantasyMatchdayCard({ matchday, onPlayer }: { matchday: ManagerRecommendation["matchdays"][number]; onPlayer: (id: string) => void }) {
+  const positions = [
+    { label: "TW", value: matchday.positionPoints.GK },
+    { label: "ABW", value: matchday.positionPoints.DEF },
+    { label: "MIT", value: matchday.positionPoints.MID },
+    { label: "Sturm", value: matchday.positionPoints.FWD },
+  ];
+  return (
+    <details className="fantasy-matchday-card">
+      <summary>
+        <span className="matchday-badge">Spieltag {matchday.matchday}</span>
+        <span className="fantasy-summary-positions">{positions.map((position) => <span key={position.label}><small>{position.label}</small><strong>{position.value}</strong></span>)}</span>
+        <span className="fantasy-matchday-total"><strong>{matchday.totalPoints}</strong><small>Punkte</small></span>
+        <span className="fantasy-matchday-toggle" aria-hidden="true">⌄</span>
+      </summary>
+      <ol className="fantasy-player-points">
+        {matchday.players.map((player) => (
+          <li key={player.id}><button onClick={() => onPlayer(player.id)}><PlayerPortrait name={player.name} url={player.photoUrl} teamCode={player.teamCode} teamLogoUrl={player.logoUrl} /><span><strong>{player.name}</strong><small>{positionName[player.position]} · {player.team}</small></span><b className={player.points < 0 ? "negative" : ""}>{player.points > 0 ? `+${player.points}` : player.points}</b></button></li>
+        ))}
+      </ol>
+    </details>
   );
 }
 

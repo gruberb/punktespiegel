@@ -165,6 +165,7 @@ export type PlayerDetail = {
   logoUrl: string | null;
   photoUrl: string | null;
   kickerUrl: string;
+  kickerNewsUrl: string;
   transfermarktUrl: string;
   position: Position;
   priceM: number;
@@ -172,12 +173,91 @@ export type PlayerDetail = {
   value: number | null;
   seasons: PlayerSeasonSummary[];
   games: PlayerGame[];
+  news: PlayerNews;
+};
+
+export type NewsArticle = {
+  source: string;
+  domain: string;
+  title: string;
+  url: string;
+  publishedAt: string;
+};
+
+export type PlayerNews = {
+  generatedAt: string | null;
+  provider: string | null;
+  articles: NewsArticle[];
+};
+
+export type ManagerMode = "classic" | "interactive";
+export type ProjectionConfidence = "high" | "medium" | "low";
+
+export type ManagerPickPlayer = {
+  id: string;
+  name: string;
+  teamId: string;
+  team: string;
+  teamCode: string;
+  logoUrl: string | null;
+  photoUrl: string | null;
+  position: Position;
+  priceM: number;
+  projectedPoints: number;
+  currentPoints: number;
+  confidence: ProjectionConfidence;
+  seasonsUsed: number;
+  appearancesUsed: number;
+  promotionAdjusted: boolean;
+  role: "start" | "reserve";
+};
+
+export type ManagerMatchdayPlayer = {
+  id: string;
+  name: string;
+  team: string;
+  teamCode: string;
+  logoUrl: string | null;
+  photoUrl: string | null;
+  position: Position;
+  points: number;
+};
+
+export type ManagerMatchday = {
+  matchday: number;
+  totalPoints: number;
+  positionPoints: Record<Position, number>;
+  players: ManagerMatchdayPlayer[];
+};
+
+export type ManagerRecommendation = {
+  league: string;
+  leagueName: string;
+  season: string;
+  mode: ManagerMode;
+  budgetM: number;
+  spentM: number;
+  remainingM: number;
+  formation: string;
+  projectedStartingPoints: number;
+  currentStartingPoints: number;
+  matchdays: ManagerMatchday[];
+  generatedAt: string;
+  rules: {
+    squadSize: number;
+    positions: Record<Position, number>;
+    maxFromTeam: number | null;
+  };
+  players: ManagerPickPlayer[];
 };
 
 export type PlayerSeasonSummary = {
   startYear: number;
   season: string;
   league: string;
+  teams: { id: string; name: string; code: string; logoUrl: string | null }[];
+  appearances: number;
+  gradedAppearances: number;
   points: number;
 };
 

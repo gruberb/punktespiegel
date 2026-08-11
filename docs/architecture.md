@@ -47,7 +47,18 @@ Die Darstellung berechnet daraus deterministisch:
 - Mannschaftspunkte insgesamt und je Position,
 - historische Toplisten,
 - Spieler- und Mannschaftsdetailseiten,
-- die punktstärkste reguläre Elf für Saison oder Spieltag.
+- die punktstärkste reguläre Elf für Saison oder Spieltag,
+- regelkonforme Classic- und Interactive-Kaderempfehlungen für die aktuelle Saison.
+
+## Kaderprognose
+
+Der Kaderplaner läuft vollständig im Browser auf den bereits veröffentlichten Saisonartefakten. Er gewichtet bis zu fünf Spielzeiten nach Aktualität, Verfügbarkeit und Stichprobengröße. Der aktuelle kicker-Marktwert dient als redaktioneller Prior für Spieler mit wenig Historie. Anschließend sucht eine begrenzte kombinatorische Optimierung den punktstärksten Kader unter Budget-, Positions-, Formations- und Vereinsregeln.
+
+Die ausgegebenen Punkte sind Erwartungswerte und werden im UI ausdrücklich als Prognose gekennzeichnet. Das Verfahren nutzt keine privaten Managerdaten und behauptet nicht, den späteren Siegerkader sicher vorherzusagen.
+
+## Nachrichten
+
+Der Datencompiler liest serverseitig im täglichen Build mehrere öffentliche RSS-Feeds. Eine statische `news.json` ordnet jedem Spieler höchstens zehn Treffer der letzten 14 Tage mit Datum, Quelle, Überschrift und Link zu. Der Browser kommuniziert nicht direkt mit den Quellen. Ein fehlgeschlagener Nachrichtenlauf ersetzt keinen vorhandenen Stand; ein optionaler NewsAPI-Schlüssel bleibt ein Actions-Secret.
 
 ## Sharding und Übertragung
 

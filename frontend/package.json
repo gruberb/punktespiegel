@@ -1,11 +1,12 @@
 {
   "name": "@punktespiegel/frontend",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "type": "module",
   "scripts": {
     "dev": "vite --host 0.0.0.0",
     "build": "tsc -b && vite build",
-    "typecheck": "tsc -b --pretty false"
+    "typecheck": "tsc -b --pretty false",
+    "test": "node --experimental-strip-types --test src/*.test.ts"
   },
   "dependencies": {
     "@vitejs/plugin-react": "latest",

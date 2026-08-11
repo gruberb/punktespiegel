@@ -4,17 +4,28 @@ Alle wesentlichen Änderungen an Punktespiegel werden in dieser Datei dokumentie
 
 ## [Unreleased]
 
-### Entfernt
-
-- Unbelegte Prognose-, P10–P90- und Verfügbarkeitswerte aus Spielerpool und Datenvertrag.
+## [1.1.0] – 2026-08-11
 
 ### Hinzugefügt
 
-- Vollständige Spielernamen, kontextbezogene kicker-Links und eine saisonübergreifende Punkteübersicht im Spielerprofil.
+- Datenbasierte Fantasy-Team-Empfehlungen für Classic und Interactive in allen drei Ligen, einschließlich Vereins-, Positions-, Formations- und Budgetregeln.
+- Ligastufen-Korrektur für Aufsteiger, Prognosekonfidenz sowie Gegenüberstellung von projizierten und tatsächlich erzielten Punkten.
+- Kompakte Spieltagsauswertung der empfohlenen Startelf mit Positionssummen und aufklappbaren Einzelwerten.
+- Automatische Nachrichtenübersicht in Spielerprofilen aus öffentlichen Fußball-RSS-Feeds und optional NewsAPI.
+- Saisonübergreifende Mannschafts- und Spielerprofile mit damaligem Verein, Einsätzen, benoteten Spielen und automatischer Liga-Auswahl.
+- Vollständige Spielernamen, kontextbezogene kicker-Links, historische Marktwerte und Punkte-pro-Million-Auswertungen.
+- Automatische Vorauswahl des neuesten Spieltags, für den tatsächlich Daten vorliegen.
 - Datenschutzfreundliche Seitenaufrufmessung mit Plausible Analytics.
-- Saisonübergreifende Mannschafts- und Spielerprofile mit automatischer Auswahl der damaligen Liga.
-- Saisonpunkte, historischer Marktwert und Punkte-pro-Million-Wert im Spielerprofil sowie eine Wert-Spalte im Spielerpool.
 - Lokal ausgelieferte Noto-Sans-Variable-Font für Oberfläche, Überschriften und Zahlen.
+
+### Geändert
+
+- Startelf und Ersatzbank werden im Fantasy Team gemeinsam dargestellt; die Spieltagsauswertung folgt darunter.
+- Spielerprofile zeigen Nachrichten vor der nun vollbreiten Saisonübersicht.
+
+### Entfernt
+
+- Unbelegte Prognose-, P10–P90- und Verfügbarkeitswerte aus Spielerpool und Datenvertrag.
 
 ## [1.0.0] – 2026-08-10
 
@@ -34,3 +45,4 @@ Alle wesentlichen Änderungen an Punktespiegel werden in dieser Datei dokumentie
 - Alle öffentlichen Assets verwenden GitHub-Pages-kompatible relative Pfade.
 
 [1.0.0]: https://github.com/gruberb/punktespiegel/releases/tag/v1.0.0
+[1.1.0]: https://github.com/gruberb/punktespiegel/releases/tag/v1.1.0

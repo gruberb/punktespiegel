@@ -46,6 +46,8 @@ jobs:
           cache: npm
 
       - name: Statische Daten aktualisieren
+        env:
+          NEWS_API_KEY: ${{ secrets.NEWS_API_KEY }}
         run: |
           if [ "${{ inputs.refresh_all }}" = "true" ]; then
             cargo run --locked -p punktespiegel-data -- --refresh-all

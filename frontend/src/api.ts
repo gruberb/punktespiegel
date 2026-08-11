@@ -4,6 +4,9 @@ import type {
   Dashboard,
   HistoricalPlayer,
   History,
+  ManagerMode,
+  ManagerRecommendation,
+  NewsArticle,
   Player,
   PlayerDetail,
   PlayerGame,
@@ -16,8 +19,16 @@ import type {
   TeamPlayerScore,
   TeamScore,
 } from "./types";
+import { recommendManagerSquad } from "./manager-model";
 
 type StaticCatalog = Catalog & { schemaVersion: number; generatedAt: string };
+
+type StaticNews = {
+  schemaVersion: number;
+  generatedAt: string;
+  provider: string;
+  players: Record<string, NewsArticle[]>;
+};
 
 type StaticSeason = {
   schemaVersion: number;
@@ -111,6 +122,12 @@ type PlayerAccumulator = {
 };
 
 const catalogCache = loadJson<StaticCatalog>(asset("data/catalog.json"));
+const newsCache = loadJson<StaticNews>(asset("data/news.json")).catch((): StaticNews => ({
+  schemaVersion: 1,
+  generatedAt: "",
+  provider: "",
+  players: {},
+}));
 const seasonCache = new Map<string, Promise<SeasonIndex>>();
 
 function asset(path: string) {
@@ -447,7 +464,7 @@ function sortPlayers(players: Player[], sort: string, direction: "asc" | "desc")
   });
 }
 
-function playerDetail(index: SeasonIndex, playerId: string, catalog: StaticCatalog): PlayerDetail {
+async function playerDetail(index: SeasonIndex, playerId: string, catalog: StaticCatalog, news: StaticNews): Promise<PlayerDetail> {
   const player = index.players.get(playerId);
   if (!player) throw new Error("Spieler wurde in dieser Saison nicht gefunden.");
   const team = index.teams.get(player.teamId);
@@ -483,7 +500,7 @@ function playerDetail(index: SeasonIndex, playerId: string, catalog: StaticCatal
     }];
   }).sort((left, right) => left.matchday - right.matchday);
   const seasonPoints = games.reduce((sum, game) => sum + game.points, 0);
-  const seasons = playerSeasonHistory(catalog, playerId);
+  const seasons = await playerSeasonHistory(catalog, playerId);
   return {
     id: player.id,
     name: player.name,
@@ -496,6 +513,7 @@ function playerDetail(index: SeasonIndex, playerId: string, catalog: StaticCatal
     logoUrl: team.logoUrl,
     photoUrl: player.photoUrl,
     kickerUrl: kickerProfileUrl(index.season, player.name, team.name),
+    kickerNewsUrl: `https://www.kicker.de/${profileSlug(player.name)}/spieler-news`,
     transfermarktUrl: `https://www.transfermarkt.de/schnellsuche/ergebnis/schnellsuche?query=${encodeURIComponent(player.name)}`,
     position: player.position,
     priceM: player.priceM,
@@ -503,10 +521,30 @@ function playerDetail(index: SeasonIndex, playerId: string, catalog: StaticCatal
     value: player.priceM > 0 && player.priceM < 999 ? seasonPoints / player.priceM : null,
     seasons,
     games,
+    news: {
+      generatedAt: news.generatedAt || null,
+      provider: news.provider || null,
+      articles: news.players[player.id] ?? [],
+    },
   };
 }
 
-function playerSeasonHistory(catalog: StaticCatalog, playerId: string): PlayerSeasonSummary[] {
+function scoreCountsAsAppearance(score: StaticScore) {
+  return (score.grade != null && score.grade > 0)
+    || score.totalPoints !== 0
+    || score.goals !== 0
+    || score.assists !== 0
+    || score.pointsCleanSheet !== 0
+    || score.pointsGrade !== 0
+    || score.pointsGoals !== 0
+    || score.pointsCards !== 0
+    || score.pointsAssists !== 0
+    || score.pointsStarter !== 0
+    || score.pointsMvp !== 0
+    || score.pointsJoker !== 0;
+}
+
+async function playerSeasonHistory(catalog: StaticCatalog, playerId: string): Promise<PlayerSeasonSummary[]> {
   const candidates = catalog.seasons.flatMap((season) => {
     const membership = season.players.find((player) => player.id === playerId);
     if (!membership) return [];
@@ -525,15 +563,32 @@ function playerSeasonHistory(catalog: StaticCatalog, playerId: string): PlayerSe
     || right.points - left.points
     || left.leagueCode.localeCompare(right.leagueCode));
   const years = new Set<number>();
-  return candidates.filter((season) => {
+  return Promise.all(candidates.filter((season) => {
     if (years.has(season.startYear)) return false;
     years.add(season.startYear);
     return true;
-  }).map((season) => ({
-    startYear: season.startYear,
-    season: season.season,
-    league: season.league,
-    points: season.points,
+  }).map(async (season) => {
+    const params = new URLSearchParams({ league: season.leagueCode, season: String(season.startYear) });
+    const index = await loadSeason(params);
+    const appearanceScores = index.season.scores.filter((score) => score.playerId === playerId && scoreCountsAsAppearance(score));
+    const teamCounts = new Map<string, number>();
+    for (const score of appearanceScores) teamCounts.set(score.teamId, (teamCounts.get(score.teamId) ?? 0) + 1);
+    const fallbackTeamId = index.players.get(playerId)?.teamId;
+    if (!teamCounts.size && fallbackTeamId) teamCounts.set(fallbackTeamId, 0);
+    const teams = [...teamCounts].flatMap(([teamId, count]) => {
+      const team = index.teams.get(teamId);
+      return team ? [{ ...team, count }] : [];
+    }).sort((left, right) => right.count - left.count || left.name.localeCompare(right.name, "de"))
+      .map(({ count: _count, ...team }) => team);
+    return {
+      startYear: season.startYear,
+      season: season.season,
+      league: season.league,
+      teams,
+      appearances: appearanceScores.length,
+      gradedAppearances: index.season.scores.filter((score) => score.playerId === playerId && score.grade != null && score.grade > 0).length,
+      points: season.points,
+    };
   }));
 }
 
@@ -668,8 +723,10 @@ export const api = {
       .filter((player) => !query || player.name.toLocaleLowerCase("de").includes(query) || player.team.toLocaleLowerCase("de").includes(query)), params.get("sort") ?? "points", direction);
     return { items: filtered.slice(offset, offset + limit), nextOffset: offset + limit < filtered.length ? offset + limit : null };
   }), signal),
-  player: (playerId: string, params: URLSearchParams, signal?: AbortSignal) => abortable(Promise.all([loadSeason(params), catalogCache]).then(([index, catalog]) => playerDetail(index, playerId, catalog)), signal),
+  player: (playerId: string, params: URLSearchParams, signal?: AbortSignal) => abortable(Promise.all([loadSeason(params), catalogCache, newsCache]).then(([index, catalog, news]) => playerDetail(index, playerId, catalog, news)), signal),
   teams: (params: URLSearchParams, signal?: AbortSignal) => abortable(loadSeason(params).then((index) => buildTeamScores(index, { kind: "all" })), signal),
   team: (teamId: string, params: URLSearchParams, signal?: AbortSignal) => abortable(loadSeason(params).then((index) => teamDetail(index, teamId)), signal),
   bestEleven: (params: URLSearchParams, signal?: AbortSignal) => abortable(loadSeason(params).then((index) => bestEleven(index, params.get("scope") === "season" ? "season" : "matchday", selectedRound(params, index.season))), signal),
+  managerPicks: (params: URLSearchParams, mode: ManagerMode, signal?: AbortSignal): Promise<ManagerRecommendation> => abortable(Promise.all([loadSeason(params), catalogCache])
+    .then(([index, catalog]) => recommendManagerSquad(catalog, index.season, mode)), signal),
 };

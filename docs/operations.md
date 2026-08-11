@@ -79,6 +79,12 @@ Der Workflow:
 
 Es gibt kein `DATABASE_URL`-Secret. Der Workflow schreibt auch nicht zurück in den Branch und bläht deshalb die Git-Historie nicht täglich auf.
 
+### Nachrichtenabgleich
+
+Der gleiche tägliche Lauf aktualisiert `data/news.json`. Ohne weitere Einrichtung liest er die öffentlichen RSS-Feeds von kicker, Sportschau, Bundesliga.com, Sky Sports, ESPN, BBC Sport und The Guardian. Optional kann weiterhin ein `NEWS_API_KEY` als Actions-Secret hinterlegt werden; der Schlüssel wird nur im Generator verwendet und gelangt weder in den Browser noch in das veröffentlichte Artefakt.
+
+Der Generator sucht Überschriften der letzten 14 Tage und speichert nur Datum, Quelle, Überschrift und Ziel-URL; Artikeltexte und Bilder werden nicht kopiert. Ein einzelner ausgefallener Feed stoppt den Lauf nicht. Sind alle Quellen nicht erreichbar, bleibt der letzte erfolgreich erzeugte Nachrichtenstand erhalten. Für einen separaten lokalen Abgleich genügt `cargo run --locked -p punktespiegel-data -- --news-only`.
+
 ## GitHub Pages aktivieren
 
 1. Repository **Settings → Pages** öffnen.
