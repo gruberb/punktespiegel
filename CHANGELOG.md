@@ -10,6 +10,7 @@ Alle wesentlichen Änderungen an Punktespiegel werden in dieser Datei dokumentie
 
 ### Hinzugefügt
 
+- Vollständige Spielernamen, kontextbezogene kicker-Links und eine saisonübergreifende Punkteübersicht im Spielerprofil.
 - Datenschutzfreundliche Seitenaufrufmessung mit Plausible Analytics.
 - Saisonübergreifende Mannschafts- und Spielerprofile mit automatischer Auswahl der damaligen Liga.
 - Saisonpunkte, historischer Marktwert und Punkte-pro-Million-Wert im Spielerprofil sowie eine Wert-Spalte im Spielerpool.

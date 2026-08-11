@@ -7,6 +7,7 @@ import type {
   Player,
   PlayerDetail,
   PlayerGame,
+  PlayerSeasonSummary,
   Position,
   TeamDetail,
   TeamDetailMatch,
@@ -446,7 +447,7 @@ function sortPlayers(players: Player[], sort: string, direction: "asc" | "desc")
   });
 }
 
-function playerDetail(index: SeasonIndex, playerId: string): PlayerDetail {
+function playerDetail(index: SeasonIndex, playerId: string, catalog: StaticCatalog): PlayerDetail {
   const player = index.players.get(playerId);
   if (!player) throw new Error("Spieler wurde in dieser Saison nicht gefunden.");
   const team = index.teams.get(player.teamId);
@@ -482,26 +483,77 @@ function playerDetail(index: SeasonIndex, playerId: string): PlayerDetail {
     }];
   }).sort((left, right) => left.matchday - right.matchday);
   const seasonPoints = games.reduce((sum, game) => sum + game.points, 0);
+  const seasons = playerSeasonHistory(catalog, playerId);
   return {
     id: player.id,
     name: player.name,
     teamId: team.id,
     team: team.name,
     teamCode: team.code,
+    league: index.season.leagueName,
+    season: index.season.displayName,
+    startYear: index.season.startYear,
     logoUrl: team.logoUrl,
     photoUrl: player.photoUrl,
-    kickerUrl: `https://www.kicker.de/${profileSlug(player.name)}/spieler`,
+    kickerUrl: kickerProfileUrl(index.season, player.name, team.name),
     transfermarktUrl: `https://www.transfermarkt.de/schnellsuche/ergebnis/schnellsuche?query=${encodeURIComponent(player.name)}`,
     position: player.position,
     priceM: player.priceM,
     seasonPoints,
     value: player.priceM > 0 && player.priceM < 999 ? seasonPoints / player.priceM : null,
+    seasons,
     games,
   };
 }
 
+function playerSeasonHistory(catalog: StaticCatalog, playerId: string): PlayerSeasonSummary[] {
+  const candidates = catalog.seasons.flatMap((season) => {
+    const membership = season.players.find((player) => player.id === playerId);
+    if (!membership) return [];
+    return [{
+      startYear: season.startYear,
+      season: season.displayName,
+      leagueCode: season.leagueCode,
+      league: catalog.leagues.find((league) => league.code === season.leagueCode)?.name ?? season.leagueCode,
+      points: membership.points,
+      active: membership.active,
+      appearances: membership.appearances,
+    }];
+  }).sort((left, right) => right.startYear - left.startYear
+    || Number(right.active) - Number(left.active)
+    || right.appearances - left.appearances
+    || right.points - left.points
+    || left.leagueCode.localeCompare(right.leagueCode));
+  const years = new Set<number>();
+  return candidates.filter((season) => {
+    if (years.has(season.startYear)) return false;
+    years.add(season.startYear);
+    return true;
+  }).map((season) => ({
+    startYear: season.startYear,
+    season: season.season,
+    league: season.league,
+    points: season.points,
+  }));
+}
+
+function kickerProfileUrl(season: StaticSeason, playerName: string, teamName: string) {
+  const league = ({ "0001": "bundesliga", "0002": "2-bundesliga", "0003": "3-liga" } as Record<string, string>)[season.leagueCode]
+    ?? profileSlug(season.leagueName);
+  const seasonSlug = season.displayName.replace("/", "-");
+  return `https://www.kicker.de/${profileSlug(playerName)}/spieler/${league}/${seasonSlug}/${profileSlug(teamName)}`;
+}
+
 function profileSlug(value: string) {
-  return value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/ß/g, "ss").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+  return value.toLocaleLowerCase("de")
+    .replace(/ä/g, "ae")
+    .replace(/ö/g, "oe")
+    .replace(/ü/g, "ue")
+    .replace(/ß/g, "ss")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
 }
 
 function teamDetail(index: SeasonIndex, teamId: string): TeamDetail {
@@ -616,7 +668,7 @@ export const api = {
       .filter((player) => !query || player.name.toLocaleLowerCase("de").includes(query) || player.team.toLocaleLowerCase("de").includes(query)), params.get("sort") ?? "points", direction);
     return { items: filtered.slice(offset, offset + limit), nextOffset: offset + limit < filtered.length ? offset + limit : null };
   }), signal),
-  player: (playerId: string, params: URLSearchParams, signal?: AbortSignal) => abortable(loadSeason(params).then((index) => playerDetail(index, playerId)), signal),
+  player: (playerId: string, params: URLSearchParams, signal?: AbortSignal) => abortable(Promise.all([loadSeason(params), catalogCache]).then(([index, catalog]) => playerDetail(index, playerId, catalog)), signal),
   teams: (params: URLSearchParams, signal?: AbortSignal) => abortable(loadSeason(params).then((index) => buildTeamScores(index, { kind: "all" })), signal),
   team: (teamId: string, params: URLSearchParams, signal?: AbortSignal) => abortable(loadSeason(params).then((index) => teamDetail(index, teamId)), signal),
   bestEleven: (params: URLSearchParams, signal?: AbortSignal) => abortable(loadSeason(params).then((index) => bestEleven(index, params.get("scope") === "season" ? "season" : "matchday", selectedRound(params, index.season))), signal),

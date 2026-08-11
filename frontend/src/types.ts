@@ -159,6 +159,9 @@ export type PlayerDetail = {
   teamId: string;
   team: string;
   teamCode: string;
+  league: string;
+  season: string;
+  startYear: number;
   logoUrl: string | null;
   photoUrl: string | null;
   kickerUrl: string;
@@ -167,7 +170,15 @@ export type PlayerDetail = {
   priceM: number;
   seasonPoints: number;
   value: number | null;
+  seasons: PlayerSeasonSummary[];
   games: PlayerGame[];
+};
+
+export type PlayerSeasonSummary = {
+  startYear: number;
+  season: string;
+  league: string;
+  points: number;
 };
 
 export type TeamDetailPlayer = {

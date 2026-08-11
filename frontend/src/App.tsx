@@ -430,7 +430,7 @@ export default function App() {
                   : <Overview data={dashboard} onView={setView} onPlayer={openPlayer} onTeam={openTeam} />
             )}
             {view === "players" && <PlayersView filters={filters} onPlayer={openPlayer} />}
-            {view === "player" && playerId && (playerSelectionPending ? <LoadingState /> : <PlayerDetailView filters={filters} playerId={playerId} backLabel={backLabel} onBack={() => goBack("players")} onTeam={openTeam} />)}
+            {view === "player" && playerId && (playerSelectionPending ? <LoadingState /> : <PlayerDetailView filters={filters} playerId={playerId} backLabel={backLabel} onBack={() => goBack("players")} onTeam={openTeam} onSeason={(year) => updatePlayerSeason(String(year))} />)}
             {view === "teams" && <TeamsView filters={filters} onTeam={openTeam} />}
             {view === "team" && teamId && (teamSelectionPending ? <LoadingState /> : <TeamDetailView filters={filters} teamId={teamId} backLabel={backLabel} onBack={() => goBack("teams")} onPlayer={openPlayer} onTeam={openTeam} />)}
             {view === "history" && <HistoryView filters={filters} leagues={catalog.leagues} seasons={seasons} onFilter={updateFilter} onPlayer={openPlayerAt} onTeam={openTeamAt} />}
@@ -766,7 +766,7 @@ function SortableHead({ label, column, active, direction, onSort, numeric = fals
   return <th className={numeric ? "num" : ""} aria-sort={active === column ? (direction === "asc" ? "ascending" : "descending") : "none"}><button className="sort-button" onClick={() => onSort(column)}>{label}<span>{active === column ? (direction === "asc" ? "↑" : "↓") : "↕"}</span></button></th>;
 }
 
-function PlayerDetailView({ filters, playerId, backLabel, onBack, onTeam }: { filters: Filters; playerId: string; backLabel: string; onBack: () => void; onTeam: (id: string) => void }) {
+function PlayerDetailView({ filters, playerId, backLabel, onBack, onTeam, onSeason }: { filters: Filters; playerId: string; backLabel: string; onBack: () => void; onTeam: (id: string) => void; onSeason: (year: number) => void }) {
   const [detail, setDetail] = useState<PlayerDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -787,13 +787,25 @@ function PlayerDetailView({ filters, playerId, backLabel, onBack, onTeam }: { fi
       <button className="back-button" onClick={onBack}>← {backLabel}</button>
       <header className="player-profile">
         <PlayerPortrait name={detail.name} url={detail.photoUrl} teamCode={detail.teamCode} teamLogoUrl={detail.logoUrl} large />
-        <div className="profile-copy"><p className="kicker">{positionName[detail.position]}</p><h2>{detail.name}</h2><button className="profile-team-link" onClick={() => onTeam(detail.teamId)}>{detail.team}</button><div className="profile-links"><a href={detail.kickerUrl} target="_blank" rel="noreferrer">kicker-Profil ↗</a><a href={detail.transfermarktUrl} target="_blank" rel="noreferrer">Bei Transfermarkt suchen ↗</a></div></div>
+        <div className="profile-copy"><p className="kicker">{positionName[detail.position]}</p><h2>{detail.name}</h2><div className="profile-context"><button className="profile-team-link" onClick={() => onTeam(detail.teamId)}>{detail.team}</button><span>{detail.league} · {detail.season}</span></div><div className="profile-links"><a href={detail.kickerUrl} target="_blank" rel="noreferrer">kicker-Profil ↗</a><a href={detail.transfermarktUrl} target="_blank" rel="noreferrer">Bei Transfermarkt suchen ↗</a></div></div>
         <div className="profile-stats">
           <span><strong>{detail.seasonPoints}</strong><small>Saisonpunkte</small></span>
           <span><strong>{formatMarketValue(detail.priceM)}</strong><small>Marktwert</small></span>
           <span><strong>{formatPlayerValue(detail.value)}</strong><small>Wert · Pkt. / Mio. €</small></span>
         </div>
       </header>
+      <section className="player-seasons">
+        <h3>Punkte nach Saison</h3>
+        <div className="table-shell player-season-table">
+          <table><thead><tr><th>Jahr</th><th>Liga</th><th className="num">Gesamtpunkte</th></tr></thead>
+            <tbody>{detail.seasons.map((season) => (
+              <tr key={season.startYear} className={`clickable-row ${season.startYear === detail.startYear ? "selected" : ""}`} tabIndex={0} onClick={() => onSeason(season.startYear)} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") onSeason(season.startYear); }}>
+                <td><strong>{season.season}</strong></td><td>{season.league}</td><td className="num primary-num">{season.points}</td>
+              </tr>
+            ))}</tbody>
+          </table>
+        </div>
+      </section>
       <div className="section-copy"><p className="kicker">Saisonverlauf</p><h3>Jeder Einsatz und jede Punkteaktion</h3></div>
       <div className="table-shell game-table">
         <table><thead><tr><th>Spieltag</th><th>Datum</th><th>Gegner</th><th>Ergebnis</th><th className="num">Punkte</th><th className="num">Note</th><th className="num">Tore</th><th className="num">Vorlagen</th><th className="num">Zu null</th><th className="num">Startelf</th><th className="num">Karten</th><th className="num">SdS</th><th className="num">Joker</th></tr></thead>

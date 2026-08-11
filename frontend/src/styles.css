@@ -228,12 +228,20 @@ tbody tr:hover { background: #fbfcf9; }
 .profile-links a:hover { border-color: var(--green); background: white; }
 .profile-team-link { display: block; padding: 4px 0; margin-top: 3px; border: 0; border-bottom: 1px solid transparent; background: transparent; color: var(--muted); font-size: 12px; text-align: left; }
 .profile-team-link:hover { border-bottom-color: #b8c7bb; color: var(--green-deep); }
+.profile-context { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px; color: var(--muted); font-size: 12px; }
+.profile-context .profile-team-link { margin-top: 3px; }
 .profile-stats { display: flex; overflow: hidden; border: 1px solid var(--line); border-radius: 11px; background: rgba(255, 255, 255, .7); }
 .profile-stats > span { min-width: 112px; padding: 14px 16px; border-left: 1px solid var(--line); }
 .profile-stats > span:first-child { border-left: 0; }
 .profile-stats strong, .profile-stats small { display: block; }
 .profile-stats strong { color: var(--green-deep); font: 680 20px "Noto Sans", ui-sans-serif, sans-serif; font-variant-numeric: tabular-nums; }
 .profile-stats small { margin-top: 4px; color: var(--muted); font-size: 8px; text-transform: uppercase; }
+.player-seasons { max-width: 760px; margin-bottom: 30px; }
+.player-seasons h3 { margin: 0 0 12px; font-size: 17px; font-weight: 620; }
+.player-season-table table { min-width: 480px; }
+.player-season-table th, .player-season-table td { padding: 12px 16px; }
+.player-season-table tr.selected { background: var(--sage-soft); }
+.player-season-table tr.selected td:first-child { box-shadow: inset 3px 0 var(--green); }
 .section-copy { margin-bottom: 14px; }
 .section-copy h3 { margin: 0; font-size: 17px; font-weight: 620; }
 .game-table table { min-width: 1360px; }

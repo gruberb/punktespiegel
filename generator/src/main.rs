@@ -263,6 +263,8 @@ struct UpstreamPlayer {
     first_name: String,
     #[serde(default)]
     last_name: String,
+    #[serde(default)]
+    display_long_name: String,
     display_name: String,
     team_id: String,
     position: String,
@@ -273,12 +275,16 @@ struct UpstreamPlayer {
 
 impl UpstreamPlayer {
     fn name(&self) -> String {
-        if !self.display_name.trim().is_empty() {
-            return self.display_name.trim().to_owned();
+        if !self.display_long_name.trim().is_empty() {
+            return self.display_long_name.trim().to_owned();
         }
-        format!("{} {}", self.first_name.trim(), self.last_name.trim())
+        let full_name = format!("{} {}", self.first_name.trim(), self.last_name.trim())
             .trim()
-            .to_owned()
+            .to_owned();
+        if !full_name.is_empty() {
+            return full_name;
+        }
+        self.display_name.trim().to_owned()
     }
 }
 
@@ -1032,6 +1038,22 @@ mod tests {
             photo_url: None,
         };
         assert!(serde_json::to_string(&player).unwrap().contains("999.0"));
+    }
+
+    #[test]
+    fn prefers_the_complete_player_name() {
+        let player = UpstreamPlayer {
+            id: "pl-k1".to_owned(),
+            first_name: "Maxwell".to_owned(),
+            last_name: "Gyamfi".to_owned(),
+            display_long_name: "Maxwell Gyamfi".to_owned(),
+            display_name: "Gyamfi".to_owned(),
+            team_id: "tm-k1".to_owned(),
+            position: "DEFENDER".to_owned(),
+            market_value: 500_000,
+            active: true,
+        };
+        assert_eq!(player.name(), "Maxwell Gyamfi");
     }
 
     #[test]
