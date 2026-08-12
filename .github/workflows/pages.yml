@@ -45,16 +45,6 @@ jobs:
           node-version: 24
           cache: npm
 
-      - name: uv installieren
-        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
-        with:
-          enable-cache: true
-
-      - name: Python-Abhängigkeiten installieren
-        run: |
-          uv python install
-          uv sync --frozen
-
       - name: Statische Daten aktualisieren
         env:
           NEWS_API_KEY: ${{ secrets.NEWS_API_KEY }}
@@ -69,7 +59,6 @@ jobs:
         run: |
           cargo run --locked -p punktespiegel-data -- --validate-only
           npm ci
-          npm run generate:recommendations
           npm run build
 
       - name: Pages konfigurieren

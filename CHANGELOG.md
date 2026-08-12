@@ -2,6 +2,12 @@
 
 Alle wesentlichen Änderungen an Punktespiegel werden in dieser Datei dokumentiert.
 
+## [1.4.1] – 2026-08-12
+
+### Behoben
+
+- CI und GitHub Pages validieren und veröffentlichen nun ausschließlich die eingecheckten statischen Kaderempfehlungen, statt das Offline-Modell während Build oder Deployment erneut zu trainieren.
+
 ## [1.4.0] – 2026-08-12
 
 ### Hinzugefügt
@@ -102,3 +108,4 @@ Alle wesentlichen Änderungen an Punktespiegel werden in dieser Datei dokumentie
 [1.2.2]: https://github.com/gruberb/punktespiegel/releases/tag/v1.2.2
 [1.3.0]: https://github.com/gruberb/punktespiegel/releases/tag/v1.3.0
 [1.4.0]: https://github.com/gruberb/punktespiegel/releases/tag/v1.4.0
+[1.4.1]: https://github.com/gruberb/punktespiegel/releases/tag/v1.4.1

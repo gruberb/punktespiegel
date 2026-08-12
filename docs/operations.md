@@ -50,7 +50,7 @@ uv sync --frozen
 npm run generate:recommendations
 ```
 
-Der Befehl schreibt je Liga und Modus ein versioniertes v2-JSON nach `frontend/public/data/recommendations`. Die Pipeline trainiert CatBoost offline, führt zeitlich getrennte Vorsaison-Holdouts aus und löst Classic- sowie Interactive-Kader mit HiGHS; dieser Schritt kann mehrere Minuten dauern. `npm run dev` und `npm run build` verwenden die vorhandenen JSON-Artefakte und trainieren nicht erneut.
+Der Befehl schreibt je Liga und Modus ein versioniertes v2-JSON nach `frontend/public/data/recommendations`. Die Pipeline trainiert CatBoost offline, führt zeitlich getrennte Vorsaison-Holdouts aus und löst Classic- sowie Interactive-Kader mit HiGHS; dieser Schritt kann mehrere Minuten dauern. Die erzeugten JSON-Dateien werden geprüft und eingecheckt. CI, `npm run dev`, `npm run build` und das Pages-Deployment verwenden ausschließlich diese vorhandenen Artefakte und trainieren nicht erneut.
 
 ## CI
 
@@ -82,8 +82,8 @@ Der Workflow:
 
 1. checkt das Repository aus,
 2. aktualisiert die laufenden Saisondateien,
-3. berechnet Classic und Interactive für alle drei Ligen,
-4. baut React,
+3. validiert die eingecheckten Classic- und Interactive-Empfehlungen,
+4. baut React mit genau diesen statischen Empfehlungen,
 5. lädt `frontend/dist` als Pages-Artefakt hoch,
 6. ersetzt die Website nur nach einem vollständig erfolgreichen Build.
 
