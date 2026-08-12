@@ -2,6 +2,12 @@
 
 Alle wesentlichen Änderungen an Punktespiegel werden in dieser Datei dokumentiert.
 
+## [1.4.2] – 2026-08-12
+
+### Entfernt
+
+- Winterwechsel-Plan und spieltagsspezifische Prognose-Aufstellungen aus der Fantasy-Team-Oberfläche; die zugrunde liegenden statischen Modelldaten bleiben unverändert erhalten.
+
 ## [1.4.1] – 2026-08-12
 
 ### Behoben
@@ -109,3 +115,4 @@ Alle wesentlichen Änderungen an Punktespiegel werden in dieser Datei dokumentie
 [1.3.0]: https://github.com/gruberb/punktespiegel/releases/tag/v1.3.0
 [1.4.0]: https://github.com/gruberb/punktespiegel/releases/tag/v1.4.0
 [1.4.1]: https://github.com/gruberb/punktespiegel/releases/tag/v1.4.1
+[1.4.2]: https://github.com/gruberb/punktespiegel/releases/tag/v1.4.2
