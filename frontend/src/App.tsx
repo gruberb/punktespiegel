@@ -913,18 +913,18 @@ function ManagerPicksView({ filters, onPlayer }: { filters: Filters; onPlayer: (
           <button className={mode === "classic" ? "active" : ""} onClick={() => setMode("classic")}>Classic</button>
           <button className={mode === "interactive" ? "active" : ""} onClick={() => setMode("interactive")}>Interactive</button>
         </div>
-        <p>{mode === "classic" ? "15 Spieler · feste 4-4-2-Aufstellung" : "22 Spieler · beste der sieben erlaubten Formationen"}</p>
+        <p>{mode === "classic" ? "15 Spieler · feste 4-4-2-Aufstellung" : "22 Spieler · beste Elf und Formation für jeden Spieltag"}</p>
       </div>
       {loading || !recommendation ? <LoadingState /> : (
         <>
           <section className="detail-section manager-summary-section">
             <div className="detail-head">
-              <div><p className="kicker">Modellvorschlag · {recommendation.season}</p><h2>Fantasy Team</h2><p>Optimiert nach Punkteprognose sowie Positions-, Formations- und Vereinsregeln. Prognosen sind Erwartungswerte, keine Garantie.</p></div>
+              <div><p className="kicker">{recommendation.deploymentModel === "fixed-v1-champion" ? "Classic-v1 Champion" : recommendation.modelVersion === 2 ? `${recommendation.mode === "classic" ? "Classic" : "Interactive"}-v2` : "Modellvorschlag"} · {recommendation.season}</p><h2>Fantasy Team</h2><p>{recommendation.deploymentModel === "fixed-v1-champion" ? "Der zweistufige Classic-v2-Challenger verlor im unangetasteten Holdout; deshalb bleibt für diese Liga der bewährte v1-Kader Champion." : recommendation.modelVersion === 2 ? recommendation.mode === "classic" ? "Zeitlich geprüfte Prognosen mit positionsweiser automatischer Reserve; September- und Winterkader werden gemeinsam mit höchstens drei Wechseln optimiert." : "Zeitlich geprüfte Punkte- und Rollenprognosen; der September-Kader wird gemeinsam mit der besten zulässigen Elf je Spieltag und höchstens drei Winterwechseln optimiert." : "Optimiert nach Punkteprognose sowie Positions-, Formations- und Vereinsregeln."} Prognosen sind Erwartungswerte, keine Garantie.</p></div>
               <span>{recommendation.leagueName}</span>
             </div>
             <div className="manager-stats">
               <span><strong>{recommendation.formation}</strong><small>Startformation</small></span>
-              <span><strong>{recommendation.projectedStartingPoints}</strong><small>Projizierte Punkte</small></span>
+              <span><strong>{recommendation.projectedStartingPoints}</strong><small>{recommendation.modelVersion === 2 ? "Saison-Prognose" : "Projizierte Punkte"}</small></span>
               <span><strong>{recommendation.currentStartingPoints}</strong><small>Aktuelle Punkte{recommendation.matchdays.length ? ` · bis Spieltag ${recommendation.matchdays.at(-1)?.matchday}` : ""}</small></span>
             </div>
           </section>
@@ -942,6 +942,22 @@ function ManagerPicksView({ filters, onPlayer }: { filters: Filters; onPlayer: (
               </section>
             </section>
           </div>
+          {recommendation.winterPlan ? (
+            <section className="detail-section manager-winter-plan">
+              <div className="section-copy"><p className="kicker">Winterfenster · ab Spieltag {recommendation.winterPlan.startMatchday}</p><h3>Geplante Kaderwechsel</h3><p>{recommendation.deploymentModel === "fixed-v1-champion" ? "Der validierte Champion enthält keinen vorab festgelegten Winterwechsel." : `Der September-Kader wurde gemeinsam mit höchstens ${recommendation.winterPlan.transferLimit} positionsgleichen Winterwechseln optimiert.`} Im Winter sollte mit dann aktuellen Preisen und Informationen neu gerechnet werden.</p></div>
+              {recommendation.winterPlan.transfers.length ? (
+                <ol>{recommendation.winterPlan.transfers.map((transfer) => <li key={`${transfer.sell.id}:${transfer.buy.id}`}><span>{positionName[transfer.position]}</span><strong>{transfer.sell.name}</strong><b>→</b><strong>{transfer.buy.name}</strong><small>{transfer.sell.priceM.toLocaleString("de-DE")} → {transfer.buy.priceM.toLocaleString("de-DE")} Mio. €</small></li>)}</ol>
+              ) : <p className="fantasy-matchdays-empty">Das Modell reserviert derzeit keinen Winterwechsel.</p>}
+            </section>
+          ) : null}
+          {recommendation.projectedMatchdays?.length ? (
+            <section className="detail-section fantasy-matchdays">
+              <div className="section-copy"><p className="kicker">{recommendation.deploymentModel === "fixed-v1-champion" ? "Classic-v1 Champion" : recommendation.mode === "classic" ? "Classic-v2" : "Interactive-v2"}</p><h3>Geplante Elf je Spieltag</h3><p>{recommendation.mode === "classic" ? "Die Elf bleibt je Saisonphase fest; erwartete Reservebeiträge sind in der Spieltagssumme enthalten." : "Jede Elf wird vorab ausschließlich aus Prognosen gewählt."} Startwahrscheinlichkeit und P10–P90 zeigen Verfügbarkeit und Unsicherheit.</p></div>
+              <div className="fantasy-matchday-list">
+                {recommendation.projectedMatchdays.map((matchday) => <ProjectedMatchdayCard key={matchday.matchday} matchday={matchday} onPlayer={onPlayer} />)}
+              </div>
+            </section>
+          ) : null}
           <section className="detail-section fantasy-matchdays">
             <div className="section-copy"><p className="kicker">Saisonverlauf</p><h3>Punkte je Spieltag</h3><p>Gesamt- und Positionspunkte auf einen Blick. Aufklappen zeigt die Einzelwerte der Startelf.</p></div>
             {recommendation.matchdays.length ? (
@@ -957,12 +973,12 @@ function ManagerPicksView({ filters, onPlayer }: { filters: Filters; onPlayer: (
 }
 
 function ManagerPlayerCard({ player, onClick }: { player: ManagerRecommendation["players"][number]; onClick: () => void }) {
-  return <button className="manager-player-card" onClick={onClick}><PlayerPortrait name={player.name} url={player.photoUrl} teamCode={player.teamCode} teamLogoUrl={player.logoUrl} /><span><strong>{player.name}</strong><small>{player.team}</small></span><b>{player.currentPoints} Pkt.<small>aktuell</small></b>{player.promotionAdjusted && <em>Ligastufe korrigiert</em>}</button>;
+  return <button className="manager-player-card" onClick={onClick}><PlayerPortrait name={player.name} url={player.photoUrl} teamCode={player.teamCode} teamLogoUrl={player.logoUrl} /><span><strong>{player.name}</strong><small>{player.team}</small></span><b>{player.pStart == null ? `${player.currentPoints} Pkt.` : `${Math.round(player.pStart * 100)} %`}<small>{player.pStart == null ? "aktuell" : "Startelf"}</small></b>{player.promotionAdjusted && <em>Ligastufe korrigiert</em>}</button>;
 }
 
 function ManagerPlayerRow({ player, onClick }: { player: ManagerRecommendation["players"][number]; onClick: () => void }) {
   const confidence = ({ high: "hoch", medium: "mittel", low: "gering" } as const)[player.confidence];
-  return <button onClick={onClick}><PlayerPortrait name={player.name} url={player.photoUrl} teamCode={player.teamCode} teamLogoUrl={player.logoUrl} /><span><strong>{player.name}</strong><small>{positionName[player.position]} · {player.team}{player.promotionAdjusted ? " · Ligastufe korrigiert" : ""}</small></span><span><b>{player.currentPoints}</b><small>Aktuell</small></span><em className={`confidence ${player.confidence}`}>{confidence}</em></button>;
+  return <button onClick={onClick}><PlayerPortrait name={player.name} url={player.photoUrl} teamCode={player.teamCode} teamLogoUrl={player.logoUrl} /><span><strong>{player.name}</strong><small>{positionName[player.position]} · {player.team}{player.promotionAdjusted ? " · Ligastufe korrigiert" : ""}</small></span><span><b>{player.pStart == null ? player.currentPoints : `${Math.round(player.pStart * 100)} %`}</b><small>{player.pStart == null ? "Aktuell" : "Startelf"}</small></span><em className={`confidence ${player.confidence}`}>{confidence}</em></button>;
 }
 
 function FantasyMatchdayCard({ matchday, onPlayer }: { matchday: ManagerRecommendation["matchdays"][number]; onPlayer: (id: string) => void }) {
@@ -983,6 +999,24 @@ function FantasyMatchdayCard({ matchday, onPlayer }: { matchday: ManagerRecommen
       <ol className="fantasy-player-points">
         {matchday.players.map((player) => (
           <li key={player.id}><button onClick={() => onPlayer(player.id)}><PlayerPortrait name={player.name} url={player.photoUrl} teamCode={player.teamCode} teamLogoUrl={player.logoUrl} /><span><strong>{player.name}</strong><small>{positionName[player.position]} · {player.team}</small></span><b className={player.points < 0 ? "negative" : ""}>{player.points > 0 ? `+${player.points}` : player.points}</b></button></li>
+        ))}
+      </ol>
+    </details>
+  );
+}
+
+function ProjectedMatchdayCard({ matchday, onPlayer }: { matchday: NonNullable<ManagerRecommendation["projectedMatchdays"]>[number]; onPlayer: (id: string) => void }) {
+  return (
+    <details className="fantasy-matchday-card">
+      <summary>
+        <span className="matchday-badge">Spieltag {matchday.matchday}</span>
+        <span className="fantasy-summary-positions projected-formation"><span><small>Formation</small><strong>{matchday.formation}</strong></span></span>
+        <span className="fantasy-matchday-total"><strong>{matchday.expectedPoints.toLocaleString("de-DE", { maximumFractionDigits: 1 })}</strong><small>Erwartete Punkte</small></span>
+        <span className="fantasy-matchday-toggle" aria-hidden="true">⌄</span>
+      </summary>
+      <ol className="fantasy-player-points">
+        {matchday.players.map((player) => (
+          <li key={player.id}><button onClick={() => onPlayer(player.id)}><PlayerPortrait name={player.name} url={player.photoUrl} teamCode={player.teamCode} teamLogoUrl={player.logoUrl} /><span><strong>{player.name}</strong><small>{positionName[player.position]} · {player.home ? "vs." : "bei"} {player.opponentCode} · {Math.round(player.pStart * 100)} % Start</small></span><b>{player.meanPoints.toLocaleString("de-DE", { maximumFractionDigits: 1 })}<small>P10 {player.p10Points.toLocaleString("de-DE", { maximumFractionDigits: 1 })} · P90 {player.p90Points.toLocaleString("de-DE", { maximumFractionDigits: 1 })}</small></b></button></li>
         ))}
       </ol>
     </details>

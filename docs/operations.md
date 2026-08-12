@@ -46,10 +46,11 @@ Ein vollständiger Lauf ist für Erstaufbau oder historische Korrekturen gedacht
 Anschließend werden die sechs aktuellen Kaderempfehlungen aus genau diesem Datenstand erzeugt:
 
 ```bash
+uv sync --frozen
 npm run generate:recommendations
 ```
 
-Der Befehl schreibt je Liga und Modus ein versioniertes JSON nach `frontend/public/data/recommendations`. Die normalen Befehle `npm run dev` und `npm run build` führen ihn automatisch aus.
+Der Befehl schreibt je Liga und Modus ein versioniertes v2-JSON nach `frontend/public/data/recommendations`. Die Pipeline trainiert CatBoost offline, führt zeitlich getrennte Vorsaison-Holdouts aus und löst Classic- sowie Interactive-Kader mit HiGHS; dieser Schritt kann mehrere Minuten dauern. `npm run dev` und `npm run build` verwenden die vorhandenen JSON-Artefakte und trainieren nicht erneut.
 
 ## CI
 

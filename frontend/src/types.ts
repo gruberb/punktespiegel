@@ -205,6 +205,9 @@ export type ManagerPickPlayer = {
   priceM: number;
   projectedPoints: number;
   currentPoints: number;
+  pStart?: number;
+  pSub?: number;
+  pDnp?: number;
   confidence: ProjectionConfidence;
   seasonsUsed: number;
   appearancesUsed: number;
@@ -230,7 +233,32 @@ export type ManagerMatchday = {
   players: ManagerMatchdayPlayer[];
 };
 
+export type ManagerProjectedMatchdayPlayer = Omit<ManagerMatchdayPlayer, "points"> & {
+  opponentId: string;
+  opponent: string;
+  opponentCode: string;
+  opponentLogoUrl: string | null;
+  home: boolean;
+  pStart: number;
+  pSub: number;
+  pDnp: number;
+  meanPoints: number;
+  p10Points: number;
+  medianPoints: number;
+  p90Points: number;
+};
+
+export type ManagerProjectedMatchday = {
+  matchday: number;
+  formation: string;
+  expectedPoints: number;
+  expectedReservePoints?: number;
+  players: ManagerProjectedMatchdayPlayer[];
+};
+
 export type ManagerRecommendation = {
+  modelVersion?: number;
+  deploymentModel?: "two-stage-v2" | "fixed-v1-champion";
   league: string;
   leagueName: string;
   season: string;
@@ -238,10 +266,22 @@ export type ManagerRecommendation = {
   budgetM: number;
   spentM: number;
   remainingM: number;
+  winterPlan?: {
+    startMatchday: number;
+    transferLimit: number;
+    transferCount: number;
+    spentM: number;
+    transfers: {
+      position: Position;
+      sell: { id: string; name: string; team: string; priceM: number };
+      buy: { id: string; name: string; team: string; priceM: number };
+    }[];
+  };
   formation: string;
   projectedStartingPoints: number;
   currentStartingPoints: number;
   matchdays: ManagerMatchday[];
+  projectedMatchdays?: ManagerProjectedMatchday[];
   generatedAt: string;
   rules: {
     squadSize: number;

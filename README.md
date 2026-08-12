@@ -1,6 +1,6 @@
 # Punktespiegel
 
-Punktespiegel ist ein statisches React-Dashboard für öffentliche Fußball- und Fantasy-Wertungen. Die Auswertungen basieren auf kicker-Daten und den Regeln der kicker Manager-Liga. Tabellen, Profile und historische Vergleiche werden aus statischen Saisonartefakten im Browser berechnet; die sechs rechenintensiveren Kaderempfehlungen entstehen einmal im Build und werden ebenfalls als statisches JSON ausgeliefert.
+Punktespiegel ist ein statisches React-Dashboard für öffentliche Fußball- und Fantasy-Wertungen. Die Auswertungen basieren auf kicker-Daten und den Regeln der kicker Manager-Liga. Tabellen, Profile und historische Vergleiche werden aus statischen Saisonartefakten im Browser berechnet; die Classic-v2- und Interactive-v2-Kaderempfehlungen entstehen offline und werden ebenfalls als statisches JSON ausgeliefert.
 
 Es gibt keinen Laufzeitserver, keine Datenbank und keine Anmeldung. Rust wird ausschließlich als Build-Werkzeug eingesetzt: Der Generator prüft die öffentlichen Quelldaten und schreibt eine kompakte JSON-Datei je Liga und Saison. Dadurch kann die fertige Website direkt auf GitHub Pages laufen.
 
@@ -39,13 +39,14 @@ cargo run --locked -p punktespiegel-data -- --refresh-all
 
 Der Datenbestand ist nach Liga und Saison getrennt. Der Browser lädt nicht alle Jahre auf einmal. Die 15 enthaltenen Saisons benötigen zusammen ungefähr 54 MB im Repository; eine vollständige Saison wird mit üblicher HTTP-Kompression auf ungefähr 180–250 KB übertragen.
 
-Nach einem Datenimport lassen sich die Kaderempfehlungen für alle drei Ligen und beide Modi separat neu berechnen:
+Nach einem Datenimport lassen sich die Kaderempfehlungen für alle drei Ligen und beide Modi neu berechnen. Dafür werden [uv](https://docs.astral.sh/uv/) und Python 3.13 benötigt; `uv` installiert die exakt gesperrten CatBoost- und HiGHS-Abhängigkeiten selbst:
 
 ```bash
+uv sync --frozen
 npm run generate:recommendations
 ```
 
-`npm run dev` und `npm run build` führen diesen Schritt automatisch aus.
+Der erste Schritt erzeugt v1 als Vergleichsmodell. Anschließend trainiert die v2-Pipeline chronologisch, prüft die Modelle auf der abgeschlossenen Vorsaison und löst Classic und Interactive für alle drei Ligen. `npm run dev` und `npm run build` verwenden die bereits erzeugten Artefakte und starten deshalb ohne erneutes Modelltraining.
 
 ## GitHub Pages
 
@@ -73,12 +74,16 @@ docker compose build web
 - `frontend/public/data/catalog.json`: unterstützte Ligen und Saisons.
 - `frontend/public/data/seasons/`: ein normalisierter Snapshot je Liga-Saison.
 - `frontend/public/data/recommendations/`: vorberechnete Classic- und Interactive-Empfehlungen der neuesten Saison.
-- `scripts/generate-manager-recommendations.ts`: deterministischer Offline-Optimierer für diese sechs Artefakte.
+- `scripts/generate-manager-recommendations.ts`: deterministisches v1-Vergleichsmodell.
+- `scripts/generate-interactive-v2.py`: rollenabhängige Prognose, Holdout-Prüfung und zweistufige MILPs für Classic und Interactive.
+- `pyproject.toml` und `uv.lock`: reproduzierbare Offline-Modellumgebung.
 - `.github/workflows/`: CI sowie täglicher Pages-Datenbuild.
 - `docs/`: Architektur, Betrieb und Architekturentscheidung.
 
 Weitere Details:
 
 - [Architektur](docs/architecture.md)
+- [Classic-v2](docs/classic-v2.md)
+- [Interactive-v2](docs/interactive-v2.md)
 - [Betrieb und Datenpflege](docs/operations.md)
 - [ADR: statische Saisonartefakte](docs/adr/0001-static-season-artifacts.md)

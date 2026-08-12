@@ -32,6 +32,9 @@ type StaticManagerRecommendation = {
     seasonGeneratedAt: string;
     seasonId: string;
   };
+  model?: {
+    deploymentModel?: "two-stage-v2" | "fixed-v1-champion";
+  };
   recommendation: ManagerRecommendation;
 };
 
@@ -191,10 +194,11 @@ function loadManagerRecommendation(params: URLSearchParams, mode: ManagerMode) {
   let pending = managerRecommendationCache.get(cacheKey);
   if (!pending) {
     pending = loadJson<StaticManagerRecommendation>(asset(`data/recommendations/${id}-${mode}.json`)).then((artifact) => {
-      if (artifact.schemaVersion !== 1 || artifact.modelVersion !== 1 || artifact.source.seasonId !== id) {
+      const expectedVersion = 2;
+      if (artifact.schemaVersion !== expectedVersion || artifact.modelVersion !== expectedVersion || artifact.source.seasonId !== id) {
         throw new Error("Die Kaderempfehlung verwendet einen unbekannten Vertrag.");
       }
-      return artifact.recommendation;
+      return { ...artifact.recommendation, deploymentModel: artifact.model?.deploymentModel };
     });
     managerRecommendationCache.set(cacheKey, pending);
   }

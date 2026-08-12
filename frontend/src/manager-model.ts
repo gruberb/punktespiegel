@@ -192,6 +192,14 @@ function buildCandidates(catalog: Catalog, season: ManagerSeason, rules: Manager
   });
 }
 
+export function managerCandidateProjections(catalog: Catalog, season: ManagerSeason, mode: ManagerMode) {
+  const rules = managerRules(mode, season.leagueCode);
+  return buildCandidates(catalog, season, rules).map((candidate) => ({
+    id: candidate.id,
+    projectedPoints: candidate.projectedPoints,
+  }));
+}
+
 const emptyPlan = (): PlanOption => ({ spentCents: 0, score: 0, startingPoints: 0, path: null });
 
 function comparePlan(left: PlanOption, right: PlanOption) {

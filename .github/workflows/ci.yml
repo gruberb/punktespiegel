@@ -56,11 +56,26 @@ jobs:
           node-version: 24
           cache: npm
 
+      - name: uv installieren
+        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        with:
+          enable-cache: true
+
+      - name: Python-Abhängigkeiten installieren
+        run: |
+          uv python install
+          uv sync --frozen
+
       - name: Abhängigkeiten installieren
         run: npm ci
 
       - name: Typen prüfen
         run: npm run typecheck
+
+      - name: Classic-/Interactive-v2-Pipeline prüfen
+        run: |
+          npm run generate:recommendations:baseline
+          uv run --frozen python scripts/generate-interactive-v2.py --skip-validation --iterations 10 --time-limit 30
 
       - name: Frontend-Tests ausführen
         run: npm test --workspace frontend

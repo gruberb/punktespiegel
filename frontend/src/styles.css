@@ -282,7 +282,7 @@ tbody tr:hover { background: #fbfcf9; }
 .manager-view { display: grid; gap: 16px; }
 .manager-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
 .manager-toolbar > p { margin: 0; color: var(--muted); font-size: 11px; }
-.manager-summary-section, .manager-lineup, .fantasy-matchdays { padding: 20px; }
+.manager-summary-section, .manager-lineup, .manager-winter-plan, .fantasy-matchdays { padding: 20px; }
 .manager-stats { display: grid; grid-template-columns: repeat(3, 1fr); overflow: hidden; margin-top: 22px; border: 1px solid var(--line); border-radius: 13px; background: #fbfcf8; }
 .manager-stats > span { min-height: 64px; display: grid; align-content: center; gap: 3px; padding: 10px 16px; border-left: 1px solid var(--line); }
 .manager-stats > span:first-child { border-left: 0; }
@@ -304,6 +304,12 @@ tbody tr:hover { background: #fbfcf9; }
 .manager-player-card > b { grid-column: 3; grid-row: 1 / 3; color: var(--green-deep); font-size: 13px; text-align: right; white-space: nowrap; }
 .manager-player-card > b small { display: block; margin: 2px 0 0; font-size: 6px; font-weight: 500; text-transform: uppercase; }
 .manager-player-card > em { grid-column: 2 / 4; color: var(--muted); font-size: 7px; font-style: normal; }
+.manager-winter-plan ol { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; padding: 0; margin: 0; list-style: none; }
+.manager-winter-plan li { display: grid; grid-template-columns: auto minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: 7px; padding: 12px; border: 1px solid var(--line); border-radius: 10px; background: #fbfcf8; font-size: 9px; }
+.manager-winter-plan li > span { color: var(--muted); font-size: 7px; text-transform: uppercase; }
+.manager-winter-plan li > strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.manager-winter-plan li > b { color: var(--green-deep); }
+.manager-winter-plan li > small { grid-column: 2 / 5; color: var(--muted); font-size: 7px; }
 .manager-reserves-inline { padding-top: 16px; margin-top: 16px; border-top: 1px solid var(--line); }
 .manager-reserves ol { list-style: none; padding: 0; margin: 0; }
 .manager-reserves-inline ol { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); border: 1px solid var(--line); border-radius: 12px; background: white; }
@@ -329,6 +335,7 @@ tbody tr:hover { background: #fbfcf9; }
 .fantasy-matchday-card > summary::-webkit-details-marker { display: none; }
 .fantasy-matchday-card[open] > summary { border-bottom: 1px solid var(--line-soft); background: #fbfcf8; }
 .fantasy-summary-positions { display: grid; grid-template-columns: repeat(4, minmax(55px, 1fr)); }
+.fantasy-summary-positions.projected-formation { grid-template-columns: minmax(100px, 1fr); }
 .fantasy-summary-positions > span { display: flex; justify-content: center; align-items: baseline; gap: 7px; border-left: 1px solid var(--line-soft); }
 .fantasy-summary-positions > span:first-child { border-left: 0; }
 .fantasy-summary-positions small, .fantasy-matchday-total small { color: var(--muted); font-size: 8px; }
@@ -636,11 +643,12 @@ tbody tr:hover { background: #fbfcf9; }
   .top-player-columns li > button { grid-template-columns: 18px 34px minmax(90px, 1fr) 50px 45px; gap: 5px; }
   .top-player-columns .player-photo { width: 32px; height: 38px; }
   .top-player-history, .top-player-average, .top-player-value { display: none; }
-  .manager-summary-section, .manager-lineup, .fantasy-matchdays { padding: 18px; }
+  .manager-summary-section, .manager-lineup, .manager-winter-plan, .fantasy-matchdays { padding: 18px; }
   .manager-stats { grid-template-columns: 1fr; }
   .manager-stats > span { border-top: 1px solid var(--line); border-left: 0; }
   .manager-stats > span:first-child { border-top: 0; }
   .manager-position-groups > section > div { grid-template-columns: 1fr; }
+  .manager-winter-plan ol { grid-template-columns: 1fr; }
   .fantasy-player-points { grid-template-columns: 1fr; }
   .fantasy-player-points li:nth-child(2) { border-top: 1px solid var(--line-soft); }
   .fantasy-player-points li:nth-child(even) { border-left: 0; }

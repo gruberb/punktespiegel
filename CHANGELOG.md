@@ -2,7 +2,21 @@
 
 Alle wesentlichen Änderungen an Punktespiegel werden in dieser Datei dokumentiert.
 
-## [Unreleased]
+## [1.4.0] – 2026-08-12
+
+### Hinzugefügt
+
+- Interactive-v2 mit chronologischem DNP-/Einwechsel-/Startelf-Modell, positions- und rollenabhängigen CatBoost-Punkteprognosen, Quantilen und empirischen Priors für neue Spieler.
+- Zweistufiges Mehrspieltags-MILP in HiGHS, das September- und Winterkader mit höchstens drei positionsgleichen Wechseln über die beste zulässige Elf jedes Spieltags statt über eine feste Startelf und einen pauschalen Reservefaktor bewertet.
+- Zeitlich getrennter Vorsaison-Holdout mit Rollen-Kalibrierung, Punktefehlern, Intervallabdeckung und realisierten Punkten des optimierten Kaders im Artefakt.
+- Champion-/Challenger-Gate je Liga: Ein neuer Punkteforecast wird nur produktiv, wenn er nach vorheriger Gewichtswahl auch den unangetasteten späteren Holdout besteht.
+- Classic-v2 mit exakter historischer Aktivierung einer positionsgebundenen Reserve, probabilistischer Reservebewertung und einem zweistufigen September-/Winterkader unter Budget-, Positions- und Drei-pro-Verein-Regeln.
+- UI-Ansicht der geplanten Formation und Elf je Spieltag einschließlich Startwahrscheinlichkeit und P10–P90.
+
+### Geändert
+
+- Classic-v1 bleibt als unverändertes Vergleichsmodell und ligaweiser Rückfall erhalten; Classic- und Interactive-Artefakte verwenden Schema- und Modellversion 2.
+- Normale Frontend-Builds verwenden vorhandene Empfehlungen. Nur der explizite Generierungsschritt trainiert das Offline-Modell erneut.
 
 ## [1.3.0] – 2026-08-11
 
@@ -87,3 +101,4 @@ Alle wesentlichen Änderungen an Punktespiegel werden in dieser Datei dokumentie
 [1.2.1]: https://github.com/gruberb/punktespiegel/releases/tag/v1.2.1
 [1.2.2]: https://github.com/gruberb/punktespiegel/releases/tag/v1.2.2
 [1.3.0]: https://github.com/gruberb/punktespiegel/releases/tag/v1.3.0
+[1.4.0]: https://github.com/gruberb/punktespiegel/releases/tag/v1.4.0

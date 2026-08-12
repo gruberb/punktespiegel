@@ -1,0 +1,15 @@
+[project]
+name = "punktespiegel-recommendations"
+version = "0.1.0"
+description = "Offline Interactive-v2 forecasting and roster optimization for Punktespiegel"
+requires-python = ">=3.9"
+dependencies = [
+  "catboost==1.2.10",
+  "highspy==1.15.1",
+  "numpy==2.0.2; python_version < '3.10'",
+  "numpy==2.2.6; python_version >= '3.10' and python_version < '3.14'",
+  "numpy==2.4.1; python_version >= '3.14'",
+]
+
+[tool.uv]
+package = false

@@ -3,7 +3,7 @@ import { readFileSync } from "node:fs";
 import test from "node:test";
 import { leagueProjectionFactor, recommendManagerSquad } from "./manager-model.ts";
 import type { ManagerSeason } from "./manager-model.ts";
-import type { Catalog, ManagerMode, Position } from "./types.ts";
+import type { Catalog, ManagerMode, ManagerRecommendation, Position } from "./types.ts";
 
 const positions: Position[] = ["GK", "DEF", "MID", "FWD"];
 const teams = Array.from({ length: 10 }, (_, index) => ({ id: `team-${index}`, name: `Team ${index}`, code: `T${index}`, logoUrl: null }));
@@ -101,50 +101,104 @@ test("tracks actual points for the recommended starting eleven by matchday", () 
 });
 
 const publishedCatalog = JSON.parse(readFileSync(new URL("../public/data/catalog.json", import.meta.url), "utf8")) as Catalog;
-const publishedExpectations: Record<string, { spentM: number; points: number; formation: string }> = {
-  "0001:classic": { spentM: 30, points: 1876, formation: "4-4-2" },
-  "0001:interactive": { spentM: 42.5, points: 2149, formation: "3-5-2" },
-  "0002:classic": { spentM: 7.5, points: 2053, formation: "4-4-2" },
-  "0002:interactive": { spentM: 10, points: 2271, formation: "3-4-3" },
-  "0003:classic": { spentM: 4, points: 2221, formation: "4-4-2" },
-  "0003:interactive": { spentM: 5.95, points: 2354, formation: "5-4-1" },
-};
-
 for (const league of ["0001", "0002", "0003"]) {
   for (const mode of ["classic", "interactive"] as ManagerMode[]) {
     test(`published ${league} ${mode} recommendation is valid and stable`, () => {
-      const publishedSeason = JSON.parse(readFileSync(new URL(`../public/data/seasons/se-k${league}2026.json`, import.meta.url), "utf8")) as ManagerSeason;
-      const result = recommendManagerSquad(publishedCatalog, publishedSeason, mode);
       const artifact = JSON.parse(readFileSync(new URL(`../public/data/recommendations/se-k${league}2026-${mode}.json`, import.meta.url), "utf8")) as {
         schemaVersion: number;
         modelVersion: number;
         source: { seasonId: string };
         recommendation: unknown;
       };
-      const expectation = publishedExpectations[`${league}:${mode}`];
-      assert.equal(artifact.schemaVersion, 1);
-      assert.equal(artifact.modelVersion, 1);
       assert.equal(artifact.source.seasonId, `se-k${league}2026`);
-      assert.deepEqual(artifact.recommendation, result);
-      assert.deepEqual(
-        { spentM: result.spentM, points: result.projectedStartingPoints, formation: result.formation },
-        expectation,
-      );
-      assert.equal(new Set(result.players.map((player) => player.id)).size, result.players.length);
-      assert.equal(result.players.length, result.rules.squadSize);
-      assert.equal(result.players.filter((player) => player.role === "start").length, 11);
-      assert.ok(result.spentM <= result.budgetM);
+      assert.equal(artifact.schemaVersion, 2);
+      assert.equal(artifact.modelVersion, 2);
+      const published = artifact.recommendation as ManagerRecommendation;
+      assert.equal(new Set(published.players.map((player) => player.id)).size, published.players.length);
+      assert.equal(published.players.length, published.rules.squadSize);
+      assert.equal(published.players.filter((player) => player.role === "start").length, 11);
+      assert.ok(published.spentM <= published.budgetM);
       for (const position of positions) {
-        assert.equal(result.players.filter((player) => player.position === position).length, result.rules.positions[position]);
-        const starters = result.players.filter((player) => player.position === position && player.role === "start");
-        const reserves = result.players.filter((player) => player.position === position && player.role === "reserve");
-        assert.ok(Math.min(...starters.map((player) => player.projectedPoints)) >= Math.max(...reserves.map((player) => player.projectedPoints)));
+        assert.equal(published.players.filter((player) => player.position === position).length, published.rules.positions[position]);
       }
-      if (result.rules.maxFromTeam != null) {
+      if (published.rules.maxFromTeam != null) {
         const teamCounts = new Map<string, number>();
-        result.players.forEach((player) => teamCounts.set(player.teamId, (teamCounts.get(player.teamId) ?? 0) + 1));
-        assert.ok([...teamCounts.values()].every((count) => count <= result.rules.maxFromTeam!));
+        published.players.forEach((player) => teamCounts.set(player.teamId, (teamCounts.get(player.teamId) ?? 0) + 1));
+        assert.ok([...teamCounts.values()].every((count) => count <= published.rules.maxFromTeam!));
       }
     });
   }
+}
+
+for (const league of ["0001", "0002", "0003"]) {
+  test(`published ${league} Classic-v2 recommendation has exact roster roles and winter constraints`, () => {
+    const artifact = JSON.parse(readFileSync(new URL(`../public/data/recommendations/se-k${league}2026-classic.json`, import.meta.url), "utf8")) as {
+      schemaVersion: number;
+      modelVersion: number;
+      recommendation: ManagerRecommendation;
+    };
+    const recommendation = artifact.recommendation;
+    assert.equal(artifact.schemaVersion, 2);
+    assert.equal(artifact.modelVersion, 2);
+    assert.equal(recommendation.modelVersion, 2);
+    assert.equal(recommendation.players.length, 15);
+    assert.equal(recommendation.players.filter((player) => player.role === "start").length, 11);
+    assert.equal(recommendation.players.filter((player) => player.role === "reserve").length, 4);
+    for (const position of positions) {
+      assert.equal(recommendation.players.filter((player) => player.position === position && player.role === "reserve").length, 1);
+    }
+    assert.equal(recommendation.winterPlan?.transferLimit, 3);
+    assert.ok((recommendation.winterPlan?.transferCount ?? 4) <= 3);
+    assert.equal(recommendation.projectedMatchdays?.length, league === "0003" ? 38 : 34);
+    assert.ok(recommendation.projectedMatchdays?.every((matchday) => matchday.players.length === 11));
+  });
+}
+
+for (const league of ["0001", "0002", "0003"]) {
+  test(`published ${league} Interactive-v2 recommendation uses valid round-specific lineups`, () => {
+    const artifact = JSON.parse(readFileSync(new URL(`../public/data/recommendations/se-k${league}2026-interactive.json`, import.meta.url), "utf8")) as {
+      schemaVersion: number;
+      modelVersion: number;
+      recommendation: ManagerRecommendation;
+    };
+    const recommendation = artifact.recommendation;
+    assert.equal(artifact.schemaVersion, 2);
+    assert.equal(artifact.modelVersion, 2);
+    assert.equal(recommendation.modelVersion, 2);
+    assert.equal(recommendation.players.length, 22);
+    assert.equal(new Set(recommendation.players.map((player) => player.id)).size, 22);
+    assert.equal(recommendation.players.filter((player) => player.role === "start").length, 11);
+    assert.ok(recommendation.spentM <= recommendation.budgetM);
+    const roundCount = league === "0003" ? 38 : 34;
+    assert.equal(recommendation.projectedMatchdays?.length, roundCount);
+    assert.equal(recommendation.winterPlan?.transferLimit, 3);
+    assert.ok((recommendation.winterPlan?.transferCount ?? 4) <= 3);
+    assert.ok((recommendation.winterPlan?.spentM ?? recommendation.budgetM + 1) <= recommendation.budgetM);
+    for (const transfer of recommendation.winterPlan?.transfers ?? []) {
+      assert.equal(transfer.position, recommendation.players.find((player) => player.id === transfer.sell.id)?.position);
+    }
+    for (const position of positions) {
+      assert.equal(recommendation.players.filter((player) => player.position === position).length, recommendation.rules.positions[position]);
+    }
+    for (const matchday of recommendation.projectedMatchdays ?? []) {
+      assert.equal(matchday.players.length, 11);
+      assert.match(matchday.formation, /^[345]-[345]-[123]$/);
+      assert.ok(matchday.expectedPoints > 0);
+      assert.ok(matchday.players.every((player) => {
+        const probability = player.pStart + player.pSub + player.pDnp;
+        return Math.abs(probability - 1) < 0.002
+          && player.pStart + player.pSub >= 0.5
+          && player.p10Points <= player.medianPoints
+          && player.medianPoints <= player.p90Points;
+      }));
+      const initialIds = new Set(recommendation.players.map((player) => player.id));
+      const activeIds = matchday.matchday < (recommendation.winterPlan?.startMatchday ?? roundCount + 1)
+        ? initialIds
+        : new Set([
+            ...[...initialIds].filter((id) => !(recommendation.winterPlan?.transfers.some((transfer) => transfer.sell.id === id) ?? false)),
+            ...(recommendation.winterPlan?.transfers.map((transfer) => transfer.buy.id) ?? []),
+          ]);
+      assert.ok(matchday.players.every((player) => activeIds.has(player.id)));
+    }
+  });
 }
