@@ -310,6 +310,7 @@ export type ManagerRecommendation = {
     squadSize: number;
     positions: Record<Position, number>;
     maxFromTeam: number | null;
+    goalkeepersFromSameTeam?: boolean;
   };
   players: ManagerPickPlayer[];
 };

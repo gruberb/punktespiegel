@@ -10,7 +10,7 @@ const teams = Array.from({ length: 10 }, (_, index) => ({ id: `team-${index}`, n
 const players = positions.flatMap((position, positionIndex) => Array.from({ length: 12 }, (_, index) => ({
   id: `${position}-${index}`,
   name: `${position} Player ${index}`,
-  teamId: teams[(index + positionIndex) % teams.length].id,
+  teamId: position === "GK" ? teams[Math.floor(index / 3)].id : teams[(index + positionIndex) % teams.length].id,
   position,
   priceM: 0.15 + index * 0.03,
   active: true,
@@ -71,6 +71,10 @@ test("interactive recommendation produces a valid 22-player squad and formation"
   assert.ok(result.spentM <= 10);
   assert.equal(result.players.filter((player) => player.role === "start").length, 11);
   assert.match(result.formation, /^[345]-[345]-[123]$/);
+  const goalkeepers = result.players.filter((player) => player.position === "GK");
+  assert.equal(goalkeepers.length, 3);
+  assert.equal(new Set(goalkeepers.map((player) => player.teamId)).size, 1);
+  assert.equal(result.rules.goalkeepersFromSameTeam, true);
 });
 
 test("discounts historical points when a player moves into a higher league", () => {
@@ -188,6 +192,10 @@ for (const league of ["0001", "0002", "0003"]) {
     assert.equal(new Set(recommendation.players.map((player) => player.id)).size, 22);
     assert.equal(recommendation.players.filter((player) => player.role === "start").length, 11);
     assert.ok(recommendation.spentM <= recommendation.budgetM);
+    assert.equal(recommendation.rules.goalkeepersFromSameTeam, true);
+    const openingGoalkeepers = recommendation.players.filter((player) => player.position === "GK");
+    assert.equal(openingGoalkeepers.length, 3);
+    assert.equal(new Set(openingGoalkeepers.map((player) => player.teamId)).size, 1);
     const roundCount = league === "0003" ? 38 : 34;
     assert.equal(recommendation.projectedMatchdays?.length, roundCount);
     assert.ok([3, 4].includes(recommendation.winterPlan?.transferLimit ?? 0));
@@ -196,6 +204,14 @@ for (const league of ["0001", "0002", "0003"]) {
     for (const transfer of recommendation.winterPlan?.transfers ?? []) {
       assert.equal(transfer.position, recommendation.players.find((player) => player.id === transfer.sell.id)?.position);
     }
+    const winterGoalkeepers = new Map(openingGoalkeepers.map((player) => [player.id, player.team]));
+    for (const transfer of recommendation.winterPlan?.transfers ?? []) {
+      if (transfer.position !== "GK") continue;
+      winterGoalkeepers.delete(transfer.sell.id);
+      winterGoalkeepers.set(transfer.buy.id, transfer.buy.team);
+    }
+    assert.equal(winterGoalkeepers.size, 3);
+    assert.equal(new Set(winterGoalkeepers.values()).size, 1);
     for (const position of positions) {
       assert.equal(recommendation.players.filter((player) => player.position === position).length, recommendation.rules.positions[position]);
     }

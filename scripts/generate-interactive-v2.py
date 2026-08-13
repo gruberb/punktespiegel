@@ -1266,6 +1266,8 @@ def optimize_roster(
     transfer_in_index: Dict[str, int] = {}
     y_index: Dict[Tuple[str, int], int] = {}
     z_index: Dict[Tuple[int, int], int] = {}
+    goalkeeper_team_summer_index: Dict[str, int] = {}
+    goalkeeper_team_winter_index: Dict[str, int] = {}
     costs: List[float] = []
     lower: List[float] = []
     upper: List[float] = []
@@ -1285,6 +1287,18 @@ def optimize_roster(
         x_winter_index[player_id] = add_binary(-season_mean * 1e-7)
         transfer_out_index[player_id] = add_binary(0.0)
         transfer_in_index[player_id] = add_binary(0.0)
+    goalkeepers_by_team: Dict[str, List[str]] = defaultdict(list)
+    for player_id in player_ids:
+        if players[player_id]["position"] == "GK":
+            goalkeepers_by_team[str(players[player_id]["teamId"])].append(player_id)
+    eligible_goalkeeper_teams = sorted(
+        team_id for team_id, goalkeeper_ids in goalkeepers_by_team.items() if len(goalkeeper_ids) >= rules.roster_counts["GK"]
+    )
+    if not eligible_goalkeeper_teams:
+        raise RuntimeError("Interactive: kein Verein hat drei auswählbare Torhüter für die Torwartversicherung.")
+    for team_id in eligible_goalkeeper_teams:
+        goalkeeper_team_summer_index[team_id] = add_binary(0.0)
+        goalkeeper_team_winter_index[team_id] = add_binary(0.0)
     for round_number in rounds:
         for player_id in player_ids:
             forecast = forecast_map[(player_id, round_number)]
@@ -1322,6 +1336,16 @@ def optimize_roster(
         winter_coefficients = {x_winter_index[player_id]: 1.0 for player_id in player_ids if players[player_id]["position"] == position}
         add_row(summer_coefficients, rules.roster_counts[position], rules.roster_counts[position])
         add_row(winter_coefficients, rules.roster_counts[position], rules.roster_counts[position])
+    add_row({index: 1.0 for index in goalkeeper_team_summer_index.values()}, 1.0, 1.0)
+    add_row({index: 1.0 for index in goalkeeper_team_winter_index.values()}, 1.0, 1.0)
+    for team_id, goalkeeper_ids in goalkeepers_by_team.items():
+        summer_coefficients = {x_summer_index[player_id]: 1.0 for player_id in goalkeeper_ids}
+        winter_coefficients = {x_winter_index[player_id]: 1.0 for player_id in goalkeeper_ids}
+        if team_id in goalkeeper_team_summer_index:
+            summer_coefficients[goalkeeper_team_summer_index[team_id]] = -float(rules.roster_counts["GK"])
+            winter_coefficients[goalkeeper_team_winter_index[team_id]] = -float(rules.roster_counts["GK"])
+        add_row(summer_coefficients, 0.0, 0.0)
+        add_row(winter_coefficients, 0.0, 0.0)
     for player_id in player_ids:
         add_row(
             {
@@ -1405,6 +1429,8 @@ def optimize_roster(
         raise RuntimeError(f"Ungültige Kadergröße aus HiGHS: {len(selected_ids)}")
     if len(winter_selected_ids) != 22 or len(transfers_in) != len(transfers_out) or len(transfers_in) > rules.transfer_limit:
         raise RuntimeError("Ungültiger Winterkader aus HiGHS.")
+    validate_interactive_goalkeeper_stack(players, selected_ids, "Eröffnungskader")
+    validate_interactive_goalkeeper_stack(players, winter_selected_ids, "Winterkader")
     lineups = {
         round_number: [player_id for player_id in player_ids if solution[y_index[(player_id, round_number)]] > 0.5]
         for round_number in rounds
@@ -1433,6 +1459,19 @@ def optimize_roster(
         solver_status,
         mip_gap,
     )
+
+
+def validate_interactive_goalkeeper_stack(
+    players: Mapping[str, Mapping[str, Any]],
+    selected_ids: Sequence[str],
+    label: str,
+) -> None:
+    goalkeeper_ids = [player_id for player_id in selected_ids if players[player_id]["position"] == "GK"]
+    goalkeeper_teams = {str(players[player_id]["teamId"]) for player_id in goalkeeper_ids}
+    if len(goalkeeper_ids) != ROSTER_COUNTS["GK"] or len(goalkeeper_teams) != 1:
+        raise RuntimeError(
+            f"Interactive: {label} muss drei Torhüter desselben Vereins als Torwartversicherung enthalten."
+        )
 
 
 def optimize_classic_roster(
@@ -2410,6 +2449,7 @@ def build_recommendation(
             "squadSize": 22,
             "positions": rules.roster_counts,
             "maxFromTeam": None,
+            "goalkeepersFromSameTeam": True,
         },
         "optimization": {
             "solver": "HiGHS",
@@ -3013,6 +3053,22 @@ def validate_publication(recommendation: Mapping[str, Any]) -> None:
     starters = [player for player in recommendation["players"] if player["role"] == "start"]
     if len(starters) != 11:
         raise RuntimeError("Veröffentlichung abgebrochen: Startelf enthält nicht genau 11 Spieler.")
+    if recommendation.get("mode") == "interactive":
+        goalkeepers = [player for player in recommendation["players"] if player["position"] == "GK"]
+        if len(goalkeepers) != ROSTER_COUNTS["GK"] or len({player["teamId"] for player in goalkeepers}) != 1:
+            raise RuntimeError(
+                "Veröffentlichung abgebrochen: Interactive-Kader enthält keine vollständige Torwartversicherung."
+            )
+        winter_goalkeepers = {player["id"]: player["team"] for player in goalkeepers}
+        for transfer in recommendation.get("winterPlan", {}).get("transfers", []):
+            if transfer["position"] != "GK":
+                continue
+            winter_goalkeepers.pop(transfer["sell"]["id"], None)
+            winter_goalkeepers[transfer["buy"]["id"]] = transfer["buy"]["team"]
+        if len(winter_goalkeepers) != ROSTER_COUNTS["GK"] or len(set(winter_goalkeepers.values())) != 1:
+            raise RuntimeError(
+                "Veröffentlichung abgebrochen: Interactive-Winterkader bricht die Torwartversicherung."
+            )
     for player in starters:
         appearance = float(player.get("pStart", 0.0)) + float(player.get("pSub", 0.0))
         minimum = 0.50 if player["position"] == "GK" else 0.18
@@ -3060,6 +3116,7 @@ def write_artifact(
             "quantiles": "heuristic unconditional UI intervals; not calibrated decision intervals",
             "coldStart": "price-tier empirical-Bayes prior",
             "optimizer": "multi-matchday mixed-integer model solved with HiGHS",
+            "goalkeeperInsurance": "three goalkeepers from one club in both roster phases",
             "objective": (
                 "sum of expected points from the best valid XI in every matchday with the "
                 "season-specific position-preserving winter window"

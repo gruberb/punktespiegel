@@ -37,6 +37,7 @@ type ManagerRules = {
   maxFromTeam: number | null;
   formations: Formation[];
   reserveWeight: number;
+  goalkeepersFromSameTeam: boolean;
 };
 
 type Candidate = Omit<ManagerPickPlayer, "role" | "currentPoints"> & {
@@ -98,6 +99,7 @@ export function managerRules(mode: ManagerMode, league: string): ManagerRules {
         maxFromTeam: 3,
         formations: [{ GK: 1, DEF: 4, MID: 4, FWD: 2 }],
         reserveWeight: 0.05,
+        goalkeepersFromSameTeam: false,
       }
     : {
         budgetM,
@@ -105,6 +107,7 @@ export function managerRules(mode: ManagerMode, league: string): ManagerRules {
         maxFromTeam: null,
         formations,
         reserveWeight: 0.03,
+        goalkeepersFromSameTeam: true,
       };
 }
 
@@ -386,12 +389,22 @@ function optimizeRoster(candidates: Candidate[], rules: ManagerRules): Optimized
       throw new Error(`Nicht genug verfügbare Spieler für ${position}.`);
     }
   }
+  const goalkeeperTeams = rules.goalkeepersFromSameTeam
+    ? [...new Set(candidates.filter((player) => player.position === "GK").map((player) => player.teamId))]
+      .filter((teamId) => candidates.filter((player) => player.position === "GK" && player.teamId === teamId).length >= rules.positions.GK)
+    : [null];
+  if (!goalkeeperTeams.length) throw new Error("Kein Verein hat drei verfügbare Torhüter für die Torwartversicherung.");
   let best: OptimizedRoster | null = null;
-  for (const formation of rules.formations) {
-    const option = optimizeFormation(candidates, rules, formation, budgetCents);
-    if (!option) continue;
-    const optimized = { ...option, formation, picks: planPicks(option.path) };
-    if (!best || comparePlan(optimized, best) > 0) best = optimized;
+  for (const goalkeeperTeam of goalkeeperTeams) {
+    const constrainedCandidates = goalkeeperTeam == null
+      ? candidates
+      : candidates.filter((player) => player.position !== "GK" || player.teamId === goalkeeperTeam);
+    for (const formation of rules.formations) {
+      const option = optimizeFormation(constrainedCandidates, rules, formation, budgetCents);
+      if (!option) continue;
+      const optimized = { ...option, formation, picks: planPicks(option.path) };
+      if (!best || comparePlan(optimized, best) > 0) best = optimized;
+    }
   }
   if (!best) throw new Error("Mit den verfügbaren Marktwerten lässt sich kein gültiger Kader bilden.");
   return best;
@@ -479,6 +492,7 @@ export function recommendManagerSquad(catalog: Catalog, season: ManagerSeason, m
       squadSize: Object.values(rules.positions).reduce((sum, count) => sum + count, 0),
       positions: rules.positions,
       maxFromTeam: rules.maxFromTeam,
+      goalkeepersFromSameTeam: rules.goalkeepersFromSameTeam,
     },
     players,
   };
