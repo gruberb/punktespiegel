@@ -105,6 +105,12 @@ test("tracks actual points for the recommended starting eleven by matchday", () 
 });
 
 const publishedCatalog = JSON.parse(readFileSync(new URL("../public/data/catalog.json", import.meta.url), "utf8")) as Catalog;
+const availabilitySignals = JSON.parse(readFileSync(new URL("../public/data/current-availability-signals.json", import.meta.url), "utf8")) as {
+  season: number;
+  leagues: Record<string, {
+    players: Record<string, { status: string; reason: string | null }>;
+  }>;
+};
 for (const league of ["0001", "0002", "0003"]) {
   for (const mode of ["classic", "interactive"] as ManagerMode[]) {
     test(`published ${league} ${mode} recommendation is valid and stable`, () => {
@@ -118,6 +124,14 @@ for (const league of ["0001", "0002", "0003"]) {
       assert.equal(artifact.schemaVersion, 2);
       assert.equal(artifact.modelVersion, 2);
       const published = artifact.recommendation as ManagerRecommendation;
+      const medicallyBlocked = new Set(Object.entries(availabilitySignals.leagues[league].players)
+        .filter(([, signal]) => ["injured", "rehab", "not_considered", "unavailable"].includes(signal.status))
+        .map(([playerId]) => playerId));
+      assert.ok(published.availabilityAudit);
+      assert.equal(published.availabilityAudit?.excludedPlayerCount, medicallyBlocked.size);
+      assert.ok(published.players.every((player) => !medicallyBlocked.has(player.id)));
+      assert.ok((published.projectedMatchdays ?? []).every((matchday) => matchday.players.every((player) => !medicallyBlocked.has(player.id))));
+      assert.ok((published.winterPlan?.transfers ?? []).every((transfer) => !medicallyBlocked.has(transfer.buy.id)));
       assert.equal(new Set(published.players.map((player) => player.id)).size, published.players.length);
       assert.equal(published.players.length, published.rules.squadSize);
       assert.equal(published.players.filter((player) => player.role === "start").length, 11);
@@ -150,6 +164,19 @@ test("published Bundesliga recommendations do not start the externally identifie
       recommendation: ManagerRecommendation;
     };
     assert.notEqual(artifact.recommendation.players.find((player) => player.id === "pl-k00064802")?.role, "start");
+  }
+});
+
+test("published recommendations reject Mitchell Weiser while his ACL rehabilitation has no return date", () => {
+  const weiser = availabilitySignals.leagues["0001"].players["pl-k00058003"];
+  assert.equal(weiser.status, "rehab");
+  assert.equal(weiser.reason, "Kreuzbandriss");
+  for (const mode of ["classic", "interactive"] as ManagerMode[]) {
+    const artifact = JSON.parse(readFileSync(new URL(`../public/data/recommendations/se-k00012026-${mode}.json`, import.meta.url), "utf8")) as {
+      recommendation: ManagerRecommendation;
+    };
+    assert.ok(artifact.recommendation.availabilityAudit?.excludedPlayers.some((player) => player.id === "pl-k00058003"));
+    assert.ok(!artifact.recommendation.players.some((player) => player.id === "pl-k00058003"));
   }
 });
 

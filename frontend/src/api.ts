@@ -58,6 +58,25 @@ type StaticRoleSignals = {
   }>;
 };
 
+type StaticAvailabilitySignals = {
+  schemaVersion: number;
+  generatedAt: string;
+  season: number;
+  leagues: Record<string, {
+    provider: string;
+    sourceUrl: string;
+    players: Record<string, {
+      status: "injured" | "rehab" | "suspended" | "not_considered" | "unavailable";
+      reason: string | null;
+      absentSince: string | null;
+      expectedReturn: string | null;
+      source: string;
+      sourceUrl: string;
+      profileUrl: string | null;
+    }>;
+  }>;
+};
+
 type StaticSeason = {
   schemaVersion: number;
   generatedAt: string;
@@ -157,6 +176,7 @@ const newsCache = loadJson<StaticNews>(asset("data/news.json")).catch((): Static
   players: {},
 }));
 const roleSignalsCache = loadJson<StaticRoleSignals>(asset("data/current-role-signals.json")).catch(() => null);
+const availabilitySignalsCache = loadJson<StaticAvailabilitySignals>(asset("data/current-availability-signals.json")).catch(() => null);
 const seasonCache = new Map<string, Promise<SeasonIndex>>();
 const managerRecommendationCache = new Map<string, Promise<ManagerRecommendation>>();
 
@@ -513,7 +533,14 @@ function sortPlayers(players: Player[], sort: string, direction: "asc" | "desc")
   });
 }
 
-async function playerDetail(index: SeasonIndex, playerId: string, catalog: StaticCatalog, news: StaticNews, roleSignals: StaticRoleSignals | null): Promise<PlayerDetail> {
+async function playerDetail(
+  index: SeasonIndex,
+  playerId: string,
+  catalog: StaticCatalog,
+  news: StaticNews,
+  roleSignals: StaticRoleSignals | null,
+  availabilitySignals: StaticAvailabilitySignals | null,
+): Promise<PlayerDetail> {
   const player = index.players.get(playerId);
   if (!player) throw new Error("Spieler wurde in dieser Saison nicht gefunden.");
   const team = index.teams.get(player.teamId);
@@ -550,6 +577,9 @@ async function playerDetail(index: SeasonIndex, playerId: string, catalog: Stati
   }).sort((left, right) => left.matchday - right.matchday);
   const seasonPoints = games.reduce((sum, game) => sum + game.points, 0);
   const seasons = await playerSeasonHistory(catalog, playerId);
+  const availability = availabilitySignals?.season === index.season.startYear
+    ? availabilitySignals.leagues[index.season.leagueCode]?.players[playerId]
+    : null;
   return {
     id: player.id,
     name: player.name,
@@ -578,6 +608,15 @@ async function playerDetail(index: SeasonIndex, playerId: string, catalog: Stati
       provider: news.provider || null,
       articles: news.players[player.id] ?? [],
     },
+    availability: availability ? {
+      status: availability.status,
+      reason: availability.reason,
+      absentSince: availability.absentSince,
+      expectedReturn: availability.expectedReturn,
+      source: availability.source,
+      sourceUrl: availability.sourceUrl,
+      generatedAt: availabilitySignals!.generatedAt,
+    } : null,
   };
 }
 
@@ -887,7 +926,7 @@ export const api = {
       .filter((player) => !query || player.name.toLocaleLowerCase("de").includes(query) || player.team.toLocaleLowerCase("de").includes(query)), params.get("sort") ?? "points", direction);
     return { items: filtered.slice(offset, offset + limit), nextOffset: offset + limit < filtered.length ? offset + limit : null };
   }), signal),
-  player: (playerId: string, params: URLSearchParams, signal?: AbortSignal) => abortable(Promise.all([loadSeason(params), catalogCache, newsCache, roleSignalsCache]).then(([index, catalog, news, roleSignals]) => playerDetail(index, playerId, catalog, news, roleSignals)), signal),
+  player: (playerId: string, params: URLSearchParams, signal?: AbortSignal) => abortable(Promise.all([loadSeason(params), catalogCache, newsCache, roleSignalsCache, availabilitySignalsCache]).then(([index, catalog, news, roleSignals, availabilitySignals]) => playerDetail(index, playerId, catalog, news, roleSignals, availabilitySignals)), signal),
   teams: (params: URLSearchParams, signal?: AbortSignal) => abortable(loadSeason(params).then((index) => buildTeamScores(index, { kind: "all" })), signal),
   team: (teamId: string, params: URLSearchParams, signal?: AbortSignal) => abortable(Promise.all([loadSeason(params), roleSignalsCache]).then(([index, roleSignals]) => teamDetail(index, teamId, roleSignals)), signal),
   bestEleven: (params: URLSearchParams, signal?: AbortSignal) => abortable(loadSeason(params).then((index) => bestEleven(index, params.get("scope") === "season" ? "season" : "matchday", selectedRound(params, index.season))), signal),

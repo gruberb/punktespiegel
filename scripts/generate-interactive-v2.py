@@ -30,6 +30,7 @@ DATA_DIR = ROOT / "frontend" / "public" / "data"
 SEASON_DIR = DATA_DIR / "seasons"
 RECOMMENDATION_DIR = DATA_DIR / "recommendations"
 ROLE_SIGNAL_PATH = DATA_DIR / "current-role-signals.json"
+AVAILABILITY_SIGNAL_PATH = DATA_DIR / "current-availability-signals.json"
 
 POSITIONS = ("GK", "DEF", "MID", "FWD")
 ROSTER_COUNTS = {"GK": 3, "DEF": 7, "MID": 7, "FWD": 5}
@@ -918,6 +919,99 @@ def apply_current_role_signals(
             p_dnp=(1.0 - source_weight) * forecast.p_dnp + source_weight * target_dnp,
         ))
     return adjusted
+
+
+def load_current_availability_signals(season: Mapping[str, Any]) -> Mapping[str, Any]:
+    if not AVAILABILITY_SIGNAL_PATH.exists():
+        raise RuntimeError("Aktuelle medizinische Verfügbarkeitssignale fehlen.")
+    artifact = json.loads(AVAILABILITY_SIGNAL_PATH.read_text(encoding="utf-8"))
+    if (
+        int(artifact.get("schemaVersion", 0)) != 1
+        or int(artifact.get("season", -1)) != int(season["startYear"])
+    ):
+        raise RuntimeError("Aktuelle medizinische Verfügbarkeitssignale passen nicht zur Zielsaison.")
+    league = artifact.get("leagues", {}).get(str(season["leagueCode"]))
+    if not league or not league.get("players"):
+        raise RuntimeError(
+            f"Aktuelle medizinische Verfügbarkeitssignale fehlen für Liga {season['leagueCode']}."
+        )
+    return {
+        **league,
+        "generatedAt": artifact["generatedAt"],
+        "policy": artifact["policy"],
+    }
+
+
+def availability_excluded_player_ids(artifact: Mapping[str, Any]) -> Set[str]:
+    opening_ineligible = {"injured", "rehab", "not_considered", "unavailable"}
+    return {
+        str(player_id)
+        for player_id, signal in artifact.get("players", {}).items()
+        if str(signal.get("status")) in opening_ineligible
+    }
+
+
+def apply_current_availability_signals(
+    forecasts: Sequence[Forecast],
+    artifact: Mapping[str, Any],
+) -> List[Forecast]:
+    """Apply short matchday-specific absences before blocked players are removed."""
+    suspended_ids = {
+        str(player_id)
+        for player_id, signal in artifact.get("players", {}).items()
+        if str(signal.get("status")) == "suspended"
+    }
+    first_round = {
+        player_id: min(
+            forecast.round for forecast in forecasts if forecast.player_id == player_id
+        )
+        for player_id in suspended_ids
+        if any(forecast.player_id == player_id for forecast in forecasts)
+    }
+    return [
+        role_conditioned_forecast(forecast, p_start=0.0, p_sub=0.0, p_dnp=1.0)
+        if forecast.player_id in first_round and forecast.round == first_round[forecast.player_id]
+        else forecast
+        for forecast in forecasts
+    ]
+
+
+def build_availability_audit(
+    season: Mapping[str, Any],
+    players: Mapping[str, Mapping[str, Any]],
+    artifact: Mapping[str, Any],
+) -> Dict[str, Any]:
+    teams = {str(team["id"]): team for team in season["teams"]}
+    excluded_ids = availability_excluded_player_ids(artifact).intersection(players)
+    excluded_players = []
+    for player_id in sorted(excluded_ids, key=lambda value: str(players[value]["name"])):
+        player = players[player_id]
+        signal = artifact["players"][player_id]
+        excluded_players.append({
+            "id": player_id,
+            "name": player["name"],
+            "team": teams[str(player["teamId"])]["name"],
+            "position": player["position"],
+            "status": signal["status"],
+            "reason": signal.get("reason"),
+            "expectedReturn": signal.get("expectedReturn"),
+            "source": signal["source"],
+            "sourceUrl": signal["sourceUrl"],
+        })
+    return {
+        "generatedAt": artifact["generatedAt"],
+        "provider": artifact["provider"],
+        "sourceUrl": artifact["sourceUrl"],
+        "policy": (
+            "Aktuell verletzte, im Aufbautraining befindliche oder nicht berücksichtigte Spieler "
+            "sind für den Eröffnungskader und die vorab simulierte Winterphase gesperrt. "
+            "Sperren werden spieltagsspezifisch berücksichtigt."
+        ),
+        "checkedPlayerCount": len(players),
+        "excludedPlayerCount": len(excluded_players),
+        "unmatchedSourcePlayers": artifact.get("unmatchedPlayers", []),
+        "excludedPlayers": excluded_players,
+    }
 
 
 def predict_forecasts(
@@ -3050,6 +3144,29 @@ def run_validation(
 
 def validate_publication(recommendation: Mapping[str, Any]) -> None:
     """Fail closed on implausible or internally inconsistent published teams."""
+    availability_audit = recommendation.get("availabilityAudit")
+    if not availability_audit:
+        raise RuntimeError("Veröffentlichung abgebrochen: Verfügbarkeitsprüfung fehlt.")
+    excluded_ids = {
+        str(player["id"])
+        for player in availability_audit.get("excludedPlayers", [])
+    }
+    published_ids = {str(player["id"]) for player in recommendation["players"]}
+    published_ids.update(
+        str(player["id"])
+        for matchday in recommendation.get("projectedMatchdays", [])
+        for player in matchday.get("players", [])
+    )
+    published_ids.update(
+        str(transfer["buy"]["id"])
+        for transfer in recommendation.get("winterPlan", {}).get("transfers", [])
+    )
+    blocked_publication = published_ids.intersection(excluded_ids)
+    if blocked_publication:
+        raise RuntimeError(
+            "Veröffentlichung abgebrochen: aktueller Ausfallstatus im veröffentlichten Kader: "
+            + ", ".join(sorted(blocked_publication))
+        )
     starters = [player for player in recommendation["players"] if player["role"] == "start"]
     if len(starters) != 11:
         raise RuntimeError("Veröffentlichung abgebrochen: Startelf enthält nicht genau 11 Spieler.")
@@ -3100,6 +3217,7 @@ def write_artifact(
 ) -> None:
     validate_publication(recommendation)
     role_signals = load_current_role_signals(season)
+    availability_signals = load_current_availability_signals(season)
     artifact = {
         "schemaVersion": 2,
         "modelVersion": 2,
@@ -3121,7 +3239,7 @@ def write_artifact(
                 "sum of expected points from the best valid XI in every matchday with the "
                 "season-specific position-preserving winter window"
             ),
-            "lineupEligibility": "all selectable players; availability is priced into expected points",
+            "lineupEligibility": "selectable and not currently injured, in rehabilitation, or not considered",
             "historicalMarketSnapshots": "unavailable; validation is experimental until archived snapshots exist",
             "catBoostWeight": model_weight,
             "baselineWeight": rounded(1.0 - model_weight, 2),
@@ -3129,6 +3247,12 @@ def write_artifact(
                 "provider": role_signals["provider"],
                 "generatedAt": role_signals["generatedAt"],
                 "method": role_signals["method"],
+            },
+            "currentAvailabilitySignals": {
+                "provider": availability_signals["provider"],
+                "generatedAt": availability_signals["generatedAt"],
+                "sourceUrl": availability_signals["sourceUrl"],
+                "policy": availability_signals["policy"],
             },
             "trainingRows": training_rows,
             "trainingThroughSeason": f"{training_end_year}/{str(training_end_year + 1)[-2:]}",
@@ -3158,6 +3282,7 @@ def write_classic_artifact(
 ) -> None:
     validate_publication(recommendation)
     role_signals = load_current_role_signals(season)
+    availability_signals = load_current_availability_signals(season)
     artifact = {
         "schemaVersion": 2,
         "modelVersion": 2,
@@ -3187,7 +3312,7 @@ def write_classic_artifact(
                 if deploy_challenger
                 else "stable conditional scoring prior retained after the recourse challenger regressed; roster is never copied"
             ),
-            "starterEligibility": "all selectable players; availability is priced into expected points",
+            "starterEligibility": "selectable and not currently injured, in rehabilitation, or not considered",
             "historicalMarketSnapshots": "unavailable; validation is experimental until archived snapshots exist",
             "classicResidualWeight": validation.get("residualWeight"),
             "winterScenarioCount": validation.get("scenarioCount") if deploy_challenger else None,
@@ -3195,6 +3320,12 @@ def write_classic_artifact(
                 "provider": role_signals["provider"],
                 "generatedAt": role_signals["generatedAt"],
                 "method": role_signals["method"],
+            },
+            "currentAvailabilitySignals": {
+                "provider": availability_signals["provider"],
+                "generatedAt": availability_signals["generatedAt"],
+                "sourceUrl": availability_signals["sourceUrl"],
+                "policy": availability_signals["policy"],
             },
             "trainingRows": training_rows,
             "trainingThroughSeason": f"{training_end_year}/{str(training_end_year + 1)[-2:]}",
@@ -3284,12 +3415,26 @@ def main() -> int:
     output_dir = Path(args.recommendation_output_dir)
     for league, season in sorted(targets.items()):
         players, raw_forecasts = predict_forecasts(season, bundle, priors, player_states, team_states)
+        all_players = players
         raw_forecasts = apply_current_role_signals(
             season,
             players,
             raw_forecasts,
             load_current_role_signals(season),
         )
+        availability_signals = load_current_availability_signals(season)
+        raw_forecasts = apply_current_availability_signals(raw_forecasts, availability_signals)
+        excluded_player_ids = availability_excluded_player_ids(availability_signals)
+        players = {
+            player_id: player
+            for player_id, player in players.items()
+            if player_id not in excluded_player_ids
+        }
+        raw_forecasts = [
+            forecast for forecast in raw_forecasts
+            if forecast.player_id not in excluded_player_ids
+        ]
+        availability_audit = build_availability_audit(season, all_players, availability_signals)
         forecasts = blend_forecasts(
             raw_forecasts,
             production_baselines[league]["playerProjections"],
@@ -3299,6 +3444,8 @@ def main() -> int:
         )
         optimization = optimize_roster(season, players, forecasts, time_limit=args.time_limit)
         recommendation = build_recommendation(catalog, season, players, forecasts, player_states, optimization)
+        recommendation["availabilityAudit"] = availability_audit
+        recommendation["rules"]["availabilityPolicy"] = "current medical status blocks opening-roster selection"
         write_artifact(
             catalog,
             season,
@@ -3338,6 +3485,8 @@ def main() -> int:
             player_states,
             classic_optimization,
         )
+        classic_recommendation["availabilityAudit"] = availability_audit
+        classic_recommendation["rules"]["availabilityPolicy"] = "current medical status blocks opening-roster selection"
         write_classic_artifact(
             catalog,
             season,

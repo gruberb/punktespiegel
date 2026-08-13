@@ -175,6 +175,17 @@ export type PlayerDetail = {
   seasons: PlayerSeasonSummary[];
   games: PlayerGame[];
   news: PlayerNews;
+  availability: PlayerAvailability | null;
+};
+
+export type PlayerAvailability = {
+  status: "injured" | "rehab" | "suspended" | "not_considered" | "unavailable";
+  reason: string | null;
+  absentSince: string | null;
+  expectedReturn: string | null;
+  source: string;
+  sourceUrl: string;
+  generatedAt: string;
 };
 
 export type NewsArticle = {
@@ -306,11 +317,32 @@ export type ManagerRecommendation = {
   matchdays: ManagerMatchday[];
   projectedMatchdays?: ManagerProjectedMatchday[];
   generatedAt: string;
+  availabilityAudit?: {
+    generatedAt: string;
+    provider: string;
+    sourceUrl: string;
+    policy: string;
+    checkedPlayerCount: number;
+    excludedPlayerCount: number;
+    unmatchedSourcePlayers: string[];
+    excludedPlayers: {
+      id: string;
+      name: string;
+      team: string;
+      position: Position;
+      status: PlayerAvailability["status"];
+      reason: string | null;
+      expectedReturn: string | null;
+      source: string;
+      sourceUrl: string;
+    }[];
+  };
   rules: {
     squadSize: number;
     positions: Record<Position, number>;
     maxFromTeam: number | null;
     goalkeepersFromSameTeam?: boolean;
+    availabilityPolicy?: string;
   };
   players: ManagerPickPlayer[];
 };

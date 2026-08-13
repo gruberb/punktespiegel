@@ -50,7 +50,7 @@ uv sync --frozen
 npm run generate:recommendations
 ```
 
-Der Befehl aktualisiert zuerst den statischen Bundesliga-Rollensnapshot von LigaInsider und schreibt danach je Liga und Modus ein versioniertes v2-JSON nach `frontend/public/data/recommendations`. Die Pipeline trainiert CatBoost offline, führt zeitlich getrennte Interactive- sowie Rolling-Origin-Classic-Prüfungen aus und löst die Kader mit HiGHS; dieser Schritt kann mehrere Minuten dauern. Die erzeugten JSON-Dateien werden geprüft und eingecheckt. CI, `npm run dev`, `npm run build` und das Pages-Deployment verwenden ausschließlich diese vorhandenen Artefakte und trainieren nicht erneut.
+Der Befehl aktualisiert zuerst den statischen Bundesliga-Rollensnapshot sowie den medizinischen Snapshot aller drei Ligen von LigaInsider/Transfermarkt und schreibt danach je Liga und Modus ein versioniertes v2-JSON nach `frontend/public/data/recommendations`. Die Pipeline trainiert CatBoost offline, führt zeitlich getrennte Interactive- sowie Rolling-Origin-Classic-Prüfungen aus und löst die Kader mit HiGHS; dieser Schritt kann mehrere Minuten dauern. Die erzeugten JSON-Dateien werden geprüft und eingecheckt. CI, `npm run dev`, `npm run build` und das Pages-Deployment verwenden ausschließlich diese vorhandenen Artefakte und trainieren nicht erneut.
 
 Der reale Classic-Winterlauf ist ein eigener Befehl. Er benötigt den tatsächlich gekauften Kader und schreibt standardmäßig nicht in das Produktionsverzeichnis; ein vollständiges Beispiel steht in [Classic-v2](classic-v2.md).
 

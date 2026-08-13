@@ -66,7 +66,7 @@ Die ausgegebenen Punkte sind Erwartungswerte und werden im UI ausdrücklich als 
 
 Der Datencompiler liest serverseitig im täglichen Build mehrere öffentliche RSS-Feeds. Eine statische `news.json` ordnet jedem Spieler höchstens zehn Treffer der letzten 14 Tage mit Datum, Quelle, Überschrift und Link zu. Der Browser kommuniziert nicht direkt mit den Quellen. Ein fehlgeschlagener Nachrichtenlauf ersetzt keinen vorhandenen Stand; ein optionaler NewsAPI-Schlüssel bleibt ein Actions-Secret.
 
-Für die aktuelle Bundesliga ergänzt `current-role-signals.json` einen lokal erzeugten LigaInsider-Snapshot: Topelf/Alternativen, direkte Spieler- und Vereinslinks sowie aktuelle Vereinsthemen. Transfermarkt-Vereins- und Spielersuchen werden als Kontrollquellen verlinkt, aber wegen des vorgeschalteten Bot-Schutzes nicht als zwingender Scrape verwendet. Der Browser lädt auch diesen Stand nur als statische Datei.
+Für die aktuelle Bundesliga ergänzt `current-role-signals.json` einen lokal erzeugten LigaInsider-Snapshot: Topelf/Alternativen, direkte Spieler- und Vereinslinks sowie aktuelle Vereinsthemen. `current-availability-signals.json` trennt davon den aktuellen medizinischen Status. LigaInsider liefert Verletzungen, Aufbautraining, Sperren und Nichtberücksichtigung für die Bundesliga; die öffentlichen Transfermarkt-Ausfalllisten decken die 2. Bundesliga und 3. Liga ab. Der medizinische Status hat in der Produktionsoptimierung Vorrang vor der Saisonhierarchie. Beide Stände und die daraus erzeugten Empfehlungen werden lokal erstellt, gemeinsam eingecheckt und vom Browser ausschließlich als statische Dateien geladen.
 
 ## Sharding und Übertragung
 

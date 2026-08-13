@@ -40,6 +40,13 @@ const positionName: Record<Position, string> = {
   MID: "Mittelfeld",
   FWD: "Sturm",
 };
+const availabilityStatusName: Record<NonNullable<PlayerDetail["availability"]>["status"], string> = {
+  injured: "Verletzt",
+  rehab: "Aufbautraining",
+  suspended: "Gesperrt",
+  not_considered: "Nicht berücksichtigt",
+  unavailable: "Nicht verfügbar",
+};
 const nav: { id: NavView; label: string }[] = [
   { id: "overview", label: "Überblick" },
   { id: "players", label: "Spieler" },
@@ -831,6 +838,12 @@ function PlayerDetailView({ filters, playerId, backLabel, onBack, onTeam, onSeas
           <span><strong>{formatPlayerValue(detail.value)}</strong><small>Wert · Pkt. / Mio. €</small></span>
         </div>
       </header>
+      {detail.availability && (
+        <aside className={`availability-alert ${detail.availability.status}`}>
+          <div><p className="kicker">Aktueller Verfügbarkeitsstatus</p><strong>{availabilityStatusName[detail.availability.status]}{detail.availability.reason ? ` · ${detail.availability.reason}` : ""}</strong><small>{detail.availability.absentSince ? `Fehlt seit ${detail.availability.absentSince}. ` : ""}{detail.availability.expectedReturn ? `Erwartete Rückkehr: ${formatDate(detail.availability.expectedReturn)}.` : "Kein bestätigtes Rückkehrdatum."}</small></div>
+          <a href={detail.availability.sourceUrl} target="_blank" rel="noreferrer">{detail.availability.source} · Stand {formatDate(detail.availability.generatedAt)} ↗</a>
+        </aside>
+      )}
       <PlayerNewsSection news={detail.news} kickerNewsUrl={detail.kickerNewsUrl} />
       <section className="player-seasons">
         <div className="section-copy"><h3>Punkte nach Saison</h3><p>Verein, Einsätze und benotete Spiele je Saison.</p></div>
@@ -927,6 +940,11 @@ function ManagerPicksView({ filters, onPlayer }: { filters: Filters; onPlayer: (
               <span><strong>{recommendation.projectedStartingPoints}</strong><small>{recommendation.modelVersion === 2 ? "Saison-Prognose" : "Projizierte Punkte"}</small></span>
               <span><strong>{recommendation.currentStartingPoints}</strong><small>Aktuelle Punkte{recommendation.matchdays.length ? ` · bis Spieltag ${recommendation.matchdays.at(-1)?.matchday}` : ""}</small></span>
             </div>
+            {recommendation.availabilityAudit && (
+              <p className="manager-availability-audit">
+                <strong>Verfügbarkeit geprüft:</strong> {recommendation.availabilityAudit.excludedPlayerCount} aktuell verletzte, im Aufbautraining befindliche oder nicht berücksichtigte Kandidaten wurden ausgeschlossen. <a href={recommendation.availabilityAudit.sourceUrl} target="_blank" rel="noreferrer">{recommendation.availabilityAudit.provider} · Stand {formatDate(recommendation.availabilityAudit.generatedAt)} ↗</a>
+              </p>
+            )}
           </section>
           <div className="manager-squad-grid">
             <section className="detail-section manager-lineup">

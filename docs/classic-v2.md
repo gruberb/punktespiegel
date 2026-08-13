@@ -41,7 +41,9 @@ Die Entscheidung ist im Artefakt unter `model.deploymentModel` sichtbar. `scenar
 
 Saisonpunkte werden nicht unabhängig von der Rolle gemischt. Der stabile Prior wird zunächst in Punkte je tatsächlichem Einsatz zurückgerechnet; erst danach entstehen unbedingte Erwartungspunkte als `pStart × Punkte|Start + pEinwechslung × Punkte|Einwechslung`. Dadurch kann ein aktueller Ersatzspieler nicht gleichzeitig fast sicher ausfallen und dennoch eine volle Saisonprojektion erhalten.
 
-Für die Bundesliga wird die Rollenprognose vor der Produktionsoptimierung mit einem eingecheckten, datierten LigaInsider-Topelf-Snapshot verankert. Das ist ein aktuelles Produktionssignal und wird nicht rückwirkend in historische Folds eingebaut. Vor dem Schreiben prüft der Generator zusätzlich Mindest-Einsatzwahrscheinlichkeiten und die mathematische Konsistenz zwischen Punkten und Verfügbarkeit; ein Verstoß bricht die Veröffentlichung ab.
+Für die Bundesliga wird die Rollenprognose vor der Produktionsoptimierung mit einem eingecheckten, datierten LigaInsider-Topelf-Snapshot verankert. Unabhängig davon wird für alle drei Ligen ein medizinischer Snapshot geladen: aktuell verletzte, im Aufbautraining befindliche oder ausdrücklich nicht berücksichtigte Spieler sind für den Septemberkader und die vorab simulierte Winterphase nicht wählbar; eine Sperre wirkt nur auf den betroffenen ersten Spieltag. LigaInsider liefert diesen Status für die Bundesliga, Transfermarkt für die 2. Bundesliga und 3. Liga. Der medizinische Status hat immer Vorrang vor der saisonalen Kaderhierarchie. Diese aktuellen Produktionssignale werden nicht rückwirkend in historische Folds eingebaut.
+
+Jedes Artefakt enthält unter `recommendation.availabilityAudit` Quelle, Zeitpunkt und die tatsächlich ausgeschlossenen Kandidaten. Vor dem Schreiben prüft der Generator, dass keiner davon im Eröffnungs-, Winter- oder Spieltagskader steht. Er prüft außerdem Mindest-Einsatzwahrscheinlichkeiten und die mathematische Konsistenz zwischen Punkten und Verfügbarkeit; ein Verstoß bricht die Veröffentlichung ab.
 
 ## Erzeugung
 

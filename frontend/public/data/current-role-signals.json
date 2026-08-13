@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-08-13T01:23:02.338385+00:00",
+  "generatedAt": "2026-08-13T09:45:10.812317+00:00",
   "league": "0001",
   "season": 2026,
   "provider": "LigaInsider Topelf",
-  "method": "preferred player in each published Topelf slot; alternatives are retained as alternatives",
+  "method": "preferred season-hierarchy player in each Topelf slot; medical availability is applied separately",
   "players": {
     "pl-k00051437": {
       "role": "starter",

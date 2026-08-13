@@ -1,0 +1,1288 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-08-13T09:45:19.100447+00:00",
+  "season": 2026,
+  "policy": "current medical status overrides season hierarchy; missing return dates are never interpreted as healthy",
+  "leagues": {
+    "0001": {
+      "provider": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/bundesliga/verletzte-und-gesperrte-spieler/",
+      "sourceRows": 50,
+      "matchedPlayers": 48,
+      "unmatchedPlayers": [
+        "Florian Flick",
+        "Justin Heekeren"
+      ],
+      "players": {
+        "pl-k00165263": {
+          "status": "injured",
+          "reason": "Muskelsehnenriss Oberschenkel",
+          "absentSince": "3 Monaten und 1 Woche",
+          "expectedReturn": null,
+          "latestNewsTitle": null,
+          "source": "LigaInsider",
+          "sourceUrl": "https://www.ligainsider.de/david-santos-daiber_38573/",
+          "profileUrl": "https://www.ligainsider.de/david-santos-daiber_38573/"
+        },
+        "pl-k00066753": {
+          "status": "rehab",
+          "reason": "Adduktorenabriss",
+          "absentSince": "3 Monaten und 3 Wochen",
+          "expectedReturn": null,
+          "latestNewsTitle": null,
+          "source": "LigaInsider",
+          "sourceUrl": "https://www.ligainsider.de/serge-gnabry_4815/",
+          "profileUrl": "https://www.ligainsider.de/serge-gnabry_4815/"
+        },
+        "pl-k00156015": {
+          "status": "rehab",
+          "reason": "Muskelbündelriss Oberschenkel",
+          "absentSince": "2 Monaten und 1 Woche",
+          "expectedReturn": null,
+          "latestNewsTitle": null,
+          "source": "LigaInsider",
+          "sourceUrl": "https://www.ligainsider.de/lennart-karl_38411/",
+          "profileUrl": "https://www.ligainsider.de/lennart-karl_38411/"
+        },
+        "pl-k00058007": {
+          "status": "injured",
+          "reason": "Kreuzbandriss",
+          "absentSince": "5 Monaten und 2 Wochen",
+          "expectedReturn": null,
+          "latestNewsTitle": null,
+          "source": "LigaInsider",
+          "sourceUrl": "https://www.ligainsider.de/emre-can_1812/",
+          "profileUrl": "https://www.ligainsider.de/emre-can_1812/"
+        },
+        "pl-k00096140": {
+          "status": "injured",
+          "reason": "Verletzung",
+          "absentSince": "1 Monat und 3 Wochen",
+          "expectedReturn": null,
+          "latestNewsTitle": "Schlotterbeck fällt für restliche WM aus",
+          "source": "LigaInsider",
+          "sourceUrl": "https://www.ligainsider.de/nico-schlotterbeck_20052/schlotterbeck-faellt-fuer-restliche-wm-aus-414417/",
+          "profileUrl": "https://www.ligainsider.de/nico-schlotterbeck_20052/"
+        },
+        "pl-k00131371": {
+          "status": "injured",
+          "reason": "Unbekannte Blessur",
+          "absentSince": "2 Monaten und 4 Wochen",
+          "expectedReturn": null,
+          "latestNewsTitle": null,
+          "source": "LigaInsider",
+          "sourceUrl": "https://www.ligainsider.de/silas-ostrzinski_27269/",
+          "profileUrl": "https://www.ligainsider.de/silas-ostrzinski_27269/"
+        },
+        "pl-k00139342": {
+          "status": "injured",
+          "reason": "Verletzung",
+          "absentSince": "1 Woche und 1 Tag",
+          "expectedReturn": null,
+          "latestNewsTitle": "Ouédraogo fällt für die nächsten Wochen aus",
+          "source": "LigaInsider",
+          "sourceUrl": "https://www.ligainsider.de/assan-ouedraogo_36735/ouedraogo-faellt-fuer-die-naechsten-wochen-aus-415958/",
+          "profileUrl": "https://www.ligainsider.de/assan-ouedraogo_36735/"
+        },
+        "pl-k00167652": {
+          "status": "injured",
+          "reason": "Kreuzbandriss",
+          "absentSince": "9 Monaten und 3 Wochen",
+          "expectedReturn": null,
+          "latestNewsTitle": null,
+          "source": "LigaInsider",
+          "sourceUrl": "https://www.ligainsider.de/viggo-gebel_37240/",
+          "profileUrl": "https://www.ligainsider.de/viggo-gebel_37240/"
+        },
+        "pl-k00102800": {
+          "status": "rehab",
+          "reason": "Aufbautraining",
+          "absentSince": "2 Monaten und 1 Woche",
+          "expectedReturn": null,
+          "latestNewsTitle": "Baumgartner absolviert erste Laufeinheiten",
+          "source": "LigaInsider",
+          "sourceUrl": "https://www.ligainsider.de/christoph-baumgartner_18640/baumgartner-absolviert-erste-laufeinheiten-415841/",
+          "profileUrl": "https://www.ligainsider.de/christoph-baumgartner_18640/"
+        },
+        "pl-k00100299": {
+          "status": "injured",
+          "reason": "Verletzung",
+          "absentSince": "5 Tagen",
+          "expectedReturn": null,
+          "latestNewsTitle": "Zagadou fällt mehrere Wochen aus",
+          "source": "LigaInsider",
+          "sourceUrl": "https://www.ligainsider.de/dan-axel-zagadou_12683/zagadou-faellt-mehrere-wochen-aus-416073/",
+          "profileUrl": "https://www.ligainsider.de/dan-axel-zagadou_12683/"
+        },
+        "pl-k00121863": {
+          "status": "injured",
+          "reason": "Muskelverletzung Oberschenkel",
+          "absentSince": "3 Wochen und 1 Tag",
+          "expectedReturn": null,
+          "latestNewsTitle": null,
+          "source": "LigaInsider",
+          "sourceUrl": "https://www.ligainsider.de/justin-diehl_24547/",
+          "profileUrl": "https://www.ligainsider.de/justin-diehl_24547/"
+        },
+        "pl-k00131777": {
+          "status": "injured",
+          "reason": "Verletzung",
+          "absentSince": "2 Monaten und 1 Woche",
+          "expectedReturn": null,
+          "latestNewsTitle": "Assignon kehrt frühestens Ende August zurück",
+          "source": "LigaInsider",
+          "sourceUrl": "https://www.ligainsider.de/lorenz-assignon_25114/assignon-kehrt-fruehestens-ende-august-zurueck-415324/",
+          "profileUrl": "https://www.ligainsider.de/lorenz-assignon_25114/"
+        },
+        "pl-k00132180": {
+          "status": "injured",
+          "reason": "Muskelverletzung Oberschenkel",
+          "absentSince": "3 Wochen und 1 Tag",
+          "expectedReturn": null,
+          "latestNewsTitle": null,
+          "source": "LigaInsider",
+          "sourceUrl": "https://www.ligainsider.de/dennis-seimen_35226/",
+          "profileUrl": "https://www.ligainsider.de/dennis-seimen_35226/"
+        },
+        "pl-k00156708": {
+          "status": "rehab",
+          "reason": "Trainingsrückstand",
+          "absentSince": "2 Wochen",
+          "expectedReturn": null,
+          "latestNewsTitle": null,
+          "source": "LigaInsider",
+          "sourceUrl": "https://www.ligainsider.de/leo-sauer_36387/",
+          "profileUrl": "https://www.ligainsider.de/leo-sauer_36387/"
+        },
+        "pl-k00111937": {
+          "status": "suspended",
+          "reason": "Gelb-Rote Karte",
+          "absentSince": "",
+          "expectedReturn": null,
+          "latestNewsTitle": null,
+          "source": "LigaInsider",
+          "sourceUrl": "https://www.ligainsider.de/tim-lemperle_23854/",
+          "profileUrl": "https://www.ligainsider.de/tim-lemperle_23854/"
+        },
+        "pl-k00059041": {
+          "status": "injured",
+          "reason": "Leistenoperation",
+          "absentSince": "1 Monat und 6 Tagen",
+          "expectedReturn": null,
+          "latestNewsTitle": null,
+          "source": "LigaInsider",
+          "sourceUrl": "https://www.ligainsider.de/andrej-kramaric_2439/",
+          "profileUrl": "https://www.ligainsider.de/andrej-kramaric_2439/"
+        },
+        "pl-k00098050": {
+          "status": "injured",
+          "reason": "Schambeinentzündung",
+          "absentSince": "2 Wochen und 6 Tagen",
+          "expectedReturn": null,
+          "latestNewsTitle": null,
+          "source": "LigaInsider",
+          "sourceUrl": "https://www.ligainsider.de/koki-machida_35863/",
+          "profileUrl": "https://www.ligainsider.de/koki-machida_35863/"
+        },
+        "pl-k00149290": {
+          "status": "injured",
+          "reason": "Muskelverletzung Oberschenkel",
+          "absentSince": "3 Wochen und 5 Tagen",
+          "expectedReturn": null,
+          "latestNewsTitle": null,
+          "source": "LigaInsider",
+          "sourceUrl": "https://www.ligainsider.de/eliesse-ben-seghir_35709/",
+          "profileUrl": "https://www.ligainsider.de/eliesse-ben-seghir_35709/"
+        },
+        "pl-k00151366": {
+          "status": "injured",
+          "reason": "Verletzung",
+          "absentSince": "6 Tagen",
+          "expectedReturn": null,
+          "latestNewsTitle": "Culbreath verpasst Leverkusener Saisonstart",
+          "source": "LigaInsider",
+          "sourceUrl": "https://www.ligainsider.de/montrell-culbreath_37258/culbreath-verpasst-leverkusener-saisonstart-416031/",
+          "profileUrl": "https://www.ligainsider.de/montrell-culbreath_37258/"
+        },
+        "pl-k00168485": {
+          "status": "injured",
+          "reason": "Stoffwechselstörung",
+          "absentSince": "4 Wochen und 1 Tag",
+          "expectedReturn": null,
+          "latestNewsTitle": null,
+          "source": "LigaInsider",
+          "sourceUrl": "https://www.ligainsider.de/kennet-eichhorn_38775/",
+          "profileUrl": "https://www.ligainsider.de/kennet-eichhorn_38775/"
+        },
+        "pl-k00090149": {
+          "status": "injured",
+          "reason": "Kreuzbandriss",
+          "absentSince": "4 Monaten und 2 Tagen",
+          "expectedReturn": null,
+          "latestNewsTitle": null,
+          "source": "LigaInsider",
+          "sourceUrl": "https://www.ligainsider.de/florent-muslija_13863/",
+          "profileUrl": "https://www.ligainsider.de/florent-muslija_13863/"
+        },
+        "pl-k00100088": {
+          "status": "injured",
+          "reason": "Muskelverletzung Oberschenkel",
+          "absentSince": "6 Tagen",
+          "expectedReturn": null,
+          "latestNewsTitle": null,
+          "source": "LigaInsider",
+          "sourceUrl": "https://www.ligainsider.de/jessic-ngankam_20484/",
+          "profileUrl": "https://www.ligainsider.de/jessic-ngankam_20484/"
+        },
+        "pl-k00087441": {
+          "status": "rehab",
+          "reason": "Aufbautraining",
+          "absentSince": "1 Woche und 6 Tagen",
+          "expectedReturn": null,
+          "latestNewsTitle": null,
+          "source": "LigaInsider",
+          "sourceUrl": "https://www.ligainsider.de/steve-mounie_14079/",
+          "profileUrl": "https://www.ligainsider.de/steve-mounie_14079/"
+        },
+        "pl-k00100591": {
+          "status": "injured",
+          "reason": "Verletzung",
+          "absentSince": "1 Woche und 2 Tagen",
+          "expectedReturn": null,
+          "latestNewsTitle": "Verletzung setzt Nebel vorerst außer Gefecht",
+          "source": "LigaInsider",
+          "sourceUrl": "https://www.ligainsider.de/paul-nebel_20674/verletzung-setzt-nebel-vorerst-ausser-gefecht-415934/",
+          "profileUrl": "https://www.ligainsider.de/paul-nebel_20674/"
+        },
+        "pl-k00119414": {
+          "status": "injured",
+          "reason": "Verletzung",
+          "absentSince": "1 Woche und 6 Tagen",
+          "expectedReturn": null,
+          "latestNewsTitle": "Martel fällt mit Knieverletzung vorerst aus",
+          "source": "LigaInsider",
+          "sourceUrl": "https://www.ligainsider.de/eric-martel_20728/martel-faellt-mit-knieverletzung-vorerst-aus-415682/",
+          "profileUrl": "https://www.ligainsider.de/eric-martel_20728/"
+        },
+        "pl-k00120073": {
+          "status": "injured",
+          "reason": "Schien- und Wadenbeinbruch",
+          "absentSince": "5 Monaten und 1 Tag",
+          "expectedReturn": null,
+          "latestNewsTitle": null,
+          "source": "LigaInsider",
+          "sourceUrl": "https://www.ligainsider.de/silas_21594/",
+          "profileUrl": "https://www.ligainsider.de/silas_21594/"
+        },
+        "pl-k00159341": {
+          "status": "injured",
+          "reason": "Kreuzbandriss",
+          "absentSince": "1 Monat und 4 Tagen",
+          "expectedReturn": null,
+          "latestNewsTitle": null,
+          "source": "LigaInsider",
+          "sourceUrl": "https://www.ligainsider.de/andrik-markgraf_38588/",
+          "profileUrl": "https://www.ligainsider.de/andrik-markgraf_38588/"
+        },
+        "pl-k00075651": {
+          "status": "rehab",
+          "reason": "Muskelverletzung Adduktoren",
+          "absentSince": "3 Monaten und 2 Wochen",
+          "expectedReturn": null,
+          "latestNewsTitle": null,
+          "source": "LigaInsider",
+          "sourceUrl": "https://www.ligainsider.de/frederik-roennow_7943/",
+          "profileUrl": "https://www.ligainsider.de/frederik-roennow_7943/"
+        },
+        "pl-k00112730": {
+          "status": "injured",
+          "reason": "Verletzung",
+          "absentSince": "1 Woche und 1 Tag",
+          "expectedReturn": null,
+          "latestNewsTitle": "Schulteroperation: Castrop fällt Monate aus",
+          "source": "LigaInsider",
+          "sourceUrl": "https://www.ligainsider.de/jens-castrop_24405/schulteroperation-castrop-faellt-monate-aus-415961/",
+          "profileUrl": "https://www.ligainsider.de/jens-castrop_24405/"
+        },
+        "pl-k00117668": {
+          "status": "injured",
+          "reason": "Verletzung",
+          "absentSince": "2 Wochen und 5 Tagen",
+          "expectedReturn": null,
+          "latestNewsTitle": "Diagnose da: Gladbach bestätigt Konoplya-Ausfall",
+          "source": "LigaInsider",
+          "sourceUrl": "https://www.ligainsider.de/yukhym-konoplya_26866/diagnose-da-gladbach-bestaetigt-konoplya-ausfall-415469/",
+          "profileUrl": "https://www.ligainsider.de/yukhym-konoplya_26866/"
+        },
+        "pl-k00112498": {
+          "status": "rehab",
+          "reason": "Muskelverletzung Adduktoren",
+          "absentSince": "2 Monaten und 1 Woche",
+          "expectedReturn": null,
+          "latestNewsTitle": null,
+          "source": "LigaInsider",
+          "sourceUrl": "https://www.ligainsider.de/tomas-cvancara_26608/",
+          "profileUrl": "https://www.ligainsider.de/tomas-cvancara_26608/"
+        },
+        "pl-k00158911": {
+          "status": "rehab",
+          "reason": "Schulterverletzung",
+          "absentSince": "5 Monaten und 1 Woche",
+          "expectedReturn": null,
+          "latestNewsTitle": null,
+          "source": "LigaInsider",
+          "sourceUrl": "https://www.ligainsider.de/fernando-dickes_37244/",
+          "profileUrl": "https://www.ligainsider.de/fernando-dickes_37244/"
+        },
+        "pl-k00167928": {
+          "status": "rehab",
+          "reason": "Syndesmoseriss",
+          "absentSince": "3 Monaten und 2 Wochen",
+          "expectedReturn": null,
+          "latestNewsTitle": null,
+          "source": "LigaInsider",
+          "sourceUrl": "https://www.ligainsider.de/alexander-roessing-lelesiit_38495/",
+          "profileUrl": "https://www.ligainsider.de/alexander-roessing-lelesiit_38495/"
+        },
+        "pl-k00096661": {
+          "status": "not_considered",
+          "reason": "Nicht berücksichtigt",
+          "absentSince": "",
+          "expectedReturn": null,
+          "latestNewsTitle": null,
+          "source": "LigaInsider",
+          "sourceUrl": "https://www.ligainsider.de/jean-luc-dompe_12020/",
+          "profileUrl": "https://www.ligainsider.de/jean-luc-dompe_12020/"
+        },
+        "pl-k00080172": {
+          "status": "injured",
+          "reason": "Knieverletzung",
+          "absentSince": "9 Monaten und 2 Wochen",
+          "expectedReturn": null,
+          "latestNewsTitle": null,
+          "source": "LigaInsider",
+          "sourceUrl": "https://www.ligainsider.de/timo-huebers_8912/",
+          "profileUrl": "https://www.ligainsider.de/timo-huebers_8912/"
+        },
+        "pl-k00148193": {
+          "status": "injured",
+          "reason": "Verletzung",
+          "absentSince": "6 Tagen",
+          "expectedReturn": null,
+          "latestNewsTitle": "Sebulonsen muss bis auf Weiteres pausieren",
+          "source": "LigaInsider",
+          "sourceUrl": "https://www.ligainsider.de/sebastian-sebulonsen_38632/sebulonsen-muss-bis-auf-weiteres-pausieren-416017/",
+          "profileUrl": "https://www.ligainsider.de/sebastian-sebulonsen_38632/"
+        },
+        "pl-k00121838": {
+          "status": "injured",
+          "reason": "Kreuzbandriss",
+          "absentSince": "4 Monaten und 2 Wochen",
+          "expectedReturn": null,
+          "latestNewsTitle": null,
+          "source": "LigaInsider",
+          "sourceUrl": "https://www.ligainsider.de/keke-topp_35787/",
+          "profileUrl": "https://www.ligainsider.de/keke-topp_35787/"
+        },
+        "pl-k00058003": {
+          "status": "rehab",
+          "reason": "Kreuzbandriss",
+          "absentSince": "1 Jahr und 4 Wochen",
+          "expectedReturn": null,
+          "latestNewsTitle": null,
+          "source": "LigaInsider",
+          "sourceUrl": "https://www.ligainsider.de/mitchell-weiser_1720/",
+          "profileUrl": "https://www.ligainsider.de/mitchell-weiser_1720/"
+        },
+        "pl-k00143372": {
+          "status": "injured",
+          "reason": "Achillessehnenverletzung",
+          "absentSince": "11 Monaten und 2 Tagen",
+          "expectedReturn": null,
+          "latestNewsTitle": null,
+          "source": "LigaInsider",
+          "sourceUrl": "https://www.ligainsider.de/emil-hoejlund_37190/",
+          "profileUrl": "https://www.ligainsider.de/emil-hoejlund_37190/"
+        },
+        "pl-k00136092": {
+          "status": "injured",
+          "reason": "Syndesmoseverletzung Sprunggelenk",
+          "absentSince": "2 Wochen und 5 Tagen",
+          "expectedReturn": null,
+          "latestNewsTitle": null,
+          "source": "LigaInsider",
+          "sourceUrl": "https://www.ligainsider.de/adrian-gantenbein_37275/",
+          "profileUrl": "https://www.ligainsider.de/adrian-gantenbein_37275/"
+        },
+        "pl-k00080551": {
+          "status": "not_considered",
+          "reason": "Nicht berücksichtigt",
+          "absentSince": "",
+          "expectedReturn": null,
+          "latestNewsTitle": null,
+          "source": "LigaInsider",
+          "sourceUrl": "https://www.ligainsider.de/anton-donkor_6742/",
+          "profileUrl": "https://www.ligainsider.de/anton-donkor_6742/"
+        },
+        "pl-k00146306": {
+          "status": "not_considered",
+          "reason": "Nicht berücksichtigt",
+          "absentSince": "",
+          "expectedReturn": null,
+          "latestNewsTitle": null,
+          "source": "LigaInsider",
+          "sourceUrl": "https://www.ligainsider.de/max-grueger_37366/",
+          "profileUrl": "https://www.ligainsider.de/max-grueger_37366/"
+        },
+        "pl-k00152572": {
+          "status": "not_considered",
+          "reason": "Nicht berücksichtigt",
+          "absentSince": "",
+          "expectedReturn": null,
+          "latestNewsTitle": null,
+          "source": "LigaInsider",
+          "sourceUrl": "https://www.ligainsider.de/zaid-tchibara_38499/",
+          "profileUrl": "https://www.ligainsider.de/zaid-tchibara_38499/"
+        },
+        "pl-k00137975": {
+          "status": "injured",
+          "reason": "Syndesmoseverletzung",
+          "absentSince": "1 Monat und 4 Tagen",
+          "expectedReturn": null,
+          "latestNewsTitle": null,
+          "source": "LigaInsider",
+          "sourceUrl": "https://www.ligainsider.de/luis-seifert_36900/",
+          "profileUrl": "https://www.ligainsider.de/luis-seifert_36900/"
+        },
+        "pl-k00072566": {
+          "status": "injured",
+          "reason": "Leistenverletzung",
+          "absentSince": "1 Woche und 5 Tagen",
+          "expectedReturn": null,
+          "latestNewsTitle": null,
+          "source": "LigaInsider",
+          "sourceUrl": "https://www.ligainsider.de/sven-michel_2391/",
+          "profileUrl": "https://www.ligainsider.de/sven-michel_2391/"
+        },
+        "pl-k00095159": {
+          "status": "injured",
+          "reason": "Verletzung",
+          "absentSince": "2 Wochen und 1 Tag",
+          "expectedReturn": null,
+          "latestNewsTitle": "Klaas fällt rund vier Wochen aus",
+          "source": "LigaInsider",
+          "sourceUrl": "https://www.ligainsider.de/sebastian-klaas_15795/klaas-faellt-rund-vier-wochen-aus-415724/",
+          "profileUrl": "https://www.ligainsider.de/sebastian-klaas_15795/"
+        },
+        "pl-k00092317": {
+          "status": "injured",
+          "reason": "Kreuzbandriss",
+          "absentSince": "3 Monaten und 3 Wochen",
+          "expectedReturn": null,
+          "latestNewsTitle": null,
+          "source": "LigaInsider",
+          "sourceUrl": "https://www.ligainsider.de/timur-gayret_26215/",
+          "profileUrl": "https://www.ligainsider.de/timur-gayret_26215/"
+        },
+        "pl-k00148500": {
+          "status": "injured",
+          "reason": "Außenbandverletzung",
+          "absentSince": "1 Monat und 2 Tagen",
+          "expectedReturn": null,
+          "latestNewsTitle": null,
+          "source": "LigaInsider",
+          "sourceUrl": "https://www.ligainsider.de/nyamekye-awortwie-grant_36091/",
+          "profileUrl": "https://www.ligainsider.de/nyamekye-awortwie-grant_36091/"
+        }
+      }
+    },
+    "0002": {
+      "provider": "Transfermarkt",
+      "sourceUrl": "https://www.transfermarkt.de/2-bundesliga/verletztespieler/wettbewerb/L2",
+      "sourceRows": 39,
+      "matchedPlayers": 39,
+      "unmatchedPlayers": [],
+      "players": {
+        "pl-k00085871": {
+          "status": "rehab",
+          "reason": "Trainingsrückstand",
+          "absentSince": null,
+          "expectedReturn": null,
+          "latestNewsTitle": null,
+          "source": "Transfermarkt",
+          "sourceUrl": "https://www.transfermarkt.de/lennart-grill/profil/spieler/309397",
+          "profileUrl": "https://www.transfermarkt.de/lennart-grill/profil/spieler/309397"
+        },
+        "pl-k00103767": {
+          "status": "injured",
+          "reason": "Muskelverletzung",
+          "absentSince": null,
+          "expectedReturn": null,
+          "latestNewsTitle": null,
+          "source": "Transfermarkt",
+          "sourceUrl": "https://www.transfermarkt.de/rogerio/profil/spieler/401527",
+          "profileUrl": "https://www.transfermarkt.de/rogerio/profil/spieler/401527"
+        },
+        "pl-k00124089": {
+          "status": "injured",
+          "reason": "unbekannte Verletzung",
+          "absentSince": null,
+          "expectedReturn": null,
+          "latestNewsTitle": null,
+          "source": "Transfermarkt",
+          "sourceUrl": "https://www.transfermarkt.de/aster-vranckx/profil/spieler/503881",
+          "profileUrl": "https://www.transfermarkt.de/aster-vranckx/profil/spieler/503881"
+        },
+        "pl-k00139302": {
+          "status": "injured",
+          "reason": "Oberschenkelverletzung",
+          "absentSince": null,
+          "expectedReturn": null,
+          "latestNewsTitle": null,
+          "source": "Transfermarkt",
+          "sourceUrl": "https://www.transfermarkt.de/mohamed-amoura/profil/spieler/746910",
+          "profileUrl": "https://www.transfermarkt.de/mohamed-amoura/profil/spieler/746910"
+        },
+        "pl-k00139331": {
+          "status": "rehab",
+          "reason": "Trainingsrückstand",
+          "absentSince": null,
+          "expectedReturn": null,
+          "latestNewsTitle": null,
+          "source": "Transfermarkt",
+          "sourceUrl": "https://www.transfermarkt.de/bence-dardai/profil/spieler/789252",
+          "profileUrl": "https://www.transfermarkt.de/bence-dardai/profil/spieler/789252"
+        },
+        "pl-k00146021": {
+          "status": "injured",
+          "reason": "Sprunggelenksverletzung",
+          "absentSince": null,
+          "expectedReturn": null,
+          "latestNewsTitle": null,
+          "source": "Transfermarkt",
+          "sourceUrl": "https://www.transfermarkt.de/jan-burger/profil/spieler/1009440",
+          "profileUrl": "https://www.transfermarkt.de/jan-burger/profil/spieler/1009440"
+        },
+        "pl-k00151363": {
+          "status": "injured",
+          "reason": "unbekannte Verletzung",
+          "absentSince": null,
+          "expectedReturn": null,
+          "latestNewsTitle": null,
+          "source": "Transfermarkt",
+          "sourceUrl": "https://www.transfermarkt.de/trevor-benedict/profil/spieler/1029413",
+          "profileUrl": "https://www.transfermarkt.de/trevor-benedict/profil/spieler/1029413"
+        },
+        "pl-k00089497": {
+          "status": "injured",
+          "reason": "Kreuzbandriss",
+          "absentSince": null,
+          "expectedReturn": null,
+          "latestNewsTitle": null,
+          "source": "Transfermarkt",
+          "sourceUrl": "https://www.transfermarkt.de/luca-marseiler/profil/spieler/339057",
+          "profileUrl": "https://www.transfermarkt.de/luca-marseiler/profil/spieler/339057"
+        },
+        "pl-k00103179": {
+          "status": "injured",
+          "reason": "Oberschenkelverletzung",
+          "absentSince": null,
+          "expectedReturn": null,
+          "latestNewsTitle": null,
+          "source": "Transfermarkt",
+          "sourceUrl": "https://www.transfermarkt.de/fabian-nurnberger/profil/spieler/349433",
+          "profileUrl": "https://www.transfermarkt.de/fabian-nurnberger/profil/spieler/349433"
+        },
+        "pl-k00093861": {
+          "status": "injured",
+          "reason": "Meniskusverletzung",
+          "absentSince": null,
+          "expectedReturn": null,
+          "latestNewsTitle": null,
+          "source": "Transfermarkt",
+          "sourceUrl": "https://www.transfermarkt.de/merveille-papela/profil/spieler/405689",
+          "profileUrl": "https://www.transfermarkt.de/merveille-papela/profil/spieler/405689"
+        },
+        "pl-k00075750": {
+          "status": "injured",
+          "reason": "Knieverletzung",
+          "absentSince": null,
+          "expectedReturn": null,
+          "latestNewsTitle": null,
+          "source": "Transfermarkt",
+          "sourceUrl": "https://www.transfermarkt.de/timon-wellenreuther/profil/spieler/196829",
+          "profileUrl": "https://www.transfermarkt.de/timon-wellenreuther/profil/spieler/196829"
+        },
+        "pl-k00089875": {
+          "status": "injured",
+          "reason": "Hirnblutung",
+          "absentSince": null,
+          "expectedReturn": null,
+          "latestNewsTitle": null,
+          "source": "Transfermarkt",
+          "sourceUrl": "https://www.transfermarkt.de/lars-bunning/profil/spieler/379114",
+          "profileUrl": "https://www.transfermarkt.de/lars-bunning/profil/spieler/379114"
+        },
+        "pl-k00078277": {
+          "status": "injured",
+          "reason": "Knieprobleme",
+          "absentSince": null,
+          "expectedReturn": null,
+          "latestNewsTitle": null,
+          "source": "Transfermarkt",
+          "sourceUrl": "https://www.transfermarkt.de/daniel-heber/profil/spieler/151583",
+          "profileUrl": "https://www.transfermarkt.de/daniel-heber/profil/spieler/151583"
+        },
+        "pl-k00087038": {
+          "status": "injured",
+          "reason": "Achillessehnenriss",
+          "absentSince": null,
+          "expectedReturn": null,
+          "latestNewsTitle": null,
+          "source": "Transfermarkt",
+          "sourceUrl": "https://www.transfermarkt.de/lubambo-musonda/profil/spieler/333859",
+          "profileUrl": "https://www.transfermarkt.de/lubambo-musonda/profil/spieler/333859"
+        },
+        "pl-k00095359": {
+          "status": "injured",
+          "reason": "muskuläre Probleme",
+          "absentSince": null,
+          "expectedReturn": null,
+          "latestNewsTitle": null,
+          "source": "Transfermarkt",
+          "sourceUrl": "https://www.transfermarkt.de/torben-musel/profil/spieler/368860",
+          "profileUrl": "https://www.transfermarkt.de/torben-musel/profil/spieler/368860"
+        },
+        "pl-k00106697": {
+          "status": "injured",
+          "reason": "Syndesmosebandriss",
+          "absentSince": null,
+          "expectedReturn": null,
+          "latestNewsTitle": null,
+          "source": "Transfermarkt",
+          "sourceUrl": "https://www.transfermarkt.de/lasse-rosenboom/profil/spieler/512352",
+          "profileUrl": "https://www.transfermarkt.de/lasse-rosenboom/profil/spieler/512352"
+        },
+        "pl-k00125975": {
+          "status": "injured",
+          "reason": "Zerrung",
+          "absentSince": null,
+          "expectedReturn": null,
+          "latestNewsTitle": null,
+          "source": "Transfermarkt",
+          "sourceUrl": "https://www.transfermarkt.de/andu-kelati/profil/spieler/719694",
+          "profileUrl": "https://www.transfermarkt.de/andu-kelati/profil/spieler/719694"
+        },
+        "pl-k00058843": {
+          "status": "injured",
+          "reason": "Kreuzbandriss",
+          "absentSince": null,
+          "expectedReturn": null,
+          "latestNewsTitle": null,
+          "source": "Transfermarkt",
+          "sourceUrl": "https://www.transfermarkt.de/leart-pacarada/profil/spieler/107219",
+          "profileUrl": "https://www.transfermarkt.de/leart-pacarada/profil/spieler/107219"
+        },
+        "pl-k00126213": {
+          "status": "injured",
+          "reason": "Unterarmbruch",
+          "absentSince": null,
+          "expectedReturn": null,
+          "latestNewsTitle": null,
+          "source": "Transfermarkt",
+          "sourceUrl": "https://www.transfermarkt.de/mikkel-kaufmann/profil/spieler/545332",
+          "profileUrl": "https://www.transfermarkt.de/mikkel-kaufmann/profil/spieler/545332"
+        },
+        "pl-k00111202": {
+          "status": "injured",
+          "reason": "Kreuzbandverletzung",
+          "absentSince": null,
+          "expectedReturn": null,
+          "latestNewsTitle": null,
+          "source": "Transfermarkt",
+          "sourceUrl": "https://www.transfermarkt.de/frederik-jakel/profil/spieler/405679",
+          "profileUrl": "https://www.transfermarkt.de/frederik-jakel/profil/spieler/405679"
+        },
+        "pl-k00158630": {
+          "status": "injured",
+          "reason": "Schambeinentzündung",
+          "absentSince": null,
+          "expectedReturn": null,
+          "latestNewsTitle": null,
+          "source": "Transfermarkt",
+          "sourceUrl": "https://www.transfermarkt.de/owen-gibs/profil/spieler/952980",
+          "profileUrl": "https://www.transfermarkt.de/owen-gibs/profil/spieler/952980"
+        },
+        "pl-k00097254": {
+          "status": "injured",
+          "reason": "Grippaler Infekt",
+          "absentSince": null,
+          "expectedReturn": null,
+          "latestNewsTitle": null,
+          "source": "Transfermarkt",
+          "sourceUrl": "https://www.transfermarkt.de/sigurd-haugen/profil/spieler/386541",
+          "profileUrl": "https://www.transfermarkt.de/sigurd-haugen/profil/spieler/386541"
+        },
+        "pl-k00115925": {
+          "status": "rehab",
+          "reason": "Trainingsrückstand",
+          "absentSince": null,
+          "expectedReturn": null,
+          "latestNewsTitle": null,
+          "source": "Transfermarkt",
+          "sourceUrl": "https://www.transfermarkt.de/andrea-ceresoli/profil/spieler/567475",
+          "profileUrl": "https://www.transfermarkt.de/andrea-ceresoli/profil/spieler/567475"
+        },
+        "pl-k00118718": {
+          "status": "injured",
+          "reason": "muskuläre Probleme",
+          "absentSince": null,
+          "expectedReturn": null,
+          "latestNewsTitle": null,
+          "source": "Transfermarkt",
+          "sourceUrl": "https://www.transfermarkt.de/styopa-mkrtchyan/profil/spieler/623119",
+          "profileUrl": "https://www.transfermarkt.de/styopa-mkrtchyan/profil/spieler/623119"
+        },
+        "pl-k00123789": {
+          "status": "rehab",
+          "reason": "Trainingsrückstand",
+          "absentSince": null,
+          "expectedReturn": null,
+          "latestNewsTitle": null,
+          "source": "Transfermarkt",
+          "sourceUrl": "https://www.transfermarkt.de/mikayil-faye/profil/spieler/666974",
+          "profileUrl": "https://www.transfermarkt.de/mikayil-faye/profil/spieler/666974"
+        },
+        "pl-k00152333": {
+          "status": "injured",
+          "reason": "Innenbandriss Knie",
+          "absentSince": null,
+          "expectedReturn": null,
+          "latestNewsTitle": null,
+          "source": "Transfermarkt",
+          "sourceUrl": "https://www.transfermarkt.de/winners-osawe/profil/spieler/974564",
+          "profileUrl": "https://www.transfermarkt.de/winners-osawe/profil/spieler/974564"
+        },
+        "pl-k00089773": {
+          "status": "injured",
+          "reason": "Innenbandverletzung",
+          "absentSince": null,
+          "expectedReturn": null,
+          "latestNewsTitle": null,
+          "source": "Transfermarkt",
+          "sourceUrl": "https://www.transfermarkt.de/robin-heusser/profil/spieler/337042",
+          "profileUrl": "https://www.transfermarkt.de/robin-heusser/profil/spieler/337042"
+        },
+        "pl-k00095524": {
+          "status": "injured",
+          "reason": "Knieprobleme",
+          "absentSince": null,
+          "expectedReturn": null,
+          "latestNewsTitle": null,
+          "source": "Transfermarkt",
+          "sourceUrl": "https://www.transfermarkt.de/lino-tempelmann/profil/spieler/378883",
+          "profileUrl": "https://www.transfermarkt.de/lino-tempelmann/profil/spieler/378883"
+        },
+        "pl-k00088705": {
+          "status": "injured",
+          "reason": "Achillessehnenriss",
+          "absentSince": null,
+          "expectedReturn": null,
+          "latestNewsTitle": null,
+          "source": "Transfermarkt",
+          "sourceUrl": "https://www.transfermarkt.de/ivan-prtajin/profil/spieler/340700",
+          "profileUrl": "https://www.transfermarkt.de/ivan-prtajin/profil/spieler/340700"
+        },
+        "pl-k00124798": {
+          "status": "injured",
+          "reason": "muskuläre Probleme",
+          "absentSince": null,
+          "expectedReturn": null,
+          "latestNewsTitle": null,
+          "source": "Transfermarkt",
+          "sourceUrl": "https://www.transfermarkt.de/connor-metcalfe/profil/spieler/522223",
+          "profileUrl": "https://www.transfermarkt.de/connor-metcalfe/profil/spieler/522223"
+        },
+        "pl-k00151418": {
+          "status": "injured",
+          "reason": "Oberschenkelverletzung",
+          "absentSince": null,
+          "expectedReturn": null,
+          "latestNewsTitle": null,
+          "source": "Transfermarkt",
+          "sourceUrl": "https://www.transfermarkt.de/gisli-thordarson/profil/spieler/825960",
+          "profileUrl": "https://www.transfermarkt.de/gisli-thordarson/profil/spieler/825960"
+        },
+        "pl-k00174197": {
+          "status": "injured",
+          "reason": "Sprunggelenksverletzung",
+          "absentSince": null,
+          "expectedReturn": null,
+          "latestNewsTitle": null,
+          "source": "Transfermarkt",
+          "sourceUrl": "https://www.transfermarkt.de/abdoulie-ceesay/profil/spieler/1280281",
+          "profileUrl": "https://www.transfermarkt.de/abdoulie-ceesay/profil/spieler/1280281"
+        },
+        "pl-k00111747": {
+          "status": "injured",
+          "reason": "Oberschenkelverletzung",
+          "absentSince": null,
+          "expectedReturn": null,
+          "latestNewsTitle": null,
+          "source": "Transfermarkt",
+          "sourceUrl": "https://www.transfermarkt.de/virgil-ghita/profil/spieler/340977",
+          "profileUrl": "https://www.transfermarkt.de/virgil-ghita/profil/spieler/340977"
+        },
+        "pl-k00138118": {
+          "status": "injured",
+          "reason": "Außenmeniskuseinriss",
+          "absentSince": null,
+          "expectedReturn": null,
+          "latestNewsTitle": null,
+          "source": "Transfermarkt",
+          "sourceUrl": "https://www.transfermarkt.de/benjamin-zank/profil/spieler/687903",
+          "profileUrl": "https://www.transfermarkt.de/benjamin-zank/profil/spieler/687903"
+        },
+        "pl-k00166289": {
+          "status": "injured",
+          "reason": "Meniskusschaden",
+          "absentSince": null,
+          "expectedReturn": null,
+          "latestNewsTitle": null,
+          "source": "Transfermarkt",
+          "sourceUrl": "https://www.transfermarkt.de/mikkel-rakneberg/profil/spieler/893930",
+          "profileUrl": "https://www.transfermarkt.de/mikkel-rakneberg/profil/spieler/893930"
+        },
+        "pl-k00062426": {
+          "status": "injured",
+          "reason": "Herzprobleme",
+          "absentSince": null,
+          "expectedReturn": null,
+          "latestNewsTitle": null,
+          "source": "Transfermarkt",
+          "sourceUrl": "https://www.transfermarkt.de/christian-eriksen/profil/spieler/69633",
+          "profileUrl": "https://www.transfermarkt.de/christian-eriksen/profil/spieler/69633"
+        },
+        "pl-k00157935": {
+          "status": "injured",
+          "reason": "Schulterverletzung",
+          "absentSince": null,
+          "expectedReturn": "2026-08-17",
+          "latestNewsTitle": null,
+          "source": "Transfermarkt",
+          "sourceUrl": "https://www.transfermarkt.de/husseyn-chakroun/profil/spieler/1145570",
+          "profileUrl": "https://www.transfermarkt.de/husseyn-chakroun/profil/spieler/1145570"
+        },
+        "pl-k00119357": {
+          "status": "injured",
+          "reason": "Kreuzbandriss",
+          "absentSince": null,
+          "expectedReturn": "2026-11-30",
+          "latestNewsTitle": null,
+          "source": "Transfermarkt",
+          "sourceUrl": "https://www.transfermarkt.de/kenneth-schmidt/profil/spieler/527276",
+          "profileUrl": "https://www.transfermarkt.de/kenneth-schmidt/profil/spieler/527276"
+        },
+        "pl-k00119817": {
+          "status": "injured",
+          "reason": "Kreuzbandriss",
+          "absentSince": null,
+          "expectedReturn": "2026-12-31",
+          "latestNewsTitle": null,
+          "source": "Transfermarkt",
+          "sourceUrl": "https://www.transfermarkt.de/mathias-pereira-lage/profil/spieler/424072",
+          "profileUrl": "https://www.transfermarkt.de/mathias-pereira-lage/profil/spieler/424072"
+        }
+      }
+    },
+    "0003": {
+      "provider": "Transfermarkt",
+      "sourceUrl": "https://www.transfermarkt.de/3-liga/verletztespieler/wettbewerb/L3",
+      "sourceRows": 38,
+      "matchedPlayers": 38,
+      "unmatchedPlayers": [],
+      "players": {
+        "pl-k00141744": {
+          "status": "injured",
+          "reason": "Sprunggelenksverletzung",
+          "absentSince": null,
+          "expectedReturn": null,
+          "latestNewsTitle": null,
+          "source": "Transfermarkt",
+          "sourceUrl": "https://www.transfermarkt.de/timo-hildmann/profil/spieler/814190",
+          "profileUrl": "https://www.transfermarkt.de/timo-hildmann/profil/spieler/814190"
+        },
+        "pl-k00068574": {
+          "status": "injured",
+          "reason": "Schlüsselbeinbruch",
+          "absentSince": null,
+          "expectedReturn": null,
+          "latestNewsTitle": null,
+          "source": "Transfermarkt",
+          "sourceUrl": "https://www.transfermarkt.de/maurice-multhaup/profil/spieler/187496",
+          "profileUrl": "https://www.transfermarkt.de/maurice-multhaup/profil/spieler/187496"
+        },
+        "pl-k00151461": {
+          "status": "injured",
+          "reason": "Krank",
+          "absentSince": null,
+          "expectedReturn": null,
+          "latestNewsTitle": null,
+          "source": "Transfermarkt",
+          "sourceUrl": "https://www.transfermarkt.de/yanik-spalt/profil/spieler/960462",
+          "profileUrl": "https://www.transfermarkt.de/yanik-spalt/profil/spieler/960462"
+        },
+        "pl-k00169869": {
+          "status": "injured",
+          "reason": "Knieverletzung",
+          "absentSince": null,
+          "expectedReturn": null,
+          "latestNewsTitle": null,
+          "source": "Transfermarkt",
+          "sourceUrl": "https://www.transfermarkt.de/tom-santos/profil/spieler/1159568",
+          "profileUrl": "https://www.transfermarkt.de/tom-santos/profil/spieler/1159568"
+        },
+        "pl-k00056596": {
+          "status": "injured",
+          "reason": "Kapselverletzung",
+          "absentSince": null,
+          "expectedReturn": null,
+          "latestNewsTitle": null,
+          "source": "Transfermarkt",
+          "sourceUrl": "https://www.transfermarkt.de/florian-hubner/profil/spieler/85822",
+          "profileUrl": "https://www.transfermarkt.de/florian-hubner/profil/spieler/85822"
+        },
+        "pl-k00135578": {
+          "status": "injured",
+          "reason": "Rückenprobleme",
+          "absentSince": null,
+          "expectedReturn": null,
+          "latestNewsTitle": null,
+          "source": "Transfermarkt",
+          "sourceUrl": "https://www.transfermarkt.de/donny-bogicevic/profil/spieler/742548",
+          "profileUrl": "https://www.transfermarkt.de/donny-bogicevic/profil/spieler/742548"
+        },
+        "pl-k00061003": {
+          "status": "injured",
+          "reason": "Sprunggelenksprobleme",
+          "absentSince": null,
+          "expectedReturn": null,
+          "latestNewsTitle": null,
+          "source": "Transfermarkt",
+          "sourceUrl": "https://www.transfermarkt.de/benedikt-saller/profil/spieler/93552",
+          "profileUrl": "https://www.transfermarkt.de/benedikt-saller/profil/spieler/93552"
+        },
+        "pl-k00082037": {
+          "status": "injured",
+          "reason": "Schulterverletzung",
+          "absentSince": null,
+          "expectedReturn": null,
+          "latestNewsTitle": null,
+          "source": "Transfermarkt",
+          "sourceUrl": "https://www.transfermarkt.de/florian-dietz/profil/spieler/283871",
+          "profileUrl": "https://www.transfermarkt.de/florian-dietz/profil/spieler/283871"
+        },
+        "pl-k00095665": {
+          "status": "injured",
+          "reason": "muskuläre Probleme",
+          "absentSince": null,
+          "expectedReturn": null,
+          "latestNewsTitle": null,
+          "source": "Transfermarkt",
+          "sourceUrl": "https://www.transfermarkt.de/jonas-fedl/profil/spieler/379804",
+          "profileUrl": "https://www.transfermarkt.de/jonas-fedl/profil/spieler/379804"
+        },
+        "pl-k00094684": {
+          "status": "injured",
+          "reason": "Innenbandverletzung",
+          "absentSince": null,
+          "expectedReturn": null,
+          "latestNewsTitle": null,
+          "source": "Transfermarkt",
+          "sourceUrl": "https://www.transfermarkt.de/torben-engelking/profil/spieler/383699",
+          "profileUrl": "https://www.transfermarkt.de/torben-engelking/profil/spieler/383699"
+        },
+        "pl-k00149443": {
+          "status": "rehab",
+          "reason": "Trainingsrückstand",
+          "absentSince": null,
+          "expectedReturn": null,
+          "latestNewsTitle": null,
+          "source": "Transfermarkt",
+          "sourceUrl": "https://www.transfermarkt.de/tim-kohler/profil/spieler/913429",
+          "profileUrl": "https://www.transfermarkt.de/tim-kohler/profil/spieler/913429"
+        },
+        "pl-k00138185": {
+          "status": "injured",
+          "reason": "Schambeinentzündung",
+          "absentSince": null,
+          "expectedReturn": null,
+          "latestNewsTitle": null,
+          "source": "Transfermarkt",
+          "sourceUrl": "https://www.transfermarkt.de/tim-muller/profil/spieler/912438",
+          "profileUrl": "https://www.transfermarkt.de/tim-muller/profil/spieler/912438"
+        },
+        "pl-k00149666": {
+          "status": "injured",
+          "reason": "Oberschenkelverletzung",
+          "absentSince": null,
+          "expectedReturn": null,
+          "latestNewsTitle": null,
+          "source": "Transfermarkt",
+          "sourceUrl": "https://www.transfermarkt.de/lars-strobl/profil/spieler/923608",
+          "profileUrl": "https://www.transfermarkt.de/lars-strobl/profil/spieler/923608"
+        },
+        "pl-k00169438": {
+          "status": "injured",
+          "reason": "Oberschenkelverletzung",
+          "absentSince": null,
+          "expectedReturn": null,
+          "latestNewsTitle": null,
+          "source": "Transfermarkt",
+          "sourceUrl": "https://www.transfermarkt.de/nils-schlosser/profil/spieler/1188261",
+          "profileUrl": "https://www.transfermarkt.de/nils-schlosser/profil/spieler/1188261"
+        },
+        "pl-k00172235": {
+          "status": "injured",
+          "reason": "Sprunggelenksverletzung",
+          "absentSince": null,
+          "expectedReturn": null,
+          "latestNewsTitle": null,
+          "source": "Transfermarkt",
+          "sourceUrl": "https://www.transfermarkt.de/zain-biazid/profil/spieler/1209250",
+          "profileUrl": "https://www.transfermarkt.de/zain-biazid/profil/spieler/1209250"
+        },
+        "pl-k00076431": {
+          "status": "injured",
+          "reason": "Muskelfaserriss",
+          "absentSince": null,
+          "expectedReturn": null,
+          "latestNewsTitle": null,
+          "source": "Transfermarkt",
+          "sourceUrl": "https://www.transfermarkt.de/eroll-zejnullahu/profil/spieler/203076",
+          "profileUrl": "https://www.transfermarkt.de/eroll-zejnullahu/profil/spieler/203076"
+        },
+        "pl-k00136017": {
+          "status": "injured",
+          "reason": "Außenbandriss",
+          "absentSince": null,
+          "expectedReturn": null,
+          "latestNewsTitle": null,
+          "source": "Transfermarkt",
+          "sourceUrl": "https://www.transfermarkt.de/pascal-fallmann/profil/spieler/535650",
+          "profileUrl": "https://www.transfermarkt.de/pascal-fallmann/profil/spieler/535650"
+        },
+        "pl-k00106181": {
+          "status": "injured",
+          "reason": "Knieverletzung",
+          "absentSince": null,
+          "expectedReturn": null,
+          "latestNewsTitle": null,
+          "source": "Transfermarkt",
+          "sourceUrl": "https://www.transfermarkt.de/mason-toye/profil/spieler/562388",
+          "profileUrl": "https://www.transfermarkt.de/mason-toye/profil/spieler/562388"
+        },
+        "pl-k00138189": {
+          "status": "injured",
+          "reason": "Sprunggelenksverletzung",
+          "absentSince": null,
+          "expectedReturn": null,
+          "latestNewsTitle": null,
+          "source": "Transfermarkt",
+          "sourceUrl": "https://www.transfermarkt.de/dennis-kaygin/profil/spieler/829257",
+          "profileUrl": "https://www.transfermarkt.de/dennis-kaygin/profil/spieler/829257"
+        },
+        "pl-k00103381": {
+          "status": "injured",
+          "reason": "Muskelverletzung",
+          "absentSince": null,
+          "expectedReturn": null,
+          "latestNewsTitle": null,
+          "source": "Transfermarkt",
+          "sourceUrl": "https://www.transfermarkt.de/lucien-hawryluk/profil/spieler/384740",
+          "profileUrl": "https://www.transfermarkt.de/lucien-hawryluk/profil/spieler/384740"
+        },
+        "pl-k00092494": {
+          "status": "injured",
+          "reason": "Handverletzung",
+          "absentSince": null,
+          "expectedReturn": null,
+          "latestNewsTitle": null,
+          "source": "Transfermarkt",
+          "sourceUrl": "https://www.transfermarkt.de/marius-wegmann/profil/spieler/416032",
+          "profileUrl": "https://www.transfermarkt.de/marius-wegmann/profil/spieler/416032"
+        },
+        "pl-k00135776": {
+          "status": "injured",
+          "reason": "Rückenprobleme",
+          "absentSince": null,
+          "expectedReturn": null,
+          "latestNewsTitle": null,
+          "source": "Transfermarkt",
+          "sourceUrl": "https://www.transfermarkt.de/emil-holten/profil/spieler/332071",
+          "profileUrl": "https://www.transfermarkt.de/emil-holten/profil/spieler/332071"
+        },
+        "pl-k00133046": {
+          "status": "injured",
+          "reason": "Muskelbündelriss",
+          "absentSince": null,
+          "expectedReturn": null,
+          "latestNewsTitle": null,
+          "source": "Transfermarkt",
+          "sourceUrl": "https://www.transfermarkt.de/paul-stock/profil/spieler/425834",
+          "profileUrl": "https://www.transfermarkt.de/paul-stock/profil/spieler/425834"
+        },
+        "pl-k00103760": {
+          "status": "injured",
+          "reason": "Probleme im linkem Hüftbeuger",
+          "absentSince": null,
+          "expectedReturn": null,
+          "latestNewsTitle": null,
+          "source": "Transfermarkt",
+          "sourceUrl": "https://www.transfermarkt.de/leon-dajaku/profil/spieler/483974",
+          "profileUrl": "https://www.transfermarkt.de/leon-dajaku/profil/spieler/483974"
+        },
+        "pl-k00148464": {
+          "status": "injured",
+          "reason": "Oberschenkelzerrung",
+          "absentSince": null,
+          "expectedReturn": null,
+          "latestNewsTitle": null,
+          "source": "Transfermarkt",
+          "sourceUrl": "https://www.transfermarkt.de/peter-kiedl/profil/spieler/692756",
+          "profileUrl": "https://www.transfermarkt.de/peter-kiedl/profil/spieler/692756"
+        },
+        "pl-k00140655": {
+          "status": "injured",
+          "reason": "Oberschenkelverletzung",
+          "absentSince": null,
+          "expectedReturn": null,
+          "latestNewsTitle": null,
+          "source": "Transfermarkt",
+          "sourceUrl": "https://www.transfermarkt.de/hamza-anhari/profil/spieler/751027",
+          "profileUrl": "https://www.transfermarkt.de/hamza-anhari/profil/spieler/751027"
+        },
+        "pl-k00100595": {
+          "status": "injured",
+          "reason": "Wadenverletzung",
+          "absentSince": null,
+          "expectedReturn": null,
+          "latestNewsTitle": null,
+          "source": "Transfermarkt",
+          "sourceUrl": "https://www.transfermarkt.de/dennis-borkowski/profil/spieler/467426",
+          "profileUrl": "https://www.transfermarkt.de/dennis-borkowski/profil/spieler/467426"
+        },
+        "pl-k00136528": {
+          "status": "injured",
+          "reason": "muskuläre Probleme",
+          "absentSince": null,
+          "expectedReturn": null,
+          "latestNewsTitle": null,
+          "source": "Transfermarkt",
+          "sourceUrl": "https://www.transfermarkt.de/frederik-christensen/profil/spieler/514889",
+          "profileUrl": "https://www.transfermarkt.de/frederik-christensen/profil/spieler/514889"
+        },
+        "pl-k00141653": {
+          "status": "injured",
+          "reason": "Knieverletzung",
+          "absentSince": null,
+          "expectedReturn": null,
+          "latestNewsTitle": null,
+          "source": "Transfermarkt",
+          "sourceUrl": "https://www.transfermarkt.de/eliot-bujupi/profil/spieler/907483",
+          "profileUrl": "https://www.transfermarkt.de/eliot-bujupi/profil/spieler/907483"
+        },
+        "pl-k00096772": {
+          "status": "injured",
+          "reason": "Achillessehnenriss",
+          "absentSince": null,
+          "expectedReturn": null,
+          "latestNewsTitle": null,
+          "source": "Transfermarkt",
+          "sourceUrl": "https://www.transfermarkt.de/adama-diakhaby/profil/spieler/453594",
+          "profileUrl": "https://www.transfermarkt.de/adama-diakhaby/profil/spieler/453594"
+        },
+        "pl-k00130694": {
+          "status": "injured",
+          "reason": "Kreuzbandriss",
+          "absentSince": null,
+          "expectedReturn": null,
+          "latestNewsTitle": null,
+          "source": "Transfermarkt",
+          "sourceUrl": "https://www.transfermarkt.de/jascha-brandt/profil/spieler/603734",
+          "profileUrl": "https://www.transfermarkt.de/jascha-brandt/profil/spieler/603734"
+        },
+        "pl-k00071532": {
+          "status": "injured",
+          "reason": "Kreuzbandriss",
+          "absentSince": null,
+          "expectedReturn": null,
+          "latestNewsTitle": null,
+          "source": "Transfermarkt",
+          "sourceUrl": "https://www.transfermarkt.de/simon-scherder/profil/spieler/93979",
+          "profileUrl": "https://www.transfermarkt.de/simon-scherder/profil/spieler/93979"
+        },
+        "pl-k00079914": {
+          "status": "injured",
+          "reason": "Knieverletzung",
+          "absentSince": null,
+          "expectedReturn": null,
+          "latestNewsTitle": null,
+          "source": "Transfermarkt",
+          "sourceUrl": "https://www.transfermarkt.de/marvin-schulz/profil/spieler/168678",
+          "profileUrl": "https://www.transfermarkt.de/marvin-schulz/profil/spieler/168678"
+        },
+        "pl-k00097998": {
+          "status": "injured",
+          "reason": "Kreuzbandriss",
+          "absentSince": null,
+          "expectedReturn": null,
+          "latestNewsTitle": null,
+          "source": "Transfermarkt",
+          "sourceUrl": "https://www.transfermarkt.de/malik-batmaz/profil/spieler/411134",
+          "profileUrl": "https://www.transfermarkt.de/malik-batmaz/profil/spieler/411134"
+        },
+        "pl-k00147495": {
+          "status": "injured",
+          "reason": "Sprunggelenksverletzung",
+          "absentSince": null,
+          "expectedReturn": null,
+          "latestNewsTitle": null,
+          "source": "Transfermarkt",
+          "sourceUrl": "https://www.transfermarkt.de/michael-gluck/profil/spieler/679681",
+          "profileUrl": "https://www.transfermarkt.de/michael-gluck/profil/spieler/679681"
+        },
+        "pl-k00147825": {
+          "status": "injured",
+          "reason": "Oberschenkelverletzung",
+          "absentSince": null,
+          "expectedReturn": "2026-08-17",
+          "latestNewsTitle": null,
+          "source": "Transfermarkt",
+          "sourceUrl": "https://www.transfermarkt.de/elias-egouli/profil/spieler/946037",
+          "profileUrl": "https://www.transfermarkt.de/elias-egouli/profil/spieler/946037"
+        },
+        "pl-k00115534": {
+          "status": "injured",
+          "reason": "Kreuzbandriss",
+          "absentSince": null,
+          "expectedReturn": "2026-12-31",
+          "latestNewsTitle": null,
+          "source": "Transfermarkt",
+          "sourceUrl": "https://www.transfermarkt.de/davis-asante/profil/spieler/622723",
+          "profileUrl": "https://www.transfermarkt.de/davis-asante/profil/spieler/622723"
+        },
+        "pl-k00109034": {
+          "status": "injured",
+          "reason": "Kreuzbandriss",
+          "absentSince": null,
+          "expectedReturn": "2027-06-30",
+          "latestNewsTitle": null,
+          "source": "Transfermarkt",
+          "sourceUrl": "https://www.transfermarkt.de/jasper-loffelsend/profil/spieler/443391",
+          "profileUrl": "https://www.transfermarkt.de/jasper-loffelsend/profil/spieler/443391"
+        }
+      }
+    }
+  }
+}

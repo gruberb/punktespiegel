@@ -1,9 +1,26 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
+  "medicalSources": {
+    "0001": {
+      "provider": "LigaInsider",
+      "format": "ligainsider",
+      "url": "https://www.ligainsider.de/bundesliga/verletzte-und-gesperrte-spieler/"
+    },
+    "0002": {
+      "provider": "Transfermarkt",
+      "format": "transfermarkt",
+      "url": "https://www.transfermarkt.de/2-bundesliga/verletztespieler/wettbewerb/L2"
+    },
+    "0003": {
+      "provider": "Transfermarkt",
+      "format": "transfermarkt",
+      "url": "https://www.transfermarkt.de/3-liga/verletztespieler/wettbewerb/L3"
+    }
+  },
   "leagues": {
     "0001": {
       "lineupProvider": "LigaInsider",
-      "lineupCoverage": "Topelf 2026/27; first listed player in every slot is treated as the current preferred starter",
+      "lineupCoverage": "Topelf 2026/27; first listed player in every slot describes the preferred season hierarchy only when medically available",
       "teams": {
         "tm-k00000002": { "ligaInsiderUrl": "https://www.ligainsider.de/fc-schalke-04/13/", "transfermarktClubId": 33 },
         "tm-k00000004": { "ligaInsiderUrl": "https://www.ligainsider.de/sv-werder-bremen/2/", "transfermarktClubId": 86 },
