@@ -919,6 +919,12 @@ function ManagerPicksView({ filters, onPlayer }: { filters: Filters; onPlayer: (
   if (error) return <ErrorState message={error} />;
   const starters = recommendation?.players.filter((player) => player.role === "start") ?? [];
   const reserves = recommendation?.players.filter((player) => player.role === "reserve") ?? [];
+  const remainingProjection = Boolean(
+    recommendation?.currentSeasonEvidence?.realizedPointsExcludedFromSelectionObjective
+    && recommendation.currentSeasonEvidence.throughMatchday > 0,
+  );
+  const optimizationStartsAt = recommendation?.currentSeasonEvidence?.optimizationStartsAtMatchday
+    ?? ((recommendation?.currentSeasonEvidence?.throughMatchday ?? 0) + 1);
   return (
     <div className="manager-view">
       <div className="manager-toolbar">
@@ -932,17 +938,17 @@ function ManagerPicksView({ filters, onPlayer }: { filters: Filters; onPlayer: (
         <>
           <section className="detail-section manager-summary-section">
             <div className="detail-head">
-              <div><p className="kicker">{recommendation.modelVersion === 2 ? `${recommendation.mode === "classic" ? "Classic" : "Interactive"}-v2` : "Modellvorschlag"} · {recommendation.season}</p><h2>Fantasy Team</h2><p>{recommendation.modelVersion === 2 ? recommendation.mode === "classic" ? "Der September-Kader maximiert verfügbarkeitsbereinigte Saisonpunkte mit festen Starter- und Reserveslots; die drei möglichen Winterwechsel werden erst am echten Stichtag mit den dann bekannten Informationen festgelegt." : "Punkte- und Rollenprognosen wählen den Kader gemeinsam mit der besten zulässigen Elf je Spieltag. Alle drei Torhüter kommen als Ausfallversicherung vom selben Verein." : "Optimiert nach Punkteprognose sowie Positions-, Formations- und Vereinsregeln."} Prognosen sind Erwartungswerte, keine Garantie.</p></div>
+              <div><p className="kicker">{recommendation.modelVersion === 2 ? `${recommendation.mode === "classic" ? "Classic" : "Interactive"}-v2` : "Modellvorschlag"} · {recommendation.season}</p><h2>Fantasy Team</h2><p>{recommendation.modelVersion === 2 ? recommendation.mode === "classic" ? remainingProjection ? `Der Kader maximiert die verfügbarkeitsbereinigten Punkte ab Spieltag ${optimizationStartsAt} mit festen Starter- und Reserveslots; bereits erzielte Punkte beeinflussen die Auswahl nicht.` : "Der September-Kader maximiert verfügbarkeitsbereinigte Saisonpunkte mit festen Starter- und Reserveslots; die drei möglichen Winterwechsel werden erst am echten Stichtag mit den dann bekannten Informationen festgelegt." : remainingProjection ? `Punkte- und Rollenprognosen wählen den Kader ab Spieltag ${optimizationStartsAt} gemeinsam mit der besten zulässigen Elf je Spieltag. Bereits erzielte Punkte beeinflussen die Auswahl nicht.` : "Punkte- und Rollenprognosen wählen den Kader gemeinsam mit der besten zulässigen Elf je Spieltag. Alle drei Torhüter kommen als Ausfallversicherung vom selben Verein." : "Optimiert nach Punkteprognose sowie Positions-, Formations- und Vereinsregeln."} Prognosen sind Erwartungswerte, keine Garantie.</p></div>
               <span>{recommendation.leagueName}</span>
             </div>
             <div className="manager-stats">
               <span><strong>{recommendation.formation}</strong><small>Startformation</small></span>
-              <span><strong>{recommendation.projectedStartingPoints}</strong><small>{recommendation.modelVersion === 2 ? "Saison-Prognose" : "Projizierte Punkte"}</small></span>
+              <span><strong>{recommendation.projectedStartingPoints}</strong><small>{recommendation.modelVersion === 2 ? remainingProjection ? `Rest-Prognose · ab Spieltag ${optimizationStartsAt}` : "Saison-Prognose" : "Projizierte Punkte"}</small></span>
               <span><strong>{recommendation.currentStartingPoints}</strong><small>Aktuelle Punkte{recommendation.matchdays.length ? ` · bis Spieltag ${recommendation.matchdays.at(-1)?.matchday}` : ""}</small></span>
             </div>
             {recommendation.availabilityAudit && (
               <p className="manager-availability-audit">
-                {recommendation.currentSeasonEvidence && recommendation.currentSeasonEvidence.throughMatchday > 0 && <><strong>Aktuelle Saison berücksichtigt:</strong> {recommendation.currentSeasonEvidence.completedMatches} Spiele und {recommendation.currentSeasonEvidence.roleObservations} Rollenbeobachtungen bis Spieltag {recommendation.currentSeasonEvidence.throughMatchday}. </>}
+                {recommendation.currentSeasonEvidence && recommendation.currentSeasonEvidence.throughMatchday > 0 && <><strong>Aktuelle Saison berücksichtigt:</strong> {recommendation.currentSeasonEvidence.completedMatches} Spiele und {recommendation.currentSeasonEvidence.roleObservations} Rollenbeobachtungen bis Spieltag {recommendation.currentSeasonEvidence.throughMatchday}; Kaderauswahl ab Spieltag {optimizationStartsAt}. </>}
                 <strong>Verfügbarkeit geprüft:</strong> {recommendation.availabilityAudit.excludedPlayerCount} aktuell verletzte, im Aufbautraining befindliche oder nicht berücksichtigte Kandidaten wurden ausgeschlossen. <a href={recommendation.availabilityAudit.sourceUrl} target="_blank" rel="noreferrer">{recommendation.availabilityAudit.provider} · Stand {formatDate(recommendation.availabilityAudit.generatedAt)} ↗</a>
               </p>
             )}
