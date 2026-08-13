@@ -1,6 +1,6 @@
 {
   "name": "punktespiegel-fantasy-dashboard",
-  "version": "1.4.6",
+  "version": "1.4.7",
   "type": "module",
   "workspaces": ["frontend"],
   "engines": { "node": ">=22" },

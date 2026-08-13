@@ -1,5 +1,12 @@
 {
-  "schemaVersion": 2,
+  "schemaVersion": 3,
+  "performanceBenchmarks": {
+    "0001": {
+      "provider": "LigaInsider Performance Index",
+      "season": 2025,
+      "url": "https://www.ligainsider.de/bundesliga/noten/saison-2025-2026/"
+    }
+  },
   "medicalSources": {
     "0001": {
       "provider": "LigaInsider",

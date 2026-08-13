@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-08-13T09:45:19.100447+00:00",
+  "generatedAt": "2026-08-13T10:17:58.927867+00:00",
   "season": 2026,
   "policy": "current medical status overrides season hierarchy; missing return dates are never interpreted as healthy",
   "leagues": {
@@ -226,12 +226,12 @@
         },
         "pl-k00100088": {
           "status": "injured",
-          "reason": "Muskelverletzung Oberschenkel",
+          "reason": "Verletzung",
           "absentSince": "6 Tagen",
           "expectedReturn": null,
-          "latestNewsTitle": null,
+          "latestNewsTitle": "Ngankam verletzt: SGE-Abgang geplatzt?",
           "source": "LigaInsider",
-          "sourceUrl": "https://www.ligainsider.de/jessic-ngankam_20484/",
+          "sourceUrl": "https://www.ligainsider.de/jessic-ngankam_20484/ngankam-verletzt-sge-abgang-geplatzt-415944/",
           "profileUrl": "https://www.ligainsider.de/jessic-ngankam_20484/"
         },
         "pl-k00087441": {

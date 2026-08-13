@@ -31,6 +31,7 @@ SEASON_DIR = DATA_DIR / "seasons"
 RECOMMENDATION_DIR = DATA_DIR / "recommendations"
 ROLE_SIGNAL_PATH = DATA_DIR / "current-role-signals.json"
 AVAILABILITY_SIGNAL_PATH = DATA_DIR / "current-availability-signals.json"
+PERFORMANCE_BENCHMARK_PATH = DATA_DIR / "external-performance-benchmark.json"
 
 POSITIONS = ("GK", "DEF", "MID", "FWD")
 ROSTER_COUNTS = {"GK": 3, "DEF": 7, "MID": 7, "FWD": 5}
@@ -954,6 +955,7 @@ def availability_excluded_player_ids(artifact: Mapping[str, Any]) -> Set[str]:
 def apply_current_availability_signals(
     forecasts: Sequence[Forecast],
     artifact: Mapping[str, Any],
+    through_round: int,
 ) -> List[Forecast]:
     """Apply short matchday-specific absences before blocked players are removed."""
     suspended_ids = {
@@ -963,10 +965,15 @@ def apply_current_availability_signals(
     }
     first_round = {
         player_id: min(
-            forecast.round for forecast in forecasts if forecast.player_id == player_id
+            forecast.round
+            for forecast in forecasts
+            if forecast.player_id == player_id and forecast.round > through_round
         )
         for player_id in suspended_ids
-        if any(forecast.player_id == player_id for forecast in forecasts)
+        if any(
+            forecast.player_id == player_id and forecast.round > through_round
+            for forecast in forecasts
+        )
     }
     return [
         role_conditioned_forecast(forecast, p_start=0.0, p_sub=0.0, p_dnp=1.0)
@@ -974,6 +981,186 @@ def apply_current_availability_signals(
         else forecast
         for forecast in forecasts
     ]
+
+
+def current_season_evidence(season: Mapping[str, Any]) -> Dict[str, Any]:
+    through_round, observations, _roles_by_player = current_match_observations(season)
+    completed_match_ids = {
+        str(match["id"])
+        for match in season["matches"]
+        if int(match["round"]) <= through_round and match.get("state") == "FINISHED"
+    }
+    scores = [
+        score for score in season.get("scores", [])
+        if str(score["matchId"]) in completed_match_ids
+    ]
+    roles = [score_role(score) for score in observations.values()]
+    starts = sum(role == ROLE_START for role in roles)
+    substitutes = sum(role == ROLE_SUB for role in roles)
+    inferred_dnp = len(observations) - len(scores)
+    return {
+        "throughMatchday": through_round,
+        "optimizationStartsAtMatchday": min(int(season["roundCount"]), through_round + 1),
+        "realizedPointsExcludedFromSelectionObjective": True,
+        "completedMatches": len(completed_match_ids),
+        "roleObservations": len(observations),
+        "explicitScoreRows": len(scores),
+        "inferredDnpObservations": inferred_dnp,
+        "starts": starts,
+        "substituteAppearances": substitutes,
+        "dnpObservations": len(observations) - starts - substitutes,
+        "source": "kicker current-season match artifacts plus inferred DNP for omitted squad players",
+        "sourceGeneratedAt": season["generatedAt"],
+        "method": (
+            "completed matches are replayed into recent role, points, appearance, and team-form state; "
+            "a missing player row for a completed team fixture is treated as DNP; known rounds use realized roles/points, "
+            "future role probabilities are anchored to observed selections, "
+            "and already-played points are excluded from roster selection"
+        ),
+    }
+
+
+def current_match_observations(
+    season: Mapping[str, Any],
+) -> Tuple[int, Dict[Tuple[str, int], Mapping[str, Any]], Dict[str, List[int]]]:
+    through_round = int(season.get("latestRound", 0))
+    rounds_by_match = {
+        str(match["id"]): int(match["round"])
+        for match in season["matches"]
+        if int(match["round"]) <= through_round and match.get("state") == "FINISHED"
+    }
+    observations: Dict[Tuple[str, int], Mapping[str, Any]] = {}
+    roles_by_player: Dict[str, List[int]] = defaultdict(list)
+    for score in season.get("scores", []):
+        round_number = rounds_by_match.get(str(score["matchId"]))
+        if round_number is None:
+            continue
+        player_id = str(score["playerId"])
+        observations[(player_id, round_number)] = score
+        roles_by_player[player_id].append(score_role(score))
+    player_teams = {str(player["id"]): str(player["teamId"]) for player in season["players"]}
+    completed_team_rounds = {
+        (str(team_id), int(match["round"]))
+        for match in season["matches"]
+        if int(match["round"]) <= through_round and match.get("state") == "FINISHED"
+        for team_id in (match["homeTeamId"], match["awayTeamId"])
+    }
+    for player_id, team_id in player_teams.items():
+        for completed_team_id, round_number in completed_team_rounds:
+            key = (player_id, round_number)
+            if completed_team_id != team_id or key in observations:
+                continue
+            observations[key] = {
+                "playerId": player_id,
+                "totalPoints": 0,
+                "pointsStarter": 0,
+                "pointsJoker": 0,
+                "inferredDnp": True,
+            }
+            roles_by_player[player_id].append(ROLE_DNP)
+    return through_round, observations, roles_by_player
+
+
+def apply_current_match_role_evidence(
+    season: Mapping[str, Any],
+    forecasts: Sequence[Forecast],
+) -> List[Forecast]:
+    through_round, _observations, roles_by_player = current_match_observations(season)
+    if through_round <= 0:
+        return list(forecasts)
+    role_targets = {
+        ROLE_START: (0.82, 0.08, 0.10),
+        ROLE_SUB: (0.25, 0.50, 0.25),
+        ROLE_DNP: (0.08, 0.15, 0.77),
+    }
+    adjusted: List[Forecast] = []
+    for forecast in forecasts:
+        observed_roles = roles_by_player.get(forecast.player_id, [])
+        if not observed_roles or forecast.round <= through_round:
+            adjusted.append(forecast)
+            continue
+        target_start = mean([role_targets[role][0] for role in observed_roles])
+        target_sub = mean([role_targets[role][1] for role in observed_roles])
+        target_dnp = mean([role_targets[role][2] for role in observed_roles])
+        distance = forecast.round - through_round
+        sample_weight = min(0.80, 0.65 + 0.08 * (len(observed_roles) - 1))
+        source_weight = sample_weight * max(0.45, math.exp(-0.06 * max(0, distance - 1)))
+        adjusted.append(role_conditioned_forecast(
+            forecast,
+            p_start=(1.0 - source_weight) * forecast.p_start + source_weight * target_start,
+            p_sub=(1.0 - source_weight) * forecast.p_sub + source_weight * target_sub,
+            p_dnp=(1.0 - source_weight) * forecast.p_dnp + source_weight * target_dnp,
+        ))
+    return adjusted
+
+
+def apply_realized_match_evidence(
+    season: Mapping[str, Any],
+    forecasts: Sequence[Forecast],
+) -> List[Forecast]:
+    through_round, observations, _roles_by_player = current_match_observations(season)
+    if through_round <= 0:
+        return list(forecasts)
+    player_teams = {str(player["id"]): str(player["teamId"]) for player in season["players"]}
+    completed_team_rounds = {
+        (str(team_id), int(match["round"]))
+        for match in season["matches"]
+        if int(match["round"]) <= through_round and match.get("state") == "FINISHED"
+        for team_id in (match["homeTeamId"], match["awayTeamId"])
+    }
+    adjusted: List[Forecast] = []
+    for forecast in forecasts:
+        observed = observations.get((forecast.player_id, forecast.round))
+        if observed is None:
+            if (player_teams.get(forecast.player_id, ""), forecast.round) not in completed_team_rounds:
+                adjusted.append(forecast)
+                continue
+            role = ROLE_DNP
+            points = 0.0
+        else:
+            role = score_role(observed)
+            points = float(observed["totalPoints"])
+        adjusted.append(role_conditioned_forecast(
+            forecast,
+            p_start=1.0 if role == ROLE_START else 0.0,
+            p_sub=1.0 if role == ROLE_SUB else 0.0,
+            p_dnp=1.0 if role == ROLE_DNP else 0.0,
+            start_mean=points if role == ROLE_START else None,
+            start_quantiles=(points, points, points) if role == ROLE_START else None,
+            sub_mean=points if role == ROLE_SUB else None,
+            sub_quantiles=(points, points, points) if role == ROLE_SUB else None,
+        ))
+    return adjusted
+
+
+def forecasts_for_remaining_optimization(
+    forecasts: Sequence[Forecast],
+    through_round: int,
+) -> List[Forecast]:
+    """Keep completed rounds structurally present without rewarding hindsight points."""
+    if through_round <= 0:
+        return list(forecasts)
+    return [
+        role_conditioned_forecast(
+            forecast,
+            start_mean=0.0,
+            start_quantiles=(0.0, 0.0, 0.0),
+            sub_mean=0.0,
+            sub_quantiles=(0.0, 0.0, 0.0),
+        )
+        if forecast.round <= through_round
+        else forecast
+        for forecast in forecasts
+    ]
+
+
+def load_external_performance_benchmark() -> Optional[Mapping[str, Any]]:
+    if not PERFORMANCE_BENCHMARK_PATH.exists():
+        return None
+    artifact = json.loads(PERFORMANCE_BENCHMARK_PATH.read_text(encoding="utf-8"))
+    if int(artifact.get("schemaVersion", 0)) != 1:
+        raise RuntimeError("Externer Performance-Benchmark hat eine unbekannte Version.")
+    return artifact
 
 
 def build_availability_audit(
@@ -2400,7 +2587,8 @@ def build_recommendation(
     rules = rules_for(season, "interactive")
     teams = {team["id"]: team for team in season["teams"]}
     forecast_map = {(forecast.player_id, forecast.round): forecast for forecast in forecasts}
-    round_one = optimization.lineups[1]
+    selection_round = min(int(season["roundCount"]), int(season.get("latestRound", 0)) + 1)
+    selected_lineup = optimization.lineups[selection_round]
     actual_by_round, actual_by_player = actual_points(season)
     picked_players: List[Dict[str, Any]] = []
     for player_id in optimization.selected_ids:
@@ -2431,7 +2619,7 @@ def build_recommendation(
                 "seasonsUsed": len(state.seasons),
                 "appearancesUsed": state.appearances,
                 "promotionAdjusted": promotion_adjusted,
-                "role": "start" if player_id in round_one else "reserve",
+                "role": "start" if player_id in selected_lineup else "reserve",
             }
         )
     position_order = {position: index for index, position in enumerate(POSITIONS)}
@@ -2533,7 +2721,7 @@ def build_recommendation(
             "spentM": winter_spent_m,
             "transfers": winter_transfers,
         },
-        "formation": formation_label(optimization.formations[1]),
+        "formation": formation_label(optimization.formations[selection_round]),
         "projectedStartingPoints": round(optimization.objective),
         "currentStartingPoints": sum(matchday["totalPoints"] for matchday in realized_matchdays),
         "matchdays": realized_matchdays,
@@ -3144,6 +3332,11 @@ def run_validation(
 
 def validate_publication(recommendation: Mapping[str, Any]) -> None:
     """Fail closed on implausible or internally inconsistent published teams."""
+    season_evidence = recommendation.get("currentSeasonEvidence")
+    if not season_evidence:
+        raise RuntimeError("Veröffentlichung abgebrochen: Audit der aktuellen Saison fehlt.")
+    if int(season_evidence.get("throughMatchday", -1)) > 0 and int(season_evidence.get("roleObservations", 0)) < 25:
+        raise RuntimeError("Veröffentlichung abgebrochen: aktuelle Saison enthält zu wenige Rollenbeobachtungen.")
     availability_audit = recommendation.get("availabilityAudit")
     if not availability_audit:
         raise RuntimeError("Veröffentlichung abgebrochen: Verfügbarkeitsprüfung fehlt.")
@@ -3194,7 +3387,10 @@ def validate_publication(recommendation: Mapping[str, Any]) -> None:
                 f"Veröffentlichung abgebrochen: {player['name']} ({player['position']}) hat nur "
                 f"{appearance:.1%} erwartete Einsatzwahrscheinlichkeit."
             )
+    realized_through = int(recommendation.get("currentSeasonEvidence", {}).get("throughMatchday", 0))
     for matchday in recommendation.get("projectedMatchdays", []):
+        if int(matchday["matchday"]) <= realized_through:
+            continue
         for player in matchday["players"]:
             appearance = float(player["pStart"]) + float(player["pSub"])
             maximum_consistent_mean = appearance * 25.0 + 0.05
@@ -3218,6 +3414,7 @@ def write_artifact(
     validate_publication(recommendation)
     role_signals = load_current_role_signals(season)
     availability_signals = load_current_availability_signals(season)
+    performance_benchmark = load_external_performance_benchmark()
     artifact = {
         "schemaVersion": 2,
         "modelVersion": 2,
@@ -3254,6 +3451,21 @@ def write_artifact(
                 "sourceUrl": availability_signals["sourceUrl"],
                 "policy": availability_signals["policy"],
             },
+            "currentSeasonEvidence": recommendation["currentSeasonEvidence"],
+            "externalPerformanceBenchmark": (
+                None
+                if performance_benchmark is None or str(performance_benchmark["league"]) != str(season["leagueCode"])
+                else {
+                    "provider": performance_benchmark["provider"],
+                    "generatedAt": performance_benchmark["generatedAt"],
+                    "sourceUrl": performance_benchmark["sourceUrl"],
+                    "season": performance_benchmark["season"],
+                    "matchedPlayers": performance_benchmark["matchedPlayers"],
+                    "currentSeasonPlayersCovered": performance_benchmark["currentSeasonPlayersCovered"],
+                    "metrics": performance_benchmark["metrics"],
+                    "method": performance_benchmark["method"],
+                }
+            ),
             "trainingRows": training_rows,
             "trainingThroughSeason": f"{training_end_year}/{str(training_end_year + 1)[-2:]}",
         },
@@ -3283,6 +3495,7 @@ def write_classic_artifact(
     validate_publication(recommendation)
     role_signals = load_current_role_signals(season)
     availability_signals = load_current_availability_signals(season)
+    performance_benchmark = load_external_performance_benchmark()
     artifact = {
         "schemaVersion": 2,
         "modelVersion": 2,
@@ -3327,6 +3540,21 @@ def write_classic_artifact(
                 "sourceUrl": availability_signals["sourceUrl"],
                 "policy": availability_signals["policy"],
             },
+            "currentSeasonEvidence": recommendation["currentSeasonEvidence"],
+            "externalPerformanceBenchmark": (
+                None
+                if performance_benchmark is None or str(performance_benchmark["league"]) != str(season["leagueCode"])
+                else {
+                    "provider": performance_benchmark["provider"],
+                    "generatedAt": performance_benchmark["generatedAt"],
+                    "sourceUrl": performance_benchmark["sourceUrl"],
+                    "season": performance_benchmark["season"],
+                    "matchedPlayers": performance_benchmark["matchedPlayers"],
+                    "currentSeasonPlayersCovered": performance_benchmark["currentSeasonPlayersCovered"],
+                    "metrics": performance_benchmark["metrics"],
+                    "method": performance_benchmark["method"],
+                }
+            ),
             "trainingRows": training_rows,
             "trainingThroughSeason": f"{training_end_year}/{str(training_end_year + 1)[-2:]}",
         },
@@ -3414,7 +3642,23 @@ def main() -> int:
     classic_baselines = load_baseline(target_year, "classic")
     output_dir = Path(args.recommendation_output_dir)
     for league, season in sorted(targets.items()):
-        players, raw_forecasts = predict_forecasts(season, bundle, priors, player_states, team_states)
+        through_round = int(season.get("latestRound", 0))
+        if through_round > 0:
+            production_player_states, production_team_states = replay_history_as_of(
+                seasons,
+                season,
+                through_round,
+            )
+        else:
+            production_player_states, production_team_states = player_states, team_states
+        players, raw_forecasts = predict_forecasts(
+            season,
+            bundle,
+            priors,
+            production_player_states,
+            production_team_states,
+            as_of=decision_time(season, through_round),
+        )
         all_players = players
         raw_forecasts = apply_current_role_signals(
             season,
@@ -3422,8 +3666,9 @@ def main() -> int:
             raw_forecasts,
             load_current_role_signals(season),
         )
+        raw_forecasts = apply_current_match_role_evidence(season, raw_forecasts)
         availability_signals = load_current_availability_signals(season)
-        raw_forecasts = apply_current_availability_signals(raw_forecasts, availability_signals)
+        raw_forecasts = apply_current_availability_signals(raw_forecasts, availability_signals, through_round)
         excluded_player_ids = availability_excluded_player_ids(availability_signals)
         players = {
             player_id: player
@@ -3442,9 +3687,19 @@ def main() -> int:
             int(season["roundCount"]),
             selected_weights[league],
         )
-        optimization = optimize_roster(season, players, forecasts, time_limit=args.time_limit)
-        recommendation = build_recommendation(catalog, season, players, forecasts, player_states, optimization)
+        forecasts = apply_realized_match_evidence(season, forecasts)
+        optimization_forecasts = forecasts_for_remaining_optimization(forecasts, through_round)
+        optimization = optimize_roster(season, players, optimization_forecasts, time_limit=args.time_limit)
+        recommendation = build_recommendation(
+            catalog,
+            season,
+            players,
+            forecasts,
+            production_player_states,
+            optimization,
+        )
         recommendation["availabilityAudit"] = availability_audit
+        recommendation["currentSeasonEvidence"] = current_season_evidence(season)
         recommendation["rules"]["availabilityPolicy"] = "current medical status blocks opening-roster selection"
         write_artifact(
             catalog,
@@ -3463,11 +3718,13 @@ def main() -> int:
             int(season["roundCount"]),
             args.classic_residual_weight,
         )
+        classic_forecasts = apply_realized_match_evidence(season, classic_forecasts)
+        classic_optimization_forecasts = forecasts_for_remaining_optimization(classic_forecasts, through_round)
         if classic_deploy_challenger[league]:
             classic_optimization = optimize_classic_preseason_recourse(
                 season,
                 players,
-                classic_forecasts,
+                classic_optimization_forecasts,
                 scenario_count=args.classic_scenarios,
                 time_limit=args.time_limit,
             )
@@ -3475,17 +3732,18 @@ def main() -> int:
             classic_optimization = optimize_classic_roster(
                 season,
                 players,
-                classic_forecasts,
+                classic_optimization_forecasts,
                 time_limit=args.time_limit,
             )
         classic_recommendation = build_classic_recommendation(
             season,
             players,
             classic_forecasts,
-            player_states,
+            production_player_states,
             classic_optimization,
         )
         classic_recommendation["availabilityAudit"] = availability_audit
+        classic_recommendation["currentSeasonEvidence"] = current_season_evidence(season)
         classic_recommendation["rules"]["availabilityPolicy"] = "current medical status blocks opening-roster selection"
         write_classic_artifact(
             catalog,

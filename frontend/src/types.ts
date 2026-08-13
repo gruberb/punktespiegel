@@ -317,6 +317,21 @@ export type ManagerRecommendation = {
   matchdays: ManagerMatchday[];
   projectedMatchdays?: ManagerProjectedMatchday[];
   generatedAt: string;
+  currentSeasonEvidence?: {
+    throughMatchday: number;
+    optimizationStartsAtMatchday?: number;
+    realizedPointsExcludedFromSelectionObjective?: boolean;
+    completedMatches: number;
+    roleObservations: number;
+    explicitScoreRows?: number;
+    inferredDnpObservations?: number;
+    starts: number;
+    substituteAppearances: number;
+    dnpObservations: number;
+    source: string;
+    sourceGeneratedAt: string;
+    method: string;
+  };
   availabilityAudit?: {
     generatedAt: string;
     provider: string;

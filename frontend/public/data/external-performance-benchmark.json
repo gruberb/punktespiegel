@@ -1,0 +1,4975 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-08-13T10:18:01.136371+00:00",
+  "league": "0001",
+  "season": 2025,
+  "provider": "LigaInsider Performance Index",
+  "sourceUrl": "https://www.ligainsider.de/bundesliga/noten/saison-2025-2026/",
+  "method": "independent rank benchmark against kicker history; retained as an audit and never added to kicker points as a second score",
+  "sourceRows": 279,
+  "matchedPlayers": 275,
+  "unmatchedPlayers": [
+    "Arthur Chaves",
+    "Jeanuël Belocian",
+    "Eren Dinkçi",
+    "Andréas Hountondji"
+  ],
+  "currentSeasonPlayersCovered": 202,
+  "metrics": {
+    "comparablePlayers": 275,
+    "spearmanTotalPoints": 0.8793,
+    "top25Overlap": 17
+  },
+  "players": {
+    "pl-k00125181": {
+      "name": "Michael Olise",
+      "team": "FC Bayern München",
+      "sourceUrl": "https://www.ligainsider.de/michael-olise_37170/",
+      "ligaInsider": {
+        "averageGrade": 2.39,
+        "averagePoints": 67.66,
+        "totalPoints": 2165,
+        "appearances": 32,
+        "gradedAppearances": 32,
+        "averageMinutes": 78.0
+      },
+      "kicker": {
+        "averageGrade": 2.547,
+        "totalPoints": 348,
+        "appearances": 32
+      }
+    },
+    "pl-k00070605": {
+      "name": "Harry Kane",
+      "team": "FC Bayern München",
+      "sourceUrl": "https://www.ligainsider.de/harry-kane_4828/",
+      "ligaInsider": {
+        "averageGrade": 2.44,
+        "averagePoints": 67.0,
+        "totalPoints": 2077,
+        "appearances": 31,
+        "gradedAppearances": 31,
+        "averageMinutes": 82.0
+      },
+      "kicker": {
+        "averageGrade": 2.323,
+        "totalPoints": 407,
+        "appearances": 31
+      }
+    },
+    "pl-k00071150": {
+      "name": "Joshua Kimmich",
+      "team": "FC Bayern München",
+      "sourceUrl": "https://www.ligainsider.de/joshua-kimmich_5768/",
+      "ligaInsider": {
+        "averageGrade": 2.62,
+        "averagePoints": 62.83,
+        "totalPoints": 1822,
+        "appearances": 29,
+        "gradedAppearances": 29,
+        "averageMinutes": 85.0
+      },
+      "kicker": {
+        "averageGrade": 2.707,
+        "totalPoints": 230,
+        "appearances": 29
+      }
+    },
+    "pl-k00087750": {
+      "name": "David Raum",
+      "team": "RB Leipzig",
+      "sourceUrl": "https://www.ligainsider.de/david-raum_12557/",
+      "ligaInsider": {
+        "averageGrade": 2.71,
+        "averagePoints": 60.07,
+        "totalPoints": 1761,
+        "appearances": 30,
+        "gradedAppearances": 29,
+        "averageMinutes": 93.0
+      },
+      "kicker": {
+        "averageGrade": 3.017,
+        "totalPoints": 208,
+        "appearances": 30
+      }
+    },
+    "pl-k00081465": {
+      "name": "Alejandro Grimaldo",
+      "team": "Bayer 04 Leverkusen",
+      "sourceUrl": "https://www.ligainsider.de/alejandro-grimaldo_12227/",
+      "ligaInsider": {
+        "averageGrade": 2.81,
+        "averagePoints": 59.07,
+        "totalPoints": 1713,
+        "appearances": 29,
+        "gradedAppearances": 29,
+        "averageMinutes": 93.0
+      },
+      "kicker": {
+        "averageGrade": 2.983,
+        "totalPoints": 247,
+        "appearances": 29
+      }
+    },
+    "pl-k00115737": {
+      "name": "Luis Diaz",
+      "team": "FC Bayern München",
+      "sourceUrl": "https://www.ligainsider.de/luis-diaz_22566/",
+      "ligaInsider": {
+        "averageGrade": 2.77,
+        "averagePoints": 58.97,
+        "totalPoints": 1887,
+        "appearances": 32,
+        "gradedAppearances": 32,
+        "averageMinutes": 82.0
+      },
+      "kicker": {
+        "averageGrade": 2.891,
+        "totalPoints": 287,
+        "appearances": 32
+      }
+    },
+    "pl-k00087885": {
+      "name": "Deniz Undav",
+      "team": "VfB Stuttgart",
+      "sourceUrl": "https://www.ligainsider.de/deniz-undav_19154/",
+      "ligaInsider": {
+        "averageGrade": 2.91,
+        "averagePoints": 56.64,
+        "totalPoints": 1602,
+        "appearances": 29,
+        "gradedAppearances": 28,
+        "averageMinutes": 84.0
+      },
+      "kicker": {
+        "averageGrade": 2.889,
+        "totalPoints": 255,
+        "appearances": 29
+      }
+    },
+    "pl-k00080083": {
+      "name": "Nadiem Amiri",
+      "team": "1. FSV Mainz 05",
+      "sourceUrl": "https://www.ligainsider.de/nadiem-amiri_5815/",
+      "ligaInsider": {
+        "averageGrade": 2.96,
+        "averagePoints": 56.54,
+        "totalPoints": 1470,
+        "appearances": 26,
+        "gradedAppearances": 26,
+        "averageMinutes": 85.0
+      },
+      "kicker": {
+        "averageGrade": 3.25,
+        "totalPoints": 190,
+        "appearances": 26
+      }
+    },
+    "pl-k00176299": {
+      "name": "Yan Diomande",
+      "team": "RB Leipzig",
+      "sourceUrl": "https://www.ligainsider.de/yan-diomande_38631/",
+      "ligaInsider": {
+        "averageGrade": 2.92,
+        "averagePoints": 56.09,
+        "totalPoints": 1851,
+        "appearances": 33,
+        "gradedAppearances": 33,
+        "averageMinutes": 79.0
+      },
+      "kicker": {
+        "averageGrade": 2.867,
+        "totalPoints": 273,
+        "appearances": 33
+      }
+    },
+    "pl-k00096140": {
+      "name": "Nico Schlotterbeck",
+      "team": "Borussia Dortmund",
+      "sourceUrl": "https://www.ligainsider.de/nico-schlotterbeck_20052/",
+      "ligaInsider": {
+        "averageGrade": 2.91,
+        "averagePoints": 55.93,
+        "totalPoints": 1566,
+        "appearances": 28,
+        "gradedAppearances": 28,
+        "averageMinutes": 97.0
+      },
+      "kicker": {
+        "averageGrade": 2.875,
+        "totalPoints": 217,
+        "appearances": 28
+      }
+    },
+    "pl-k00054360": {
+      "name": "Daniel Batz",
+      "team": "1. FSV Mainz 05",
+      "sourceUrl": "https://www.ligainsider.de/daniel-batz_499/",
+      "ligaInsider": {
+        "averageGrade": 2.98,
+        "averagePoints": 55.14,
+        "totalPoints": 1158,
+        "appearances": 21,
+        "gradedAppearances": 21,
+        "averageMinutes": 96.0
+      },
+      "kicker": {
+        "averageGrade": 2.881,
+        "totalPoints": 150,
+        "appearances": 21
+      }
+    },
+    "pl-k00079199": {
+      "name": "Moritz Nicolas",
+      "team": "Mönchengladbach",
+      "sourceUrl": "https://www.ligainsider.de/moritz-nicolas_6295/",
+      "ligaInsider": {
+        "averageGrade": 2.97,
+        "averagePoints": 54.91,
+        "totalPoints": 1867,
+        "appearances": 34,
+        "gradedAppearances": 34,
+        "averageMinutes": 96.0
+      },
+      "kicker": {
+        "averageGrade": 2.971,
+        "totalPoints": 246,
+        "appearances": 34
+      }
+    },
+    "pl-k00104317": {
+      "name": "Angelo Stiller",
+      "team": "VfB Stuttgart",
+      "sourceUrl": "https://www.ligainsider.de/angelo-stiller_20766/",
+      "ligaInsider": {
+        "averageGrade": 2.98,
+        "averagePoints": 54.76,
+        "totalPoints": 1862,
+        "appearances": 34,
+        "gradedAppearances": 34,
+        "averageMinutes": 86.0
+      },
+      "kicker": {
+        "averageGrade": 3.091,
+        "totalPoints": 215,
+        "appearances": 34
+      }
+    },
+    "pl-k00155823": {
+      "name": "Luka Vuskovic",
+      "team": "Hamburger SV",
+      "sourceUrl": "https://www.ligainsider.de/luka-vuskovic_35901/",
+      "ligaInsider": {
+        "averageGrade": 2.96,
+        "averagePoints": 54.71,
+        "totalPoints": 1532,
+        "appearances": 28,
+        "gradedAppearances": 28,
+        "averageMinutes": 95.0
+      },
+      "kicker": {
+        "averageGrade": 3.0,
+        "totalPoints": 213,
+        "appearances": 28
+      }
+    },
+    "pl-k00102956": {
+      "name": "Kamil Grabara",
+      "team": "VfL Wolfsburg",
+      "sourceUrl": "https://www.ligainsider.de/kamil-grabara_20652/",
+      "ligaInsider": {
+        "averageGrade": 3.03,
+        "averagePoints": 54.41,
+        "totalPoints": 1850,
+        "appearances": 34,
+        "gradedAppearances": 34,
+        "averageMinutes": 98.0
+      },
+      "kicker": {
+        "averageGrade": 2.926,
+        "totalPoints": 239,
+        "appearances": 34
+      }
+    },
+    "pl-k00088240": {
+      "name": "Aleix Garcia",
+      "team": "Bayer 04 Leverkusen",
+      "sourceUrl": "https://www.ligainsider.de/aleix-garcia_7138/",
+      "ligaInsider": {
+        "averageGrade": 3.06,
+        "averagePoints": 53.88,
+        "totalPoints": 1749,
+        "appearances": 33,
+        "gradedAppearances": 32,
+        "averageMinutes": 88.0
+      },
+      "kicker": {
+        "averageGrade": 3.062,
+        "totalPoints": 223,
+        "appearances": 33
+      }
+    },
+    "pl-k00058548": {
+      "name": "Peter Gulacsi",
+      "team": "RB Leipzig",
+      "sourceUrl": "https://www.ligainsider.de/peter-gulacsi_6429/",
+      "ligaInsider": {
+        "averageGrade": 3.04,
+        "averagePoints": 53.74,
+        "totalPoints": 1236,
+        "appearances": 23,
+        "gradedAppearances": 23,
+        "averageMinutes": 93.0
+      },
+      "kicker": {
+        "averageGrade": 2.935,
+        "totalPoints": 165,
+        "appearances": 23
+      }
+    },
+    "pl-k00079813": {
+      "name": "Maximilian Mittelstädt",
+      "team": "VfB Stuttgart",
+      "sourceUrl": "https://www.ligainsider.de/maximilian-mittelstaedt_6206/",
+      "ligaInsider": {
+        "averageGrade": 3.07,
+        "averagePoints": 53.42,
+        "totalPoints": 1671,
+        "appearances": 32,
+        "gradedAppearances": 31,
+        "averageMinutes": 74.0
+      },
+      "kicker": {
+        "averageGrade": 3.054,
+        "totalPoints": 200,
+        "appearances": 32
+      }
+    },
+    "pl-k00068674": {
+      "name": "Daniel Heuer Fernandes",
+      "team": "Hamburger SV",
+      "sourceUrl": "https://www.ligainsider.de/daniel-heuer-fernandes_6379/",
+      "ligaInsider": {
+        "averageGrade": 3.06,
+        "averagePoints": 53.15,
+        "totalPoints": 1754,
+        "appearances": 33,
+        "gradedAppearances": 33,
+        "averageMinutes": 98.0
+      },
+      "kicker": {
+        "averageGrade": 2.788,
+        "totalPoints": 253,
+        "appearances": 33
+      }
+    },
+    "pl-k00103853": {
+      "name": "Min-Jae Kim",
+      "team": "FC Bayern München",
+      "sourceUrl": "https://www.ligainsider.de/minjae-kim_27022/",
+      "ligaInsider": {
+        "averageGrade": 3.1,
+        "averagePoints": 52.95,
+        "totalPoints": 1181,
+        "appearances": 25,
+        "gradedAppearances": 21,
+        "averageMinutes": 80.0
+      },
+      "kicker": {
+        "averageGrade": 3.0,
+        "totalPoints": 136,
+        "appearances": 25
+      }
+    },
+    "pl-k00070374": {
+      "name": "Marvin Schwäbe",
+      "team": "1. FC Köln",
+      "sourceUrl": "https://www.ligainsider.de/marvin-schwaebe_2626/",
+      "ligaInsider": {
+        "averageGrade": 3.15,
+        "averagePoints": 52.62,
+        "totalPoints": 1789,
+        "appearances": 34,
+        "gradedAppearances": 34,
+        "averageMinutes": 98.0
+      },
+      "kicker": {
+        "averageGrade": 2.985,
+        "totalPoints": 224,
+        "appearances": 34
+      }
+    },
+    "pl-k00112924": {
+      "name": "Maarten Vandevoordt",
+      "team": "RB Leipzig",
+      "sourceUrl": "https://www.ligainsider.de/maarten-vandevoordt_21774/",
+      "ligaInsider": {
+        "averageGrade": 3.08,
+        "averagePoints": 52.25,
+        "totalPoints": 627,
+        "appearances": 12,
+        "gradedAppearances": 12,
+        "averageMinutes": 94.0
+      },
+      "kicker": {
+        "averageGrade": 2.917,
+        "totalPoints": 81,
+        "appearances": 12
+      }
+    },
+    "pl-k00087673": {
+      "name": "Gregor Kobel",
+      "team": "Borussia Dortmund",
+      "sourceUrl": "https://www.ligainsider.de/gregor-kobel_9357/",
+      "ligaInsider": {
+        "averageGrade": 3.13,
+        "averagePoints": 52.21,
+        "totalPoints": 1775,
+        "appearances": 34,
+        "gradedAppearances": 34,
+        "averageMinutes": 97.0
+      },
+      "kicker": {
+        "averageGrade": 2.853,
+        "totalPoints": 254,
+        "appearances": 34
+      }
+    },
+    "pl-k00043520": {
+      "name": "Janis Blaswich",
+      "team": "Bayer 04 Leverkusen",
+      "sourceUrl": "https://www.ligainsider.de/janis-blaswich_1685/",
+      "ligaInsider": {
+        "averageGrade": 3.09,
+        "averagePoints": 52.18,
+        "totalPoints": 574,
+        "appearances": 11,
+        "gradedAppearances": 11,
+        "averageMinutes": 92.0
+      },
+      "kicker": {
+        "averageGrade": 3.0,
+        "totalPoints": 73,
+        "appearances": 11
+      }
+    },
+    "pl-k00084943": {
+      "name": "Konrad Laimer",
+      "team": "FC Bayern München",
+      "sourceUrl": "https://www.ligainsider.de/konrad-laimer_6324/",
+      "ligaInsider": {
+        "averageGrade": 3.12,
+        "averagePoints": 52.04,
+        "totalPoints": 1481,
+        "appearances": 29,
+        "gradedAppearances": 28,
+        "averageMinutes": 75.0
+      },
+      "kicker": {
+        "averageGrade": 2.857,
+        "totalPoints": 210,
+        "appearances": 29
+      }
+    },
+    "pl-k00081053": {
+      "name": "Vladimir Coufal",
+      "team": "TSG Hoffenheim",
+      "sourceUrl": "https://www.ligainsider.de/vladimir-coufal_11929/",
+      "ligaInsider": {
+        "averageGrade": 3.1,
+        "averagePoints": 51.94,
+        "totalPoints": 1766,
+        "appearances": 34,
+        "gradedAppearances": 34,
+        "averageMinutes": 94.0
+      },
+      "kicker": {
+        "averageGrade": 2.985,
+        "totalPoints": 238,
+        "appearances": 34
+      }
+    },
+    "pl-k00069255": {
+      "name": "Willi Orban",
+      "team": "RB Leipzig",
+      "sourceUrl": "https://www.ligainsider.de/willi-orban_1667/",
+      "ligaInsider": {
+        "averageGrade": 3.15,
+        "averagePoints": 51.88,
+        "totalPoints": 1712,
+        "appearances": 33,
+        "gradedAppearances": 33,
+        "averageMinutes": 95.0
+      },
+      "kicker": {
+        "averageGrade": 3.242,
+        "totalPoints": 182,
+        "appearances": 33
+      }
+    },
+    "pl-k00072755": {
+      "name": "Alexander Nübel",
+      "team": "VfB Stuttgart",
+      "sourceUrl": "https://www.ligainsider.de/alexander-nuebel_4473/",
+      "ligaInsider": {
+        "averageGrade": 3.15,
+        "averagePoints": 51.59,
+        "totalPoints": 1754,
+        "appearances": 34,
+        "gradedAppearances": 34,
+        "averageMinutes": 96.0
+      },
+      "kicker": {
+        "averageGrade": 3.0,
+        "totalPoints": 228,
+        "appearances": 34
+      }
+    },
+    "pl-k00066753": {
+      "name": "Serge Gnabry",
+      "team": "FC Bayern München",
+      "sourceUrl": "https://www.ligainsider.de/serge-gnabry_4815/",
+      "ligaInsider": {
+        "averageGrade": 3.14,
+        "averagePoints": 51.43,
+        "totalPoints": 1080,
+        "appearances": 21,
+        "gradedAppearances": 21,
+        "averageMinutes": 61.0
+      },
+      "kicker": {
+        "averageGrade": 2.9,
+        "totalPoints": 171,
+        "appearances": 21
+      }
+    },
+    "pl-k00080174": {
+      "name": "Waldemar Anton",
+      "team": "Borussia Dortmund",
+      "sourceUrl": "https://www.ligainsider.de/waldemar-anton_5837/",
+      "ligaInsider": {
+        "averageGrade": 3.19,
+        "averagePoints": 51.06,
+        "totalPoints": 1634,
+        "appearances": 32,
+        "gradedAppearances": 32,
+        "averageMinutes": 97.0
+      },
+      "kicker": {
+        "averageGrade": 2.984,
+        "totalPoints": 207,
+        "appearances": 32
+      }
+    },
+    "pl-k00132187": {
+      "name": "Tom Bischof",
+      "team": "FC Bayern München",
+      "sourceUrl": "https://www.ligainsider.de/tom-bischof_26133/",
+      "ligaInsider": {
+        "averageGrade": 3.14,
+        "averagePoints": 50.89,
+        "totalPoints": 1094,
+        "appearances": 26,
+        "gradedAppearances": 19,
+        "averageMinutes": 71.0
+      },
+      "kicker": {
+        "averageGrade": 3.031,
+        "totalPoints": 131,
+        "appearances": 26
+      }
+    },
+    "pl-k00118051": {
+      "name": "Mio Backhaus",
+      "team": "SV Werder Bremen",
+      "sourceUrl": "https://www.ligainsider.de/mio-backhaus_27467/",
+      "ligaInsider": {
+        "averageGrade": 3.2,
+        "averagePoints": 50.69,
+        "totalPoints": 1622,
+        "appearances": 32,
+        "gradedAppearances": 32,
+        "averageMinutes": 97.0
+      },
+      "kicker": {
+        "averageGrade": 2.875,
+        "totalPoints": 230,
+        "appearances": 32
+      }
+    },
+    "pl-k00070592": {
+      "name": "Jonathan Tah",
+      "team": "FC Bayern München",
+      "sourceUrl": "https://www.ligainsider.de/jonathan-tah_2385/",
+      "ligaInsider": {
+        "averageGrade": 3.23,
+        "averagePoints": 50.46,
+        "totalPoints": 1352,
+        "appearances": 28,
+        "gradedAppearances": 26,
+        "averageMinutes": 83.0
+      },
+      "kicker": {
+        "averageGrade": 2.833,
+        "totalPoints": 180,
+        "appearances": 28
+      }
+    },
+    "pl-k00080351": {
+      "name": "Chris Führich",
+      "team": "VfB Stuttgart",
+      "sourceUrl": "https://www.ligainsider.de/chris-fuehrich_18542/",
+      "ligaInsider": {
+        "averageGrade": 3.19,
+        "averagePoints": 50.42,
+        "totalPoints": 1598,
+        "appearances": 33,
+        "gradedAppearances": 31,
+        "averageMinutes": 57.0
+      },
+      "kicker": {
+        "averageGrade": 3.02,
+        "totalPoints": 203,
+        "appearances": 33
+      }
+    },
+    "pl-k00089649": {
+      "name": "Ramy Bensebaini",
+      "team": "Borussia Dortmund",
+      "sourceUrl": "https://www.ligainsider.de/ramy-bensebaini_7791/",
+      "ligaInsider": {
+        "averageGrade": 3.21,
+        "averagePoints": 50.37,
+        "totalPoints": 987,
+        "appearances": 21,
+        "gradedAppearances": 19,
+        "averageMinutes": 86.0
+      },
+      "kicker": {
+        "averageGrade": 2.842,
+        "totalPoints": 154,
+        "appearances": 21
+      }
+    },
+    "pl-k00085382": {
+      "name": "Jeff Chabot",
+      "team": "VfB Stuttgart",
+      "sourceUrl": "https://www.ligainsider.de/julian-chabot_12583/",
+      "ligaInsider": {
+        "averageGrade": 3.22,
+        "averagePoints": 50.3,
+        "totalPoints": 1358,
+        "appearances": 27,
+        "gradedAppearances": 27,
+        "averageMinutes": 91.0
+      },
+      "kicker": {
+        "averageGrade": 2.788,
+        "totalPoints": 183,
+        "appearances": 27
+      }
+    },
+    "pl-k00123434": {
+      "name": "Jonas Urbig",
+      "team": "FC Bayern München",
+      "sourceUrl": "https://www.ligainsider.de/jonas-urbig_26101/",
+      "ligaInsider": {
+        "averageGrade": 3.25,
+        "averagePoints": 49.79,
+        "totalPoints": 697,
+        "appearances": 14,
+        "gradedAppearances": 14,
+        "averageMinutes": 85.0
+      },
+      "kicker": {
+        "averageGrade": 2.857,
+        "totalPoints": 99,
+        "appearances": 14
+      }
+    },
+    "pl-k00169471": {
+      "name": "Chema",
+      "team": "VfB Stuttgart",
+      "sourceUrl": "https://www.ligainsider.de/chema-andres_38650/",
+      "ligaInsider": {
+        "averageGrade": 3.21,
+        "averagePoints": 49.76,
+        "totalPoints": 1000,
+        "appearances": 25,
+        "gradedAppearances": 17,
+        "averageMinutes": 79.0
+      },
+      "kicker": {
+        "averageGrade": 3.094,
+        "totalPoints": 118,
+        "appearances": 25
+      }
+    },
+    "pl-k00149146": {
+      "name": "Ibrahim Maza",
+      "team": "Bayer 04 Leverkusen",
+      "sourceUrl": "https://www.ligainsider.de/ibrahim-maza_35905/",
+      "ligaInsider": {
+        "averageGrade": 3.22,
+        "averagePoints": 49.63,
+        "totalPoints": 1358,
+        "appearances": 28,
+        "gradedAppearances": 27,
+        "averageMinutes": 73.0
+      },
+      "kicker": {
+        "averageGrade": 3.02,
+        "totalPoints": 177,
+        "appearances": 28
+      }
+    },
+    "pl-k00105845": {
+      "name": "Noah Atubolu",
+      "team": "SC Freiburg",
+      "sourceUrl": "https://www.ligainsider.de/noah-atubolu_22000/",
+      "ligaInsider": {
+        "averageGrade": 3.24,
+        "averagePoints": 49.62,
+        "totalPoints": 1687,
+        "appearances": 34,
+        "gradedAppearances": 34,
+        "averageMinutes": 97.0
+      },
+      "kicker": {
+        "averageGrade": 3.029,
+        "totalPoints": 215,
+        "appearances": 34
+      }
+    },
+    "pl-k00146292": {
+      "name": "Can Uzun",
+      "team": "Eintracht Frankfurt",
+      "sourceUrl": "https://www.ligainsider.de/can-uzun_35949/",
+      "ligaInsider": {
+        "averageGrade": 3.27,
+        "averagePoints": 49.5,
+        "totalPoints": 1008,
+        "appearances": 21,
+        "gradedAppearances": 20,
+        "averageMinutes": 61.0
+      },
+      "kicker": {
+        "averageGrade": 3.25,
+        "totalPoints": 140,
+        "appearances": 21
+      }
+    },
+    "pl-k00066754": {
+      "name": "Leon Goretzka",
+      "team": "FC Bayern München",
+      "sourceUrl": "https://www.ligainsider.de/leon-goretzka_1863/",
+      "ligaInsider": {
+        "averageGrade": 3.28,
+        "averagePoints": 49.41,
+        "totalPoints": 1461,
+        "appearances": 31,
+        "gradedAppearances": 29,
+        "averageMinutes": 71.0
+      },
+      "kicker": {
+        "averageGrade": 3.232,
+        "totalPoints": 175,
+        "appearances": 31
+      }
+    },
+    "pl-k00070990": {
+      "name": "Matthias Ginter",
+      "team": "SC Freiburg",
+      "sourceUrl": "https://www.ligainsider.de/matthias-ginter_1835/",
+      "ligaInsider": {
+        "averageGrade": 3.27,
+        "averagePoints": 49.34,
+        "totalPoints": 1579,
+        "appearances": 32,
+        "gradedAppearances": 32,
+        "averageMinutes": 95.0
+      },
+      "kicker": {
+        "averageGrade": 2.938,
+        "totalPoints": 239,
+        "appearances": 32
+      }
+    },
+    "pl-k00039245": {
+      "name": "Oliver Baumann",
+      "team": "TSG Hoffenheim",
+      "sourceUrl": "https://www.ligainsider.de/oliver-baumann_567/",
+      "ligaInsider": {
+        "averageGrade": 3.29,
+        "averagePoints": 49.15,
+        "totalPoints": 1671,
+        "appearances": 34,
+        "gradedAppearances": 34,
+        "averageMinutes": 97.0
+      },
+      "kicker": {
+        "averageGrade": 3.074,
+        "totalPoints": 208,
+        "appearances": 34
+      }
+    },
+    "pl-k00089892": {
+      "name": "Ridle Baku",
+      "team": "RB Leipzig",
+      "sourceUrl": "https://www.ligainsider.de/ridle-baku_15835/",
+      "ligaInsider": {
+        "averageGrade": 3.28,
+        "averagePoints": 49.12,
+        "totalPoints": 1572,
+        "appearances": 32,
+        "gradedAppearances": 32,
+        "averageMinutes": 83.0
+      },
+      "kicker": {
+        "averageGrade": 3.5,
+        "totalPoints": 136,
+        "appearances": 32
+      }
+    },
+    "pl-k00102800": {
+      "name": "Christoph Baumgartner",
+      "team": "RB Leipzig",
+      "sourceUrl": "https://www.ligainsider.de/christoph-baumgartner_18640/",
+      "ligaInsider": {
+        "averageGrade": 3.27,
+        "averagePoints": 49.09,
+        "totalPoints": 1620,
+        "appearances": 33,
+        "gradedAppearances": 33,
+        "averageMinutes": 89.0
+      },
+      "kicker": {
+        "averageGrade": 3.172,
+        "totalPoints": 256,
+        "appearances": 33
+      }
+    },
+    "pl-k00114601": {
+      "name": "Edmond Tapsoba",
+      "team": "Bayer 04 Leverkusen",
+      "sourceUrl": "https://www.ligainsider.de/edmond-tapsoba_19022/",
+      "ligaInsider": {
+        "averageGrade": 3.26,
+        "averagePoints": 49.03,
+        "totalPoints": 1422,
+        "appearances": 29,
+        "gradedAppearances": 29,
+        "averageMinutes": 95.0
+      },
+      "kicker": {
+        "averageGrade": 3.086,
+        "totalPoints": 201,
+        "appearances": 29
+      }
+    },
+    "pl-k00138529": {
+      "name": "Aleksandar Pavlovic",
+      "team": "FC Bayern München",
+      "sourceUrl": "https://www.ligainsider.de/aleksandar-pavlovic_35918/",
+      "ligaInsider": {
+        "averageGrade": 3.34,
+        "averagePoints": 48.95,
+        "totalPoints": 1128,
+        "appearances": 24,
+        "gradedAppearances": 22,
+        "averageMinutes": 70.0
+      },
+      "kicker": {
+        "averageGrade": 3.275,
+        "totalPoints": 112,
+        "appearances": 24
+      }
+    },
+    "pl-k00090996": {
+      "name": "Exequiel Palacios",
+      "team": "Bayer 04 Leverkusen",
+      "sourceUrl": "https://www.ligainsider.de/exequiel-palacios_20382/",
+      "ligaInsider": {
+        "averageGrade": 3.25,
+        "averagePoints": 48.81,
+        "totalPoints": 809,
+        "appearances": 18,
+        "gradedAppearances": 16,
+        "averageMinutes": 73.0
+      },
+      "kicker": {
+        "averageGrade": 3.536,
+        "totalPoints": 60,
+        "appearances": 18
+      }
+    },
+    "pl-k00153662": {
+      "name": "Kaishu Sano",
+      "team": "1. FSV Mainz 05",
+      "sourceUrl": "https://www.ligainsider.de/kaishu-sano_36958/",
+      "ligaInsider": {
+        "averageGrade": 3.28,
+        "averagePoints": 48.71,
+        "totalPoints": 1656,
+        "appearances": 34,
+        "gradedAppearances": 34,
+        "averageMinutes": 97.0
+      },
+      "kicker": {
+        "averageGrade": 3.162,
+        "totalPoints": 198,
+        "appearances": 34
+      }
+    },
+    "pl-k00102731": {
+      "name": "Josip Stanisic",
+      "team": "FC Bayern München",
+      "sourceUrl": "https://www.ligainsider.de/josip-stanisic_20102/",
+      "ligaInsider": {
+        "averageGrade": 3.3,
+        "averagePoints": 48.68,
+        "totalPoints": 1236,
+        "appearances": 26,
+        "gradedAppearances": 25,
+        "averageMinutes": 80.0
+      },
+      "kicker": {
+        "averageGrade": 2.96,
+        "totalPoints": 168,
+        "appearances": 26
+      }
+    },
+    "pl-k00094959": {
+      "name": "Romano Schmid",
+      "team": "SV Werder Bremen",
+      "sourceUrl": "https://www.ligainsider.de/romano-schmid_16771/",
+      "ligaInsider": {
+        "averageGrade": 3.32,
+        "averagePoints": 48.65,
+        "totalPoints": 1654,
+        "appearances": 34,
+        "gradedAppearances": 34,
+        "averageMinutes": 93.0
+      },
+      "kicker": {
+        "averageGrade": 3.824,
+        "totalPoints": 127,
+        "appearances": 34
+      }
+    },
+    "pl-k00144663": {
+      "name": "Bilal El Khannouss",
+      "team": "VfB Stuttgart",
+      "sourceUrl": "https://www.ligainsider.de/bilal-el-khannouss_37086/",
+      "ligaInsider": {
+        "averageGrade": 3.29,
+        "averagePoints": 48.5,
+        "totalPoints": 1190,
+        "appearances": 25,
+        "gradedAppearances": 24,
+        "averageMinutes": 71.0
+      },
+      "kicker": {
+        "averageGrade": 3.289,
+        "totalPoints": 133,
+        "appearances": 25
+      }
+    },
+    "pl-k00135025": {
+      "name": "Castello Lukeba",
+      "team": "RB Leipzig",
+      "sourceUrl": "https://www.ligainsider.de/castello-lukeba_27079/",
+      "ligaInsider": {
+        "averageGrade": 3.34,
+        "averagePoints": 48.12,
+        "totalPoints": 1225,
+        "appearances": 26,
+        "gradedAppearances": 25,
+        "averageMinutes": 92.0
+      },
+      "kicker": {
+        "averageGrade": 3.16,
+        "totalPoints": 139,
+        "appearances": 26
+      }
+    },
+    "pl-k00153779": {
+      "name": "Johan Manzambi",
+      "team": "SC Freiburg",
+      "sourceUrl": "https://www.ligainsider.de/johan-manzambi_37206/",
+      "ligaInsider": {
+        "averageGrade": 3.31,
+        "averagePoints": 48.0,
+        "totalPoints": 1296,
+        "appearances": 27,
+        "gradedAppearances": 27,
+        "averageMinutes": 81.0
+      },
+      "kicker": {
+        "averageGrade": 3.241,
+        "totalPoints": 159,
+        "appearances": 27
+      }
+    },
+    "pl-k00075608": {
+      "name": "Finn Dahmen",
+      "team": "FC Augsburg",
+      "sourceUrl": "https://www.ligainsider.de/finn-dahmen_18728/",
+      "ligaInsider": {
+        "averageGrade": 3.32,
+        "averagePoints": 47.79,
+        "totalPoints": 1625,
+        "appearances": 34,
+        "gradedAppearances": 34,
+        "averageMinutes": 97.0
+      },
+      "kicker": {
+        "averageGrade": 3.235,
+        "totalPoints": 185,
+        "appearances": 34
+      }
+    },
+    "pl-k00080364": {
+      "name": "Amos Pieper",
+      "team": "SV Werder Bremen",
+      "sourceUrl": "https://www.ligainsider.de/amos-pieper_7061/",
+      "ligaInsider": {
+        "averageGrade": 3.33,
+        "averagePoints": 47.78,
+        "totalPoints": 876,
+        "appearances": 19,
+        "gradedAppearances": 18,
+        "averageMinutes": 89.0
+      },
+      "kicker": {
+        "averageGrade": 3.222,
+        "totalPoints": 102,
+        "appearances": 19
+      }
+    },
+    "pl-k00123373": {
+      "name": "Olivier Deman",
+      "team": "SV Werder Bremen",
+      "sourceUrl": "https://www.ligainsider.de/olivier-deman_36310/",
+      "ligaInsider": {
+        "averageGrade": 3.4,
+        "averagePoints": 47.67,
+        "totalPoints": 729,
+        "appearances": 16,
+        "gradedAppearances": 15,
+        "averageMinutes": 89.0
+      },
+      "kicker": {
+        "averageGrade": 3.4,
+        "totalPoints": 77,
+        "appearances": 16
+      }
+    },
+    "pl-k00174794": {
+      "name": "Bazoumana Touré",
+      "team": "TSG Hoffenheim",
+      "sourceUrl": "https://www.ligainsider.de/bazoumana-toure_37262/",
+      "ligaInsider": {
+        "averageGrade": 3.37,
+        "averagePoints": 47.2,
+        "totalPoints": 1416,
+        "appearances": 30,
+        "gradedAppearances": 30,
+        "averageMinutes": 80.0
+      },
+      "kicker": {
+        "averageGrade": 3.2,
+        "totalPoints": 193,
+        "appearances": 30
+      }
+    },
+    "pl-k00088151": {
+      "name": "Dayot Upamecano",
+      "team": "FC Bayern München",
+      "sourceUrl": "https://www.ligainsider.de/dayot-upamecano_11541/",
+      "ligaInsider": {
+        "averageGrade": 3.42,
+        "averagePoints": 47.17,
+        "totalPoints": 1132,
+        "appearances": 24,
+        "gradedAppearances": 24,
+        "averageMinutes": 80.0
+      },
+      "kicker": {
+        "averageGrade": 2.955,
+        "totalPoints": 145,
+        "appearances": 24
+      }
+    },
+    "pl-k00139305": {
+      "name": "Antonio Nusa",
+      "team": "RB Leipzig",
+      "sourceUrl": "https://www.ligainsider.de/antonio-nusa_37124/",
+      "ligaInsider": {
+        "averageGrade": 3.38,
+        "averagePoints": 47.1,
+        "totalPoints": 1425,
+        "appearances": 31,
+        "gradedAppearances": 29,
+        "averageMinutes": 72.0
+      },
+      "kicker": {
+        "averageGrade": 3.321,
+        "totalPoints": 162,
+        "appearances": 31
+      }
+    },
+    "pl-k00079078": {
+      "name": "Nikola Vasilj",
+      "team": "FC St. Pauli",
+      "sourceUrl": "https://www.ligainsider.de/nikola-vasilj_13866/",
+      "ligaInsider": {
+        "averageGrade": 3.34,
+        "averagePoints": 46.76,
+        "totalPoints": 1590,
+        "appearances": 34,
+        "gradedAppearances": 34,
+        "averageMinutes": 96.0
+      },
+      "kicker": {
+        "averageGrade": 3.221,
+        "totalPoints": 193,
+        "appearances": 34
+      }
+    },
+    "pl-k00105180": {
+      "name": "Jamie Leweling",
+      "team": "VfB Stuttgart",
+      "sourceUrl": "https://www.ligainsider.de/jamie-leweling_21336/",
+      "ligaInsider": {
+        "averageGrade": 3.34,
+        "averagePoints": 46.66,
+        "totalPoints": 1493,
+        "appearances": 32,
+        "gradedAppearances": 32,
+        "averageMinutes": 78.0
+      },
+      "kicker": {
+        "averageGrade": 3.107,
+        "totalPoints": 213,
+        "appearances": 32
+      }
+    },
+    "pl-k00117298": {
+      "name": "Jens Stage",
+      "team": "SV Werder Bremen",
+      "sourceUrl": "https://www.ligainsider.de/jens-stage_22538/",
+      "ligaInsider": {
+        "averageGrade": 3.4,
+        "averagePoints": 46.55,
+        "totalPoints": 1350,
+        "appearances": 29,
+        "gradedAppearances": 29,
+        "averageMinutes": 90.0
+      },
+      "kicker": {
+        "averageGrade": 3.431,
+        "totalPoints": 180,
+        "appearances": 29
+      }
+    },
+    "pl-k00090213": {
+      "name": "Stefan Posch",
+      "team": "1. FSV Mainz 05",
+      "sourceUrl": "https://www.ligainsider.de/stefan-posch_12798/",
+      "ligaInsider": {
+        "averageGrade": 3.41,
+        "averagePoints": 46.5,
+        "totalPoints": 744,
+        "appearances": 16,
+        "gradedAppearances": 16,
+        "averageMinutes": 93.0
+      },
+      "kicker": {
+        "averageGrade": 3.344,
+        "totalPoints": 74,
+        "appearances": 16
+      }
+    },
+    "pl-k00084365": {
+      "name": "Nico Elvedi",
+      "team": "Mönchengladbach",
+      "sourceUrl": "https://www.ligainsider.de/nico-elvedi_6475/",
+      "ligaInsider": {
+        "averageGrade": 3.41,
+        "averagePoints": 46.42,
+        "totalPoints": 1532,
+        "appearances": 33,
+        "gradedAppearances": 33,
+        "averageMinutes": 96.0
+      },
+      "kicker": {
+        "averageGrade": 3.333,
+        "totalPoints": 164,
+        "appearances": 33
+      }
+    },
+    "pl-k00068578": {
+      "name": "Julian Brandt",
+      "team": "Borussia Dortmund",
+      "sourceUrl": "https://www.ligainsider.de/julian-brandt_2467/",
+      "ligaInsider": {
+        "averageGrade": 3.38,
+        "averagePoints": 46.42,
+        "totalPoints": 1261,
+        "appearances": 29,
+        "gradedAppearances": 26,
+        "averageMinutes": 65.0
+      },
+      "kicker": {
+        "averageGrade": 3.263,
+        "totalPoints": 146,
+        "appearances": 29
+      }
+    },
+    "pl-k00131599": {
+      "name": "Albian Hajdari",
+      "team": "TSG Hoffenheim",
+      "sourceUrl": "https://www.ligainsider.de/albian-hajdari_37227/",
+      "ligaInsider": {
+        "averageGrade": 3.4,
+        "averagePoints": 46.4,
+        "totalPoints": 1392,
+        "appearances": 30,
+        "gradedAppearances": 30,
+        "averageMinutes": 86.0
+      },
+      "kicker": {
+        "averageGrade": 3.224,
+        "totalPoints": 157,
+        "appearances": 30
+      }
+    },
+    "pl-k00119669": {
+      "name": "Fisnik Asllani",
+      "team": "TSG Hoffenheim",
+      "sourceUrl": "https://www.ligainsider.de/fisnik-asllani_21986/",
+      "ligaInsider": {
+        "averageGrade": 3.41,
+        "averagePoints": 46.36,
+        "totalPoints": 1530,
+        "appearances": 33,
+        "gradedAppearances": 33,
+        "averageMinutes": 73.0
+      },
+      "kicker": {
+        "averageGrade": 3.145,
+        "totalPoints": 226,
+        "appearances": 33
+      }
+    },
+    "pl-k00076053": {
+      "name": "Michael Zetterer",
+      "team": "Eintracht Frankfurt",
+      "sourceUrl": "https://www.ligainsider.de/michael-zetterer_6257/",
+      "ligaInsider": {
+        "averageGrade": 3.41,
+        "averagePoints": 46.36,
+        "totalPoints": 1020,
+        "appearances": 22,
+        "gradedAppearances": 22,
+        "averageMinutes": 97.0
+      },
+      "kicker": {
+        "averageGrade": 3.432,
+        "totalPoints": 102,
+        "appearances": 22
+      }
+    },
+    "pl-k00156015": {
+      "name": "Lennart Karl",
+      "team": "FC Bayern München",
+      "sourceUrl": "https://www.ligainsider.de/lennart-karl_38411/",
+      "ligaInsider": {
+        "averageGrade": 3.38,
+        "averagePoints": 46.17,
+        "totalPoints": 1141,
+        "appearances": 26,
+        "gradedAppearances": 24,
+        "averageMinutes": 56.0
+      },
+      "kicker": {
+        "averageGrade": 3.25,
+        "totalPoints": 136,
+        "appearances": 26
+      }
+    },
+    "pl-k00059041": {
+      "name": "Andrej Kramaric",
+      "team": "TSG Hoffenheim",
+      "sourceUrl": "https://www.ligainsider.de/andrej-kramaric_2439/",
+      "ligaInsider": {
+        "averageGrade": 3.38,
+        "averagePoints": 46.15,
+        "totalPoints": 1569,
+        "appearances": 34,
+        "gradedAppearances": 34,
+        "averageMinutes": 68.0
+      },
+      "kicker": {
+        "averageGrade": 2.953,
+        "totalPoints": 276,
+        "appearances": 34
+      }
+    },
+    "pl-k00125604": {
+      "name": "Jakub Kaminski",
+      "team": "1. FC Köln",
+      "sourceUrl": "https://www.ligainsider.de/jakub-kaminski_25286/",
+      "ligaInsider": {
+        "averageGrade": 3.46,
+        "averagePoints": 45.71,
+        "totalPoints": 1554,
+        "appearances": 34,
+        "gradedAppearances": 34,
+        "averageMinutes": 95.0
+      },
+      "kicker": {
+        "averageGrade": 3.324,
+        "totalPoints": 198,
+        "appearances": 34
+      }
+    },
+    "pl-k00087705": {
+      "name": "Ermedin Demirovic",
+      "team": "VfB Stuttgart",
+      "sourceUrl": "https://www.ligainsider.de/ermedin-demirovic_24166/",
+      "ligaInsider": {
+        "averageGrade": 3.48,
+        "averagePoints": 45.59,
+        "totalPoints": 1058,
+        "appearances": 25,
+        "gradedAppearances": 22,
+        "averageMinutes": 71.0
+      },
+      "kicker": {
+        "averageGrade": 3.342,
+        "totalPoints": 151,
+        "appearances": 25
+      }
+    },
+    "pl-k00089442": {
+      "name": "Serhou Guirassy",
+      "team": "Borussia Dortmund",
+      "sourceUrl": "https://www.ligainsider.de/serhou-guirassy_10454/",
+      "ligaInsider": {
+        "averageGrade": 3.47,
+        "averagePoints": 45.5,
+        "totalPoints": 1478,
+        "appearances": 33,
+        "gradedAppearances": 32,
+        "averageMinutes": 77.0
+      },
+      "kicker": {
+        "averageGrade": 3.5,
+        "totalPoints": 186,
+        "appearances": 33
+      }
+    },
+    "pl-k00139342": {
+      "name": "Assan Ouedraogo",
+      "team": "RB Leipzig",
+      "sourceUrl": "https://www.ligainsider.de/assan-ouedraogo_36735/",
+      "ligaInsider": {
+        "averageGrade": 3.43,
+        "averagePoints": 45.4,
+        "totalPoints": 763,
+        "appearances": 19,
+        "gradedAppearances": 15,
+        "averageMinutes": 64.0
+      },
+      "kicker": {
+        "averageGrade": 3.143,
+        "totalPoints": 109,
+        "appearances": 19
+      }
+    },
+    "pl-k00123524": {
+      "name": "Yan Couto",
+      "team": "Borussia Dortmund",
+      "sourceUrl": "https://www.ligainsider.de/yan-couto_23748/",
+      "ligaInsider": {
+        "averageGrade": 3.43,
+        "averagePoints": 45.33,
+        "totalPoints": 750,
+        "appearances": 19,
+        "gradedAppearances": 15,
+        "averageMinutes": 69.0
+      },
+      "kicker": {
+        "averageGrade": 3.269,
+        "totalPoints": 91,
+        "appearances": 19
+      }
+    },
+    "pl-k00106928": {
+      "name": "Felix Nmecha",
+      "team": "Borussia Dortmund",
+      "sourceUrl": "https://www.ligainsider.de/felix-nmecha_25090/",
+      "ligaInsider": {
+        "averageGrade": 3.45,
+        "averagePoints": 45.32,
+        "totalPoints": 1285,
+        "appearances": 29,
+        "gradedAppearances": 28,
+        "averageMinutes": 81.0
+      },
+      "kicker": {
+        "averageGrade": 3.077,
+        "totalPoints": 175,
+        "appearances": 29
+      }
+    },
+    "pl-k00149673": {
+      "name": "Hennes Behrens",
+      "team": "1. FC Heidenheim",
+      "sourceUrl": "https://www.ligainsider.de/hennes-behrens_37221/",
+      "ligaInsider": {
+        "averageGrade": 3.43,
+        "averagePoints": 45.27,
+        "totalPoints": 699,
+        "appearances": 16,
+        "gradedAppearances": 15,
+        "averageMinutes": 93.0
+      },
+      "kicker": {
+        "averageGrade": 3.4,
+        "totalPoints": 77,
+        "appearances": 16
+      }
+    },
+    "pl-k00073704": {
+      "name": "Patrick Mainka",
+      "team": "1. FC Heidenheim",
+      "sourceUrl": "https://www.ligainsider.de/patrick-mainka_10618/",
+      "ligaInsider": {
+        "averageGrade": 3.44,
+        "averagePoints": 45.21,
+        "totalPoints": 1537,
+        "appearances": 34,
+        "gradedAppearances": 34,
+        "averageMinutes": 96.0
+      },
+      "kicker": {
+        "averageGrade": 3.338,
+        "totalPoints": 181,
+        "appearances": 34
+      }
+    },
+    "pl-k00072478": {
+      "name": "Mark Flekken",
+      "team": "Bayer 04 Leverkusen",
+      "sourceUrl": "https://www.ligainsider.de/mark-flekken_4530/",
+      "ligaInsider": {
+        "averageGrade": 3.5,
+        "averagePoints": 45.12,
+        "totalPoints": 1083,
+        "appearances": 24,
+        "gradedAppearances": 24,
+        "averageMinutes": 95.0
+      },
+      "kicker": {
+        "averageGrade": 3.25,
+        "totalPoints": 130,
+        "appearances": 24
+      }
+    },
+    "pl-k00100804": {
+      "name": "Ozan Kabak",
+      "team": "TSG Hoffenheim",
+      "sourceUrl": "https://www.ligainsider.de/ozan-kabak_20416/",
+      "ligaInsider": {
+        "averageGrade": 3.52,
+        "averagePoints": 45.05,
+        "totalPoints": 1039,
+        "appearances": 25,
+        "gradedAppearances": 22,
+        "averageMinutes": 85.0
+      },
+      "kicker": {
+        "averageGrade": 3.225,
+        "totalPoints": 131,
+        "appearances": 25
+      }
+    },
+    "pl-k00104485": {
+      "name": "Julian Ryerson",
+      "team": "Borussia Dortmund",
+      "sourceUrl": "https://www.ligainsider.de/julian-ryerson_18478/",
+      "ligaInsider": {
+        "averageGrade": 3.48,
+        "averagePoints": 44.55,
+        "totalPoints": 1334,
+        "appearances": 31,
+        "gradedAppearances": 29,
+        "averageMinutes": 82.0
+      },
+      "kicker": {
+        "averageGrade": 3.167,
+        "totalPoints": 186,
+        "appearances": 31
+      }
+    },
+    "pl-k00064040": {
+      "name": "Maximilian Arnold",
+      "team": "VfL Wolfsburg",
+      "sourceUrl": "https://www.ligainsider.de/maximilian-arnold_1673/",
+      "ligaInsider": {
+        "averageGrade": 3.5,
+        "averagePoints": 44.36,
+        "totalPoints": 1046,
+        "appearances": 25,
+        "gradedAppearances": 22,
+        "averageMinutes": 91.0
+      },
+      "kicker": {
+        "averageGrade": 3.7,
+        "totalPoints": 89,
+        "appearances": 25
+      }
+    },
+    "pl-k00062426": {
+      "name": "Christian Eriksen",
+      "team": "VfL Wolfsburg",
+      "sourceUrl": "https://www.ligainsider.de/christian-eriksen_4839/",
+      "ligaInsider": {
+        "averageGrade": 3.52,
+        "averagePoints": 44.29,
+        "totalPoints": 1373,
+        "appearances": 31,
+        "gradedAppearances": 31,
+        "averageMinutes": 82.0
+      },
+      "kicker": {
+        "averageGrade": 3.717,
+        "totalPoints": 127,
+        "appearances": 31
+      }
+    },
+    "pl-k00097452": {
+      "name": "Alexis Claude-Maurice",
+      "team": "FC Augsburg",
+      "sourceUrl": "https://www.ligainsider.de/alexis-claude-maurice_20630/",
+      "ligaInsider": {
+        "averageGrade": 3.48,
+        "averagePoints": 44.22,
+        "totalPoints": 1236,
+        "appearances": 29,
+        "gradedAppearances": 27,
+        "averageMinutes": 81.0
+      },
+      "kicker": {
+        "averageGrade": 3.346,
+        "totalPoints": 171,
+        "appearances": 29
+      }
+    },
+    "pl-k00130252": {
+      "name": "Nicolas Seiwald",
+      "team": "RB Leipzig",
+      "sourceUrl": "https://www.ligainsider.de/nicolas-seiwald_24619/",
+      "ligaInsider": {
+        "averageGrade": 3.48,
+        "averagePoints": 44.21,
+        "totalPoints": 1459,
+        "appearances": 33,
+        "gradedAppearances": 33,
+        "averageMinutes": 86.0
+      },
+      "kicker": {
+        "averageGrade": 3.355,
+        "totalPoints": 150,
+        "appearances": 33
+      }
+    },
+    "pl-k00092331": {
+      "name": "Bernardo",
+      "team": "TSG Hoffenheim",
+      "sourceUrl": "https://www.ligainsider.de/bernardo_11324/",
+      "ligaInsider": {
+        "averageGrade": 3.53,
+        "averagePoints": 44.17,
+        "totalPoints": 1281,
+        "appearances": 29,
+        "gradedAppearances": 29,
+        "averageMinutes": 85.0
+      },
+      "kicker": {
+        "averageGrade": 3.537,
+        "totalPoints": 106,
+        "appearances": 29
+      }
+    },
+    "pl-k00129671": {
+      "name": "Nathaniel Brown",
+      "team": "Eintracht Frankfurt",
+      "sourceUrl": "https://www.ligainsider.de/nathaniel-brown_35857/",
+      "ligaInsider": {
+        "averageGrade": 3.55,
+        "averagePoints": 44.03,
+        "totalPoints": 1430,
+        "appearances": 33,
+        "gradedAppearances": 32,
+        "averageMinutes": 89.0
+      },
+      "kicker": {
+        "averageGrade": 3.609,
+        "totalPoints": 141,
+        "appearances": 33
+      }
+    },
+    "pl-k00082732": {
+      "name": "Denis Vavro",
+      "team": "VfL Wolfsburg",
+      "sourceUrl": "https://www.ligainsider.de/denis-vavro_16744/",
+      "ligaInsider": {
+        "averageGrade": 3.58,
+        "averagePoints": 44.0,
+        "totalPoints": 631,
+        "appearances": 17,
+        "gradedAppearances": 13,
+        "averageMinutes": 95.0
+      },
+      "kicker": {
+        "averageGrade": 3.923,
+        "totalPoints": 43,
+        "appearances": 17
+      }
+    },
+    "pl-k00116507": {
+      "name": "Fabio Vieira",
+      "team": "Hamburger SV",
+      "sourceUrl": "https://www.ligainsider.de/fabio-vieira_24438/",
+      "ligaInsider": {
+        "averageGrade": 3.55,
+        "averagePoints": 44.0,
+        "totalPoints": 1276,
+        "appearances": 29,
+        "gradedAppearances": 29,
+        "averageMinutes": 81.0
+      },
+      "kicker": {
+        "averageGrade": 3.611,
+        "totalPoints": 125,
+        "appearances": 29
+      }
+    },
+    "pl-k00100591": {
+      "name": "Paul Nebel",
+      "team": "1. FSV Mainz 05",
+      "sourceUrl": "https://www.ligainsider.de/paul-nebel_20674/",
+      "ligaInsider": {
+        "averageGrade": 3.54,
+        "averagePoints": 43.77,
+        "totalPoints": 1205,
+        "appearances": 30,
+        "gradedAppearances": 26,
+        "averageMinutes": 83.0
+      },
+      "kicker": {
+        "averageGrade": 3.577,
+        "totalPoints": 118,
+        "appearances": 30
+      }
+    },
+    "pl-k00110187": {
+      "name": "Nicolai Remberg",
+      "team": "Hamburger SV",
+      "sourceUrl": "https://www.ligainsider.de/nicolai-remberg_26449/",
+      "ligaInsider": {
+        "averageGrade": 3.53,
+        "averagePoints": 43.53,
+        "totalPoints": 1393,
+        "appearances": 32,
+        "gradedAppearances": 32,
+        "averageMinutes": 98.0
+      },
+      "kicker": {
+        "averageGrade": 3.641,
+        "totalPoints": 116,
+        "appearances": 32
+      }
+    },
+    "pl-k00129291": {
+      "name": "Loic Badé",
+      "team": "Bayer 04 Leverkusen",
+      "sourceUrl": "https://www.ligainsider.de/loic-bade_35823/",
+      "ligaInsider": {
+        "averageGrade": 3.55,
+        "averagePoints": 43.52,
+        "totalPoints": 954,
+        "appearances": 23,
+        "gradedAppearances": 21,
+        "averageMinutes": 83.0
+      },
+      "kicker": {
+        "averageGrade": 3.625,
+        "totalPoints": 74,
+        "appearances": 23
+      }
+    },
+    "pl-k00084550": {
+      "name": "Robin Koch",
+      "team": "Eintracht Frankfurt",
+      "sourceUrl": "https://www.ligainsider.de/robin-koch_12490/",
+      "ligaInsider": {
+        "averageGrade": 3.53,
+        "averagePoints": 43.44,
+        "totalPoints": 1390,
+        "appearances": 32,
+        "gradedAppearances": 32,
+        "averageMinutes": 95.0
+      },
+      "kicker": {
+        "averageGrade": 3.797,
+        "totalPoints": 106,
+        "appearances": 32
+      }
+    },
+    "pl-k00104895": {
+      "name": "Rocco Reitz",
+      "team": "Mönchengladbach",
+      "sourceUrl": "https://www.ligainsider.de/rocco-reitz_24546/",
+      "ligaInsider": {
+        "averageGrade": 3.58,
+        "averagePoints": 43.39,
+        "totalPoints": 1345,
+        "appearances": 31,
+        "gradedAppearances": 31,
+        "averageMinutes": 89.0
+      },
+      "kicker": {
+        "averageGrade": 3.597,
+        "totalPoints": 117,
+        "appearances": 31
+      }
+    },
+    "pl-k00156434": {
+      "name": "Leon Avdullahu",
+      "team": "TSG Hoffenheim",
+      "sourceUrl": "https://www.ligainsider.de/leon-avdullahu_38223/",
+      "ligaInsider": {
+        "averageGrade": 3.53,
+        "averagePoints": 43.24,
+        "totalPoints": 1427,
+        "appearances": 33,
+        "gradedAppearances": 33,
+        "averageMinutes": 92.0
+      },
+      "kicker": {
+        "averageGrade": 3.03,
+        "totalPoints": 196,
+        "appearances": 33
+      }
+    },
+    "pl-k00090042": {
+      "name": "Marco Friedl",
+      "team": "SV Werder Bremen",
+      "sourceUrl": "https://www.ligainsider.de/marco-friedl_7047/",
+      "ligaInsider": {
+        "averageGrade": 3.55,
+        "averagePoints": 43.07,
+        "totalPoints": 1292,
+        "appearances": 30,
+        "gradedAppearances": 30,
+        "averageMinutes": 91.0
+      },
+      "kicker": {
+        "averageGrade": 3.448,
+        "totalPoints": 126,
+        "appearances": 30
+      }
+    },
+    "pl-k00116706": {
+      "name": "Chrislain Matsima",
+      "team": "FC Augsburg",
+      "sourceUrl": "https://www.ligainsider.de/chrislain-matsima_26695/",
+      "ligaInsider": {
+        "averageGrade": 3.56,
+        "averagePoints": 43.06,
+        "totalPoints": 746,
+        "appearances": 18,
+        "gradedAppearances": 17,
+        "averageMinutes": 94.0
+      },
+      "kicker": {
+        "averageGrade": 3.382,
+        "totalPoints": 90,
+        "appearances": 18
+      }
+    },
+    "pl-k00099946": {
+      "name": "Nikolas Nartey",
+      "team": "VfB Stuttgart",
+      "sourceUrl": "https://www.ligainsider.de/nikolas-nartey_13737/",
+      "ligaInsider": {
+        "averageGrade": 3.57,
+        "averagePoints": 43.04,
+        "totalPoints": 1073,
+        "appearances": 28,
+        "gradedAppearances": 23,
+        "averageMinutes": 57.0
+      },
+      "kicker": {
+        "averageGrade": 3.029,
+        "totalPoints": 138,
+        "appearances": 28
+      }
+    },
+    "pl-k00075651": {
+      "name": "Frederik Rönnow",
+      "team": "1. FC Union Berlin",
+      "sourceUrl": "https://www.ligainsider.de/frederik-roennow_7943/",
+      "ligaInsider": {
+        "averageGrade": 3.53,
+        "averagePoints": 43.03,
+        "totalPoints": 1291,
+        "appearances": 30,
+        "gradedAppearances": 30,
+        "averageMinutes": 95.0
+      },
+      "kicker": {
+        "averageGrade": 3.167,
+        "totalPoints": 173,
+        "appearances": 30
+      }
+    },
+    "pl-k00143483": {
+      "name": "Jarell Quansah",
+      "team": "Bayer 04 Leverkusen",
+      "sourceUrl": "https://www.ligainsider.de/jarell-quansah_36489/",
+      "ligaInsider": {
+        "averageGrade": 3.59,
+        "averagePoints": 42.85,
+        "totalPoints": 1171,
+        "appearances": 28,
+        "gradedAppearances": 27,
+        "averageMinutes": 91.0
+      },
+      "kicker": {
+        "averageGrade": 3.444,
+        "totalPoints": 135,
+        "appearances": 28
+      }
+    },
+    "pl-k00167749": {
+      "name": "Kacper Potulski",
+      "team": "1. FSV Mainz 05",
+      "sourceUrl": "https://www.ligainsider.de/kacper-potulski_38608/",
+      "ligaInsider": {
+        "averageGrade": 3.58,
+        "averagePoints": 42.77,
+        "totalPoints": 588,
+        "appearances": 15,
+        "gradedAppearances": 13,
+        "averageMinutes": 85.0
+      },
+      "kicker": {
+        "averageGrade": 3.385,
+        "totalPoints": 61,
+        "appearances": 15
+      }
+    },
+    "pl-k00137082": {
+      "name": "Leopold Querfeld",
+      "team": "1. FC Union Berlin",
+      "sourceUrl": "https://www.ligainsider.de/leopold-querfeld_27234/",
+      "ligaInsider": {
+        "averageGrade": 3.63,
+        "averagePoints": 42.53,
+        "totalPoints": 1303,
+        "appearances": 31,
+        "gradedAppearances": 30,
+        "averageMinutes": 97.0
+      },
+      "kicker": {
+        "averageGrade": 3.683,
+        "totalPoints": 124,
+        "appearances": 31
+      }
+    },
+    "pl-k00063777": {
+      "name": "Lukas Kübler",
+      "team": "SC Freiburg",
+      "sourceUrl": "https://www.ligainsider.de/lukas-kuebler_1935/",
+      "ligaInsider": {
+        "averageGrade": 3.61,
+        "averagePoints": 42.48,
+        "totalPoints": 977,
+        "appearances": 23,
+        "gradedAppearances": 23,
+        "averageMinutes": 74.0
+      },
+      "kicker": {
+        "averageGrade": 3.524,
+        "totalPoints": 96,
+        "appearances": 23
+      }
+    },
+    "pl-k00093857": {
+      "name": "Tom Krauß",
+      "team": "1. FC Köln",
+      "sourceUrl": "https://www.ligainsider.de/tom-krauss_20244/",
+      "ligaInsider": {
+        "averageGrade": 3.58,
+        "averagePoints": 42.42,
+        "totalPoints": 1052,
+        "appearances": 26,
+        "gradedAppearances": 24,
+        "averageMinutes": 78.0
+      },
+      "kicker": {
+        "averageGrade": 3.543,
+        "totalPoints": 93,
+        "appearances": 26
+      }
+    },
+    "pl-k00119414": {
+      "name": "Eric Martel",
+      "team": "1. FC Köln",
+      "sourceUrl": "https://www.ligainsider.de/eric-martel_20728/",
+      "ligaInsider": {
+        "averageGrade": 3.61,
+        "averagePoints": 42.39,
+        "totalPoints": 1314,
+        "appearances": 31,
+        "gradedAppearances": 31,
+        "averageMinutes": 89.0
+      },
+      "kicker": {
+        "averageGrade": 3.65,
+        "totalPoints": 113,
+        "appearances": 31
+      }
+    },
+    "pl-k00079503": {
+      "name": "Maximilian Eggestein",
+      "team": "SC Freiburg",
+      "sourceUrl": "https://www.ligainsider.de/maximilian-eggestein_6131/",
+      "ligaInsider": {
+        "averageGrade": 3.56,
+        "averagePoints": 42.26,
+        "totalPoints": 1437,
+        "appearances": 34,
+        "gradedAppearances": 34,
+        "averageMinutes": 97.0
+      },
+      "kicker": {
+        "averageGrade": 3.588,
+        "totalPoints": 143,
+        "appearances": 34
+      }
+    },
+    "pl-k00131930": {
+      "name": "Fabian Rieder",
+      "team": "FC Augsburg",
+      "sourceUrl": "https://www.ligainsider.de/fabian-rieder_25579/",
+      "ligaInsider": {
+        "averageGrade": 3.6,
+        "averagePoints": 42.24,
+        "totalPoints": 1283,
+        "appearances": 32,
+        "gradedAppearances": 29,
+        "averageMinutes": 84.0
+      },
+      "kicker": {
+        "averageGrade": 3.5,
+        "totalPoints": 155,
+        "appearances": 32
+      }
+    },
+    "pl-k00092237": {
+      "name": "Danilho Doekhi",
+      "team": "1. FC Union Berlin",
+      "sourceUrl": "https://www.ligainsider.de/danilho-doekhi_27485/",
+      "ligaInsider": {
+        "averageGrade": 3.6,
+        "averagePoints": 42.21,
+        "totalPoints": 1435,
+        "appearances": 34,
+        "gradedAppearances": 34,
+        "averageMinutes": 97.0
+      },
+      "kicker": {
+        "averageGrade": 3.441,
+        "totalPoints": 180,
+        "appearances": 34
+      }
+    },
+    "pl-k00105006": {
+      "name": "Albert Sambi Lokonga",
+      "team": "Hamburger SV",
+      "sourceUrl": "https://www.ligainsider.de/albert-sambi-lokonga_18447/",
+      "ligaInsider": {
+        "averageGrade": 3.58,
+        "averagePoints": 42.08,
+        "totalPoints": 1049,
+        "appearances": 26,
+        "gradedAppearances": 24,
+        "averageMinutes": 75.0
+      },
+      "kicker": {
+        "averageGrade": 3.225,
+        "totalPoints": 137,
+        "appearances": 26
+      }
+    },
+    "pl-k00114736": {
+      "name": "Maximilian Beier",
+      "team": "Borussia Dortmund",
+      "sourceUrl": "https://www.ligainsider.de/maximilian-beier_20804/",
+      "ligaInsider": {
+        "averageGrade": 3.63,
+        "averagePoints": 41.94,
+        "totalPoints": 1319,
+        "appearances": 32,
+        "gradedAppearances": 31,
+        "averageMinutes": 69.0
+      },
+      "kicker": {
+        "averageGrade": 3.389,
+        "totalPoints": 175,
+        "appearances": 32
+      }
+    },
+    "pl-k00089434": {
+      "name": "Xaver Schlager",
+      "team": "RB Leipzig",
+      "sourceUrl": "https://www.ligainsider.de/xaver-schlager_11547/",
+      "ligaInsider": {
+        "averageGrade": 3.58,
+        "averagePoints": 41.92,
+        "totalPoints": 1068,
+        "appearances": 26,
+        "gradedAppearances": 25,
+        "averageMinutes": 78.0
+      },
+      "kicker": {
+        "averageGrade": 3.205,
+        "totalPoints": 137,
+        "appearances": 26
+      }
+    },
+    "pl-k00030669": {
+      "name": "Manuel Neuer",
+      "team": "FC Bayern München",
+      "sourceUrl": "https://www.ligainsider.de/manuel-neuer_114/",
+      "ligaInsider": {
+        "averageGrade": 3.64,
+        "averagePoints": 41.91,
+        "totalPoints": 922,
+        "appearances": 22,
+        "gradedAppearances": 22,
+        "averageMinutes": 91.0
+      },
+      "kicker": {
+        "averageGrade": 3.182,
+        "totalPoints": 128,
+        "appearances": 22
+      }
+    },
+    "pl-k00085778": {
+      "name": "Patrik Schick",
+      "team": "Bayer 04 Leverkusen",
+      "sourceUrl": "https://www.ligainsider.de/patrik-schick_7794/",
+      "ligaInsider": {
+        "averageGrade": 3.65,
+        "averagePoints": 41.89,
+        "totalPoints": 1152,
+        "appearances": 28,
+        "gradedAppearances": 27,
+        "averageMinutes": 78.0
+      },
+      "kicker": {
+        "averageGrade": 3.385,
+        "totalPoints": 174,
+        "appearances": 28
+      }
+    },
+    "pl-k00102817": {
+      "name": "Ritsu Doan",
+      "team": "Eintracht Frankfurt",
+      "sourceUrl": "https://www.ligainsider.de/ritsu-doan_22974/",
+      "ligaInsider": {
+        "averageGrade": 3.66,
+        "averagePoints": 41.84,
+        "totalPoints": 1297,
+        "appearances": 31,
+        "gradedAppearances": 31,
+        "averageMinutes": 80.0
+      },
+      "kicker": {
+        "averageGrade": 3.867,
+        "totalPoints": 113,
+        "appearances": 31
+      }
+    },
+    "pl-k00143036": {
+      "name": "Romulo",
+      "team": "RB Leipzig",
+      "sourceUrl": "https://www.ligainsider.de/romulo-cardoso_38565/",
+      "ligaInsider": {
+        "averageGrade": 3.62,
+        "averagePoints": 41.77,
+        "totalPoints": 1253,
+        "appearances": 30,
+        "gradedAppearances": 30,
+        "averageMinutes": 75.0
+      },
+      "kicker": {
+        "averageGrade": 3.603,
+        "totalPoints": 143,
+        "appearances": 30
+      }
+    },
+    "pl-k00135660": {
+      "name": "Senne Lynen",
+      "team": "SV Werder Bremen",
+      "sourceUrl": "https://www.ligainsider.de/senne-lynen_35359/",
+      "ligaInsider": {
+        "averageGrade": 3.66,
+        "averagePoints": 41.55,
+        "totalPoints": 1288,
+        "appearances": 31,
+        "gradedAppearances": 31,
+        "averageMinutes": 95.0
+      },
+      "kicker": {
+        "averageGrade": 3.726,
+        "totalPoints": 98,
+        "appearances": 31
+      }
+    },
+    "pl-k00097350": {
+      "name": "Dimitrios Giannoulis",
+      "team": "FC Augsburg",
+      "sourceUrl": "https://www.ligainsider.de/dimitrios-giannoulis_11820/",
+      "ligaInsider": {
+        "averageGrade": 3.65,
+        "averagePoints": 41.54,
+        "totalPoints": 1102,
+        "appearances": 27,
+        "gradedAppearances": 26,
+        "averageMinutes": 75.0
+      },
+      "kicker": {
+        "averageGrade": 3.94,
+        "totalPoints": 80,
+        "appearances": 27
+      }
+    },
+    "pl-k00097893": {
+      "name": "Diant Ramaj",
+      "team": "1. FC Heidenheim",
+      "sourceUrl": "https://www.ligainsider.de/diant-ramaj_20836/",
+      "ligaInsider": {
+        "averageGrade": 3.65,
+        "averagePoints": 41.52,
+        "totalPoints": 1287,
+        "appearances": 31,
+        "gradedAppearances": 31,
+        "averageMinutes": 96.0
+      },
+      "kicker": {
+        "averageGrade": 3.258,
+        "totalPoints": 161,
+        "appearances": 31
+      }
+    },
+    "pl-k00129414": {
+      "name": "Arthur Theate",
+      "team": "Eintracht Frankfurt",
+      "sourceUrl": "https://www.ligainsider.de/arthur-theate_26137/",
+      "ligaInsider": {
+        "averageGrade": 3.65,
+        "averagePoints": 41.5,
+        "totalPoints": 996,
+        "appearances": 24,
+        "gradedAppearances": 24,
+        "averageMinutes": 96.0
+      },
+      "kicker": {
+        "averageGrade": 3.854,
+        "totalPoints": 72,
+        "appearances": 24
+      }
+    },
+    "pl-k00079176": {
+      "name": "Atakan Karazor",
+      "team": "VfB Stuttgart",
+      "sourceUrl": "https://www.ligainsider.de/atakan-karazor_10442/",
+      "ligaInsider": {
+        "averageGrade": 3.65,
+        "averagePoints": 41.39,
+        "totalPoints": 1044,
+        "appearances": 28,
+        "gradedAppearances": 23,
+        "averageMinutes": 85.0
+      },
+      "kicker": {
+        "averageGrade": 3.568,
+        "totalPoints": 90,
+        "appearances": 28
+      }
+    },
+    "pl-k00087292": {
+      "name": "Kevin Diks",
+      "team": "Mönchengladbach",
+      "sourceUrl": "https://www.ligainsider.de/kevin-diks_11591/",
+      "ligaInsider": {
+        "averageGrade": 3.68,
+        "averagePoints": 41.33,
+        "totalPoints": 1240,
+        "appearances": 30,
+        "gradedAppearances": 30,
+        "averageMinutes": 88.0
+      },
+      "kicker": {
+        "averageGrade": 3.411,
+        "totalPoints": 157,
+        "appearances": 30
+      }
+    },
+    "pl-k00101614": {
+      "name": "Diogo Leite",
+      "team": "1. FC Union Berlin",
+      "sourceUrl": "https://www.ligainsider.de/diogo-leite_20110/",
+      "ligaInsider": {
+        "averageGrade": 3.67,
+        "averagePoints": 41.3,
+        "totalPoints": 950,
+        "appearances": 23,
+        "gradedAppearances": 23,
+        "averageMinutes": 90.0
+      },
+      "kicker": {
+        "averageGrade": 3.717,
+        "totalPoints": 72,
+        "appearances": 23
+      }
+    },
+    "pl-k00135346": {
+      "name": "Aurele Amenda",
+      "team": "Eintracht Frankfurt",
+      "sourceUrl": "https://www.ligainsider.de/aurele-amenda_36336/",
+      "ligaInsider": {
+        "averageGrade": 3.64,
+        "averagePoints": 41.29,
+        "totalPoints": 916,
+        "appearances": 24,
+        "gradedAppearances": 21,
+        "averageMinutes": 87.0
+      },
+      "kicker": {
+        "averageGrade": 3.711,
+        "totalPoints": 73,
+        "appearances": 24
+      }
+    },
+    "pl-k00088192": {
+      "name": "Jonathan Burkardt",
+      "team": "Eintracht Frankfurt",
+      "sourceUrl": "https://www.ligainsider.de/jonathan-burkardt_19272/",
+      "ligaInsider": {
+        "averageGrade": 3.66,
+        "averagePoints": 41.25,
+        "totalPoints": 847,
+        "appearances": 22,
+        "gradedAppearances": 20,
+        "averageMinutes": 70.0
+      },
+      "kicker": {
+        "averageGrade": 3.395,
+        "totalPoints": 141,
+        "appearances": 22
+      }
+    },
+    "pl-k00141500": {
+      "name": "Jobe Bellingham",
+      "team": "Borussia Dortmund",
+      "sourceUrl": "https://www.ligainsider.de/jobe-bellingham_38153/",
+      "ligaInsider": {
+        "averageGrade": 3.67,
+        "averagePoints": 41.0,
+        "totalPoints": 1154,
+        "appearances": 32,
+        "gradedAppearances": 26,
+        "averageMinutes": 72.0
+      },
+      "kicker": {
+        "averageGrade": 3.409,
+        "totalPoints": 110,
+        "appearances": 32
+      }
+    },
+    "pl-k00096661": {
+      "name": "Jean-Luc Dompé",
+      "team": "Hamburger SV",
+      "sourceUrl": "https://www.ligainsider.de/jean-luc-dompe_12020/",
+      "ligaInsider": {
+        "averageGrade": 3.61,
+        "averagePoints": 40.95,
+        "totalPoints": 794,
+        "appearances": 20,
+        "gradedAppearances": 19,
+        "averageMinutes": 65.0
+      },
+      "kicker": {
+        "averageGrade": 3.821,
+        "totalPoints": 58,
+        "appearances": 20
+      }
+    },
+    "pl-k00090371": {
+      "name": "Philipp Sander",
+      "team": "Mönchengladbach",
+      "sourceUrl": "https://www.ligainsider.de/philipp-sander_18612/",
+      "ligaInsider": {
+        "averageGrade": 3.68,
+        "averagePoints": 40.93,
+        "totalPoints": 1228,
+        "appearances": 30,
+        "gradedAppearances": 30,
+        "averageMinutes": 86.0
+      },
+      "kicker": {
+        "averageGrade": 3.667,
+        "totalPoints": 112,
+        "appearances": 30
+      }
+    },
+    "pl-k00123300": {
+      "name": "Arnaud Kalimuendo",
+      "team": "Eintracht Frankfurt",
+      "sourceUrl": "https://www.ligainsider.de/arnaud-kalimuendo_23430/",
+      "ligaInsider": {
+        "averageGrade": 3.67,
+        "averagePoints": 40.89,
+        "totalPoints": 756,
+        "appearances": 19,
+        "gradedAppearances": 18,
+        "averageMinutes": 83.0
+      },
+      "kicker": {
+        "averageGrade": 3.694,
+        "totalPoints": 84,
+        "appearances": 19
+      }
+    },
+    "pl-k00096680": {
+      "name": "Rasmus Kristensen",
+      "team": "Eintracht Frankfurt",
+      "sourceUrl": "https://www.ligainsider.de/rasmus-kristensen_21692/",
+      "ligaInsider": {
+        "averageGrade": 3.68,
+        "averagePoints": 40.84,
+        "totalPoints": 833,
+        "appearances": 22,
+        "gradedAppearances": 19,
+        "averageMinutes": 84.0
+      },
+      "kicker": {
+        "averageGrade": 3.658,
+        "totalPoints": 77,
+        "appearances": 22
+      }
+    },
+    "pl-k00073206": {
+      "name": "Marcel Sabitzer",
+      "team": "Borussia Dortmund",
+      "sourceUrl": "https://www.ligainsider.de/marcel-sabitzer_2020/",
+      "ligaInsider": {
+        "averageGrade": 3.72,
+        "averagePoints": 40.84,
+        "totalPoints": 1037,
+        "appearances": 26,
+        "gradedAppearances": 25,
+        "averageMinutes": 77.0
+      },
+      "kicker": {
+        "averageGrade": 3.333,
+        "totalPoints": 121,
+        "appearances": 26
+      }
+    },
+    "pl-k00105841": {
+      "name": "Karim Adeyemi",
+      "team": "Borussia Dortmund",
+      "sourceUrl": "https://www.ligainsider.de/karim-adeyemi_23718/",
+      "ligaInsider": {
+        "averageGrade": 3.66,
+        "averagePoints": 40.83,
+        "totalPoints": 1016,
+        "appearances": 28,
+        "gradedAppearances": 23,
+        "averageMinutes": 54.0
+      },
+      "kicker": {
+        "averageGrade": 3.312,
+        "totalPoints": 133,
+        "appearances": 28
+      }
+    },
+    "pl-k00101460": {
+      "name": "Keven Schlotterbeck",
+      "team": "FC Augsburg",
+      "sourceUrl": "https://www.ligainsider.de/keven-schlotterbeck_19286/",
+      "ligaInsider": {
+        "averageGrade": 3.73,
+        "averagePoints": 40.79,
+        "totalPoints": 979,
+        "appearances": 24,
+        "gradedAppearances": 24,
+        "averageMinutes": 92.0
+      },
+      "kicker": {
+        "averageGrade": 3.652,
+        "totalPoints": 79,
+        "appearances": 24
+      }
+    },
+    "pl-k00141102": {
+      "name": "Nicolas Jackson",
+      "team": "FC Bayern München",
+      "sourceUrl": "https://www.ligainsider.de/nicolas-jackson_35952/",
+      "ligaInsider": {
+        "averageGrade": 3.78,
+        "averagePoints": 40.78,
+        "totalPoints": 835,
+        "appearances": 23,
+        "gradedAppearances": 18,
+        "averageMinutes": 58.0
+      },
+      "kicker": {
+        "averageGrade": 3.692,
+        "totalPoints": 82,
+        "appearances": 23
+      }
+    },
+    "pl-k00112134": {
+      "name": "Joakim Maehle",
+      "team": "VfL Wolfsburg",
+      "sourceUrl": "https://www.ligainsider.de/joakim-maehle_21782/",
+      "ligaInsider": {
+        "averageGrade": 3.68,
+        "averagePoints": 40.71,
+        "totalPoints": 616,
+        "appearances": 16,
+        "gradedAppearances": 14,
+        "averageMinutes": 93.0
+      },
+      "kicker": {
+        "averageGrade": 4.143,
+        "totalPoints": 33,
+        "appearances": 16
+      }
+    },
+    "pl-k00148187": {
+      "name": "Fares Chaibi",
+      "team": "Eintracht Frankfurt",
+      "sourceUrl": "https://www.ligainsider.de/fares-chaibi_35910/",
+      "ligaInsider": {
+        "averageGrade": 3.72,
+        "averagePoints": 40.7,
+        "totalPoints": 1112,
+        "appearances": 28,
+        "gradedAppearances": 27,
+        "averageMinutes": 71.0
+      },
+      "kicker": {
+        "averageGrade": 3.885,
+        "totalPoints": 87,
+        "appearances": 28
+      }
+    },
+    "pl-k00159629": {
+      "name": "Said El Mala",
+      "team": "1. FC Köln",
+      "sourceUrl": "https://www.ligainsider.de/said-el-mala_38546/",
+      "ligaInsider": {
+        "averageGrade": 3.68,
+        "averagePoints": 40.68,
+        "totalPoints": 1383,
+        "appearances": 34,
+        "gradedAppearances": 34,
+        "averageMinutes": 62.0
+      },
+      "kicker": {
+        "averageGrade": 3.13,
+        "totalPoints": 222,
+        "appearances": 34
+      }
+    },
+    "pl-k00141455": {
+      "name": "Finn Jeltsch",
+      "team": "VfB Stuttgart",
+      "sourceUrl": "https://www.ligainsider.de/finn-jeltsch_36816/",
+      "ligaInsider": {
+        "averageGrade": 3.67,
+        "averagePoints": 40.67,
+        "totalPoints": 887,
+        "appearances": 23,
+        "gradedAppearances": 21,
+        "averageMinutes": 77.0
+      },
+      "kicker": {
+        "averageGrade": 3.353,
+        "totalPoints": 95,
+        "appearances": 23
+      }
+    },
+    "pl-k00107843": {
+      "name": "Ramon Hendriks",
+      "team": "VfB Stuttgart",
+      "sourceUrl": "https://www.ligainsider.de/ramon-hendriks_23957/",
+      "ligaInsider": {
+        "averageGrade": 3.68,
+        "averagePoints": 40.5,
+        "totalPoints": 1136,
+        "appearances": 31,
+        "gradedAppearances": 26,
+        "averageMinutes": 82.0
+      },
+      "kicker": {
+        "averageGrade": 3.239,
+        "totalPoints": 139,
+        "appearances": 31
+      }
+    },
+    "pl-k00084940": {
+      "name": "Philipp Lienhart",
+      "team": "SC Freiburg",
+      "sourceUrl": "https://www.ligainsider.de/philipp-lienhart_13911/",
+      "ligaInsider": {
+        "averageGrade": 3.71,
+        "averagePoints": 40.32,
+        "totalPoints": 777,
+        "appearances": 20,
+        "gradedAppearances": 19,
+        "averageMinutes": 74.0
+      },
+      "kicker": {
+        "averageGrade": 3.294,
+        "totalPoints": 86,
+        "appearances": 20
+      }
+    },
+    "pl-k00116302": {
+      "name": "Nicolas Capaldo",
+      "team": "Hamburger SV",
+      "sourceUrl": "https://www.ligainsider.de/nicolas-capaldo_26628/",
+      "ligaInsider": {
+        "averageGrade": 3.71,
+        "averagePoints": 40.27,
+        "totalPoints": 1047,
+        "appearances": 26,
+        "gradedAppearances": 26,
+        "averageMinutes": 82.0
+      },
+      "kicker": {
+        "averageGrade": 3.348,
+        "totalPoints": 124,
+        "appearances": 26
+      }
+    },
+    "pl-k00109674": {
+      "name": "Malik Tillman",
+      "team": "Bayer 04 Leverkusen",
+      "sourceUrl": "https://www.ligainsider.de/malik-tillman_23862/",
+      "ligaInsider": {
+        "averageGrade": 3.77,
+        "averagePoints": 40.26,
+        "totalPoints": 1123,
+        "appearances": 29,
+        "gradedAppearances": 27,
+        "averageMinutes": 66.0
+      },
+      "kicker": {
+        "averageGrade": 3.87,
+        "totalPoints": 86,
+        "appearances": 29
+      }
+    },
+    "pl-k00103527": {
+      "name": "Danel Sinani",
+      "team": "FC St. Pauli",
+      "sourceUrl": "https://www.ligainsider.de/danel-sinani_22474/",
+      "ligaInsider": {
+        "averageGrade": 3.7,
+        "averagePoints": 40.19,
+        "totalPoints": 1136,
+        "appearances": 30,
+        "gradedAppearances": 27,
+        "averageMinutes": 81.0
+      },
+      "kicker": {
+        "averageGrade": 4.0,
+        "totalPoints": 83,
+        "appearances": 30
+      }
+    },
+    "pl-k00087823": {
+      "name": "Jae-Sung Lee",
+      "team": "1. FSV Mainz 05",
+      "sourceUrl": "https://www.ligainsider.de/jaesung-lee_21202/",
+      "ligaInsider": {
+        "averageGrade": 3.7,
+        "averagePoints": 40.14,
+        "totalPoints": 1124,
+        "appearances": 28,
+        "gradedAppearances": 28,
+        "averageMinutes": 81.0
+      },
+      "kicker": {
+        "averageGrade": 3.712,
+        "totalPoints": 109,
+        "appearances": 28
+      }
+    },
+    "pl-k00133786": {
+      "name": "Daniel Svensson",
+      "team": "Borussia Dortmund",
+      "sourceUrl": "https://www.ligainsider.de/daniel-svensson_38304/",
+      "ligaInsider": {
+        "averageGrade": 3.74,
+        "averagePoints": 40.06,
+        "totalPoints": 1322,
+        "appearances": 33,
+        "gradedAppearances": 33,
+        "averageMinutes": 80.0
+      },
+      "kicker": {
+        "averageGrade": 3.621,
+        "totalPoints": 122,
+        "appearances": 33
+      }
+    },
+    "pl-k00116437": {
+      "name": "Vinicius Souza",
+      "team": "VfL Wolfsburg",
+      "sourceUrl": "https://www.ligainsider.de/vini-souza_38589/",
+      "ligaInsider": {
+        "averageGrade": 3.75,
+        "averagePoints": 40.0,
+        "totalPoints": 918,
+        "appearances": 24,
+        "gradedAppearances": 22,
+        "averageMinutes": 85.0
+      },
+      "kicker": {
+        "averageGrade": 4.068,
+        "totalPoints": 42,
+        "appearances": 24
+      }
+    },
+    "pl-k00091126": {
+      "name": "Franck Honorat",
+      "team": "Mönchengladbach",
+      "sourceUrl": "https://www.ligainsider.de/franck-honorat_23248/",
+      "ligaInsider": {
+        "averageGrade": 3.71,
+        "averagePoints": 40.0,
+        "totalPoints": 1120,
+        "appearances": 28,
+        "gradedAppearances": 28,
+        "averageMinutes": 74.0
+      },
+      "kicker": {
+        "averageGrade": 3.865,
+        "totalPoints": 89,
+        "appearances": 28
+      }
+    },
+    "pl-k00080088": {
+      "name": "Grischa Prömel",
+      "team": "TSG Hoffenheim",
+      "sourceUrl": "https://www.ligainsider.de/grischa-proemel_5816/",
+      "ligaInsider": {
+        "averageGrade": 3.73,
+        "averagePoints": 39.9,
+        "totalPoints": 1276,
+        "appearances": 33,
+        "gradedAppearances": 31,
+        "averageMinutes": 62.0
+      },
+      "kicker": {
+        "averageGrade": 3.042,
+        "totalPoints": 182,
+        "appearances": 33
+      }
+    },
+    "pl-k00149094": {
+      "name": "Jean-Matteo Bahoya",
+      "team": "Eintracht Frankfurt",
+      "sourceUrl": "https://www.ligainsider.de/jean-matteo-bahoya_36932/",
+      "ligaInsider": {
+        "averageGrade": 3.74,
+        "averagePoints": 39.87,
+        "totalPoints": 987,
+        "appearances": 27,
+        "gradedAppearances": 23,
+        "averageMinutes": 60.0
+      },
+      "kicker": {
+        "averageGrade": 3.917,
+        "totalPoints": 74,
+        "appearances": 27
+      }
+    },
+    "pl-k00111937": {
+      "name": "Tim Lemperle",
+      "team": "TSG Hoffenheim",
+      "sourceUrl": "https://www.ligainsider.de/tim-lemperle_23854/",
+      "ligaInsider": {
+        "averageGrade": 3.71,
+        "averagePoints": 39.86,
+        "totalPoints": 1156,
+        "appearances": 29,
+        "gradedAppearances": 29,
+        "averageMinutes": 69.0
+      },
+      "kicker": {
+        "averageGrade": 3.231,
+        "totalPoints": 161,
+        "appearances": 29
+      }
+    },
+    "pl-k00106205": {
+      "name": "Yukinari Sugawara",
+      "team": "SV Werder Bremen",
+      "sourceUrl": "https://www.ligainsider.de/yukinari-sugawara_22234/",
+      "ligaInsider": {
+        "averageGrade": 3.71,
+        "averagePoints": 39.72,
+        "totalPoints": 1167,
+        "appearances": 31,
+        "gradedAppearances": 29,
+        "averageMinutes": 89.0
+      },
+      "kicker": {
+        "averageGrade": 3.767,
+        "totalPoints": 94,
+        "appearances": 31
+      }
+    },
+    "pl-k00098905": {
+      "name": "Miro Muheim",
+      "team": "Hamburger SV",
+      "sourceUrl": "https://www.ligainsider.de/miro-muheim_26094/",
+      "ligaInsider": {
+        "averageGrade": 3.76,
+        "averagePoints": 39.62,
+        "totalPoints": 1149,
+        "appearances": 29,
+        "gradedAppearances": 29,
+        "averageMinutes": 91.0
+      },
+      "kicker": {
+        "averageGrade": 3.931,
+        "totalPoints": 64,
+        "appearances": 29
+      }
+    },
+    "pl-k00099747": {
+      "name": "Ragnar Ache",
+      "team": "1. FC Köln",
+      "sourceUrl": "https://www.ligainsider.de/ragnar-ache_23720/",
+      "ligaInsider": {
+        "averageGrade": 3.78,
+        "averagePoints": 39.62,
+        "totalPoints": 1149,
+        "appearances": 29,
+        "gradedAppearances": 29,
+        "averageMinutes": 64.0
+      },
+      "kicker": {
+        "averageGrade": 3.217,
+        "totalPoints": 157,
+        "appearances": 29
+      }
+    },
+    "pl-k00075196": {
+      "name": "Jordan Torunarigha",
+      "team": "Hamburger SV",
+      "sourceUrl": "https://www.ligainsider.de/jordan-torunarigha_6513/",
+      "ligaInsider": {
+        "averageGrade": 3.75,
+        "averagePoints": 39.54,
+        "totalPoints": 949,
+        "appearances": 24,
+        "gradedAppearances": 24,
+        "averageMinutes": 88.0
+      },
+      "kicker": {
+        "averageGrade": 3.792,
+        "totalPoints": 65,
+        "appearances": 24
+      }
+    },
+    "pl-k00138666": {
+      "name": "Ernest Poku",
+      "team": "Bayer 04 Leverkusen",
+      "sourceUrl": "https://www.ligainsider.de/ernest-poku_37740/",
+      "ligaInsider": {
+        "averageGrade": 3.78,
+        "averagePoints": 39.33,
+        "totalPoints": 1098,
+        "appearances": 29,
+        "gradedAppearances": 27,
+        "averageMinutes": 57.0
+      },
+      "kicker": {
+        "averageGrade": 3.705,
+        "totalPoints": 102,
+        "appearances": 29
+      }
+    },
+    "pl-k00058938": {
+      "name": "Christopher Trimmel",
+      "team": "1. FC Union Berlin",
+      "sourceUrl": "https://www.ligainsider.de/christopher-trimmel_5713/",
+      "ligaInsider": {
+        "averageGrade": 3.72,
+        "averagePoints": 39.3,
+        "totalPoints": 1093,
+        "appearances": 29,
+        "gradedAppearances": 27,
+        "averageMinutes": 72.0
+      },
+      "kicker": {
+        "averageGrade": 3.442,
+        "totalPoints": 114,
+        "appearances": 29
+      }
+    },
+    "pl-k00137290": {
+      "name": "Aaron Zehnter",
+      "team": "VfL Wolfsburg",
+      "sourceUrl": "https://www.ligainsider.de/aaron-zehnter_26201/",
+      "ligaInsider": {
+        "averageGrade": 3.82,
+        "averagePoints": 39.24,
+        "totalPoints": 712,
+        "appearances": 20,
+        "gradedAppearances": 17,
+        "averageMinutes": 91.0
+      },
+      "kicker": {
+        "averageGrade": 3.853,
+        "totalPoints": 60,
+        "appearances": 20
+      }
+    },
+    "pl-k00075261": {
+      "name": "Haris Tabakovic",
+      "team": "Mönchengladbach",
+      "sourceUrl": "https://www.ligainsider.de/haris-tabakovic_36122/",
+      "ligaInsider": {
+        "averageGrade": 3.76,
+        "averagePoints": 39.19,
+        "totalPoints": 1254,
+        "appearances": 32,
+        "gradedAppearances": 32,
+        "averageMinutes": 78.0
+      },
+      "kicker": {
+        "averageGrade": 3.883,
+        "totalPoints": 127,
+        "appearances": 32
+      }
+    },
+    "pl-k00123688": {
+      "name": "Joel Chima Fujita",
+      "team": "FC St. Pauli",
+      "sourceUrl": "https://www.ligainsider.de/joel-chima-fujita_38450/",
+      "ligaInsider": {
+        "averageGrade": 3.77,
+        "averagePoints": 39.19,
+        "totalPoints": 1254,
+        "appearances": 32,
+        "gradedAppearances": 32,
+        "averageMinutes": 88.0
+      },
+      "kicker": {
+        "averageGrade": 3.694,
+        "totalPoints": 112,
+        "appearances": 32
+      }
+    },
+    "pl-k00105465": {
+      "name": "Cameron Puertas",
+      "team": "SV Werder Bremen",
+      "sourceUrl": "https://www.ligainsider.de/cameron-puertas_35366/",
+      "ligaInsider": {
+        "averageGrade": 3.79,
+        "averagePoints": 39.17,
+        "totalPoints": 1012,
+        "appearances": 28,
+        "gradedAppearances": 24,
+        "averageMinutes": 80.0
+      },
+      "kicker": {
+        "averageGrade": 3.913,
+        "totalPoints": 70,
+        "appearances": 28
+      }
+    },
+    "pl-k00054640": {
+      "name": "Danny da Costa",
+      "team": "1. FSV Mainz 05",
+      "sourceUrl": "https://www.ligainsider.de/danny-da-costa_650/",
+      "ligaInsider": {
+        "averageGrade": 3.76,
+        "averagePoints": 39.16,
+        "totalPoints": 1271,
+        "appearances": 34,
+        "gradedAppearances": 31,
+        "averageMinutes": 92.0
+      },
+      "kicker": {
+        "averageGrade": 3.597,
+        "totalPoints": 135,
+        "appearances": 34
+      }
+    },
+    "pl-k00125269": {
+      "name": "Patrick Wimmer",
+      "team": "VfL Wolfsburg",
+      "sourceUrl": "https://www.ligainsider.de/patrick-wimmer_26236/",
+      "ligaInsider": {
+        "averageGrade": 3.73,
+        "averagePoints": 39.04,
+        "totalPoints": 955,
+        "appearances": 25,
+        "gradedAppearances": 24,
+        "averageMinutes": 70.0
+      },
+      "kicker": {
+        "averageGrade": 3.609,
+        "totalPoints": 110,
+        "appearances": 25
+      }
+    },
+    "pl-k00124455": {
+      "name": "Konstantinos Koulierakis",
+      "team": "VfL Wolfsburg",
+      "sourceUrl": "https://www.ligainsider.de/konstantinos-koulierakis_35746/",
+      "ligaInsider": {
+        "averageGrade": 3.8,
+        "averagePoints": 38.86,
+        "totalPoints": 1107,
+        "appearances": 29,
+        "gradedAppearances": 28,
+        "averageMinutes": 96.0
+      },
+      "kicker": {
+        "averageGrade": 3.75,
+        "totalPoints": 109,
+        "appearances": 29
+      }
+    },
+    "pl-k00132198": {
+      "name": "Arijon Ibrahimovic",
+      "team": "1. FC Heidenheim",
+      "sourceUrl": "https://www.ligainsider.de/arijon-ibrahimovic_27354/",
+      "ligaInsider": {
+        "averageGrade": 3.76,
+        "averagePoints": 38.81,
+        "totalPoints": 1226,
+        "appearances": 32,
+        "gradedAppearances": 31,
+        "averageMinutes": 73.0
+      },
+      "kicker": {
+        "averageGrade": 3.733,
+        "totalPoints": 111,
+        "appearances": 32
+      }
+    },
+    "pl-k00115533": {
+      "name": "Igor Matanovic",
+      "team": "SC Freiburg",
+      "sourceUrl": "https://www.ligainsider.de/igor-matanovic_25780/",
+      "ligaInsider": {
+        "averageGrade": 3.8,
+        "averagePoints": 38.72,
+        "totalPoints": 1149,
+        "appearances": 31,
+        "gradedAppearances": 29,
+        "averageMinutes": 60.0
+      },
+      "kicker": {
+        "averageGrade": 3.354,
+        "totalPoints": 150,
+        "appearances": 31
+      }
+    },
+    "pl-k00099914": {
+      "name": "Josha Vagnoman",
+      "team": "VfB Stuttgart",
+      "sourceUrl": "https://www.ligainsider.de/josha-vagnoman_18427/",
+      "ligaInsider": {
+        "averageGrade": 3.8,
+        "averagePoints": 38.7,
+        "totalPoints": 890,
+        "appearances": 27,
+        "gradedAppearances": 20,
+        "averageMinutes": 81.0
+      },
+      "kicker": {
+        "averageGrade": 3.611,
+        "totalPoints": 95,
+        "appearances": 27
+      }
+    },
+    "pl-k00154546": {
+      "name": "Noahkai Banks",
+      "team": "FC Augsburg",
+      "sourceUrl": "https://www.ligainsider.de/noahkai-banks_37195/",
+      "ligaInsider": {
+        "averageGrade": 3.8,
+        "averagePoints": 38.64,
+        "totalPoints": 870,
+        "appearances": 23,
+        "gradedAppearances": 22,
+        "averageMinutes": 83.0
+      },
+      "kicker": {
+        "averageGrade": 3.614,
+        "totalPoints": 86,
+        "appearances": 23
+      }
+    },
+    "pl-k00174580": {
+      "name": "Christian Kofane",
+      "team": "Bayer 04 Leverkusen",
+      "sourceUrl": "https://www.ligainsider.de/christian-kofane_38550/",
+      "ligaInsider": {
+        "averageGrade": 3.8,
+        "averagePoints": 38.57,
+        "totalPoints": 970,
+        "appearances": 29,
+        "gradedAppearances": 23,
+        "averageMinutes": 57.0
+      },
+      "kicker": {
+        "averageGrade": 3.361,
+        "totalPoints": 117,
+        "appearances": 29
+      }
+    },
+    "pl-k00103978": {
+      "name": "James Sands",
+      "team": "FC St. Pauli",
+      "sourceUrl": "https://www.ligainsider.de/james-sands_23722/",
+      "ligaInsider": {
+        "averageGrade": 3.8,
+        "averagePoints": 38.57,
+        "totalPoints": 912,
+        "appearances": 24,
+        "gradedAppearances": 23,
+        "averageMinutes": 88.0
+      },
+      "kicker": {
+        "averageGrade": 3.826,
+        "totalPoints": 68,
+        "appearances": 24
+      }
+    },
+    "pl-k00084538": {
+      "name": "Manolis Saliakas",
+      "team": "FC St. Pauli",
+      "sourceUrl": "https://www.ligainsider.de/manolis-saliakas_16223/",
+      "ligaInsider": {
+        "averageGrade": 3.82,
+        "averagePoints": 38.41,
+        "totalPoints": 653,
+        "appearances": 17,
+        "gradedAppearances": 17,
+        "averageMinutes": 69.0
+      },
+      "kicker": {
+        "averageGrade": 3.9,
+        "totalPoints": 47,
+        "appearances": 17
+      }
+    },
+    "pl-k00096210": {
+      "name": "Eric Smith",
+      "team": "FC St. Pauli",
+      "sourceUrl": "https://www.ligainsider.de/eric-smith_23968/",
+      "ligaInsider": {
+        "averageGrade": 3.78,
+        "averagePoints": 38.26,
+        "totalPoints": 1033,
+        "appearances": 27,
+        "gradedAppearances": 27,
+        "averageMinutes": 92.0
+      },
+      "kicker": {
+        "averageGrade": 4.019,
+        "totalPoints": 58,
+        "appearances": 27
+      }
+    },
+    "pl-k00072759": {
+      "name": "Vincenzo Grifo",
+      "team": "SC Freiburg",
+      "sourceUrl": "https://www.ligainsider.de/vincenzo-grifo_2361/",
+      "ligaInsider": {
+        "averageGrade": 3.81,
+        "averagePoints": 38.25,
+        "totalPoints": 1239,
+        "appearances": 33,
+        "gradedAppearances": 32,
+        "averageMinutes": 57.0
+      },
+      "kicker": {
+        "averageGrade": 3.542,
+        "totalPoints": 148,
+        "appearances": 33
+      }
+    },
+    "pl-k00151054": {
+      "name": "Hugo Larsson",
+      "team": "Eintracht Frankfurt",
+      "sourceUrl": "https://www.ligainsider.de/hugo-larsson_35384/",
+      "ligaInsider": {
+        "averageGrade": 3.83,
+        "averagePoints": 38.04,
+        "totalPoints": 927,
+        "appearances": 25,
+        "gradedAppearances": 24,
+        "averageMinutes": 79.0
+      },
+      "kicker": {
+        "averageGrade": 4.021,
+        "totalPoints": 54,
+        "appearances": 25
+      }
+    },
+    "pl-k00086138": {
+      "name": "Niklas Beste",
+      "team": "SC Freiburg",
+      "sourceUrl": "https://www.ligainsider.de/niklas-beste_14520/",
+      "ligaInsider": {
+        "averageGrade": 3.81,
+        "averagePoints": 38.04,
+        "totalPoints": 1045,
+        "appearances": 28,
+        "gradedAppearances": 27,
+        "averageMinutes": 67.0
+      },
+      "kicker": {
+        "averageGrade": 3.413,
+        "totalPoints": 123,
+        "appearances": 28
+      }
+    },
+    "pl-k00123744": {
+      "name": "Ezequiel Fernandez",
+      "team": "Bayer 04 Leverkusen",
+      "sourceUrl": "https://www.ligainsider.de/equi-fernandez_38674/",
+      "ligaInsider": {
+        "averageGrade": 3.79,
+        "averagePoints": 38.0,
+        "totalPoints": 697,
+        "appearances": 20,
+        "gradedAppearances": 17,
+        "averageMinutes": 61.0
+      },
+      "kicker": {
+        "averageGrade": 3.656,
+        "totalPoints": 53,
+        "appearances": 20
+      }
+    },
+    "pl-k00081971": {
+      "name": "Jackson Irvine",
+      "team": "FC St. Pauli",
+      "sourceUrl": "https://www.ligainsider.de/jackson-irvine_27209/",
+      "ligaInsider": {
+        "averageGrade": 3.81,
+        "averagePoints": 37.95,
+        "totalPoints": 851,
+        "appearances": 24,
+        "gradedAppearances": 21,
+        "averageMinutes": 81.0
+      },
+      "kicker": {
+        "averageGrade": 3.947,
+        "totalPoints": 52,
+        "appearances": 24
+      }
+    },
+    "pl-k00139302": {
+      "name": "Mohammed Amoura",
+      "team": "VfL Wolfsburg",
+      "sourceUrl": "https://www.ligainsider.de/mohamed-amoura_36478/",
+      "ligaInsider": {
+        "averageGrade": 3.8,
+        "averagePoints": 37.82,
+        "totalPoints": 1089,
+        "appearances": 30,
+        "gradedAppearances": 28,
+        "averageMinutes": 72.0
+      },
+      "kicker": {
+        "averageGrade": 3.827,
+        "totalPoints": 106,
+        "appearances": 30
+      }
+    },
+    "pl-k00103305": {
+      "name": "Philipp Treu",
+      "team": "SC Freiburg",
+      "sourceUrl": "https://www.ligainsider.de/philipp-treu_20344/",
+      "ligaInsider": {
+        "averageGrade": 3.87,
+        "averagePoints": 37.67,
+        "totalPoints": 1035,
+        "appearances": 28,
+        "gradedAppearances": 27,
+        "averageMinutes": 86.0
+      },
+      "kicker": {
+        "averageGrade": 3.577,
+        "totalPoints": 105,
+        "appearances": 28
+      }
+    },
+    "pl-k00130593": {
+      "name": "Moritz Jenz",
+      "team": "VfL Wolfsburg",
+      "sourceUrl": "https://www.ligainsider.de/moritz-jenz_35266/",
+      "ligaInsider": {
+        "averageGrade": 3.88,
+        "averagePoints": 37.6,
+        "totalPoints": 771,
+        "appearances": 22,
+        "gradedAppearances": 20,
+        "averageMinutes": 97.0
+      },
+      "kicker": {
+        "averageGrade": 3.875,
+        "totalPoints": 56,
+        "appearances": 22
+      }
+    },
+    "pl-k00121834": {
+      "name": "Anton Kade",
+      "team": "FC Augsburg",
+      "sourceUrl": "https://www.ligainsider.de/anton-kade_26138/",
+      "ligaInsider": {
+        "averageGrade": 3.85,
+        "averagePoints": 37.59,
+        "totalPoints": 1038,
+        "appearances": 28,
+        "gradedAppearances": 27,
+        "averageMinutes": 68.0
+      },
+      "kicker": {
+        "averageGrade": 3.42,
+        "totalPoints": 138,
+        "appearances": 28
+      }
+    },
+    "pl-k00155136": {
+      "name": "Kaua Santos",
+      "team": "Eintracht Frankfurt",
+      "sourceUrl": "https://www.ligainsider.de/kaua-santos_36306/",
+      "ligaInsider": {
+        "averageGrade": 3.88,
+        "averagePoints": 37.54,
+        "totalPoints": 488,
+        "appearances": 13,
+        "gradedAppearances": 13,
+        "averageMinutes": 90.0
+      },
+      "kicker": {
+        "averageGrade": 4.0,
+        "totalPoints": 30,
+        "appearances": 13
+      }
+    },
+    "pl-k00175253": {
+      "name": "Tomoya Ando",
+      "team": "FC St. Pauli",
+      "sourceUrl": "https://www.ligainsider.de/tomoya-ando_38761/",
+      "ligaInsider": {
+        "averageGrade": 3.87,
+        "averagePoints": 37.53,
+        "totalPoints": 563,
+        "appearances": 15,
+        "gradedAppearances": 15,
+        "averageMinutes": 90.0
+      },
+      "kicker": {
+        "averageGrade": 3.7,
+        "totalPoints": 51,
+        "appearances": 15
+      }
+    },
+    "pl-k00136145": {
+      "name": "Arkadiusz Pyrka",
+      "team": "FC St. Pauli",
+      "sourceUrl": "https://www.ligainsider.de/arkadiusz-pyrka_38439/",
+      "ligaInsider": {
+        "averageGrade": 3.88,
+        "averagePoints": 37.5,
+        "totalPoints": 1142,
+        "appearances": 31,
+        "gradedAppearances": 30,
+        "averageMinutes": 91.0
+      },
+      "kicker": {
+        "averageGrade": 3.9,
+        "totalPoints": 76,
+        "appearances": 31
+      }
+    },
+    "pl-k00077817": {
+      "name": "Hauke Wahl",
+      "team": "FC St. Pauli",
+      "sourceUrl": "https://www.ligainsider.de/hauke-wahl_6372/",
+      "ligaInsider": {
+        "averageGrade": 3.87,
+        "averagePoints": 37.47,
+        "totalPoints": 1124,
+        "appearances": 30,
+        "gradedAppearances": 30,
+        "averageMinutes": 93.0
+      },
+      "kicker": {
+        "averageGrade": 3.7,
+        "totalPoints": 112,
+        "appearances": 30
+      }
+    },
+    "pl-k00110959": {
+      "name": "Yannik Engelhardt",
+      "team": "Mönchengladbach",
+      "sourceUrl": "https://www.ligainsider.de/yannik-engelhardt_20278/",
+      "ligaInsider": {
+        "averageGrade": 3.87,
+        "averagePoints": 37.43,
+        "totalPoints": 1138,
+        "appearances": 31,
+        "gradedAppearances": 30,
+        "averageMinutes": 88.0
+      },
+      "kicker": {
+        "averageGrade": 3.817,
+        "totalPoints": 99,
+        "appearances": 31
+      }
+    },
+    "pl-k00079713": {
+      "name": "Jonas Föhrenbach",
+      "team": "1. FC Heidenheim",
+      "sourceUrl": "https://www.ligainsider.de/jonas-foehrenbach_6462/",
+      "ligaInsider": {
+        "averageGrade": 3.87,
+        "averagePoints": 37.22,
+        "totalPoints": 1005,
+        "appearances": 27,
+        "gradedAppearances": 27,
+        "averageMinutes": 91.0
+      },
+      "kicker": {
+        "averageGrade": 3.667,
+        "totalPoints": 93,
+        "appearances": 27
+      }
+    },
+    "pl-k00146188": {
+      "name": "Sael Kumbedi",
+      "team": "VfL Wolfsburg",
+      "sourceUrl": "https://www.ligainsider.de/sael-kumbedi_37946/",
+      "ligaInsider": {
+        "averageGrade": 3.9,
+        "averagePoints": 37.21,
+        "totalPoints": 893,
+        "appearances": 24,
+        "gradedAppearances": 24,
+        "averageMinutes": 81.0
+      },
+      "kicker": {
+        "averageGrade": 3.881,
+        "totalPoints": 66,
+        "appearances": 24
+      }
+    },
+    "pl-k00076796": {
+      "name": "Robin Fellhauer",
+      "team": "FC Augsburg",
+      "sourceUrl": "https://www.ligainsider.de/robin-fellhauer_24864/",
+      "ligaInsider": {
+        "averageGrade": 3.88,
+        "averagePoints": 37.18,
+        "totalPoints": 1264,
+        "appearances": 34,
+        "gradedAppearances": 34,
+        "averageMinutes": 86.0
+      },
+      "kicker": {
+        "averageGrade": 3.838,
+        "totalPoints": 105,
+        "appearances": 34
+      }
+    },
+    "pl-k00150671": {
+      "name": "Andrej Ilic",
+      "team": "1. FC Union Berlin",
+      "sourceUrl": "https://www.ligainsider.de/andrej-ilic_37532/",
+      "ligaInsider": {
+        "averageGrade": 3.88,
+        "averagePoints": 37.12,
+        "totalPoints": 1188,
+        "appearances": 32,
+        "gradedAppearances": 32,
+        "averageMinutes": 77.0
+      },
+      "kicker": {
+        "averageGrade": 3.776,
+        "totalPoints": 120,
+        "appearances": 32
+      }
+    },
+    "pl-k00145381": {
+      "name": "Adam Daghim",
+      "team": "VfL Wolfsburg",
+      "sourceUrl": "https://www.ligainsider.de/adam-daghim_37622/",
+      "ligaInsider": {
+        "averageGrade": 3.89,
+        "averagePoints": 37.04,
+        "totalPoints": 945,
+        "appearances": 27,
+        "gradedAppearances": 24,
+        "averageMinutes": 61.0
+      },
+      "kicker": {
+        "averageGrade": 3.868,
+        "totalPoints": 62,
+        "appearances": 27
+      }
+    },
+    "pl-k00057241": {
+      "name": "Rani Khedira",
+      "team": "1. FC Union Berlin",
+      "sourceUrl": "https://www.ligainsider.de/rani-khedira_2122/",
+      "ligaInsider": {
+        "averageGrade": 3.89,
+        "averagePoints": 37.0,
+        "totalPoints": 1184,
+        "appearances": 32,
+        "gradedAppearances": 32,
+        "averageMinutes": 94.0
+      },
+      "kicker": {
+        "averageGrade": 3.484,
+        "totalPoints": 160,
+        "appearances": 32
+      }
+    },
+    "pl-k00125971": {
+      "name": "Rav van den Berg",
+      "team": "1. FC Köln",
+      "sourceUrl": "https://www.ligainsider.de/rav-van-den-berg_38630/",
+      "ligaInsider": {
+        "averageGrade": 3.88,
+        "averagePoints": 37.0,
+        "totalPoints": 496,
+        "appearances": 14,
+        "gradedAppearances": 13,
+        "averageMinutes": 92.0
+      },
+      "kicker": {
+        "averageGrade": 3.615,
+        "totalPoints": 42,
+        "appearances": 14
+      }
+    },
+    "pl-k00083988": {
+      "name": "Marius Bülter",
+      "team": "1. FC Köln",
+      "sourceUrl": "https://www.ligainsider.de/marius-buelter_19202/",
+      "ligaInsider": {
+        "averageGrade": 3.93,
+        "averagePoints": 36.93,
+        "totalPoints": 1098,
+        "appearances": 32,
+        "gradedAppearances": 28,
+        "averageMinutes": 61.0
+      },
+      "kicker": {
+        "averageGrade": 3.976,
+        "totalPoints": 91,
+        "appearances": 32
+      }
+    },
+    "pl-k00057245": {
+      "name": "Marnon Busch",
+      "team": "1. FC Heidenheim",
+      "sourceUrl": "https://www.ligainsider.de/marnon-busch_3599/",
+      "ligaInsider": {
+        "averageGrade": 3.89,
+        "averagePoints": 36.89,
+        "totalPoints": 1039,
+        "appearances": 29,
+        "gradedAppearances": 27,
+        "averageMinutes": 75.0
+      },
+      "kicker": {
+        "averageGrade": 3.875,
+        "totalPoints": 77,
+        "appearances": 29
+      }
+    },
+    "pl-k00147890": {
+      "name": "Robin Hranac",
+      "team": "TSG Hoffenheim",
+      "sourceUrl": "https://www.ligainsider.de/robin-hranac_37515/",
+      "ligaInsider": {
+        "averageGrade": 3.88,
+        "averagePoints": 36.79,
+        "totalPoints": 1067,
+        "appearances": 29,
+        "gradedAppearances": 29,
+        "averageMinutes": 84.0
+      },
+      "kicker": {
+        "averageGrade": 3.25,
+        "totalPoints": 141,
+        "appearances": 29
+      }
+    },
+    "pl-k00118061": {
+      "name": "Nnamdi Collins",
+      "team": "Eintracht Frankfurt",
+      "sourceUrl": "https://www.ligainsider.de/nnamdi-collins_24116/",
+      "ligaInsider": {
+        "averageGrade": 3.88,
+        "averagePoints": 36.65,
+        "totalPoints": 793,
+        "appearances": 23,
+        "gradedAppearances": 20,
+        "averageMinutes": 80.0
+      },
+      "kicker": {
+        "averageGrade": 4.026,
+        "totalPoints": 47,
+        "appearances": 23
+      }
+    },
+    "pl-k00112730": {
+      "name": "Jens Castrop",
+      "team": "Mönchengladbach",
+      "sourceUrl": "https://www.ligainsider.de/jens-castrop_24405/",
+      "ligaInsider": {
+        "averageGrade": 3.89,
+        "averagePoints": 36.61,
+        "totalPoints": 880,
+        "appearances": 26,
+        "gradedAppearances": 23,
+        "averageMinutes": 71.0
+      },
+      "kicker": {
+        "averageGrade": 3.714,
+        "totalPoints": 81,
+        "appearances": 26
+      }
+    },
+    "pl-k00060522": {
+      "name": "Stefan Bell",
+      "team": "1. FSV Mainz 05",
+      "sourceUrl": "https://www.ligainsider.de/stefan-bell_521/",
+      "ligaInsider": {
+        "averageGrade": 3.91,
+        "averagePoints": 36.56,
+        "totalPoints": 611,
+        "appearances": 18,
+        "gradedAppearances": 16,
+        "averageMinutes": 69.0
+      },
+      "kicker": {
+        "averageGrade": 3.688,
+        "totalPoints": 64,
+        "appearances": 18
+      }
+    },
+    "pl-k00126161": {
+      "name": "Yuito Suzuki",
+      "team": "SC Freiburg",
+      "sourceUrl": "https://www.ligainsider.de/yuito-suzuki_37105/",
+      "ligaInsider": {
+        "averageGrade": 3.88,
+        "averagePoints": 36.4,
+        "totalPoints": 910,
+        "appearances": 25,
+        "gradedAppearances": 25,
+        "averageMinutes": 70.0
+      },
+      "kicker": {
+        "averageGrade": 3.478,
+        "totalPoints": 113,
+        "appearances": 25
+      }
+    },
+    "pl-k00076421": {
+      "name": "Phillipp Mwene",
+      "team": "1. FSV Mainz 05",
+      "sourceUrl": "https://www.ligainsider.de/phillipp-mwene_2723/",
+      "ligaInsider": {
+        "averageGrade": 3.89,
+        "averagePoints": 36.22,
+        "totalPoints": 1016,
+        "appearances": 29,
+        "gradedAppearances": 27,
+        "averageMinutes": 81.0
+      },
+      "kicker": {
+        "averageGrade": 3.673,
+        "totalPoints": 107,
+        "appearances": 29
+      }
+    },
+    "pl-k00131777": {
+      "name": "Lorenz Assignon",
+      "team": "VfB Stuttgart",
+      "sourceUrl": "https://www.ligainsider.de/lorenz-assignon_25114/",
+      "ligaInsider": {
+        "averageGrade": 3.91,
+        "averagePoints": 36.18,
+        "totalPoints": 711,
+        "appearances": 24,
+        "gradedAppearances": 17,
+        "averageMinutes": 66.0
+      },
+      "kicker": {
+        "averageGrade": 3.429,
+        "totalPoints": 70,
+        "appearances": 24
+      }
+    },
+    "pl-k00113079": {
+      "name": "Han-Noah Massengo",
+      "team": "FC Augsburg",
+      "sourceUrl": "https://www.ligainsider.de/han-noah-massengo_35978/",
+      "ligaInsider": {
+        "averageGrade": 3.94,
+        "averagePoints": 35.97,
+        "totalPoints": 1167,
+        "appearances": 33,
+        "gradedAppearances": 32,
+        "averageMinutes": 79.0
+      },
+      "kicker": {
+        "averageGrade": 3.594,
+        "totalPoints": 125,
+        "appearances": 33
+      }
+    },
+    "pl-k00068029": {
+      "name": "Jonas Hofmann",
+      "team": "Bayer 04 Leverkusen",
+      "sourceUrl": "https://www.ligainsider.de/jonas-hofmann_2362/",
+      "ligaInsider": {
+        "averageGrade": 3.95,
+        "averagePoints": 35.95,
+        "totalPoints": 760,
+        "appearances": 23,
+        "gradedAppearances": 20,
+        "averageMinutes": 53.0
+      },
+      "kicker": {
+        "averageGrade": 3.679,
+        "totalPoints": 72,
+        "appearances": 23
+      }
+    },
+    "pl-k00068667": {
+      "name": "Karol Mets",
+      "team": "FC St. Pauli",
+      "sourceUrl": "https://www.ligainsider.de/karol-mets_7968/",
+      "ligaInsider": {
+        "averageGrade": 3.96,
+        "averagePoints": 35.78,
+        "totalPoints": 823,
+        "appearances": 23,
+        "gradedAppearances": 23,
+        "averageMinutes": 89.0
+      },
+      "kicker": {
+        "averageGrade": 3.909,
+        "totalPoints": 59,
+        "appearances": 23
+      }
+    },
+    "pl-k00070997": {
+      "name": "Robert Andrich",
+      "team": "Bayer 04 Leverkusen",
+      "sourceUrl": "https://www.ligainsider.de/robert-andrich_2590/",
+      "ligaInsider": {
+        "averageGrade": 3.92,
+        "averagePoints": 35.77,
+        "totalPoints": 1124,
+        "appearances": 32,
+        "gradedAppearances": 31,
+        "averageMinutes": 87.0
+      },
+      "kicker": {
+        "averageGrade": 3.879,
+        "totalPoints": 86,
+        "appearances": 32
+      }
+    },
+    "pl-k00071294": {
+      "name": "Dominik Kohr",
+      "team": "1. FSV Mainz 05",
+      "sourceUrl": "https://www.ligainsider.de/dominik-kohr_1821/",
+      "ligaInsider": {
+        "averageGrade": 3.9,
+        "averagePoints": 35.62,
+        "totalPoints": 1033,
+        "appearances": 29,
+        "gradedAppearances": 29,
+        "averageMinutes": 86.0
+      },
+      "kicker": {
+        "averageGrade": 3.75,
+        "totalPoints": 87,
+        "appearances": 29
+      }
+    },
+    "pl-k00132190": {
+      "name": "Dzenan Pejcinovic",
+      "team": "VfL Wolfsburg",
+      "sourceUrl": "https://www.ligainsider.de/dzenan-pejcinovic_26158/",
+      "ligaInsider": {
+        "averageGrade": 3.93,
+        "averagePoints": 35.5,
+        "totalPoints": 926,
+        "appearances": 30,
+        "gradedAppearances": 22,
+        "averageMinutes": 69.0
+      },
+      "kicker": {
+        "averageGrade": 3.765,
+        "totalPoints": 101,
+        "appearances": 30
+      }
+    },
+    "pl-k00116616": {
+      "name": "Tiago Tomas",
+      "team": "VfB Stuttgart",
+      "sourceUrl": "https://www.ligainsider.de/tiago-tomas_24512/",
+      "ligaInsider": {
+        "averageGrade": 3.96,
+        "averagePoints": 35.48,
+        "totalPoints": 917,
+        "appearances": 27,
+        "gradedAppearances": 25,
+        "averageMinutes": 45.0
+      },
+      "kicker": {
+        "averageGrade": 3.5,
+        "totalPoints": 95,
+        "appearances": 27
+      }
+    },
+    "pl-k00067514": {
+      "name": "Kevin Stöger",
+      "team": "Mönchengladbach",
+      "sourceUrl": "https://www.ligainsider.de/kevin-stoeger_692/",
+      "ligaInsider": {
+        "averageGrade": 3.98,
+        "averagePoints": 35.13,
+        "totalPoints": 924,
+        "appearances": 29,
+        "gradedAppearances": 23,
+        "averageMinutes": 59.0
+      },
+      "kicker": {
+        "averageGrade": 3.944,
+        "totalPoints": 65,
+        "appearances": 29
+      }
+    },
+    "pl-k00071930": {
+      "name": "Yannick Gerhardt",
+      "team": "VfL Wolfsburg",
+      "sourceUrl": "https://www.ligainsider.de/yannick-gerhardt_3942/",
+      "ligaInsider": {
+        "averageGrade": 3.97,
+        "averagePoints": 35.12,
+        "totalPoints": 591,
+        "appearances": 19,
+        "gradedAppearances": 16,
+        "averageMinutes": 71.0
+      },
+      "kicker": {
+        "averageGrade": 4.115,
+        "totalPoints": 36,
+        "appearances": 19
+      }
+    },
+    "pl-k00144843": {
+      "name": "Arthur",
+      "team": "Bayer 04 Leverkusen",
+      "sourceUrl": "https://www.ligainsider.de/arthur_35904/",
+      "ligaInsider": {
+        "averageGrade": 3.92,
+        "averagePoints": 35.11,
+        "totalPoints": 685,
+        "appearances": 20,
+        "gradedAppearances": 19,
+        "averageMinutes": 63.0
+      },
+      "kicker": {
+        "averageGrade": 3.735,
+        "totalPoints": 61,
+        "appearances": 20
+      }
+    },
+    "pl-k00095063": {
+      "name": "Kristijan Jakic",
+      "team": "FC Augsburg",
+      "sourceUrl": "https://www.ligainsider.de/kristijan-jakic_24599/",
+      "ligaInsider": {
+        "averageGrade": 3.96,
+        "averagePoints": 35.04,
+        "totalPoints": 911,
+        "appearances": 26,
+        "gradedAppearances": 26,
+        "averageMinutes": 69.0
+      },
+      "kicker": {
+        "averageGrade": 3.854,
+        "totalPoints": 66,
+        "appearances": 26
+      }
+    },
+    "pl-k00128262": {
+      "name": "Marco Grüll",
+      "team": "SV Werder Bremen",
+      "sourceUrl": "https://www.ligainsider.de/marco-gruell_26702/",
+      "ligaInsider": {
+        "averageGrade": 3.98,
+        "averagePoints": 34.94,
+        "totalPoints": 1130,
+        "appearances": 33,
+        "gradedAppearances": 31,
+        "averageMinutes": 68.0
+      },
+      "kicker": {
+        "averageGrade": 4.214,
+        "totalPoints": 43,
+        "appearances": 33
+      }
+    },
+    "pl-k00112064": {
+      "name": "Adam Dzwigala",
+      "team": "FC St. Pauli",
+      "sourceUrl": "https://www.ligainsider.de/adam-dzwigala_25807/",
+      "ligaInsider": {
+        "averageGrade": 3.97,
+        "averagePoints": 34.89,
+        "totalPoints": 663,
+        "appearances": 19,
+        "gradedAppearances": 19,
+        "averageMinutes": 72.0
+      },
+      "kicker": {
+        "averageGrade": 3.853,
+        "totalPoints": 49,
+        "appearances": 19
+      }
+    },
+    "pl-k00130392": {
+      "name": "Cenk Özkacar",
+      "team": "1. FC Köln",
+      "sourceUrl": "https://www.ligainsider.de/cenk-oezkacar_24623/",
+      "ligaInsider": {
+        "averageGrade": 3.96,
+        "averagePoints": 34.88,
+        "totalPoints": 847,
+        "appearances": 25,
+        "gradedAppearances": 24,
+        "averageMinutes": 80.0
+      },
+      "kicker": {
+        "averageGrade": 3.591,
+        "totalPoints": 84,
+        "appearances": 25
+      }
+    },
+    "pl-k00072706": {
+      "name": "Christian Günter",
+      "team": "SC Freiburg",
+      "sourceUrl": "https://www.ligainsider.de/christian-guenter_2153/",
+      "ligaInsider": {
+        "averageGrade": 4.0,
+        "averagePoints": 34.64,
+        "totalPoints": 803,
+        "appearances": 24,
+        "gradedAppearances": 22,
+        "averageMinutes": 74.0
+      },
+      "kicker": {
+        "averageGrade": 3.684,
+        "totalPoints": 76,
+        "appearances": 24
+      }
+    },
+    "pl-k00095291": {
+      "name": "Lovro Majer",
+      "team": "VfL Wolfsburg",
+      "sourceUrl": "https://www.ligainsider.de/lovro-majer_22120/",
+      "ligaInsider": {
+        "averageGrade": 4.0,
+        "averagePoints": 34.56,
+        "totalPoints": 913,
+        "appearances": 28,
+        "gradedAppearances": 25,
+        "averageMinutes": 58.0
+      },
+      "kicker": {
+        "averageGrade": 4.0,
+        "totalPoints": 62,
+        "appearances": 28
+      }
+    },
+    "pl-k00095745": {
+      "name": "Derrick Köhn",
+      "team": "1. FC Union Berlin",
+      "sourceUrl": "https://www.ligainsider.de/derrick-koehn_14385/",
+      "ligaInsider": {
+        "averageGrade": 4.02,
+        "averagePoints": 34.52,
+        "totalPoints": 965,
+        "appearances": 29,
+        "gradedAppearances": 27,
+        "averageMinutes": 74.0
+      },
+      "kicker": {
+        "averageGrade": 3.5,
+        "totalPoints": 106,
+        "appearances": 29
+      }
+    },
+    "pl-k00139273": {
+      "name": "Mert Kömür",
+      "team": "FC Augsburg",
+      "sourceUrl": "https://www.ligainsider.de/mert-koemuer_27169/",
+      "ligaInsider": {
+        "averageGrade": 4.0,
+        "averagePoints": 34.5,
+        "totalPoints": 891,
+        "appearances": 28,
+        "gradedAppearances": 24,
+        "averageMinutes": 65.0
+      },
+      "kicker": {
+        "averageGrade": 3.725,
+        "totalPoints": 93,
+        "appearances": 28
+      }
+    },
+    "pl-k00075379": {
+      "name": "Silvan Widmer",
+      "team": "1. FSV Mainz 05",
+      "sourceUrl": "https://www.ligainsider.de/silvan-widmer_1938/",
+      "ligaInsider": {
+        "averageGrade": 4.0,
+        "averagePoints": 34.46,
+        "totalPoints": 920,
+        "appearances": 27,
+        "gradedAppearances": 26,
+        "averageMinutes": 73.0
+      },
+      "kicker": {
+        "averageGrade": 3.771,
+        "totalPoints": 84,
+        "appearances": 27
+      }
+    },
+    "pl-k00123098": {
+      "name": "Samuel Mbangula",
+      "team": "SV Werder Bremen",
+      "sourceUrl": "https://www.ligainsider.de/samuel-mbangula_38551/",
+      "ligaInsider": {
+        "averageGrade": 4.0,
+        "averagePoints": 34.41,
+        "totalPoints": 831,
+        "appearances": 26,
+        "gradedAppearances": 22,
+        "averageMinutes": 56.0
+      },
+      "kicker": {
+        "averageGrade": 4.111,
+        "totalPoints": 52,
+        "appearances": 26
+      }
+    },
+    "pl-k00113185": {
+      "name": "Joe Scally",
+      "team": "Mönchengladbach",
+      "sourceUrl": "https://www.ligainsider.de/joe-scally_23700/",
+      "ligaInsider": {
+        "averageGrade": 3.98,
+        "averagePoints": 34.39,
+        "totalPoints": 1084,
+        "appearances": 32,
+        "gradedAppearances": 31,
+        "averageMinutes": 89.0
+      },
+      "kicker": {
+        "averageGrade": 3.917,
+        "totalPoints": 88,
+        "appearances": 32
+      }
+    },
+    "pl-k00116762": {
+      "name": "Isak Bergmann Johannesson",
+      "team": "1. FC Köln",
+      "sourceUrl": "https://www.ligainsider.de/isak-johannesson_35249/",
+      "ligaInsider": {
+        "averageGrade": 4.04,
+        "averagePoints": 34.29,
+        "totalPoints": 1009,
+        "appearances": 31,
+        "gradedAppearances": 28,
+        "averageMinutes": 68.0
+      },
+      "kicker": {
+        "averageGrade": 3.674,
+        "totalPoints": 103,
+        "appearances": 31
+      }
+    },
+    "pl-k00075624": {
+      "name": "Niklas Dorsch",
+      "team": "1. FC Heidenheim",
+      "sourceUrl": "https://www.ligainsider.de/niklas-dorsch_6811/",
+      "ligaInsider": {
+        "averageGrade": 3.97,
+        "averagePoints": 34.19,
+        "totalPoints": 1084,
+        "appearances": 32,
+        "gradedAppearances": 31,
+        "averageMinutes": 76.0
+      },
+      "kicker": {
+        "averageGrade": 3.5,
+        "totalPoints": 123,
+        "appearances": 32
+      }
+    },
+    "pl-k00086142": {
+      "name": "Linton Maina",
+      "team": "1. FC Köln",
+      "sourceUrl": "https://www.ligainsider.de/linton-maina_18217/",
+      "ligaInsider": {
+        "averageGrade": 3.98,
+        "averagePoints": 34.18,
+        "totalPoints": 786,
+        "appearances": 24,
+        "gradedAppearances": 22,
+        "averageMinutes": 51.0
+      },
+      "kicker": {
+        "averageGrade": 3.833,
+        "totalPoints": 58,
+        "appearances": 24
+      }
+    },
+    "pl-k00107684": {
+      "name": "Luca Netz",
+      "team": "Mönchengladbach",
+      "sourceUrl": "https://www.ligainsider.de/luca-netz_24118/",
+      "ligaInsider": {
+        "averageGrade": 4.04,
+        "averagePoints": 33.85,
+        "totalPoints": 467,
+        "appearances": 15,
+        "gradedAppearances": 13,
+        "averageMinutes": 77.0
+      },
+      "kicker": {
+        "averageGrade": 3.958,
+        "totalPoints": 34,
+        "appearances": 15
+      }
+    },
+    "pl-k00094305": {
+      "name": "Tim Siersleben",
+      "team": "1. FC Heidenheim",
+      "sourceUrl": "https://www.ligainsider.de/tim-siersleben_20684/",
+      "ligaInsider": {
+        "averageGrade": 4.08,
+        "averagePoints": 33.54,
+        "totalPoints": 479,
+        "appearances": 15,
+        "gradedAppearances": 13,
+        "averageMinutes": 87.0
+      },
+      "kicker": {
+        "averageGrade": 3.808,
+        "totalPoints": 38,
+        "appearances": 15
+      }
+    },
+    "pl-k00149407": {
+      "name": "Bruno Ogbus",
+      "team": "SC Freiburg",
+      "sourceUrl": "https://www.ligainsider.de/bruno-ogbus_37207/",
+      "ligaInsider": {
+        "averageGrade": 4.03,
+        "averagePoints": 33.38,
+        "totalPoints": 570,
+        "appearances": 18,
+        "gradedAppearances": 16,
+        "averageMinutes": 78.0
+      },
+      "kicker": {
+        "averageGrade": 3.667,
+        "totalPoints": 54,
+        "appearances": 18
+      }
+    },
+    "pl-k00119596": {
+      "name": "Louis Oppie",
+      "team": "FC St. Pauli",
+      "sourceUrl": "https://www.ligainsider.de/louis-oppie_36107/",
+      "ligaInsider": {
+        "averageGrade": 4.05,
+        "averagePoints": 33.36,
+        "totalPoints": 745,
+        "appearances": 23,
+        "gradedAppearances": 22,
+        "averageMinutes": 79.0
+      },
+      "kicker": {
+        "averageGrade": 4.056,
+        "totalPoints": 45,
+        "appearances": 23
+      }
+    },
+    "pl-k00100606": {
+      "name": "Jan Thielmann",
+      "team": "1. FC Köln",
+      "sourceUrl": "https://www.ligainsider.de/jan-thielmann_21998/",
+      "ligaInsider": {
+        "averageGrade": 4.04,
+        "averagePoints": 33.33,
+        "totalPoints": 828,
+        "appearances": 26,
+        "gradedAppearances": 24,
+        "averageMinutes": 66.0
+      },
+      "kicker": {
+        "averageGrade": 3.762,
+        "totalPoints": 86,
+        "appearances": 26
+      }
+    },
+    "pl-k00086106": {
+      "name": "Phillip Tietz",
+      "team": "1. FSV Mainz 05",
+      "sourceUrl": "https://www.ligainsider.de/phillip-tietz_7480/",
+      "ligaInsider": {
+        "averageGrade": 4.04,
+        "averagePoints": 33.33,
+        "totalPoints": 945,
+        "appearances": 29,
+        "gradedAppearances": 27,
+        "averageMinutes": 71.0
+      },
+      "kicker": {
+        "averageGrade": 3.659,
+        "totalPoints": 117,
+        "appearances": 29
+      }
+    },
+    "pl-k00119817": {
+      "name": "Mathias Pereira Lage",
+      "team": "FC St. Pauli",
+      "sourceUrl": "https://www.ligainsider.de/mathias-pereira-lage_37699/",
+      "ligaInsider": {
+        "averageGrade": 4.11,
+        "averagePoints": 33.25,
+        "totalPoints": 931,
+        "appearances": 28,
+        "gradedAppearances": 28,
+        "averageMinutes": 75.0
+      },
+      "kicker": {
+        "averageGrade": 4.352,
+        "totalPoints": 24,
+        "appearances": 28
+      }
+    },
+    "pl-k00114616": {
+      "name": "Andras Schäfer",
+      "team": "1. FC Union Berlin",
+      "sourceUrl": "https://www.ligainsider.de/andras-schaefer_27369/",
+      "ligaInsider": {
+        "averageGrade": 4.09,
+        "averagePoints": 33.25,
+        "totalPoints": 866,
+        "appearances": 28,
+        "gradedAppearances": 24,
+        "averageMinutes": 62.0
+      },
+      "kicker": {
+        "averageGrade": 3.675,
+        "totalPoints": 78,
+        "appearances": 28
+      }
+    },
+    "pl-k00104010": {
+      "name": "Julian Niehues",
+      "team": "1. FC Heidenheim",
+      "sourceUrl": "https://www.ligainsider.de/julian-niehues_20324/",
+      "ligaInsider": {
+        "averageGrade": 4.02,
+        "averagePoints": 33.24,
+        "totalPoints": 748,
+        "appearances": 24,
+        "gradedAppearances": 21,
+        "averageMinutes": 67.0
+      },
+      "kicker": {
+        "averageGrade": 3.6,
+        "totalPoints": 86,
+        "appearances": 24
+      }
+    },
+    "pl-k00109417": {
+      "name": "Jan Schöppner",
+      "team": "1. FC Heidenheim",
+      "sourceUrl": "https://www.ligainsider.de/jan-schoeppner_21310/",
+      "ligaInsider": {
+        "averageGrade": 4.08,
+        "averagePoints": 33.03,
+        "totalPoints": 1024,
+        "appearances": 31,
+        "gradedAppearances": 31,
+        "averageMinutes": 76.0
+      },
+      "kicker": {
+        "averageGrade": 3.983,
+        "totalPoints": 87,
+        "appearances": 31
+      }
+    },
+    "pl-k00141233": {
+      "name": "Kristoffer Lund",
+      "team": "1. FC Köln",
+      "sourceUrl": "https://www.ligainsider.de/kristoffer-lund_25668/",
+      "ligaInsider": {
+        "averageGrade": 4.08,
+        "averagePoints": 32.94,
+        "totalPoints": 1070,
+        "appearances": 33,
+        "gradedAppearances": 32,
+        "averageMinutes": 75.0
+      },
+      "kicker": {
+        "averageGrade": 3.893,
+        "totalPoints": 78,
+        "appearances": 33
+      }
+    },
+    "pl-k00118312": {
+      "name": "Justin Njinmah",
+      "team": "SV Werder Bremen",
+      "sourceUrl": "https://www.ligainsider.de/justin-njinmah_27480/",
+      "ligaInsider": {
+        "averageGrade": 4.12,
+        "averagePoints": 32.67,
+        "totalPoints": 1046,
+        "appearances": 33,
+        "gradedAppearances": 30,
+        "averageMinutes": 68.0
+      },
+      "kicker": {
+        "averageGrade": 4.204,
+        "totalPoints": 51,
+        "appearances": 33
+      }
+    },
+    "pl-k00109512": {
+      "name": "Marvin Pieringer",
+      "team": "1. FC Heidenheim",
+      "sourceUrl": "https://www.ligainsider.de/marvin-pieringer_20424/",
+      "ligaInsider": {
+        "averageGrade": 4.12,
+        "averagePoints": 32.52,
+        "totalPoints": 862,
+        "appearances": 27,
+        "gradedAppearances": 25,
+        "averageMinutes": 68.0
+      },
+      "kicker": {
+        "averageGrade": 4.174,
+        "totalPoints": 53,
+        "appearances": 27
+      }
+    },
+    "pl-k00093688": {
+      "name": "Cedric Zesiger",
+      "team": "FC Augsburg",
+      "sourceUrl": "https://www.ligainsider.de/cedric-zesiger_23382/",
+      "ligaInsider": {
+        "averageGrade": 4.14,
+        "averagePoints": 32.45,
+        "totalPoints": 809,
+        "appearances": 27,
+        "gradedAppearances": 22,
+        "averageMinutes": 86.0
+      },
+      "kicker": {
+        "averageGrade": 4.023,
+        "totalPoints": 50,
+        "appearances": 27
+      }
+    },
+    "pl-k00136435": {
+      "name": "Alexander Prass",
+      "team": "TSG Hoffenheim",
+      "sourceUrl": "https://www.ligainsider.de/alexander-prass_27057/",
+      "ligaInsider": {
+        "averageGrade": 4.11,
+        "averagePoints": 32.41,
+        "totalPoints": 970,
+        "appearances": 32,
+        "gradedAppearances": 27,
+        "averageMinutes": 52.0
+      },
+      "kicker": {
+        "averageGrade": 3.344,
+        "totalPoints": 123,
+        "appearances": 32
+      }
+    },
+    "pl-k00131913": {
+      "name": "Derry Scherhant",
+      "team": "SC Freiburg",
+      "sourceUrl": "https://www.ligainsider.de/derry-scherhant_27532/",
+      "ligaInsider": {
+        "averageGrade": 4.07,
+        "averagePoints": 32.26,
+        "totalPoints": 958,
+        "appearances": 31,
+        "gradedAppearances": 27,
+        "averageMinutes": 51.0
+      },
+      "kicker": {
+        "averageGrade": 3.5,
+        "totalPoints": 105,
+        "appearances": 31
+      }
+    },
+    "pl-k00093478": {
+      "name": "Oliver Burke",
+      "team": "1. FC Union Berlin",
+      "sourceUrl": "https://www.ligainsider.de/oliver-burke_11325/",
+      "ligaInsider": {
+        "averageGrade": 4.16,
+        "averagePoints": 32.15,
+        "totalPoints": 887,
+        "appearances": 29,
+        "gradedAppearances": 26,
+        "averageMinutes": 67.0
+      },
+      "kicker": {
+        "averageGrade": 4.023,
+        "totalPoints": 79,
+        "appearances": 29
+      }
+    },
+    "pl-k00118291": {
+      "name": "Ansgar Knauff",
+      "team": "Eintracht Frankfurt",
+      "sourceUrl": "https://www.ligainsider.de/ansgar-knauff_24398/",
+      "ligaInsider": {
+        "averageGrade": 4.17,
+        "averagePoints": 32.0,
+        "totalPoints": 878,
+        "appearances": 28,
+        "gradedAppearances": 26,
+        "averageMinutes": 54.0
+      },
+      "kicker": {
+        "averageGrade": 3.974,
+        "totalPoints": 64,
+        "appearances": 28
+      }
+    },
+    "pl-k00138020": {
+      "name": "Aljoscha Kemlein",
+      "team": "1. FC Union Berlin",
+      "sourceUrl": "https://www.ligainsider.de/aljoscha-kemlein_27560/",
+      "ligaInsider": {
+        "averageGrade": 4.1,
+        "averagePoints": 31.9,
+        "totalPoints": 945,
+        "appearances": 30,
+        "gradedAppearances": 29,
+        "averageMinutes": 71.0
+      },
+      "kicker": {
+        "averageGrade": 3.731,
+        "totalPoints": 86,
+        "appearances": 30
+      }
+    },
+    "pl-k00103374": {
+      "name": "Patrick Osterhage",
+      "team": "SC Freiburg",
+      "sourceUrl": "https://www.ligainsider.de/patrick-osterhage_20826/",
+      "ligaInsider": {
+        "averageGrade": 4.17,
+        "averagePoints": 31.84,
+        "totalPoints": 622,
+        "appearances": 20,
+        "gradedAppearances": 19,
+        "averageMinutes": 67.0
+      },
+      "kicker": {
+        "averageGrade": 3.933,
+        "totalPoints": 44,
+        "appearances": 20
+      }
+    },
+    "pl-k00135219": {
+      "name": "William Mikelbrencis",
+      "team": "Hamburger SV",
+      "sourceUrl": "https://www.ligainsider.de/william-mikelbrencis_35667/",
+      "ligaInsider": {
+        "averageGrade": 4.13,
+        "averagePoints": 31.79,
+        "totalPoints": 729,
+        "appearances": 26,
+        "gradedAppearances": 19,
+        "averageMinutes": 74.0
+      },
+      "kicker": {
+        "averageGrade": 4.412,
+        "totalPoints": 28,
+        "appearances": 26
+      }
+    },
+    "pl-k00146323": {
+      "name": "Oscar Höjlund",
+      "team": "Eintracht Frankfurt",
+      "sourceUrl": "https://www.ligainsider.de/oscar-hoejlund_37210/",
+      "ligaInsider": {
+        "averageGrade": 4.17,
+        "averagePoints": 31.78,
+        "totalPoints": 648,
+        "appearances": 24,
+        "gradedAppearances": 18,
+        "averageMinutes": 61.0
+      },
+      "kicker": {
+        "averageGrade": 3.912,
+        "totalPoints": 52,
+        "appearances": 24
+      }
+    },
+    "pl-k00097392": {
+      "name": "Budu Zivzivadze",
+      "team": "1. FC Heidenheim",
+      "sourceUrl": "https://www.ligainsider.de/budu-zivzivadze_35934/",
+      "ligaInsider": {
+        "averageGrade": 4.13,
+        "averagePoints": 31.21,
+        "totalPoints": 605,
+        "appearances": 20,
+        "gradedAppearances": 19,
+        "averageMinutes": 63.0
+      },
+      "kicker": {
+        "averageGrade": 4.056,
+        "totalPoints": 43,
+        "appearances": 20
+      }
+    },
+    "pl-k00136677": {
+      "name": "Jordy Makengo",
+      "team": "SC Freiburg",
+      "sourceUrl": "https://www.ligainsider.de/jordy-makengo_26088/",
+      "ligaInsider": {
+        "averageGrade": 4.12,
+        "averagePoints": 31.18,
+        "totalPoints": 588,
+        "appearances": 20,
+        "gradedAppearances": 17,
+        "averageMinutes": 74.0
+      },
+      "kicker": {
+        "averageGrade": 3.933,
+        "totalPoints": 40,
+        "appearances": 20
+      }
+    },
+    "pl-k00148193": {
+      "name": "Sebastian Sebulonsen",
+      "team": "1. FC Köln",
+      "sourceUrl": "https://www.ligainsider.de/sebastian-sebulonsen_38632/",
+      "ligaInsider": {
+        "averageGrade": 4.18,
+        "averagePoints": 31.1,
+        "totalPoints": 964,
+        "appearances": 31,
+        "gradedAppearances": 31,
+        "averageMinutes": 86.0
+      },
+      "kicker": {
+        "averageGrade": 3.65,
+        "totalPoints": 100,
+        "appearances": 31
+      }
+    },
+    "pl-k00090133": {
+      "name": "Omar Haktab Traoré",
+      "team": "1. FC Heidenheim",
+      "sourceUrl": "https://www.ligainsider.de/omar-traore_35989/",
+      "ligaInsider": {
+        "averageGrade": 4.21,
+        "averagePoints": 31.09,
+        "totalPoints": 738,
+        "appearances": 26,
+        "gradedAppearances": 22,
+        "averageMinutes": 71.0
+      },
+      "kicker": {
+        "averageGrade": 3.762,
+        "totalPoints": 66,
+        "appearances": 26
+      }
+    },
+    "pl-k00079935": {
+      "name": "Lucas Höler",
+      "team": "SC Freiburg",
+      "sourceUrl": "https://www.ligainsider.de/lucas-hoeler_6593/",
+      "ligaInsider": {
+        "averageGrade": 4.19,
+        "averagePoints": 31.03,
+        "totalPoints": 972,
+        "appearances": 33,
+        "gradedAppearances": 29,
+        "averageMinutes": 73.0
+      },
+      "kicker": {
+        "averageGrade": 3.98,
+        "totalPoints": 86,
+        "appearances": 33
+      }
+    },
+    "pl-k00156279": {
+      "name": "Conrad Harder",
+      "team": "RB Leipzig",
+      "sourceUrl": "https://www.ligainsider.de/conrad-harder_36956/",
+      "ligaInsider": {
+        "averageGrade": 4.21,
+        "averagePoints": 30.8,
+        "totalPoints": 788,
+        "appearances": 29,
+        "gradedAppearances": 20,
+        "averageMinutes": 48.0
+      },
+      "kicker": {
+        "averageGrade": 3.792,
+        "totalPoints": 75,
+        "appearances": 29
+      }
+    },
+    "pl-k00133609": {
+      "name": "Carney Chukwuemeka",
+      "team": "Borussia Dortmund",
+      "sourceUrl": "https://www.ligainsider.de/carney-chukwuemeka_26083/",
+      "ligaInsider": {
+        "averageGrade": 4.17,
+        "averagePoints": 30.47,
+        "totalPoints": 744,
+        "appearances": 28,
+        "gradedAppearances": 19,
+        "averageMinutes": 49.0
+      },
+      "kicker": {
+        "averageGrade": 3.7,
+        "totalPoints": 71,
+        "appearances": 28
+      }
+    },
+    "pl-k00132208": {
+      "name": "Warmed Omari",
+      "team": "Hamburger SV",
+      "sourceUrl": "https://www.ligainsider.de/warmed-omari_25626/",
+      "ligaInsider": {
+        "averageGrade": 4.2,
+        "averagePoints": 30.4,
+        "totalPoints": 608,
+        "appearances": 20,
+        "gradedAppearances": 20,
+        "averageMinutes": 87.0
+      },
+      "kicker": {
+        "averageGrade": 4.237,
+        "totalPoints": 20,
+        "appearances": 20
+      }
+    },
+    "pl-k00089655": {
+      "name": "Ellyes Skhiri",
+      "team": "Eintracht Frankfurt",
+      "sourceUrl": "https://www.ligainsider.de/ellyes-skhiri_20776/",
+      "ligaInsider": {
+        "averageGrade": 4.2,
+        "averagePoints": 30.35,
+        "totalPoints": 716,
+        "appearances": 25,
+        "gradedAppearances": 20,
+        "averageMinutes": 74.0
+      },
+      "kicker": {
+        "averageGrade": 4.333,
+        "totalPoints": 19,
+        "appearances": 25
+      }
+    },
+    "pl-k00097916": {
+      "name": "Ransford Königsdörffer",
+      "team": "Hamburger SV",
+      "sourceUrl": "https://www.ligainsider.de/ransford-koenigsdoerffer_23911/",
+      "ligaInsider": {
+        "averageGrade": 4.22,
+        "averagePoints": 30.34,
+        "totalPoints": 992,
+        "appearances": 33,
+        "gradedAppearances": 32,
+        "averageMinutes": 75.0
+      },
+      "kicker": {
+        "averageGrade": 4.422,
+        "totalPoints": 26,
+        "appearances": 33
+      }
+    },
+    "pl-k00071610": {
+      "name": "Janik Haberer",
+      "team": "1. FC Union Berlin",
+      "sourceUrl": "https://www.ligainsider.de/janik-haberer_3616/",
+      "ligaInsider": {
+        "averageGrade": 4.21,
+        "averagePoints": 30.33,
+        "totalPoints": 793,
+        "appearances": 28,
+        "gradedAppearances": 24,
+        "averageMinutes": 71.0
+      },
+      "kicker": {
+        "averageGrade": 3.929,
+        "totalPoints": 62,
+        "appearances": 28
+      }
+    },
+    "pl-k00136443": {
+      "name": "Daniel Elfadli",
+      "team": "Hamburger SV",
+      "sourceUrl": "https://www.ligainsider.de/daniel-elfadli_35221/",
+      "ligaInsider": {
+        "averageGrade": 4.18,
+        "averagePoints": 30.32,
+        "totalPoints": 602,
+        "appearances": 21,
+        "gradedAppearances": 19,
+        "averageMinutes": 71.0
+      },
+      "kicker": {
+        "averageGrade": 3.625,
+        "totalPoints": 61,
+        "appearances": 21
+      }
+    },
+    "pl-k00161346": {
+      "name": "Karim Coulibaly",
+      "team": "SV Werder Bremen",
+      "sourceUrl": "https://www.ligainsider.de/karim-coulibaly_38228/",
+      "ligaInsider": {
+        "averageGrade": 4.23,
+        "averagePoints": 29.81,
+        "totalPoints": 798,
+        "appearances": 27,
+        "gradedAppearances": 26,
+        "averageMinutes": 87.0
+      },
+      "kicker": {
+        "averageGrade": 3.712,
+        "totalPoints": 82,
+        "appearances": 27
+      }
+    },
+    "pl-k00149508": {
+      "name": "Ilyas Ansah",
+      "team": "1. FC Union Berlin",
+      "sourceUrl": "https://www.ligainsider.de/ilyas-ansah_36892/",
+      "ligaInsider": {
+        "averageGrade": 4.23,
+        "averagePoints": 29.6,
+        "totalPoints": 934,
+        "appearances": 33,
+        "gradedAppearances": 30,
+        "averageMinutes": 65.0
+      },
+      "kicker": {
+        "averageGrade": 3.643,
+        "totalPoints": 122,
+        "appearances": 33
+      }
+    },
+    "pl-k00136357": {
+      "name": "Tom Rothe",
+      "team": "1. FC Union Berlin",
+      "sourceUrl": "https://www.ligainsider.de/tom-rothe_26243/",
+      "ligaInsider": {
+        "averageGrade": 4.25,
+        "averagePoints": 29.56,
+        "totalPoints": 599,
+        "appearances": 21,
+        "gradedAppearances": 18,
+        "averageMinutes": 61.0
+      },
+      "kicker": {
+        "averageGrade": 3.885,
+        "totalPoints": 46,
+        "appearances": 21
+      }
+    },
+    "pl-k00130503": {
+      "name": "Joel Schmied",
+      "team": "1. FC Köln",
+      "sourceUrl": "https://www.ligainsider.de/joel-schmied_38328/",
+      "ligaInsider": {
+        "averageGrade": 4.25,
+        "averagePoints": 29.5,
+        "totalPoints": 472,
+        "appearances": 16,
+        "gradedAppearances": 16,
+        "averageMinutes": 73.0
+      },
+      "kicker": {
+        "averageGrade": 3.321,
+        "totalPoints": 68,
+        "appearances": 16
+      }
+    },
+    "pl-k00088765": {
+      "name": "Lars Ritzka",
+      "team": "FC St. Pauli",
+      "sourceUrl": "https://www.ligainsider.de/lars-ritzka_6823/",
+      "ligaInsider": {
+        "averageGrade": 4.25,
+        "averagePoints": 29.31,
+        "totalPoints": 569,
+        "appearances": 21,
+        "gradedAppearances": 16,
+        "averageMinutes": 60.0
+      },
+      "kicker": {
+        "averageGrade": 4.233,
+        "totalPoints": 22,
+        "appearances": 21
+      }
+    },
+    "pl-k00089233": {
+      "name": "Mathias Honsak",
+      "team": "1. FC Heidenheim",
+      "sourceUrl": "https://www.ligainsider.de/mathias-honsak_20060/",
+      "ligaInsider": {
+        "averageGrade": 4.28,
+        "averagePoints": 28.91,
+        "totalPoints": 747,
+        "appearances": 27,
+        "gradedAppearances": 23,
+        "averageMinutes": 55.0
+      },
+      "kicker": {
+        "averageGrade": 4.211,
+        "totalPoints": 42,
+        "appearances": 27
+      }
+    },
+    "pl-k00079577": {
+      "name": "Marius Wolf",
+      "team": "FC Augsburg",
+      "sourceUrl": "https://www.ligainsider.de/marius-wolf_5670/",
+      "ligaInsider": {
+        "averageGrade": 4.31,
+        "averagePoints": 28.19,
+        "totalPoints": 759,
+        "appearances": 29,
+        "gradedAppearances": 21,
+        "averageMinutes": 49.0
+      },
+      "kicker": {
+        "averageGrade": 3.929,
+        "totalPoints": 65,
+        "appearances": 29
+      }
+    },
+    "pl-k00101721": {
+      "name": "Woo-Yeong Jeong",
+      "team": "1. FC Union Berlin",
+      "sourceUrl": "https://www.ligainsider.de/wooyeong-jeong_14145/",
+      "ligaInsider": {
+        "averageGrade": 4.29,
+        "averagePoints": 27.81,
+        "totalPoints": 759,
+        "appearances": 28,
+        "gradedAppearances": 26,
+        "averageMinutes": 49.0
+      },
+      "kicker": {
+        "averageGrade": 4.158,
+        "totalPoints": 50,
+        "appearances": 28
+      }
+    },
+    "pl-k00135162": {
+      "name": "Giorgi Gocholeishvili",
+      "team": "Hamburger SV",
+      "sourceUrl": "https://www.ligainsider.de/giorgi-gocholeishvili_36382/",
+      "ligaInsider": {
+        "averageGrade": 4.37,
+        "averagePoints": 27.79,
+        "totalPoints": 620,
+        "appearances": 24,
+        "gradedAppearances": 19,
+        "averageMinutes": 53.0
+      },
+      "kicker": {
+        "averageGrade": 4.05,
+        "totalPoints": 45,
+        "appearances": 24
+      }
+    },
+    "pl-k00120042": {
+      "name": "Rayan Philippe",
+      "team": "Hamburger SV",
+      "sourceUrl": "https://www.ligainsider.de/rayan-philippe_36121/",
+      "ligaInsider": {
+        "averageGrade": 4.32,
+        "averagePoints": 27.52,
+        "totalPoints": 732,
+        "appearances": 28,
+        "gradedAppearances": 25,
+        "averageMinutes": 55.0
+      },
+      "kicker": {
+        "averageGrade": 4.118,
+        "totalPoints": 58,
+        "appearances": 28
+      }
+    },
+    "pl-k00147587": {
+      "name": "Martijn Kaars",
+      "team": "FC St. Pauli",
+      "sourceUrl": "https://www.ligainsider.de/martijn-kaars_37507/",
+      "ligaInsider": {
+        "averageGrade": 4.38,
+        "averagePoints": 27.2,
+        "totalPoints": 743,
+        "appearances": 29,
+        "gradedAppearances": 25,
+        "averageMinutes": 57.0
+      },
+      "kicker": {
+        "averageGrade": 4.55,
+        "totalPoints": 18,
+        "appearances": 29
+      }
+    },
+    "pl-k00132205": {
+      "name": "Lukas Ullrich",
+      "team": "Mönchengladbach",
+      "sourceUrl": "https://www.ligainsider.de/lukas-ullrich_27518/",
+      "ligaInsider": {
+        "averageGrade": 4.38,
+        "averagePoints": 27.19,
+        "totalPoints": 596,
+        "appearances": 23,
+        "gradedAppearances": 21,
+        "averageMinutes": 66.0
+      },
+      "kicker": {
+        "averageGrade": 4.235,
+        "totalPoints": 24,
+        "appearances": 23
+      }
+    },
+    "pl-k00106313": {
+      "name": "Shuto Machino",
+      "team": "Mönchengladbach",
+      "sourceUrl": "https://www.ligainsider.de/shuto-machino_36130/",
+      "ligaInsider": {
+        "averageGrade": 4.38,
+        "averagePoints": 27.05,
+        "totalPoints": 753,
+        "appearances": 32,
+        "gradedAppearances": 21,
+        "averageMinutes": 52.0
+      },
+      "kicker": {
+        "averageGrade": 4.6,
+        "totalPoints": 29,
+        "appearances": 32
+      }
+    },
+    "pl-k00080554": {
+      "name": "Elvis Rexhbecaj",
+      "team": "FC Augsburg",
+      "sourceUrl": "https://www.ligainsider.de/elvis-rexhbecaj_13707/",
+      "ligaInsider": {
+        "averageGrade": 4.39,
+        "averagePoints": 25.45,
+        "totalPoints": 629,
+        "appearances": 26,
+        "gradedAppearances": 22,
+        "averageMinutes": 54.0
+      },
+      "kicker": {
+        "averageGrade": 3.735,
+        "totalPoints": 64,
+        "appearances": 26
+      }
+    },
+    "pl-k00072676": {
+      "name": "Benedikt Gimber",
+      "team": "1. FC Heidenheim",
+      "sourceUrl": "https://www.ligainsider.de/benedikt-gimber_6424/",
+      "ligaInsider": {
+        "averageGrade": 4.47,
+        "averagePoints": 25.4,
+        "totalPoints": 527,
+        "appearances": 21,
+        "gradedAppearances": 20,
+        "averageMinutes": 75.0
+      },
+      "kicker": {
+        "averageGrade": 4.237,
+        "totalPoints": 22,
+        "appearances": 21
+      }
+    }
+  }
+}

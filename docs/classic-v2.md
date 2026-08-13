@@ -43,6 +43,10 @@ Saisonpunkte werden nicht unabhängig von der Rolle gemischt. Der stabile Prior 
 
 Für die Bundesliga wird die Rollenprognose vor der Produktionsoptimierung mit einem eingecheckten, datierten LigaInsider-Topelf-Snapshot verankert. Unabhängig davon wird für alle drei Ligen ein medizinischer Snapshot geladen: aktuell verletzte, im Aufbautraining befindliche oder ausdrücklich nicht berücksichtigte Spieler sind für den Septemberkader und die vorab simulierte Winterphase nicht wählbar; eine Sperre wirkt nur auf den betroffenen ersten Spieltag. LigaInsider liefert diesen Status für die Bundesliga, Transfermarkt für die 2. Bundesliga und 3. Liga. Der medizinische Status hat immer Vorrang vor der saisonalen Kaderhierarchie. Diese aktuellen Produktionssignale werden nicht rückwirkend in historische Folds eingebaut.
 
+Abgeschlossene Spiele der aktuellen Saison werden für alle drei Ligen in die Spieler- und Mannschaftszustände eingespielt. Beobachtete Start-, Joker- und DNP-Rollen verankern die verbleibende Saison vorsichtig; fehlt ein Spieler trotz abgeschlossenem Vereinsspiel in der kicker-Punktetabelle, wird dies als DNP mit null Punkten erfasst. Ein einzelner Spieltag ersetzt die langfristige Historie nicht. Die bereits erzielten Punkte bleiben im Ist-Verlauf sichtbar, sind aber aus der neuen Kaderzielfunktion ausgeschlossen. So nutzt eine nach Spieltag 1 erzeugte Empfehlung die neue Information, ohne die Spielerauswahl nachträglich auf die höchsten bekannten Spieltagspunkte zu optimieren.
+
+Der separat gespeicherte LigaInsider-Leistungsindex der Vorsaison dient ausschließlich als externer Rangvergleich für die Bundesliga. Er wird nicht mit kicker-Punkten summiert und verändert die Zielfunktion nicht direkt.
+
 Jedes Artefakt enthält unter `recommendation.availabilityAudit` Quelle, Zeitpunkt und die tatsächlich ausgeschlossenen Kandidaten. Vor dem Schreiben prüft der Generator, dass keiner davon im Eröffnungs-, Winter- oder Spieltagskader steht. Er prüft außerdem Mindest-Einsatzwahrscheinlichkeiten und die mathematische Konsistenz zwischen Punkten und Verfügbarkeit; ein Verstoß bricht die Veröffentlichung ab.
 
 ## Erzeugung

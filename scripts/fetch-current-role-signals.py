@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import html
 import json
+import math
 import re
 import unicodedata
 from datetime import datetime, timezone
@@ -21,6 +22,7 @@ DATA_DIR = ROOT / "frontend" / "public" / "data"
 CONFIG_PATH = ROOT / "config" / "external-sources.json"
 OUTPUT_PATH = DATA_DIR / "current-role-signals.json"
 AVAILABILITY_OUTPUT_PATH = DATA_DIR / "current-availability-signals.json"
+PERFORMANCE_OUTPUT_PATH = DATA_DIR / "external-performance-benchmark.json"
 USER_AGENT = "Mozilla/5.0 (compatible; punktespiegel/1.5; +https://github.com/gruberb/punktespiegel)"
 
 
@@ -106,6 +108,173 @@ def parse_headlines(page: str) -> list[dict[str, str]]:
         clean_title = html.unescape(re.sub(r"<[^>]+>", "", title)).replace("\u00ad", "").strip()
         result.append({"source": "LigaInsider", "title": clean_title, "url": absolute})
     return result[:6]
+
+
+def clean_text(value: str) -> str:
+    return " ".join(html.unescape(re.sub(r"<[^>]+>", " ", value)).replace("\u00ad", "").split())
+
+
+def parse_decimal(value: str) -> float | None:
+    normalized = clean_text(value).replace(",", ".")
+    if not normalized or normalized.upper() == "NULL":
+        return None
+    try:
+        return float(normalized)
+    except ValueError:
+        return None
+
+
+def parse_performance_index(page: str) -> list[dict[str, Any]]:
+    table_match = re.search(r'<table[^>]+id="DataTable"[^>]*>(.*?)</table>', page, flags=re.DOTALL)
+    if table_match is None:
+        raise RuntimeError("LigaInsider-Performance-Index enthält keine Datentabelle.")
+    rows: list[dict[str, Any]] = []
+    for row_html in re.findall(
+        r"<tr[^>]+data-anchor-rowfilter='filter1'[^>]*>(.*?)</tr>",
+        table_match.group(1),
+        flags=re.DOTALL,
+    ):
+        cells = re.findall(r"<td[^>]*>(.*?)</td>", row_html, flags=re.DOTALL)
+        if len(cells) < 10:
+            continue
+        player_link = re.search(r'<a href="([^"]+)">(.*?)</a>', cells[2], flags=re.DOTALL)
+        team_link = re.search(r'<a[^>]+href="([^"]+)">(.*?)</a>', cells[3], flags=re.DOTALL)
+        appearances = re.search(r"(\d+)\s*\((\d+)\)", clean_text(cells[8]))
+        if player_link is None or team_link is None or appearances is None:
+            continue
+        profile_url = player_link.group(1)
+        rows.append({
+            "name": clean_text(player_link.group(2)),
+            "team": clean_text(team_link.group(2)),
+            "profileUrl": (
+                profile_url if profile_url.startswith("http")
+                else f"https://www.ligainsider.de{profile_url}"
+            ),
+            "averageGrade": parse_decimal(cells[4]),
+            "averagePoints": parse_decimal(cells[6]),
+            "totalPoints": int(parse_decimal(cells[7]) or 0),
+            "appearances": int(appearances.group(1)),
+            "gradedAppearances": int(appearances.group(2)),
+            "averageMinutes": parse_decimal(cells[9]),
+        })
+    if len(rows) < 100:
+        raise RuntimeError("LigaInsider-Performance-Index enthält zu wenige Spielerzeilen.")
+    return rows
+
+
+def ranks(values: Sequence[float]) -> list[float]:
+    ordered = sorted(range(len(values)), key=lambda index: values[index])
+    result = [0.0] * len(values)
+    cursor = 0
+    while cursor < len(ordered):
+        end = cursor + 1
+        while end < len(ordered) and values[ordered[end]] == values[ordered[cursor]]:
+            end += 1
+        average_rank = (cursor + end - 1) / 2.0 + 1.0
+        for ordered_index in ordered[cursor:end]:
+            result[ordered_index] = average_rank
+        cursor = end
+    return result
+
+
+def pearson(left: Sequence[float], right: Sequence[float]) -> float | None:
+    if len(left) != len(right) or len(left) < 3:
+        return None
+    left_mean = sum(left) / len(left)
+    right_mean = sum(right) / len(right)
+    numerator = sum((a - left_mean) * (b - right_mean) for a, b in zip(left, right))
+    left_scale = math.sqrt(sum((value - left_mean) ** 2 for value in left))
+    right_scale = math.sqrt(sum((value - right_mean) ** 2 for value in right))
+    if left_scale == 0.0 or right_scale == 0.0:
+        return None
+    return numerator / (left_scale * right_scale)
+
+
+def build_performance_benchmark(
+    source: Mapping[str, Any],
+    rows: Sequence[Mapping[str, Any]],
+    season: Mapping[str, Any],
+    current_season: Mapping[str, Any],
+) -> dict[str, Any]:
+    scores_by_player: dict[str, list[Mapping[str, Any]]] = {}
+    for score in season["scores"]:
+        scores_by_player.setdefault(str(score["playerId"]), []).append(score)
+    matched: dict[str, dict[str, Any]] = {}
+    unmatched: list[str] = []
+    for row in rows:
+        player = match_medical_player(row, season)
+        if player is None:
+            unmatched.append(str(row["name"]))
+            continue
+        player_scores = scores_by_player.get(str(player["id"]), [])
+        appearance_scores = [
+            score for score in player_scores
+            if int(score.get("pointsStarter", 0)) > 0 or int(score.get("pointsJoker", 0)) > 0
+        ]
+        grades = [float(score["grade"]) / 100.0 for score in appearance_scores if score.get("grade")]
+        matched[str(player["id"])] = {
+            "name": player["name"],
+            "team": row["team"],
+            "sourceUrl": row["profileUrl"],
+            "ligaInsider": {
+                "averageGrade": row["averageGrade"],
+                "averagePoints": row["averagePoints"],
+                "totalPoints": row["totalPoints"],
+                "appearances": row["appearances"],
+                "gradedAppearances": row["gradedAppearances"],
+                "averageMinutes": row["averageMinutes"],
+            },
+            "kicker": {
+                "averageGrade": round(sum(grades) / len(grades), 3) if grades else None,
+                "totalPoints": sum(int(score["totalPoints"]) for score in appearance_scores),
+                "appearances": len(appearance_scores),
+            },
+        }
+    comparable = [
+        item for item in matched.values()
+        if item["ligaInsider"]["totalPoints"] and item["kicker"]["appearances"]
+    ]
+    li_points = [float(item["ligaInsider"]["totalPoints"]) for item in comparable]
+    kicker_points = [float(item["kicker"]["totalPoints"]) for item in comparable]
+    correlation = pearson(ranks(li_points), ranks(kicker_points))
+    top_count = min(25, len(comparable))
+    li_top = {
+        item["name"] for item in sorted(
+            comparable,
+            key=lambda item: float(item["ligaInsider"]["totalPoints"]),
+            reverse=True,
+        )[:top_count]
+    }
+    kicker_top = {
+        item["name"] for item in sorted(
+            comparable,
+            key=lambda item: float(item["kicker"]["totalPoints"]),
+            reverse=True,
+        )[:top_count]
+    }
+    current_player_ids = {str(player["id"]) for player in current_season["players"]}
+    return {
+        "schemaVersion": 1,
+        "generatedAt": datetime.now(timezone.utc).isoformat(),
+        "league": str(season["leagueCode"]),
+        "season": int(source["season"]),
+        "provider": source["provider"],
+        "sourceUrl": source["url"],
+        "method": (
+            "independent rank benchmark against kicker history; retained as an audit and never added "
+            "to kicker points as a second score"
+        ),
+        "sourceRows": len(rows),
+        "matchedPlayers": len(matched),
+        "unmatchedPlayers": unmatched,
+        "currentSeasonPlayersCovered": len(current_player_ids.intersection(matched)),
+        "metrics": {
+            "comparablePlayers": len(comparable),
+            "spearmanTotalPoints": round(correlation, 4) if correlation is not None else None,
+            "top25Overlap": len(li_top.intersection(kicker_top)),
+        },
+        "players": matched,
+    }
 
 
 class LigaInsiderAvailabilityParser(HTMLParser):
@@ -404,6 +573,7 @@ def main() -> None:
     parser.add_argument("--config", type=Path, default=CONFIG_PATH)
     parser.add_argument("--output", type=Path, default=OUTPUT_PATH)
     parser.add_argument("--availability-output", type=Path, default=AVAILABILITY_OUTPUT_PATH)
+    parser.add_argument("--performance-output", type=Path, default=PERFORMANCE_OUTPUT_PATH)
     args = parser.parse_args()
     config = json.loads(args.config.read_text(encoding="utf-8"))
     season = json.loads((DATA_DIR / "seasons" / "se-k00012026.json").read_text(encoding="utf-8"))
@@ -529,9 +699,27 @@ def main() -> None:
         json.dumps(availability_artifact, ensure_ascii=False, indent=2) + "\n",
         encoding="utf-8",
     )
+    performance_source = config["performanceBenchmarks"]["0001"]
+    performance_page = fetch_page(performance_source["url"])
+    performance_rows = parse_performance_index(performance_page)
+    performance_season = json.loads(
+        (DATA_DIR / "seasons" / f"se-k0001{performance_source['season']}.json").read_text(encoding="utf-8")
+    )
+    performance_artifact = build_performance_benchmark(
+        performance_source,
+        performance_rows,
+        performance_season,
+        season,
+    )
+    args.performance_output.parent.mkdir(parents=True, exist_ok=True)
+    args.performance_output.write_text(
+        json.dumps(performance_artifact, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+    )
     print(
         f"{len(signals)} Bundesliga-Rollensignale und "
-        f"{sum(len(item['players']) for item in medical_leagues.values())} aktuelle Ausfälle geschrieben"
+        f"{sum(len(item['players']) for item in medical_leagues.values())} aktuelle Ausfälle geschrieben; "
+        f"Performance-Benchmark: {performance_artifact['matchedPlayers']}/{performance_artifact['sourceRows']} Spieler"
     )
 
 

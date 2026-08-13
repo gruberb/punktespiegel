@@ -942,6 +942,7 @@ function ManagerPicksView({ filters, onPlayer }: { filters: Filters; onPlayer: (
             </div>
             {recommendation.availabilityAudit && (
               <p className="manager-availability-audit">
+                {recommendation.currentSeasonEvidence && recommendation.currentSeasonEvidence.throughMatchday > 0 && <><strong>Aktuelle Saison berücksichtigt:</strong> {recommendation.currentSeasonEvidence.completedMatches} Spiele und {recommendation.currentSeasonEvidence.roleObservations} Rollenbeobachtungen bis Spieltag {recommendation.currentSeasonEvidence.throughMatchday}. </>}
                 <strong>Verfügbarkeit geprüft:</strong> {recommendation.availabilityAudit.excludedPlayerCount} aktuell verletzte, im Aufbautraining befindliche oder nicht berücksichtigte Kandidaten wurden ausgeschlossen. <a href={recommendation.availabilityAudit.sourceUrl} target="_blank" rel="noreferrer">{recommendation.availabilityAudit.provider} · Stand {formatDate(recommendation.availabilityAudit.generatedAt)} ↗</a>
               </p>
             )}

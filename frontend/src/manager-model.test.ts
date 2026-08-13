@@ -114,6 +114,12 @@ const availabilitySignals = JSON.parse(readFileSync(new URL("../public/data/curr
 for (const league of ["0001", "0002", "0003"]) {
   for (const mode of ["classic", "interactive"] as ManagerMode[]) {
     test(`published ${league} ${mode} recommendation is valid and stable`, () => {
+      const publishedSeason = JSON.parse(readFileSync(new URL(`../public/data/seasons/se-k${league}2026.json`, import.meta.url), "utf8")) as {
+        latestRound: number;
+        matches: { id: string; round: number; state: string; homeTeamId: string; awayTeamId: string }[];
+        players: { id: string; teamId: string }[];
+        scores: { matchId: string; playerId: string; totalPoints: number; pointsStarter: number; pointsJoker: number }[];
+      };
       const artifact = JSON.parse(readFileSync(new URL(`../public/data/recommendations/se-k${league}2026-${mode}.json`, import.meta.url), "utf8")) as {
         schemaVersion: number;
         modelVersion: number;
@@ -128,6 +134,18 @@ for (const league of ["0001", "0002", "0003"]) {
         .filter(([, signal]) => ["injured", "rehab", "not_considered", "unavailable"].includes(signal.status))
         .map(([playerId]) => playerId));
       assert.ok(published.availabilityAudit);
+      assert.ok(published.currentSeasonEvidence);
+      assert.equal(published.currentSeasonEvidence?.throughMatchday, publishedSeason.latestRound);
+      assert.equal(published.currentSeasonEvidence?.optimizationStartsAtMatchday, Math.min(league === "0003" ? 38 : 34, publishedSeason.latestRound + 1));
+      assert.equal(published.currentSeasonEvidence?.realizedPointsExcludedFromSelectionObjective, true);
+      if (publishedSeason.latestRound > 0) {
+        assert.ok((published.currentSeasonEvidence?.completedMatches ?? 0) > 0);
+        assert.ok((published.currentSeasonEvidence?.roleObservations ?? 0) > 25);
+        assert.equal(
+          published.currentSeasonEvidence?.roleObservations,
+          (published.currentSeasonEvidence?.explicitScoreRows ?? 0) + (published.currentSeasonEvidence?.inferredDnpObservations ?? 0),
+        );
+      }
       assert.equal(published.availabilityAudit?.excludedPlayerCount, medicallyBlocked.size);
       assert.ok(published.players.every((player) => !medicallyBlocked.has(player.id)));
       assert.ok((published.projectedMatchdays ?? []).every((matchday) => matchday.players.every((player) => !medicallyBlocked.has(player.id))));
@@ -146,12 +164,58 @@ for (const league of ["0001", "0002", "0003"]) {
       }
       const starters = published.players.filter((player) => player.role === "start");
       assert.ok(starters.every((player) => (player.pStart ?? 0) + (player.pSub ?? 0) >= (player.position === "GK" ? 0.5 : 0.18)));
+      const matchRoundById = new Map(publishedSeason.matches
+        .filter((match) => match.state === "FINISHED")
+        .map((match) => [match.id, match.round]));
+      const realizedScoreByPlayerRound = new Map(publishedSeason.scores.flatMap((score) => {
+        const round = matchRoundById.get(score.matchId);
+        return round == null ? [] : [[`${round}:${score.playerId}`, score] as const];
+      }));
+      const playerTeamById = new Map(publishedSeason.players.map((player) => [player.id, player.teamId]));
+      const completedTeamRounds = new Set(publishedSeason.matches
+        .filter((match) => match.state === "FINISHED")
+        .flatMap((match) => [`${match.round}:${match.homeTeamId}`, `${match.round}:${match.awayTeamId}`]));
       for (const matchday of published.projectedMatchdays ?? []) {
-        assert.ok(matchday.players.every((player) => player.meanPoints <= (player.pStart + player.pSub) * 25 + 0.051));
+        if (matchday.matchday <= publishedSeason.latestRound) {
+          for (const player of matchday.players) {
+            const score = realizedScoreByPlayerRound.get(`${matchday.matchday}:${player.id}`);
+            if (!score) {
+              assert.ok(completedTeamRounds.has(`${matchday.matchday}:${playerTeamById.get(player.id)}`));
+            }
+            const role = !score ? "dnp" : score.pointsStarter > 0 ? "start" : score.pointsJoker > 0 ? "sub" : "dnp";
+            assert.equal(player.pStart, role === "start" ? 1 : 0);
+            assert.equal(player.pSub, role === "sub" ? 1 : 0);
+            assert.equal(player.pDnp, role === "dnp" ? 1 : 0);
+            assert.equal(player.meanPoints, score?.totalPoints ?? 0);
+          }
+        } else {
+          assert.ok(matchday.players.every((player) => player.meanPoints <= (player.pStart + player.pSub) * 25 + 0.051));
+        }
       }
     });
   }
 }
+
+test("LigaInsider prior-season performance index remains a strong independent Bundesliga benchmark", () => {
+  const benchmark = JSON.parse(readFileSync(new URL("../public/data/external-performance-benchmark.json", import.meta.url), "utf8")) as {
+    schemaVersion: number;
+    league: string;
+    sourceRows: number;
+    matchedPlayers: number;
+    currentSeasonPlayersCovered: number;
+    method: string;
+    metrics: { comparablePlayers: number; spearmanTotalPoints: number; top25Overlap: number };
+  };
+  assert.equal(benchmark.schemaVersion, 1);
+  assert.equal(benchmark.league, "0001");
+  assert.ok(benchmark.sourceRows >= 275);
+  assert.ok(benchmark.matchedPlayers >= 270);
+  assert.ok(benchmark.currentSeasonPlayersCovered >= 190);
+  assert.ok(benchmark.metrics.comparablePlayers >= 270);
+  assert.ok(benchmark.metrics.spearmanTotalPoints >= 0.8);
+  assert.ok(benchmark.metrics.top25Overlap >= 15);
+  assert.match(benchmark.method, /independent rank benchmark/);
+});
 
 test("published Bundesliga recommendations do not start the externally identified backup goalkeeper", () => {
   const roleSignals = JSON.parse(readFileSync(new URL("../public/data/current-role-signals.json", import.meta.url), "utf8")) as {
