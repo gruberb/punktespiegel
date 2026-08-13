@@ -21,18 +21,23 @@ const result: Record<string, {
   projectedPoints: number;
   realizedPoints: number;
   playerProjections: Record<string, number>;
+  playerAvailability: Record<string, number>;
   roster: { id: string; position: string; role: string }[];
 }> = {};
 for (const league of catalog.leagues) {
   const season = JSON.parse(readFileSync(resolve(dataDirectory, `seasons/se-k${league.code}${holdoutYear}.json`), "utf8")) as ManagerSeason;
   const recommendation = recommendManagerSquad(trainingCatalog, season, mode);
+  const candidateProjections = managerCandidateProjections(trainingCatalog, season, mode);
   const starters = new Set(recommendation.players.filter((player) => player.role === "start").map((player) => player.id));
   const realizedPoints = season.scores.reduce((sum, score) => sum + (starters.has(score.playerId) ? score.totalPoints : 0), 0);
   result[league.code] = {
     projectedPoints: recommendation.projectedStartingPoints,
     realizedPoints,
     playerProjections: Object.fromEntries(
-      managerCandidateProjections(trainingCatalog, season, mode).map((player) => [player.id, player.projectedPoints]),
+      candidateProjections.map((player) => [player.id, player.projectedPoints]),
+    ),
+    playerAvailability: Object.fromEntries(
+      candidateProjections.map((player) => [player.id, player.projectedAvailability]),
     ),
     roster: recommendation.players.map((player) => ({ id: player.id, position: player.position, role: player.role })),
   };

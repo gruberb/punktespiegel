@@ -824,7 +824,7 @@ function PlayerDetailView({ filters, playerId, backLabel, onBack, onTeam, onSeas
       <button className="back-button" onClick={onBack}>← {backLabel}</button>
       <header className="player-profile">
         <PlayerPortrait name={detail.name} url={detail.photoUrl} teamCode={detail.teamCode} teamLogoUrl={detail.logoUrl} large />
-        <div className="profile-copy"><p className="kicker">{positionName[detail.position]}</p><h2>{detail.name}</h2><div className="profile-context"><button className="profile-team-link" onClick={() => onTeam(detail.teamId)}>{detail.team}</button><span>{detail.league} · {detail.season}</span></div><div className="profile-links"><a href={detail.kickerUrl} target="_blank" rel="noreferrer">kicker-Profil ↗</a><a href={detail.transfermarktUrl} target="_blank" rel="noreferrer">Bei Transfermarkt suchen ↗</a></div></div>
+        <div className="profile-copy"><p className="kicker">{positionName[detail.position]}</p><h2>{detail.name}</h2><div className="profile-context"><button className="profile-team-link" onClick={() => onTeam(detail.teamId)}>{detail.team}</button><span>{detail.league} · {detail.season}</span></div><div className="profile-links"><a href={detail.kickerUrl} target="_blank" rel="noreferrer">kicker-Profil ↗</a>{detail.ligaInsiderUrl && <a href={detail.ligaInsiderUrl} target="_blank" rel="noreferrer">LigaInsider ↗</a>}<a href={detail.transfermarktUrl} target="_blank" rel="noreferrer">Transfermarkt ↗</a></div></div>
         <div className="profile-stats">
           <span><strong>{detail.seasonPoints}</strong><small>Saisonpunkte</small></span>
           <span><strong>{formatMarketValue(detail.priceM)}</strong><small>Marktwert</small></span>
@@ -919,7 +919,7 @@ function ManagerPicksView({ filters, onPlayer }: { filters: Filters; onPlayer: (
         <>
           <section className="detail-section manager-summary-section">
             <div className="detail-head">
-              <div><p className="kicker">{recommendation.deploymentModel === "fixed-v1-champion" ? "Classic-v1 Champion" : recommendation.modelVersion === 2 ? `${recommendation.mode === "classic" ? "Classic" : "Interactive"}-v2` : "Modellvorschlag"} · {recommendation.season}</p><h2>Fantasy Team</h2><p>{recommendation.deploymentModel === "fixed-v1-champion" ? "Der Classic-v2-Challenger hat das Validierungstor nicht bestanden; deshalb bleibt für diese Liga der bewährte v1-Kader Champion." : recommendation.modelVersion === 2 ? recommendation.mode === "classic" ? "Der September-Kader maximiert erwartete Punkte mit festen Starter- und Reserveslots; die drei möglichen Winterwechsel werden erst am echten Stichtag mit den dann bekannten Informationen festgelegt." : "Punkte- und Rollenprognosen wählen den Kader gemeinsam mit der besten zulässigen Elf je Spieltag und den saisonabhängigen Transferregeln." : "Optimiert nach Punkteprognose sowie Positions-, Formations- und Vereinsregeln."} Prognosen sind Erwartungswerte, keine Garantie.</p></div>
+              <div><p className="kicker">{recommendation.modelVersion === 2 ? `${recommendation.mode === "classic" ? "Classic" : "Interactive"}-v2` : "Modellvorschlag"} · {recommendation.season}</p><h2>Fantasy Team</h2><p>{recommendation.modelVersion === 2 ? recommendation.mode === "classic" ? "Der September-Kader maximiert verfügbarkeitsbereinigte Saisonpunkte mit festen Starter- und Reserveslots; die drei möglichen Winterwechsel werden erst am echten Stichtag mit den dann bekannten Informationen festgelegt." : "Punkte- und Rollenprognosen wählen den Kader gemeinsam mit der besten zulässigen Elf je Spieltag und den saisonabhängigen Transferregeln." : "Optimiert nach Punkteprognose sowie Positions-, Formations- und Vereinsregeln."} Prognosen sind Erwartungswerte, keine Garantie.</p></div>
               <span>{recommendation.leagueName}</span>
             </div>
             <div className="manager-stats">
@@ -957,12 +957,12 @@ function ManagerPicksView({ filters, onPlayer }: { filters: Filters; onPlayer: (
 }
 
 function ManagerPlayerCard({ player, onClick }: { player: ManagerRecommendation["players"][number]; onClick: () => void }) {
-  return <button className="manager-player-card" onClick={onClick}><PlayerPortrait name={player.name} url={player.photoUrl} teamCode={player.teamCode} teamLogoUrl={player.logoUrl} /><span><strong>{player.name}</strong><small>{player.team}</small></span><b>{player.pStart == null ? `${player.currentPoints} Pkt.` : `${Math.round(player.pStart * 100)} %`}<small>{player.pStart == null ? "aktuell" : "Startelf"}</small></b>{player.promotionAdjusted && <em>Ligastufe korrigiert</em>}</button>;
+  return <button className="manager-player-card" onClick={onClick}><PlayerPortrait name={player.name} url={player.photoUrl} teamCode={player.teamCode} teamLogoUrl={player.logoUrl} /><span><strong>{player.name}</strong><small>{player.team}</small></span><b>{player.currentPoints} Pkt.<small>aktuell</small></b>{player.promotionAdjusted && <em>Ligastufe korrigiert</em>}</button>;
 }
 
 function ManagerPlayerRow({ player, onClick }: { player: ManagerRecommendation["players"][number]; onClick: () => void }) {
   const confidence = ({ high: "hoch", medium: "mittel", low: "gering" } as const)[player.confidence];
-  return <button onClick={onClick}><PlayerPortrait name={player.name} url={player.photoUrl} teamCode={player.teamCode} teamLogoUrl={player.logoUrl} /><span><strong>{player.name}</strong><small>{positionName[player.position]} · {player.team}{player.promotionAdjusted ? " · Ligastufe korrigiert" : ""}</small></span><span><b>{player.pStart == null ? player.currentPoints : `${Math.round(player.pStart * 100)} %`}</b><small>{player.pStart == null ? "Aktuell" : "Startelf"}</small></span><em className={`confidence ${player.confidence}`}>{confidence}</em></button>;
+  return <button onClick={onClick}><PlayerPortrait name={player.name} url={player.photoUrl} teamCode={player.teamCode} teamLogoUrl={player.logoUrl} /><span><strong>{player.name}</strong><small>{positionName[player.position]} · {player.team}{player.promotionAdjusted ? " · Ligastufe korrigiert" : ""}</small></span><span><b>{player.currentPoints} Pkt.</b><small>Aktuell</small></span><em className={`confidence ${player.confidence}`}>{confidence}</em></button>;
 }
 
 function FantasyMatchdayCard({ matchday, onPlayer }: { matchday: ManagerRecommendation["matchdays"][number]; onPlayer: (id: string) => void }) {
@@ -1061,6 +1061,15 @@ function TeamDetailView({ filters, teamId, backLabel, onBack, onPlayer, onTeam }
             </div>
           </article>
         </div>
+        {detail.externalSources && (
+          <section className="player-news team-source-news" aria-labelledby="team-news-title">
+            <div className="section-copy news-heading">
+              <div><p className="kicker">Medienbeobachtung</p><h3 id="team-news-title">Aktuelle Mannschaftsthemen</h3></div>
+              <div className="news-actions"><span>Quellenstand {formatDate(detail.externalSources.generatedAt)}</span><a href={detail.externalSources.ligaInsiderUrl} target="_blank" rel="noreferrer">LigaInsider ↗</a><a href={detail.externalSources.transfermarktUrl} target="_blank" rel="noreferrer">Transfermarkt ↗</a></div>
+            </div>
+            <ol className="news-list">{detail.externalSources.headlines.map((article) => <li key={article.url}><a href={article.url} target="_blank" rel="noreferrer"><span><b>{article.source}</b></span><strong>{article.title}</strong><small>ligainsider.de ↗</small></a></li>)}</ol>
+          </section>
+        )}
       </section>
     </div>
   );

@@ -37,7 +37,11 @@ Die Classic-Prüfung verwendet Rolling-Origin-Folds. In jedem Fold wird der Sept
 
 Historische Preis-, Aktiv- und Auswahlfelder liegen derzeit nicht als echte Entscheidungszeit-Snapshots vor. Die Rolling-Ergebnisse sind deshalb ausdrücklich `experimental` und dürfen noch nicht als leakage-sicher bezeichnet werden. Der Generator vermerkt diese Einschränkung im Artefakt. Für eine belastbare Freigabe müssen Vorsaison- und Wintersnapshots archiviert werden.
 
-Die Entscheidung ist im Artefakt unter `model.deploymentModel` sichtbar. `scenario-recourse-v2` bezeichnet den neuen Optimierer; `fixed-v1-champion` den konservativen Rückfall.
+Die Entscheidung ist im Artefakt unter `model.deploymentModel` sichtbar. `scenario-recourse-v2` bezeichnet den Szenariooptimierer. Verfehlt er das Validierungstor, verwendet `availability-aware-stable-v2` dessen stabile bedingte Punktestärke, optimiert den Kader aber immer neu mit den aktuellen Einsatzwahrscheinlichkeiten. Ein historischer v1-Kader wird nie unverändert in die Produktion kopiert.
+
+Saisonpunkte werden nicht unabhängig von der Rolle gemischt. Der stabile Prior wird zunächst in Punkte je tatsächlichem Einsatz zurückgerechnet; erst danach entstehen unbedingte Erwartungspunkte als `pStart × Punkte|Start + pEinwechslung × Punkte|Einwechslung`. Dadurch kann ein aktueller Ersatzspieler nicht gleichzeitig fast sicher ausfallen und dennoch eine volle Saisonprojektion erhalten.
+
+Für die Bundesliga wird die Rollenprognose vor der Produktionsoptimierung mit einem eingecheckten, datierten LigaInsider-Topelf-Snapshot verankert. Das ist ein aktuelles Produktionssignal und wird nicht rückwirkend in historische Folds eingebaut. Vor dem Schreiben prüft der Generator zusätzlich Mindest-Einsatzwahrscheinlichkeiten und die mathematische Konsistenz zwischen Punkten und Verfügbarkeit; ein Verstoß bricht die Veröffentlichung ab.
 
 ## Erzeugung
 

@@ -1,0 +1,3857 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-08-13T01:23:02.338385+00:00",
+  "league": "0001",
+  "season": 2026,
+  "provider": "LigaInsider Topelf",
+  "method": "preferred player in each published Topelf slot; alternatives are retained as alternatives",
+  "players": {
+    "pl-k00051437": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/loris-karius_1641/",
+      "sourceUpdatedAt": "07.08.2026 10:48"
+    },
+    "pl-k00146283": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/mertcan-ayhan_38514/",
+      "sourceUpdatedAt": "07.08.2026 10:48"
+    },
+    "pl-k00079188": {
+      "role": "alternative",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/timo-becker_11068/",
+      "sourceUpdatedAt": "07.08.2026 10:48"
+    },
+    "pl-k00091406": {
+      "role": "alternative",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/maximilian-woeber_11916/",
+      "sourceUpdatedAt": "07.08.2026 10:48"
+    },
+    "pl-k00101109": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/nikola-katic_23002/",
+      "sourceUpdatedAt": "07.08.2026 10:48"
+    },
+    "pl-k00153331": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/hasan-kurucay_35927/",
+      "sourceUpdatedAt": "07.08.2026 10:48"
+    },
+    "pl-k00116369": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/junior-dina-ebimbe_26881/",
+      "sourceUpdatedAt": "07.08.2026 10:48"
+    },
+    "pl-k00101728": {
+      "role": "alternative",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/dejan-ljubicic_24396/",
+      "sourceUpdatedAt": "07.08.2026 10:48"
+    },
+    "pl-k00123692": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/satoshi-tanaka_38876/",
+      "sourceUpdatedAt": "07.08.2026 10:48"
+    },
+    "pl-k00098720": {
+      "role": "alternative",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/ron-schallenberg_14580/",
+      "sourceUpdatedAt": "07.08.2026 10:48"
+    },
+    "pl-k00131201": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/soufiane-el-faouzi_26067/",
+      "sourceUpdatedAt": "07.08.2026 10:48"
+    },
+    "pl-k00090273": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/robin-gosens_16537/",
+      "sourceUpdatedAt": "07.08.2026 10:48"
+    },
+    "pl-k00072475": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/kenan-karaman_2676/",
+      "sourceUpdatedAt": "07.08.2026 10:48"
+    },
+    "pl-k00102058": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/moussa-sylla_16217/",
+      "sourceUpdatedAt": "07.08.2026 10:48"
+    },
+    "pl-k00044560": {
+      "role": "alternative",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/edin-dzeko_4755/",
+      "sourceUpdatedAt": "07.08.2026 10:48"
+    },
+    "pl-k00130251": {
+      "role": "alternative",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/junior-adamu_24620/",
+      "sourceUpdatedAt": "07.08.2026 10:48"
+    },
+    "pl-k00116711": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/adil-aouchiche_22176/",
+      "sourceUpdatedAt": "07.08.2026 10:48"
+    },
+    "pl-k00080551": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/anton-donkor_6742/",
+      "sourceUpdatedAt": "07.08.2026 10:48"
+    },
+    "pl-k00064802": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/kevin-mueller_1316/",
+      "sourceUpdatedAt": "07.08.2026 10:48"
+    },
+    "pl-k00158699": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/johannes-siebeking_38861/",
+      "sourceUpdatedAt": "07.08.2026 10:48"
+    },
+    "pl-k00136298": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/bryan-lasme_26131/",
+      "sourceUpdatedAt": "07.08.2026 10:48"
+    },
+    "pl-k00075198": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/finn-porath_6693/",
+      "sourceUpdatedAt": "07.08.2026 10:48"
+    },
+    "pl-k00143372": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/emil-hoejlund_37190/",
+      "sourceUpdatedAt": "07.08.2026 10:48"
+    },
+    "pl-k00136092": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/adrian-gantenbein_37275/",
+      "sourceUpdatedAt": "07.08.2026 10:48"
+    },
+    "pl-k00084575": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/janik-bachmann_5753/",
+      "sourceUpdatedAt": "07.08.2026 10:48"
+    },
+    "pl-k00158782": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/christian-gomis_38864/",
+      "sourceUpdatedAt": "07.08.2026 10:48"
+    },
+    "pl-k00141638": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/vitalie-becker_37365/",
+      "sourceUpdatedAt": "07.08.2026 10:48"
+    },
+    "pl-k00146306": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/max-grueger_37366/",
+      "sourceUpdatedAt": "07.08.2026 10:48"
+    },
+    "pl-k00152572": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/zaid-tchibara_38499/",
+      "sourceUpdatedAt": "07.08.2026 10:48"
+    },
+    "pl-k00173186": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/dylan-leonard_38862/",
+      "sourceUpdatedAt": "07.08.2026 10:48"
+    },
+    "pl-k00169805": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/luca-vozar_38892/",
+      "sourceUpdatedAt": "07.08.2026 10:48"
+    },
+    "pl-k00130808": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/karl-hein_25603/",
+      "sourceUpdatedAt": "08.08.2026 17:54"
+    },
+    "pl-k00058003": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/mitchell-weiser_1720/",
+      "sourceUpdatedAt": "08.08.2026 17:54"
+    },
+    "pl-k00080364": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/amos-pieper_7061/",
+      "sourceUpdatedAt": "08.08.2026 17:54"
+    },
+    "pl-k00144701": {
+      "role": "alternative",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/oskar-wojcik_38922/",
+      "sourceUpdatedAt": "08.08.2026 17:54"
+    },
+    "pl-k00090042": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/marco-friedl_7047/",
+      "sourceUpdatedAt": "08.08.2026 17:54"
+    },
+    "pl-k00123373": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/olivier-deman_36310/",
+      "sourceUpdatedAt": "08.08.2026 17:54"
+    },
+    "pl-k00096032": {
+      "role": "alternative",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/felix-agu_21590/",
+      "sourceUpdatedAt": "08.08.2026 17:54"
+    },
+    "pl-k00117298": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/jens-stage_22538/",
+      "sourceUpdatedAt": "08.08.2026 17:54"
+    },
+    "pl-k00135660": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/senne-lynen_35359/",
+      "sourceUpdatedAt": "08.08.2026 17:54"
+    },
+    "pl-k00161356": {
+      "role": "alternative",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/chuki_38831/",
+      "sourceUpdatedAt": "08.08.2026 17:54"
+    },
+    "pl-k00118312": {
+      "role": "alternative",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/justin-njinmah_27480/",
+      "sourceUpdatedAt": "08.08.2026 17:54"
+    },
+    "pl-k00092690": {
+      "role": "alternative",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/cedric-itten_18071/",
+      "sourceUpdatedAt": "08.08.2026 17:54"
+    },
+    "pl-k00158876": {
+      "role": "alternative",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/salim-musah_37144/",
+      "sourceUpdatedAt": "08.08.2026 17:54"
+    },
+    "pl-k00123098": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/samuel-mbangula_38551/",
+      "sourceUpdatedAt": "08.08.2026 17:54"
+    },
+    "pl-k00057797": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/markus-kolke_15549/",
+      "sourceUpdatedAt": "08.08.2026 17:54"
+    },
+    "pl-k00121838": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/keke-topp_35787/",
+      "sourceUpdatedAt": "08.08.2026 17:54"
+    },
+    "pl-k00085071": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/alexander-schlager_22752/",
+      "sourceUpdatedAt": "08.08.2026 17:54"
+    },
+    "pl-k00170514": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/darwin-soylu_37561/",
+      "sourceUpdatedAt": "08.08.2026 17:54"
+    },
+    "pl-k00085582": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/dawid-kownacki_12846/",
+      "sourceUpdatedAt": "08.08.2026 17:54"
+    },
+    "pl-k00071151": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/niklas-stark_2441/",
+      "sourceUpdatedAt": "08.08.2026 17:54"
+    },
+    "pl-k00169915": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/stefan-smarkalev_37181/",
+      "sourceUpdatedAt": "08.08.2026 17:54"
+    },
+    "pl-k00168200": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/patrice-covic_38219/",
+      "sourceUpdatedAt": "08.08.2026 17:54"
+    },
+    "pl-k00128262": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/marco-gruell_26702/",
+      "sourceUpdatedAt": "08.08.2026 17:54"
+    },
+    "pl-k00145004": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/julian-malatini_36952/",
+      "sourceUpdatedAt": "08.08.2026 17:54"
+    },
+    "pl-k00137331": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/dariusz-stalmach_38501/",
+      "sourceUpdatedAt": "08.08.2026 17:54"
+    },
+    "pl-k00161192": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/mick-schmetgens_37129/",
+      "sourceUpdatedAt": "08.08.2026 17:54"
+    },
+    "pl-k00147901": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/skelly-alvero_35903/",
+      "sourceUpdatedAt": "08.08.2026 17:54"
+    },
+    "pl-k00179378": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/kenny-quetant_38826/",
+      "sourceUpdatedAt": "08.08.2026 17:54"
+    },
+    "pl-k00169925": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/paul-erevbenagie_38929/",
+      "sourceUpdatedAt": "08.08.2026 17:54"
+    },
+    "pl-k00161346": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/karim-coulibaly_38228/",
+      "sourceUpdatedAt": "08.08.2026 17:54"
+    },
+    "pl-k00118051": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/mio-backhaus_27467/",
+      "sourceUpdatedAt": "06.08.2026 16:59"
+    },
+    "pl-k00103305": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/philipp-treu_20344/",
+      "sourceUpdatedAt": "06.08.2026 16:59"
+    },
+    "pl-k00070990": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/matthias-ginter_1835/",
+      "sourceUpdatedAt": "06.08.2026 16:59"
+    },
+    "pl-k00084940": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/philipp-lienhart_13911/",
+      "sourceUpdatedAt": "06.08.2026 16:59"
+    },
+    "pl-k00144073": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/berkay-yilmaz_37208/",
+      "sourceUpdatedAt": "06.08.2026 16:59"
+    },
+    "pl-k00063777": {
+      "role": "alternative",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/lukas-kuebler_1935/",
+      "sourceUpdatedAt": "06.08.2026 16:59"
+    },
+    "pl-k00072706": {
+      "role": "alternative",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/christian-guenter_2153/",
+      "sourceUpdatedAt": "06.08.2026 16:59"
+    },
+    "pl-k00079503": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/maximilian-eggestein_6131/",
+      "sourceUpdatedAt": "06.08.2026 16:59"
+    },
+    "pl-k00126161": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/yuito-suzuki_37105/",
+      "sourceUpdatedAt": "06.08.2026 16:59"
+    },
+    "pl-k00153893": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/rihito-yamamoto_38872/",
+      "sourceUpdatedAt": "06.08.2026 16:59"
+    },
+    "pl-k00110959": {
+      "role": "alternative",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/yannik-engelhardt_20278/",
+      "sourceUpdatedAt": "06.08.2026 16:59"
+    },
+    "pl-k00086138": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/niklas-beste_14520/",
+      "sourceUpdatedAt": "06.08.2026 16:59"
+    },
+    "pl-k00171930": {
+      "role": "alternative",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/cyriaque-irie_38409/",
+      "sourceUpdatedAt": "06.08.2026 16:59"
+    },
+    "pl-k00115533": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/igor-matanovic_25780/",
+      "sourceUpdatedAt": "06.08.2026 16:59"
+    },
+    "pl-k00072759": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/vincenzo-grifo_2361/",
+      "sourceUpdatedAt": "06.08.2026 16:59"
+    },
+    "pl-k00131913": {
+      "role": "alternative",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/derry-scherhant_27532/",
+      "sourceUpdatedAt": "06.08.2026 16:59"
+    },
+    "pl-k00105845": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/noah-atubolu_22000/",
+      "sourceUpdatedAt": "06.08.2026 16:59"
+    },
+    "pl-k00169838": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/rouven-tarnutzer_38617/",
+      "sourceUpdatedAt": "06.08.2026 16:59"
+    },
+    "pl-k00079935": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/lucas-hoeler_6593/",
+      "sourceUpdatedAt": "06.08.2026 16:59"
+    },
+    "pl-k00078917": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/jannik-huth_6540/",
+      "sourceUpdatedAt": "06.08.2026 16:59"
+    },
+    "pl-k00090149": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/florent-muslija_13863/",
+      "sourceUpdatedAt": "06.08.2026 16:59"
+    },
+    "pl-k00080766": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/florian-mueller_7609/",
+      "sourceUpdatedAt": "06.08.2026 16:59"
+    },
+    "pl-k00119706": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/eren-dinkci_22008/",
+      "sourceUpdatedAt": "06.08.2026 16:59"
+    },
+    "pl-k00065090": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/anthony-jung_2245/",
+      "sourceUpdatedAt": "06.08.2026 16:59"
+    },
+    "pl-k00103374": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/patrick-osterhage_20826/",
+      "sourceUpdatedAt": "06.08.2026 16:59"
+    },
+    "pl-k00174671": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/keisuke-goto_38267/",
+      "sourceUpdatedAt": "06.08.2026 16:59"
+    },
+    "pl-k00149412": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/karl-steinmann_37271/",
+      "sourceUpdatedAt": "06.08.2026 16:59"
+    },
+    "pl-k00136677": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/jordy-makengo_26088/",
+      "sourceUpdatedAt": "06.08.2026 16:59"
+    },
+    "pl-k00111919": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/max-rosenfelder_26203/",
+      "sourceUpdatedAt": "06.08.2026 16:59"
+    },
+    "pl-k00149407": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/bruno-ogbus_37207/",
+      "sourceUpdatedAt": "06.08.2026 16:59"
+    },
+    "pl-k00072478": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/mark-flekken_4530/",
+      "sourceUpdatedAt": "11.08.2026 17:57"
+    },
+    "pl-k00143483": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/jarell-quansah_36489/",
+      "sourceUpdatedAt": "11.08.2026 17:57"
+    },
+    "pl-k00114601": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/edmond-tapsoba_19022/",
+      "sourceUpdatedAt": "11.08.2026 17:57"
+    },
+    "pl-k00129291": {
+      "role": "alternative",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/loic-bade_35823/",
+      "sourceUpdatedAt": "11.08.2026 17:57"
+    },
+    "pl-k00090996": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/exequiel-palacios_20382/",
+      "sourceUpdatedAt": "11.08.2026 17:57"
+    },
+    "pl-k00123744": {
+      "role": "alternative",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/equi-fernandez_38674/",
+      "sourceUpdatedAt": "11.08.2026 17:57"
+    },
+    "pl-k00149146": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/ibrahim-maza_35905/",
+      "sourceUpdatedAt": "11.08.2026 17:57"
+    },
+    "pl-k00088240": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/aleix-garcia_7138/",
+      "sourceUpdatedAt": "11.08.2026 17:57"
+    },
+    "pl-k00151366": {
+      "role": "alternative",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/montrell-culbreath_37258/",
+      "sourceUpdatedAt": "11.08.2026 17:57"
+    },
+    "pl-k00085778": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/patrik-schick_7794/",
+      "sourceUpdatedAt": "11.08.2026 17:57"
+    },
+    "pl-k00174580": {
+      "role": "alternative",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/christian-kofane_38550/",
+      "sourceUpdatedAt": "11.08.2026 17:57"
+    },
+    "pl-k00146179": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/afonso-moreira_36841/",
+      "sourceUpdatedAt": "11.08.2026 17:57"
+    },
+    "pl-k00043520": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/janis-blaswich_1685/",
+      "sourceUpdatedAt": "11.08.2026 17:57"
+    },
+    "pl-k00083017": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/lucas-vazquez_7631/",
+      "sourceUpdatedAt": "11.08.2026 17:57"
+    },
+    "pl-k00072607": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/niklas-lomb_2226/",
+      "sourceUpdatedAt": "11.08.2026 17:57"
+    },
+    "pl-k00109674": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/malik-tillman_23862/",
+      "sourceUpdatedAt": "11.08.2026 17:57"
+    },
+    "pl-k00132800": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/victor-boniface_35360/",
+      "sourceUpdatedAt": "11.08.2026 17:57"
+    },
+    "pl-k00070997": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/robert-andrich_2590/",
+      "sourceUpdatedAt": "11.08.2026 17:57"
+    },
+    "pl-k00068029": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/jonas-hofmann_2362/",
+      "sourceUpdatedAt": "11.08.2026 17:57"
+    },
+    "pl-k00097797": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/martin-terrier_21876/",
+      "sourceUpdatedAt": "11.08.2026 17:57"
+    },
+    "pl-k00131053": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/tim-oermann_26552/",
+      "sourceUpdatedAt": "11.08.2026 17:57"
+    },
+    "pl-k00149290": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/eliesse-ben-seghir_35709/",
+      "sourceUpdatedAt": "11.08.2026 17:57"
+    },
+    "pl-k00143938": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/jeanuel-belocian_35601/",
+      "sourceUpdatedAt": "11.08.2026 17:57"
+    },
+    "pl-k00144843": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/arthur_35904/",
+      "sourceUpdatedAt": "11.08.2026 17:57"
+    },
+    "pl-k00141651": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/farid-alfa-ruprecht_38615/",
+      "sourceUpdatedAt": "11.08.2026 17:57"
+    },
+    "pl-k00168485": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/kennet-eichhorn_38775/",
+      "sourceUpdatedAt": "11.08.2026 17:57"
+    },
+    "pl-k00129118": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/nathan-tella_36300/",
+      "sourceUpdatedAt": "11.08.2026 17:57"
+    },
+    "pl-k00138666": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/ernest-poku_37740/",
+      "sourceUpdatedAt": "11.08.2026 17:57"
+    },
+    "pl-k00173877": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/axel-tape_38260/",
+      "sourceUpdatedAt": "11.08.2026 17:57"
+    },
+    "pl-k00132180": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/dennis-seimen_35226/",
+      "sourceUpdatedAt": "10.08.2026 16:56"
+    },
+    "pl-k00141455": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/finn-jeltsch_36816/",
+      "sourceUpdatedAt": "10.08.2026 16:56"
+    },
+    "pl-k00143407": {
+      "role": "alternative",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/luca-jaquez_38305/",
+      "sourceUpdatedAt": "10.08.2026 16:56"
+    },
+    "pl-k00085382": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/julian-chabot_12583/",
+      "sourceUpdatedAt": "10.08.2026 16:56"
+    },
+    "pl-k00107843": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/ramon-hendriks_23957/",
+      "sourceUpdatedAt": "10.08.2026 16:56"
+    },
+    "pl-k00099946": {
+      "role": "alternative",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/nikolas-nartey_13737/",
+      "sourceUpdatedAt": "10.08.2026 16:56"
+    },
+    "pl-k00105180": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/jamie-leweling_21336/",
+      "sourceUpdatedAt": "10.08.2026 16:56"
+    },
+    "pl-k00080088": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/grischa-proemel_5816/",
+      "sourceUpdatedAt": "10.08.2026 16:56"
+    },
+    "pl-k00169471": {
+      "role": "alternative",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/chema-andres_38650/",
+      "sourceUpdatedAt": "10.08.2026 16:56"
+    },
+    "pl-k00079176": {
+      "role": "alternative",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/atakan-karazor_10442/",
+      "sourceUpdatedAt": "10.08.2026 16:56"
+    },
+    "pl-k00104317": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/angelo-stiller_20766/",
+      "sourceUpdatedAt": "10.08.2026 16:56"
+    },
+    "pl-k00079813": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/maximilian-mittelstaedt_6206/",
+      "sourceUpdatedAt": "10.08.2026 16:56"
+    },
+    "pl-k00144663": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/bilal-el-khannouss_37086/",
+      "sourceUpdatedAt": "10.08.2026 16:56"
+    },
+    "pl-k00087705": {
+      "role": "alternative",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/ermedin-demirovic_24166/",
+      "sourceUpdatedAt": "10.08.2026 16:56"
+    },
+    "pl-k00132190": {
+      "role": "alternative",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/dzenan-pejcinovic_26158/",
+      "sourceUpdatedAt": "10.08.2026 16:56"
+    },
+    "pl-k00087885": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/deniz-undav_19154/",
+      "sourceUpdatedAt": "10.08.2026 16:56"
+    },
+    "pl-k00080351": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/chris-fuehrich_18542/",
+      "sourceUpdatedAt": "10.08.2026 16:56"
+    },
+    "pl-k00067047": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/marius-funk_5936/",
+      "sourceUpdatedAt": "10.08.2026 16:56"
+    },
+    "pl-k00099914": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/josha-vagnoman_18427/",
+      "sourceUpdatedAt": "10.08.2026 16:56"
+    },
+    "pl-k00082119": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/fabian-bredlow_6395/",
+      "sourceUpdatedAt": "10.08.2026 16:56"
+    },
+    "pl-k00095202": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/stefan-drljaca_7606/",
+      "sourceUpdatedAt": "10.08.2026 16:56"
+    },
+    "pl-k00100299": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/dan-axel-zagadou_12683/",
+      "sourceUpdatedAt": "10.08.2026 16:56"
+    },
+    "pl-k00132188": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/laurin-ulrich_27568/",
+      "sourceUpdatedAt": "10.08.2026 16:56"
+    },
+    "pl-k00116616": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/tiago-tomas_24512/",
+      "sourceUpdatedAt": "10.08.2026 16:56"
+    },
+    "pl-k00114751": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/leonidas-stergiou_36303/",
+      "sourceUpdatedAt": "10.08.2026 16:56"
+    },
+    "pl-k00169871": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/mirza-catovic_38625/",
+      "sourceUpdatedAt": "10.08.2026 16:56"
+    },
+    "pl-k00146255": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/jovan-milosevic_35760/",
+      "sourceUpdatedAt": "10.08.2026 16:56"
+    },
+    "pl-k00160199": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/jeremy-arevalo_38747/",
+      "sourceUpdatedAt": "10.08.2026 16:56"
+    },
+    "pl-k00116648": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/ameen-al-dakhil_37516/",
+      "sourceUpdatedAt": "10.08.2026 16:56"
+    },
+    "pl-k00171716": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/ertugrul-yigit_38977/",
+      "sourceUpdatedAt": "10.08.2026 16:56"
+    },
+    "pl-k00121863": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/justin-diehl_24547/",
+      "sourceUpdatedAt": "10.08.2026 16:56"
+    },
+    "pl-k00131777": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/lorenz-assignon_25114/",
+      "sourceUpdatedAt": "10.08.2026 16:56"
+    },
+    "pl-k00150682": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/badredine-bouanani_37742/",
+      "sourceUpdatedAt": "10.08.2026 16:56"
+    },
+    "pl-k00156899": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/lazar-jovanovic_38309/",
+      "sourceUpdatedAt": "10.08.2026 16:56"
+    },
+    "pl-k00156708": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/leo-sauer_36387/",
+      "sourceUpdatedAt": "10.08.2026 16:56"
+    },
+    "pl-k00151361": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/jarzinho-malanga_37204/",
+      "sourceUpdatedAt": "10.08.2026 16:56"
+    },
+    "pl-k00068674": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/daniel-heuer-fernandes_6379/",
+      "sourceUpdatedAt": "06.08.2026 17:58"
+    },
+    "pl-k00116302": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/nicolas-capaldo_26628/",
+      "sourceUpdatedAt": "06.08.2026 17:58"
+    },
+    "pl-k00075196": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/jordan-torunarigha_6513/",
+      "sourceUpdatedAt": "06.08.2026 17:58"
+    },
+    "pl-k00132208": {
+      "role": "alternative",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/warmed-omari_25626/",
+      "sourceUpdatedAt": "06.08.2026 17:58"
+    },
+    "pl-k00110187": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/nicolai-remberg_26449/",
+      "sourceUpdatedAt": "06.08.2026 17:58"
+    },
+    "pl-k00105006": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/albert-sambi-lokonga_18447/",
+      "sourceUpdatedAt": "06.08.2026 17:58"
+    },
+    "pl-k00098905": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/miro-muheim_26094/",
+      "sourceUpdatedAt": "06.08.2026 17:58"
+    },
+    "pl-k00099945": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/patson-daka_16774/",
+      "sourceUpdatedAt": "06.08.2026 17:58"
+    },
+    "pl-k00143503": {
+      "role": "alternative",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/martin-adeline_38937/",
+      "sourceUpdatedAt": "06.08.2026 17:58"
+    },
+    "pl-k00132735": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/albert-groenbaek_35437/",
+      "sourceUpdatedAt": "06.08.2026 17:58"
+    },
+    "pl-k00076446": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/yussuf-poulsen_5765/",
+      "sourceUpdatedAt": "06.08.2026 17:58"
+    },
+    "pl-k00141205": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/sander-tangvik_24494/",
+      "sourceUpdatedAt": "06.08.2026 17:58"
+    },
+    "pl-k00171306": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/louis-lemke_38811/",
+      "sourceUpdatedAt": "06.08.2026 17:58"
+    },
+    "pl-k00094605": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/bakery-jatta_7056/",
+      "sourceUpdatedAt": "06.08.2026 17:58"
+    },
+    "pl-k00158911": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/fernando-dickes_37244/",
+      "sourceUpdatedAt": "06.08.2026 17:58"
+    },
+    "pl-k00109664": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/immanuel-pherai_14097/",
+      "sourceUpdatedAt": "06.08.2026 17:58"
+    },
+    "pl-k00096661": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/jean-luc-dompe_12020/",
+      "sourceUpdatedAt": "06.08.2026 17:58"
+    },
+    "pl-k00120042": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/rayan-philippe_36121/",
+      "sourceUpdatedAt": "06.08.2026 17:58"
+    },
+    "pl-k00151371": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/otto-stange_38517/",
+      "sourceUpdatedAt": "06.08.2026 17:58"
+    },
+    "pl-k00136443": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/daniel-elfadli_35221/",
+      "sourceUpdatedAt": "06.08.2026 17:58"
+    },
+    "pl-k00137848": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/bilal-nadir_36654/",
+      "sourceUpdatedAt": "06.08.2026 17:58"
+    },
+    "pl-k00104505": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/emir-sahiti_38469/",
+      "sourceUpdatedAt": "06.08.2026 17:58"
+    },
+    "pl-k00149538": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/joel-agyekum_38494/",
+      "sourceUpdatedAt": "06.08.2026 17:58"
+    },
+    "pl-k00149539": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/fabio-balde_37472/",
+      "sourceUpdatedAt": "06.08.2026 17:58"
+    },
+    "pl-k00170963": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/shafiq-nandja_38678/",
+      "sourceUpdatedAt": "06.08.2026 17:58"
+    },
+    "pl-k00139271": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/kofi-amoako_27549/",
+      "sourceUpdatedAt": "06.08.2026 17:58"
+    },
+    "pl-k00167928": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/alexander-roessing-lelesiit_38495/",
+      "sourceUpdatedAt": "06.08.2026 17:58"
+    },
+    "pl-k00030669": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/manuel-neuer_114/",
+      "sourceUpdatedAt": "06.08.2026 15:14"
+    },
+    "pl-k00123434": {
+      "role": "alternative",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/jonas-urbig_26101/",
+      "sourceUpdatedAt": "06.08.2026 15:14"
+    },
+    "pl-k00084943": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/konrad-laimer_6324/",
+      "sourceUpdatedAt": "06.08.2026 15:14"
+    },
+    "pl-k00102731": {
+      "role": "alternative",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/josip-stanisic_20102/",
+      "sourceUpdatedAt": "06.08.2026 15:14"
+    },
+    "pl-k00088151": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/dayot-upamecano_11541/",
+      "sourceUpdatedAt": "06.08.2026 15:14"
+    },
+    "pl-k00070592": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/jonathan-tah_2385/",
+      "sourceUpdatedAt": "06.08.2026 15:14"
+    },
+    "pl-k00129671": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/nathaniel-brown_35857/",
+      "sourceUpdatedAt": "06.08.2026 15:14"
+    },
+    "pl-k00099583": {
+      "role": "alternative",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/alphonso-davies_20098/",
+      "sourceUpdatedAt": "06.08.2026 15:14"
+    },
+    "pl-k00071150": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/joshua-kimmich_5768/",
+      "sourceUpdatedAt": "06.08.2026 15:14"
+    },
+    "pl-k00107692": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/jamal-musiala_24149/",
+      "sourceUpdatedAt": "06.08.2026 15:14"
+    },
+    "pl-k00132107": {
+      "role": "alternative",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/ismael-saibari_25609/",
+      "sourceUpdatedAt": "06.08.2026 15:14"
+    },
+    "pl-k00156015": {
+      "role": "alternative",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/lennart-karl_38411/",
+      "sourceUpdatedAt": "06.08.2026 15:14"
+    },
+    "pl-k00138529": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/aleksandar-pavlovic_35918/",
+      "sourceUpdatedAt": "06.08.2026 15:14"
+    },
+    "pl-k00132187": {
+      "role": "alternative",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/tom-bischof_26133/",
+      "sourceUpdatedAt": "06.08.2026 15:14"
+    },
+    "pl-k00125181": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/michael-olise_37170/",
+      "sourceUpdatedAt": "06.08.2026 15:14"
+    },
+    "pl-k00070605": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/harry-kane_4828/",
+      "sourceUpdatedAt": "06.08.2026 15:14"
+    },
+    "pl-k00115737": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/luis-diaz_22566/",
+      "sourceUpdatedAt": "06.08.2026 15:14"
+    },
+    "pl-k00187691": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/bara-sapoko-ndiaye_38779/",
+      "sourceUpdatedAt": "06.08.2026 15:14"
+    },
+    "pl-k00066753": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/serge-gnabry_4815/",
+      "sourceUpdatedAt": "06.08.2026 15:14"
+    },
+    "pl-k00039161": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/sven-ulreich_205/",
+      "sourceUpdatedAt": "06.08.2026 15:14"
+    },
+    "pl-k00115990": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/sacha-boey_23034/",
+      "sourceUpdatedAt": "06.08.2026 15:14"
+    },
+    "pl-k00085013": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/joao-palhinha_13287/",
+      "sourceUpdatedAt": "06.08.2026 15:14"
+    },
+    "pl-k00111928": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/armindo-sieb_24114/",
+      "sourceUpdatedAt": "06.08.2026 15:14"
+    },
+    "pl-k00132198": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/arijon-ibrahimovic_27354/",
+      "sourceUpdatedAt": "06.08.2026 15:14"
+    },
+    "pl-k00106358": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/hiroki-ito_26128/",
+      "sourceUpdatedAt": "06.08.2026 15:14"
+    },
+    "pl-k00170610": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/felipe-chavez_38426/",
+      "sourceUpdatedAt": "06.08.2026 15:14"
+    },
+    "pl-k00143278": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/bryan-zaragoza_36856/",
+      "sourceUpdatedAt": "06.08.2026 15:14"
+    },
+    "pl-k00079199": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/moritz-nicolas_6295/",
+      "sourceUpdatedAt": "08.08.2026 15:59"
+    },
+    "pl-k00054360": {
+      "role": "alternative",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/daniel-batz_499/",
+      "sourceUpdatedAt": "08.08.2026 15:59"
+    },
+    "pl-k00105132": {
+      "role": "alternative",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/daiki-hashioka_36955/",
+      "sourceUpdatedAt": "08.08.2026 15:59"
+    },
+    "pl-k00084365": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/nico-elvedi_6475/",
+      "sourceUpdatedAt": "08.08.2026 15:59"
+    },
+    "pl-k00087292": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/kevin-diks_11591/",
+      "sourceUpdatedAt": "08.08.2026 15:59"
+    },
+    "pl-k00113082": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/david-herold_34927/",
+      "sourceUpdatedAt": "08.08.2026 15:59"
+    },
+    "pl-k00132205": {
+      "role": "alternative",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/lukas-ullrich_27518/",
+      "sourceUpdatedAt": "08.08.2026 15:59"
+    },
+    "pl-k00090371": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/philipp-sander_18612/",
+      "sourceUpdatedAt": "08.08.2026 15:59"
+    },
+    "pl-k00167335": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/hugo-bolin_37888/",
+      "sourceUpdatedAt": "08.08.2026 15:59"
+    },
+    "pl-k00096948": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/enzo-leopold_20348/",
+      "sourceUpdatedAt": "08.08.2026 15:59"
+    },
+    "pl-k00161193": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/wael-mohya_38636/",
+      "sourceUpdatedAt": "08.08.2026 15:59"
+    },
+    "pl-k00091126": {
+      "role": "alternative",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/franck-honorat_23248/",
+      "sourceUpdatedAt": "08.08.2026 15:59"
+    },
+    "pl-k00076954": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/tim-kleindienst_6321/",
+      "sourceUpdatedAt": "08.08.2026 15:59"
+    },
+    "pl-k00082727": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/robin-hack_14139/",
+      "sourceUpdatedAt": "08.08.2026 15:59"
+    },
+    "pl-k00037056": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/tobias-sippel_495/",
+      "sourceUpdatedAt": "08.08.2026 15:59"
+    },
+    "pl-k00112730": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/jens-castrop_24405/",
+      "sourceUpdatedAt": "08.08.2026 15:59"
+    },
+    "pl-k00113185": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/joe-scally_23700/",
+      "sourceUpdatedAt": "08.08.2026 15:59"
+    },
+    "pl-k00081913": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/florian-neuhaus_10416/",
+      "sourceUpdatedAt": "08.08.2026 15:59"
+    },
+    "pl-k00106313": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/shuto-machino_36130/",
+      "sourceUpdatedAt": "08.08.2026 15:59"
+    },
+    "pl-k00097892": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/jan-olschowsky_20114/",
+      "sourceUpdatedAt": "08.08.2026 15:59"
+    },
+    "pl-k00101606": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/isac-lidberg_37438/",
+      "sourceUpdatedAt": "08.08.2026 15:59"
+    },
+    "pl-k00117583": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/nathan-ngoumou_35229/",
+      "sourceUpdatedAt": "08.08.2026 15:59"
+    },
+    "pl-k00112498": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/tomas-cvancara_26608/",
+      "sourceUpdatedAt": "08.08.2026 15:59"
+    },
+    "pl-k00137935": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/fabio-chiarodia_26588/",
+      "sourceUpdatedAt": "08.08.2026 15:59"
+    },
+    "pl-k00067514": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/kevin-stoeger_692/",
+      "sourceUpdatedAt": "08.08.2026 15:59"
+    },
+    "pl-k00168347": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/jan-leszczynski_38925/",
+      "sourceUpdatedAt": "08.08.2026 15:59"
+    },
+    "pl-k00165729": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/zento-uno_38869/",
+      "sourceUpdatedAt": "08.08.2026 15:59"
+    },
+    "pl-k00070374": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/marvin-schwaebe_2626/",
+      "sourceUpdatedAt": "06.08.2026 18:14"
+    },
+    "pl-k00121221": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/alessio-castro-montes_22736/",
+      "sourceUpdatedAt": "06.08.2026 18:14"
+    },
+    "pl-k00148193": {
+      "role": "alternative",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/sebastian-sebulonsen_38632/",
+      "sourceUpdatedAt": "06.08.2026 18:14"
+    },
+    "pl-k00165908": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/jahmai-simpson-pusey_38128/",
+      "sourceUpdatedAt": "06.08.2026 18:14"
+    },
+    "pl-k00101708": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/luka-lochoshvili_23949/",
+      "sourceUpdatedAt": "06.08.2026 18:14"
+    },
+    "pl-k00125971": {
+      "role": "alternative",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/rav-van-den-berg_38630/",
+      "sourceUpdatedAt": "06.08.2026 18:14"
+    },
+    "pl-k00130503": {
+      "role": "alternative",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/joel-schmied_38328/",
+      "sourceUpdatedAt": "06.08.2026 18:14"
+    },
+    "pl-k00104033": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/gideon-mensah_16759/",
+      "sourceUpdatedAt": "06.08.2026 18:14"
+    },
+    "pl-k00116762": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/isak-johannesson_35249/",
+      "sourceUpdatedAt": "06.08.2026 18:14"
+    },
+    "pl-k00093857": {
+      "role": "alternative",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/tom-krauss_20244/",
+      "sourceUpdatedAt": "06.08.2026 18:14"
+    },
+    "pl-k00181848": {
+      "role": "alternative",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/paul-okon-engstler_38936/",
+      "sourceUpdatedAt": "06.08.2026 18:14"
+    },
+    "pl-k00100606": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/jan-thielmann_21998/",
+      "sourceUpdatedAt": "06.08.2026 18:14"
+    },
+    "pl-k00099747": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/ragnar-ache_23720/",
+      "sourceUpdatedAt": "06.08.2026 18:14"
+    },
+    "pl-k00172907": {
+      "role": "alternative",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/reigan-heskey_38945/",
+      "sourceUpdatedAt": "06.08.2026 18:14"
+    },
+    "pl-k00159629": {
+      "role": "alternative",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/said-el-mala_38546/",
+      "sourceUpdatedAt": "06.08.2026 18:14"
+    },
+    "pl-k00039284": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/ron-robert-zieler_613/",
+      "sourceUpdatedAt": "06.08.2026 18:14"
+    },
+    "pl-k00070598": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/luca-waldschmidt_2594/",
+      "sourceUpdatedAt": "06.08.2026 18:14"
+    },
+    "pl-k00083988": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/marius-buelter_19202/",
+      "sourceUpdatedAt": "06.08.2026 18:14"
+    },
+    "pl-k00072675": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/matthias-koebbing_13896/",
+      "sourceUpdatedAt": "06.08.2026 18:14"
+    },
+    "pl-k00080172": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/timo-huebers_8912/",
+      "sourceUpdatedAt": "06.08.2026 18:14"
+    },
+    "pl-k00186518": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/martin-james_38985/",
+      "sourceUpdatedAt": "06.08.2026 18:14"
+    },
+    "pl-k00086142": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/linton-maina_18217/",
+      "sourceUpdatedAt": "06.08.2026 18:14"
+    },
+    "pl-k00140561": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/elias-bakatukanda_35775/",
+      "sourceUpdatedAt": "06.08.2026 18:14"
+    },
+    "pl-k00132182": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/julian-pauli_36311/",
+      "sourceUpdatedAt": "06.08.2026 18:14"
+    },
+    "pl-k00159630": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/malek-el-mala_38547/",
+      "sourceUpdatedAt": "06.08.2026 18:14"
+    },
+    "pl-k00155318": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/youssoupha-niang_38624/",
+      "sourceUpdatedAt": "06.08.2026 18:14"
+    },
+    "pl-k00131717": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/imad-rondic_25482/",
+      "sourceUpdatedAt": "06.08.2026 18:14"
+    },
+    "pl-k00087673": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/gregor-kobel_9357/",
+      "sourceUpdatedAt": "06.08.2026 15:25"
+    },
+    "pl-k00156585": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/joane-gadou_37021/",
+      "sourceUpdatedAt": "06.08.2026 15:25"
+    },
+    "pl-k00089649": {
+      "role": "alternative",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/ramy-bensebaini_7791/",
+      "sourceUpdatedAt": "06.08.2026 15:25"
+    },
+    "pl-k00080174": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/waldemar-anton_5837/",
+      "sourceUpdatedAt": "06.08.2026 15:25"
+    },
+    "pl-k00096140": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/nico-schlotterbeck_20052/",
+      "sourceUpdatedAt": "06.08.2026 15:25"
+    },
+    "pl-k00104485": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/julian-ryerson_18478/",
+      "sourceUpdatedAt": "06.08.2026 15:25"
+    },
+    "pl-k00141500": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/jobe-bellingham_38153/",
+      "sourceUpdatedAt": "06.08.2026 15:25"
+    },
+    "pl-k00073206": {
+      "role": "alternative",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/marcel-sabitzer_2020/",
+      "sourceUpdatedAt": "06.08.2026 15:25"
+    },
+    "pl-k00106928": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/felix-nmecha_25090/",
+      "sourceUpdatedAt": "06.08.2026 15:25"
+    },
+    "pl-k00133786": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/daniel-svensson_38304/",
+      "sourceUpdatedAt": "06.08.2026 15:25"
+    },
+    "pl-k00114736": {
+      "role": "alternative",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/maximilian-beier_20804/",
+      "sourceUpdatedAt": "06.08.2026 15:25"
+    },
+    "pl-k00164900": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/konstantinos-karetsas_38406/",
+      "sourceUpdatedAt": "06.08.2026 15:25"
+    },
+    "pl-k00089442": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/serhou-guirassy_10454/",
+      "sourceUpdatedAt": "06.08.2026 15:25"
+    },
+    "pl-k00116506": {
+      "role": "alternative",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/fabio-silva_22570/",
+      "sourceUpdatedAt": "06.08.2026 15:25"
+    },
+    "pl-k00169162": {
+      "role": "alternative",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/samuele-inacio_37188/",
+      "sourceUpdatedAt": "06.08.2026 15:25"
+    },
+    "pl-k00067144": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/patrick-drewes_1981/",
+      "sourceUpdatedAt": "06.08.2026 15:25"
+    },
+    "pl-k00058007": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/emre-can_1812/",
+      "sourceUpdatedAt": "06.08.2026 15:25"
+    },
+    "pl-k00133609": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/carney-chukwuemeka_26083/",
+      "sourceUpdatedAt": "06.08.2026 15:25"
+    },
+    "pl-k00058740": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/alexander-meyer_14604/",
+      "sourceUpdatedAt": "06.08.2026 15:25"
+    },
+    "pl-k00097893": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/diant-ramaj_20836/",
+      "sourceUpdatedAt": "06.08.2026 15:25"
+    },
+    "pl-k00167174": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/justin-lerma_37104/",
+      "sourceUpdatedAt": "06.08.2026 15:25"
+    },
+    "pl-k00173305": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/mathis-albert_38572/",
+      "sourceUpdatedAt": "06.08.2026 15:25"
+    },
+    "pl-k00131371": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/silas-ostrzinski_27269/",
+      "sourceUpdatedAt": "06.08.2026 15:25"
+    },
+    "pl-k00139335": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/almugera-kabar_37161/",
+      "sourceUpdatedAt": "06.08.2026 15:25"
+    },
+    "pl-k00190265": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/kaua-prates_38741/",
+      "sourceUpdatedAt": "06.08.2026 15:25"
+    },
+    "pl-k00167638": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/mussa-kaba_38783/",
+      "sourceUpdatedAt": "06.08.2026 15:25"
+    },
+    "pl-k00143858": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/filippo-mane_37067/",
+      "sourceUpdatedAt": "06.08.2026 15:25"
+    },
+    "pl-k00167640": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/luca-reggiani_38816/",
+      "sourceUpdatedAt": "06.08.2026 15:25"
+    },
+    "pl-k00065896": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/robin-zentner_3298/",
+      "sourceUpdatedAt": "12.08.2026 12:16"
+    },
+    "pl-k00119939": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/fabio-gruber_26579/",
+      "sourceUpdatedAt": "12.08.2026 12:16"
+    },
+    "pl-k00054640": {
+      "role": "alternative",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/danny-da-costa_650/",
+      "sourceUpdatedAt": "12.08.2026 12:16"
+    },
+    "pl-k00167749": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/kacper-potulski_38608/",
+      "sourceUpdatedAt": "12.08.2026 12:16"
+    },
+    "pl-k00071294": {
+      "role": "alternative",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/dominik-kohr_1821/",
+      "sourceUpdatedAt": "12.08.2026 12:16"
+    },
+    "pl-k00100305": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/anthony-caci_26102/",
+      "sourceUpdatedAt": "12.08.2026 12:16"
+    },
+    "pl-k00100591": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/paul-nebel_20674/",
+      "sourceUpdatedAt": "12.08.2026 12:16"
+    },
+    "pl-k00087823": {
+      "role": "alternative",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/jaesung-lee_21202/",
+      "sourceUpdatedAt": "12.08.2026 12:16"
+    },
+    "pl-k00119414": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/eric-martel_20728/",
+      "sourceUpdatedAt": "12.08.2026 12:16"
+    },
+    "pl-k00080083": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/nadiem-amiri_5815/",
+      "sourceUpdatedAt": "12.08.2026 12:16"
+    },
+    "pl-k00076421": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/phillipp-mwene_2723/",
+      "sourceUpdatedAt": "12.08.2026 12:16"
+    },
+    "pl-k00087260": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/sheraldo-becker_20640/",
+      "sourceUpdatedAt": "12.08.2026 12:16"
+    },
+    "pl-k00086106": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/phillip-tietz_7480/",
+      "sourceUpdatedAt": "12.08.2026 12:16"
+    },
+    "pl-k00063586": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/alexander-schwolow_1781/",
+      "sourceUpdatedAt": "12.08.2026 12:16"
+    },
+    "pl-k00060522": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/stefan-bell_521/",
+      "sourceUpdatedAt": "12.08.2026 12:16"
+    },
+    "pl-k00152535": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/otto-ruoppi_38812/",
+      "sourceUpdatedAt": "12.08.2026 12:16"
+    },
+    "pl-k00081638": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/marco-richter_12774/",
+      "sourceUpdatedAt": "12.08.2026 12:16"
+    },
+    "pl-k00131115": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/maximilian-kinzig_34997/",
+      "sourceUpdatedAt": "12.08.2026 12:16"
+    },
+    "pl-k00120073": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/silas_21594/",
+      "sourceUpdatedAt": "12.08.2026 12:16"
+    },
+    "pl-k00075379": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/silvan-widmer_1938/",
+      "sourceUpdatedAt": "12.08.2026 12:16"
+    },
+    "pl-k00099897": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/lennard-maloney_15833/",
+      "sourceUpdatedAt": "12.08.2026 12:16"
+    },
+    "pl-k00130193": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/william-boeving_24255/",
+      "sourceUpdatedAt": "12.08.2026 12:16"
+    },
+    "pl-k00101451": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/benedict-hollerbach_24960/",
+      "sourceUpdatedAt": "12.08.2026 12:16"
+    },
+    "pl-k00097916": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/ransford-koenigsdoerffer_23911/",
+      "sourceUpdatedAt": "12.08.2026 12:16"
+    },
+    "pl-k00104484": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/andreas-hanche-olsen_25263/",
+      "sourceUpdatedAt": "12.08.2026 12:16"
+    },
+    "pl-k00144420": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/sota-kawasaki_38606/",
+      "sourceUpdatedAt": "12.08.2026 12:16"
+    },
+    "pl-k00153662": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/kaishu-sano_36958/",
+      "sourceUpdatedAt": "12.08.2026 12:16"
+    },
+    "pl-k00141756": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/elias-baum_35727/",
+      "sourceUpdatedAt": "06.08.2026 17:04"
+    },
+    "pl-k00084550": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/robin-koch_12490/",
+      "sourceUpdatedAt": "06.08.2026 17:04"
+    },
+    "pl-k00118061": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/nnamdi-collins_24116/",
+      "sourceUpdatedAt": "06.08.2026 17:04"
+    },
+    "pl-k00162291": {
+      "role": "alternative",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/keita-kosugi_38762/",
+      "sourceUpdatedAt": "06.08.2026 17:04"
+    },
+    "pl-k00129414": {
+      "role": "alternative",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/arthur-theate_26137/",
+      "sourceUpdatedAt": "06.08.2026 17:04"
+    },
+    "pl-k00102817": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/ritsu-doan_22974/",
+      "sourceUpdatedAt": "06.08.2026 17:04"
+    },
+    "pl-k00140663": {
+      "role": "alternative",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/ayoube-amaimouni-echghouyab_38710/",
+      "sourceUpdatedAt": "06.08.2026 17:04"
+    },
+    "pl-k00136514": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/raphael-onyedika_26786/",
+      "sourceUpdatedAt": "06.08.2026 17:04"
+    },
+    "pl-k00151054": {
+      "role": "alternative",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/hugo-larsson_35384/",
+      "sourceUpdatedAt": "06.08.2026 17:04"
+    },
+    "pl-k00139276": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/noel-aseko_36931/",
+      "sourceUpdatedAt": "06.08.2026 17:04"
+    },
+    "pl-k00146323": {
+      "role": "alternative",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/oscar-hoejlund_37210/",
+      "sourceUpdatedAt": "06.08.2026 17:04"
+    },
+    "pl-k00148187": {
+      "role": "alternative",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/fares-chaibi_35910/",
+      "sourceUpdatedAt": "06.08.2026 17:04"
+    },
+    "pl-k00146292": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/can-uzun_35949/",
+      "sourceUpdatedAt": "06.08.2026 17:04"
+    },
+    "pl-k00088192": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/jonathan-burkardt_19272/",
+      "sourceUpdatedAt": "06.08.2026 17:04"
+    },
+    "pl-k00154239": {
+      "role": "alternative",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/younes-ebnoutalib_38489/",
+      "sourceUpdatedAt": "06.08.2026 17:04"
+    },
+    "pl-k00040891": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/jens-grahl_727/",
+      "sourceUpdatedAt": "06.08.2026 17:04"
+    },
+    "pl-k00043592": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/mario-goetze_501/",
+      "sourceUpdatedAt": "06.08.2026 17:04"
+    },
+    "pl-k00070409": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/michy-batshuayi_2927/",
+      "sourceUpdatedAt": "06.08.2026 17:04"
+    },
+    "pl-k00076053": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/michael-zetterer_6257/",
+      "sourceUpdatedAt": "06.08.2026 17:04"
+    },
+    "pl-k00050237": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/timothy-chandler_643/",
+      "sourceUpdatedAt": "06.08.2026 17:04"
+    },
+    "pl-k00100088": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/jessic-ngankam_20484/",
+      "sourceUpdatedAt": "06.08.2026 17:04"
+    },
+    "pl-k00155136": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/kaua-santos_36306/",
+      "sourceUpdatedAt": "06.08.2026 17:04"
+    },
+    "pl-k00167552": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/amil-siljevic_38182/",
+      "sourceUpdatedAt": "06.08.2026 17:04"
+    },
+    "pl-k00125811": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/noel-futkeu_24815/",
+      "sourceUpdatedAt": "06.08.2026 17:04"
+    },
+    "pl-k00123991": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/niels-nkounkou_35999/",
+      "sourceUpdatedAt": "06.08.2026 17:04"
+    },
+    "pl-k00118291": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/ansgar-knauff_24398/",
+      "sourceUpdatedAt": "06.08.2026 17:04"
+    },
+    "pl-k00176357": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/love-arrhov_38440/",
+      "sourceUpdatedAt": "06.08.2026 17:04"
+    },
+    "pl-k00132741": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/elye-wahi_35837/",
+      "sourceUpdatedAt": "06.08.2026 17:04"
+    },
+    "pl-k00176506": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/otavio_39011/",
+      "sourceUpdatedAt": "06.08.2026 17:04"
+    },
+    "pl-k00089655": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/ellyes-skhiri_20776/",
+      "sourceUpdatedAt": "06.08.2026 17:04"
+    },
+    "pl-k00190115": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/malik-pimpong_38920/",
+      "sourceUpdatedAt": "06.08.2026 17:04"
+    },
+    "pl-k00149094": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/jean-matteo-bahoya_36932/",
+      "sourceUpdatedAt": "06.08.2026 17:04"
+    },
+    "pl-k00075651": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/frederik-roennow_7943/",
+      "sourceUpdatedAt": "06.08.2026 17:41"
+    },
+    "pl-k00058938": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/christopher-trimmel_5713/",
+      "sourceUpdatedAt": "06.08.2026 17:41"
+    },
+    "pl-k00091372": {
+      "role": "alternative",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/josip-juranovic_26979/",
+      "sourceUpdatedAt": "06.08.2026 17:41"
+    },
+    "pl-k00137082": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/leopold-querfeld_27234/",
+      "sourceUpdatedAt": "06.08.2026 17:41"
+    },
+    "pl-k00133558": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/zeno-van-den-bosch_25990/",
+      "sourceUpdatedAt": "06.08.2026 17:41"
+    },
+    "pl-k00105275": {
+      "role": "alternative",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/stanley-nsoki_18802/",
+      "sourceUpdatedAt": "06.08.2026 17:41"
+    },
+    "pl-k00095745": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/derrick-koehn_14385/",
+      "sourceUpdatedAt": "06.08.2026 17:41"
+    },
+    "pl-k00136357": {
+      "role": "alternative",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/tom-rothe_26243/",
+      "sourceUpdatedAt": "06.08.2026 17:41"
+    },
+    "pl-k00149508": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/ilyas-ansah_36892/",
+      "sourceUpdatedAt": "06.08.2026 17:41"
+    },
+    "pl-k00114616": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/andras-schaefer_27369/",
+      "sourceUpdatedAt": "06.08.2026 17:41"
+    },
+    "pl-k00057241": {
+      "role": "alternative",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/rani-khedira_2122/",
+      "sourceUpdatedAt": "06.08.2026 17:41"
+    },
+    "pl-k00138020": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/aljoscha-kemlein_27560/",
+      "sourceUpdatedAt": "06.08.2026 17:41"
+    },
+    "pl-k00155808": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/livan-burcu_36114/",
+      "sourceUpdatedAt": "06.08.2026 17:41"
+    },
+    "pl-k00101721": {
+      "role": "alternative",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/wooyeong-jeong_14145/",
+      "sourceUpdatedAt": "06.08.2026 17:41"
+    },
+    "pl-k00096990": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/emmanuel-latte-lath_24183/",
+      "sourceUpdatedAt": "06.08.2026 17:41"
+    },
+    "pl-k00093478": {
+      "role": "alternative",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/oliver-burke_11325/",
+      "sourceUpdatedAt": "06.08.2026 17:41"
+    },
+    "pl-k00150671": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/andrej-ilic_37532/",
+      "sourceUpdatedAt": "06.08.2026 17:41"
+    },
+    "pl-k00070987": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/carl-klaus_1982/",
+      "sourceUpdatedAt": "06.08.2026 17:41"
+    },
+    "pl-k00088061": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/tim-skarke_6374/",
+      "sourceUpdatedAt": "06.08.2026 17:41"
+    },
+    "pl-k00071610": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/janik-haberer_3616/",
+      "sourceUpdatedAt": "06.08.2026 17:41"
+    },
+    "pl-k00094875": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/matheo-raab_11224/",
+      "sourceUpdatedAt": "06.08.2026 17:41"
+    },
+    "pl-k00077333": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/marvin-friedrich_3296/",
+      "sourceUpdatedAt": "06.08.2026 17:41"
+    },
+    "pl-k00095487": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/robert-skov_18702/",
+      "sourceUpdatedAt": "06.08.2026 17:41"
+    },
+    "pl-k00141432": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/marin-ljubicic_36465/",
+      "sourceUpdatedAt": "06.08.2026 17:41"
+    },
+    "pl-k00161353": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/dmytro-bogdanov_37476/",
+      "sourceUpdatedAt": "06.08.2026 17:41"
+    },
+    "pl-k00170733": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/tim-blaszczak_38706/",
+      "sourceUpdatedAt": "06.08.2026 17:41"
+    },
+    "pl-k00159341": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/andrik-markgraf_38588/",
+      "sourceUpdatedAt": "06.08.2026 17:41"
+    },
+    "pl-k00167392": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/mekhi-gray_38708/",
+      "sourceUpdatedAt": "06.08.2026 17:41"
+    },
+    "pl-k00158733": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/oluwaseun-ogbemudia_36006/",
+      "sourceUpdatedAt": "06.08.2026 17:41"
+    },
+    "pl-k00159344": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/julien-friedrich_37200/",
+      "sourceUpdatedAt": "06.08.2026 17:41"
+    },
+    "pl-k00177491": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/linus-guether_38833/",
+      "sourceUpdatedAt": "06.08.2026 17:41"
+    },
+    "pl-k00075608": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/finn-dahmen_18728/",
+      "sourceUpdatedAt": "06.08.2026 17:14"
+    },
+    "pl-k00116706": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/chrislain-matsima_26695/",
+      "sourceUpdatedAt": "06.08.2026 17:14"
+    },
+    "pl-k00075006": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/jeffrey-gouweleeuw_1851/",
+      "sourceUpdatedAt": "06.08.2026 17:14"
+    },
+    "pl-k00154546": {
+      "role": "alternative",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/noahkai-banks_37195/",
+      "sourceUpdatedAt": "06.08.2026 17:14"
+    },
+    "pl-k00097884": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/calvin-brackelmann_12771/",
+      "sourceUpdatedAt": "06.08.2026 17:14"
+    },
+    "pl-k00101460": {
+      "role": "alternative",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/keven-schlotterbeck_19286/",
+      "sourceUpdatedAt": "06.08.2026 17:14"
+    },
+    "pl-k00076796": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/robin-fellhauer_24864/",
+      "sourceUpdatedAt": "06.08.2026 17:14"
+    },
+    "pl-k00113079": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/han-noah-massengo_35978/",
+      "sourceUpdatedAt": "06.08.2026 17:14"
+    },
+    "pl-k00131930": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/fabian-rieder_25579/",
+      "sourceUpdatedAt": "06.08.2026 17:14"
+    },
+    "pl-k00149673": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/hennes-behrens_37221/",
+      "sourceUpdatedAt": "06.08.2026 17:14"
+    },
+    "pl-k00121834": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/anton-kade_26138/",
+      "sourceUpdatedAt": "06.08.2026 17:14"
+    },
+    "pl-k00063799": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/michael-gregoritsch_1512/",
+      "sourceUpdatedAt": "06.08.2026 17:14"
+    },
+    "pl-k00143035": {
+      "role": "alternative",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/rodrigo-ribeiro_27435/",
+      "sourceUpdatedAt": "06.08.2026 17:14"
+    },
+    "pl-k00139273": {
+      "role": "alternative",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/mert-koemuer_27169/",
+      "sourceUpdatedAt": "06.08.2026 17:14"
+    },
+    "pl-k00097452": {
+      "role": "alternative",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/alexis-claude-maurice_20630/",
+      "sourceUpdatedAt": "06.08.2026 17:14"
+    },
+    "pl-k00170727": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/tom-wisbereit_38837/",
+      "sourceUpdatedAt": "06.08.2026 17:14"
+    },
+    "pl-k00079577": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/marius-wolf_5670/",
+      "sourceUpdatedAt": "06.08.2026 17:14"
+    },
+    "pl-k00087441": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/steve-mounie_14079/",
+      "sourceUpdatedAt": "06.08.2026 17:14"
+    },
+    "pl-k00139040": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/nediljko-labrovic_37153/",
+      "sourceUpdatedAt": "06.08.2026 17:14"
+    },
+    "pl-k00101253": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/mads-pedersen_15841/",
+      "sourceUpdatedAt": "06.08.2026 17:14"
+    },
+    "pl-k00088182": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/yannik-keitel_22010/",
+      "sourceUpdatedAt": "06.08.2026 17:14"
+    },
+    "pl-k00124479": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/thomas-kastanaras_27430/",
+      "sourceUpdatedAt": "06.08.2026 17:14"
+    },
+    "pl-k00095063": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/kristijan-jakic_24599/",
+      "sourceUpdatedAt": "06.08.2026 17:14"
+    },
+    "pl-k00119868": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/tim-breithaupt_25618/",
+      "sourceUpdatedAt": "06.08.2026 17:14"
+    },
+    "pl-k00178704": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/uchenna-ogundu_38810/",
+      "sourceUpdatedAt": "06.08.2026 17:14"
+    },
+    "pl-k00141535": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/sima-suso_36794/",
+      "sourceUpdatedAt": "06.08.2026 17:14"
+    },
+    "pl-k00116718": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/nathanael-mbuku_35745/",
+      "sourceUpdatedAt": "06.08.2026 17:14"
+    },
+    "pl-k00156023": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/faik-sakar_37237/",
+      "sourceUpdatedAt": "06.08.2026 17:14"
+    },
+    "pl-k00166190": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/tim-schnitzer_38168/",
+      "sourceUpdatedAt": "06.08.2026 17:14"
+    },
+    "pl-k00125043": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/nahuel-noll_24594/",
+      "sourceUpdatedAt": "12.08.2026 13:24"
+    },
+    "pl-k00104827": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/tjark-scheller_36890/",
+      "sourceUpdatedAt": "12.08.2026 13:24"
+    },
+    "pl-k00148500": {
+      "role": "alternative",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/nyamekye-awortwie-grant_36091/",
+      "sourceUpdatedAt": "12.08.2026 13:24"
+    },
+    "pl-k00119391": {
+      "role": "alternative",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/jano-ter-horst_36702/",
+      "sourceUpdatedAt": "12.08.2026 13:24"
+    },
+    "pl-k00080357": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/felix-goetze_10508/",
+      "sourceUpdatedAt": "12.08.2026 13:24"
+    },
+    "pl-k00110339": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/marcel-hoffmeier_26447/",
+      "sourceUpdatedAt": "12.08.2026 13:24"
+    },
+    "pl-k00104478": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/laurin-curda_36261/",
+      "sourceUpdatedAt": "12.08.2026 13:24"
+    },
+    "pl-k00154597": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/santiago-castaneda_37450/",
+      "sourceUpdatedAt": "12.08.2026 13:24"
+    },
+    "pl-k00094630": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/raphael-obermair_12780/",
+      "sourceUpdatedAt": "12.08.2026 13:24"
+    },
+    "pl-k00149406": {
+      "role": "alternative",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/ruben-mueller_37563/",
+      "sourceUpdatedAt": "12.08.2026 13:24"
+    },
+    "pl-k00138223": {
+      "role": "alternative",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/stefano-marino_27339/",
+      "sourceUpdatedAt": "12.08.2026 13:24"
+    },
+    "pl-k00093863": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/oliver-batista-meier_19164/",
+      "sourceUpdatedAt": "12.08.2026 13:24"
+    },
+    "pl-k00149976": {
+      "role": "alternative",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/albert-millgramm_38879/",
+      "sourceUpdatedAt": "12.08.2026 13:24"
+    },
+    "pl-k00154311": {
+      "role": "alternative",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/deniz-zeitler_37353/",
+      "sourceUpdatedAt": "12.08.2026 13:24"
+    },
+    "pl-k00084861": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/markus-schubert_8133/",
+      "sourceUpdatedAt": "12.08.2026 13:24"
+    },
+    "pl-k00136379": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/mika-baur_35751/",
+      "sourceUpdatedAt": "12.08.2026 13:24"
+    },
+    "pl-k00072566": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/sven-michel_2391/",
+      "sourceUpdatedAt": "12.08.2026 13:24"
+    },
+    "pl-k00085717": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/tom-baack_7463/",
+      "sourceUpdatedAt": "12.08.2026 13:24"
+    },
+    "pl-k00091527": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/steffen-tigges_15810/",
+      "sourceUpdatedAt": "12.08.2026 13:24"
+    },
+    "pl-k00158528": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/florian-pruhs_38854/",
+      "sourceUpdatedAt": "12.08.2026 13:24"
+    },
+    "pl-k00092317": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/timur-gayret_26215/",
+      "sourceUpdatedAt": "12.08.2026 13:24"
+    },
+    "pl-k00154904": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/kennedy-okpala_38857/",
+      "sourceUpdatedAt": "12.08.2026 13:24"
+    },
+    "pl-k00095159": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/sebastian-klaas_15795/",
+      "sourceUpdatedAt": "12.08.2026 13:24"
+    },
+    "pl-k00179095": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/lasse-eickel_38880/",
+      "sourceUpdatedAt": "12.08.2026 13:24"
+    },
+    "pl-k00130865": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/tristan-zobel_38502/",
+      "sourceUpdatedAt": "12.08.2026 13:24"
+    },
+    "pl-k00140738": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/jonah-sticker_38855/",
+      "sourceUpdatedAt": "12.08.2026 13:24"
+    },
+    "pl-k00102692": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/nick-baetzner_20302/",
+      "sourceUpdatedAt": "12.08.2026 13:24"
+    },
+    "pl-k00178690": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/niklas-mohr_38856/",
+      "sourceUpdatedAt": "12.08.2026 13:24"
+    },
+    "pl-k00124286": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/mattes-hansen_35894/",
+      "sourceUpdatedAt": "12.08.2026 13:24"
+    },
+    "pl-k00159587": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/clemens-lippmann_38885/",
+      "sourceUpdatedAt": "12.08.2026 13:24"
+    },
+    "pl-k00117115": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/nicolas-kristof_26473/",
+      "sourceUpdatedAt": "06.08.2026 18:48"
+    },
+    "pl-k00071901": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/jan-gyamerah_5825/",
+      "sourceUpdatedAt": "06.08.2026 18:48"
+    },
+    "pl-k00113269": {
+      "role": "alternative",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/luca-sirch_26346/",
+      "sourceUpdatedAt": "06.08.2026 18:48"
+    },
+    "pl-k00131359": {
+      "role": "alternative",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/felix-keidel_27483/",
+      "sourceUpdatedAt": "06.08.2026 18:48"
+    },
+    "pl-k00103048": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/lukas-pinckert_38539/",
+      "sourceUpdatedAt": "06.08.2026 18:48"
+    },
+    "pl-k00118849": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/maximilian-rohr_24711/",
+      "sourceUpdatedAt": "06.08.2026 18:48"
+    },
+    "pl-k00111922": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/lasse-guenther_26087/",
+      "sourceUpdatedAt": "06.08.2026 18:48"
+    },
+    "pl-k00071019": {
+      "role": "alternative",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/amara-conde_6545/",
+      "sourceUpdatedAt": "06.08.2026 18:48"
+    },
+    "pl-k00146030": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/francis-onyeka_36948/",
+      "sourceUpdatedAt": "06.08.2026 18:48"
+    },
+    "pl-k00125575": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/lukasz-poreba_36788/",
+      "sourceUpdatedAt": "06.08.2026 18:48"
+    },
+    "pl-k00103012": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/lukas-petkov_20088/",
+      "sourceUpdatedAt": "06.08.2026 18:48"
+    },
+    "pl-k00144321": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/david-mokwa_35765/",
+      "sourceUpdatedAt": "06.08.2026 18:48"
+    },
+    "pl-k00101815": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/tom-zimmerschied_38111/",
+      "sourceUpdatedAt": "06.08.2026 18:48"
+    },
+    "pl-k00153733": {
+      "role": "alternative",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/cole-campbell_36946/",
+      "sourceUpdatedAt": "06.08.2026 18:48"
+    },
+    "pl-k00045037": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/frank-lehmann_2876/",
+      "sourceUpdatedAt": "06.08.2026 18:48"
+    },
+    "pl-k00119683": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/frederik-schmahl_36005/",
+      "sourceUpdatedAt": "06.08.2026 18:48"
+    },
+    "pl-k00077452": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/luca-schnellbacher_6495/",
+      "sourceUpdatedAt": "06.08.2026 18:48"
+    },
+    "pl-k00169821": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/elias-etringer_38898/",
+      "sourceUpdatedAt": "06.08.2026 18:48"
+    },
+    "pl-k00094785": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/luca-pfeiffer_19196/",
+      "sourceUpdatedAt": "06.08.2026 18:48"
+    },
+    "pl-k00068475": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/tim-boss_19242/",
+      "sourceUpdatedAt": "06.08.2026 18:48"
+    },
+    "pl-k00141453": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/noah-darvich_36018/",
+      "sourceUpdatedAt": "06.08.2026 18:48"
+    },
+    "pl-k00141330": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/maurice-krattenmacher_36255/",
+      "sourceUpdatedAt": "06.08.2026 18:48"
+    },
+    "pl-k00096434": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/jason-ceka_20512/",
+      "sourceUpdatedAt": "06.08.2026 18:48"
+    },
+    "pl-k00106945": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/nicholas-mickelson_38873/",
+      "sourceUpdatedAt": "06.08.2026 18:48"
+    },
+    "pl-k00137975": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/luis-seifert_36900/",
+      "sourceUpdatedAt": "06.08.2026 18:48"
+    },
+    "pl-k00177748": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/raif-adam_38679/",
+      "sourceUpdatedAt": "06.08.2026 18:48"
+    },
+    "pl-k00089587": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/florian-le-joncour_37052/",
+      "sourceUpdatedAt": "06.08.2026 18:48"
+    },
+    "pl-k00148669": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/filimon-gerezgiher_37443/",
+      "sourceUpdatedAt": "06.08.2026 18:48"
+    },
+    "pl-k00039245": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/oliver-baumann_567/",
+      "sourceUpdatedAt": "11.08.2026 12:51"
+    },
+    "pl-k00081053": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/vladimir-coufal_11929/",
+      "sourceUpdatedAt": "11.08.2026 12:51"
+    },
+    "pl-k00100804": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/ozan-kabak_20416/",
+      "sourceUpdatedAt": "11.08.2026 12:51"
+    },
+    "pl-k00131599": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/albian-hajdari_37227/",
+      "sourceUpdatedAt": "11.08.2026 12:51"
+    },
+    "pl-k00154172": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/mats-rots_37794/",
+      "sourceUpdatedAt": "11.08.2026 12:51"
+    },
+    "pl-k00092331": {
+      "role": "alternative",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/bernardo_11324/",
+      "sourceUpdatedAt": "11.08.2026 12:51"
+    },
+    "pl-k00098050": {
+      "role": "alternative",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/koki-machida_35863/",
+      "sourceUpdatedAt": "11.08.2026 12:51"
+    },
+    "pl-k00169680": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/nathan-de-cat_38750/",
+      "sourceUpdatedAt": "11.08.2026 12:51"
+    },
+    "pl-k00156434": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/leon-avdullahu_38223/",
+      "sourceUpdatedAt": "11.08.2026 12:51"
+    },
+    "pl-k00107842": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/wouter-burger_22632/",
+      "sourceUpdatedAt": "11.08.2026 12:51"
+    },
+    "pl-k00111937": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/tim-lemperle_23854/",
+      "sourceUpdatedAt": "11.08.2026 12:51"
+    },
+    "pl-k00145381": {
+      "role": "alternative",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/adam-daghim_37622/",
+      "sourceUpdatedAt": "11.08.2026 12:51"
+    },
+    "pl-k00059041": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/andrej-kramaric_2439/",
+      "sourceUpdatedAt": "11.08.2026 12:51"
+    },
+    "pl-k00125269": {
+      "role": "alternative",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/patrick-wimmer_26236/",
+      "sourceUpdatedAt": "11.08.2026 12:51"
+    },
+    "pl-k00119669": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/fisnik-asllani_21986/",
+      "sourceUpdatedAt": "11.08.2026 12:51"
+    },
+    "pl-k00075625": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/dennis-geiger_10434/",
+      "sourceUpdatedAt": "11.08.2026 12:51"
+    },
+    "pl-k00102795": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/luca-philipp_24129/",
+      "sourceUpdatedAt": "11.08.2026 12:51"
+    },
+    "pl-k00132029": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/lukas-petersson_37114/",
+      "sourceUpdatedAt": "11.08.2026 12:51"
+    },
+    "pl-k00104978": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/adam-hlozek_24095/",
+      "sourceUpdatedAt": "11.08.2026 12:51"
+    },
+    "pl-k00111315": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/valentin-gendrey_35971/",
+      "sourceUpdatedAt": "11.08.2026 12:51"
+    },
+    "pl-k00118073": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/umut-tohumcu_27482/",
+      "sourceUpdatedAt": "11.08.2026 12:51"
+    },
+    "pl-k00112735": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/bambase-conte_27420/",
+      "sourceUpdatedAt": "11.08.2026 12:51"
+    },
+    "pl-k00136435": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/alexander-prass_27057/",
+      "sourceUpdatedAt": "11.08.2026 12:51"
+    },
+    "pl-k00160972": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/natnael-abraha_38435/",
+      "sourceUpdatedAt": "11.08.2026 12:51"
+    },
+    "pl-k00164910": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/luis-engelns_37089/",
+      "sourceUpdatedAt": "11.08.2026 12:51"
+    },
+    "pl-k00141456": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/max-moerstedt_36318/",
+      "sourceUpdatedAt": "11.08.2026 12:51"
+    },
+    "pl-k00159360": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/cajetan-lenz_37065/",
+      "sourceUpdatedAt": "11.08.2026 12:51"
+    },
+    "pl-k00173662": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/alessandro-vogt_38792/",
+      "sourceUpdatedAt": "11.08.2026 12:51"
+    },
+    "pl-k00147890": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/robin-hranac_37515/",
+      "sourceUpdatedAt": "11.08.2026 12:51"
+    },
+    "pl-k00145594": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/arthur-chaves_37533/",
+      "sourceUpdatedAt": "11.08.2026 12:51"
+    },
+    "pl-k00148104": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/sean-dulic_38904/",
+      "sourceUpdatedAt": "11.08.2026 12:51"
+    },
+    "pl-k00112924": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/maarten-vandevoordt_21774/",
+      "sourceUpdatedAt": "08.08.2026 12:33"
+    },
+    "pl-k00089892": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/ridle-baku_15835/",
+      "sourceUpdatedAt": "08.08.2026 12:33"
+    },
+    "pl-k00069255": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/willi-orban_1667/",
+      "sourceUpdatedAt": "08.08.2026 12:33"
+    },
+    "pl-k00167851": {
+      "role": "alternative",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/abdoul-kone_38801/",
+      "sourceUpdatedAt": "08.08.2026 12:33"
+    },
+    "pl-k00134465": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/maxime-esteve_38844/",
+      "sourceUpdatedAt": "08.08.2026 12:33"
+    },
+    "pl-k00087750": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/david-raum_12557/",
+      "sourceUpdatedAt": "08.08.2026 12:33"
+    },
+    "pl-k00139342": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/assan-ouedraogo_36735/",
+      "sourceUpdatedAt": "08.08.2026 12:33"
+    },
+    "pl-k00104895": {
+      "role": "alternative",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/rocco-reitz_24546/",
+      "sourceUpdatedAt": "08.08.2026 12:33"
+    },
+    "pl-k00130252": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/nicolas-seiwald_24619/",
+      "sourceUpdatedAt": "08.08.2026 12:33"
+    },
+    "pl-k00102800": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/christoph-baumgartner_18640/",
+      "sourceUpdatedAt": "08.08.2026 12:33"
+    },
+    "pl-k00118068": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/brajan-gruda_35733/",
+      "sourceUpdatedAt": "08.08.2026 12:33"
+    },
+    "pl-k00143036": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/romulo-cardoso_38565/",
+      "sourceUpdatedAt": "08.08.2026 12:33"
+    },
+    "pl-k00156279": {
+      "role": "alternative",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/conrad-harder_36956/",
+      "sourceUpdatedAt": "08.08.2026 12:33"
+    },
+    "pl-k00139305": {
+      "role": "starter",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/antonio-nusa_37124/",
+      "sourceUpdatedAt": "08.08.2026 12:33"
+    },
+    "pl-k00072684": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/leopold-zingerle_2452/",
+      "sourceUpdatedAt": "08.08.2026 12:33"
+    },
+    "pl-k00140563": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/max-finkgraefe_35735/",
+      "sourceUpdatedAt": "08.08.2026 12:33"
+    },
+    "pl-k00141457": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/robert-ramsak_37238/",
+      "sourceUpdatedAt": "08.08.2026 12:33"
+    },
+    "pl-k00071021": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/benjamin-henrichs_5680/",
+      "sourceUpdatedAt": "08.08.2026 12:33"
+    },
+    "pl-k00146229": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/ezechiel-banzuzi_38383/",
+      "sourceUpdatedAt": "08.08.2026 12:33"
+    },
+    "pl-k00156588": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/tidiam-gomis_36962/",
+      "sourceUpdatedAt": "08.08.2026 12:33"
+    },
+    "pl-k00100558": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/lutsharel-geertruida_16366/",
+      "sourceUpdatedAt": "08.08.2026 12:33"
+    },
+    "pl-k00094920": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/eljif-elmas_21900/",
+      "sourceUpdatedAt": "08.08.2026 12:33"
+    },
+    "pl-k00112775": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/johan-bakayoko_35421/",
+      "sourceUpdatedAt": "08.08.2026 12:33"
+    },
+    "pl-k00135025": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/castello-lukeba_27079/",
+      "sourceUpdatedAt": "08.08.2026 12:33"
+    },
+    "pl-k00165899": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/ayodele-thomas_38746/",
+      "sourceUpdatedAt": "08.08.2026 12:33"
+    },
+    "pl-k00136673": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/el-chadaille-bitshiabu_24578/",
+      "sourceUpdatedAt": "08.08.2026 12:33"
+    },
+    "pl-k00167652": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/viggo-gebel_37240/",
+      "sourceUpdatedAt": "08.08.2026 12:33"
+    },
+    "pl-k00179096": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/samba-konate_38757/",
+      "sourceUpdatedAt": "08.08.2026 12:33"
+    },
+    "pl-k00165957": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/joyeux-masanka-bungi_37241/",
+      "sourceUpdatedAt": "08.08.2026 12:33"
+    },
+    "pl-k00156895": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/andrija-maksimovic_37867/",
+      "sourceUpdatedAt": "08.08.2026 12:33"
+    },
+    "pl-k00181962": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/suleman-sani_38787/",
+      "sourceUpdatedAt": "08.08.2026 12:33"
+    },
+    "pl-k00076575": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/lukas-klostermann_5622/",
+      "sourceUpdatedAt": "08.08.2026 12:33"
+    },
+    "pl-k00178213": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/benno-kaltefleiter_38764/",
+      "sourceUpdatedAt": "08.08.2026 12:33"
+    },
+    "pl-k00146044": {
+      "role": "squad",
+      "source": "LigaInsider",
+      "sourceUrl": "https://www.ligainsider.de/arthur-vermeeren_36361/",
+      "sourceUpdatedAt": "08.08.2026 12:33"
+    }
+  },
+  "teams": {
+    "tm-k00000002": {
+      "ligaInsiderUrl": "https://www.ligainsider.de/fc-schalke-04/13/",
+      "transfermarktUrl": "https://www.transfermarkt.de/-/startseite/verein/33",
+      "sourceUpdatedAt": "07.08.2026 10:48",
+      "matchedPlayers": 17,
+      "matchedStarters": 11,
+      "unmatchedStarters": [],
+      "headlines": [
+        {
+          "source": "LigaInsider",
+          "title": "Sommerfahrplan der Bundesliga-Klubs 2026/27",
+          "url": "https://www.ligainsider.de/ligainsider_1381/sommerfahrplan-der-bundesliga-klubs-2026-27-413573/"
+        },
+        {
+          "source": "LigaInsider",
+          "title": "Top-Elf-Prognose: FC Schalke 04 im Check",
+          "url": "https://www.ligainsider.de/fc-schalke-04/13/top-elf-prognose-fc-schalke-04-im-check-414090/"
+        },
+        {
+          "source": "LigaInsider",
+          "title": "Schalke unterliegt Atalanta mit 0:3",
+          "url": "https://www.ligainsider.de/fc-schalke-04/13/schalke-unterliegt-atalanta-mit-0-3-415992/"
+        },
+        {
+          "source": "LigaInsider",
+          "title": "Ebimbe ist nach Schalke-Debüt angeschlagen",
+          "url": "https://www.ligainsider.de/junior-dina-ebimbe_26881/ebimbe-ist-nach-schalke-debuet-angeschlagen-416010/"
+        },
+        {
+          "source": "LigaInsider",
+          "title": "Offiziell: Schalke verpflichtet Dina Ebimbe",
+          "url": "https://www.ligainsider.de/junior-dina-ebimbe_26881/offiziell-schalke-verpflichtet-dina-ebimbe-415924/"
+        }
+      ]
+    },
+    "tm-k00000004": {
+      "ligaInsiderUrl": "https://www.ligainsider.de/sv-werder-bremen/2/",
+      "transfermarktUrl": "https://www.transfermarkt.de/-/startseite/verein/86",
+      "sourceUpdatedAt": "08.08.2026 17:54",
+      "matchedPlayers": 14,
+      "matchedStarters": 8,
+      "unmatchedStarters": [],
+      "headlines": [
+        {
+          "source": "LigaInsider",
+          "title": "Sommerfahrplan der Bundesliga-Klubs 2026/27",
+          "url": "https://www.ligainsider.de/ligainsider_1381/sommerfahrplan-der-bundesliga-klubs-2026-27-413573/"
+        },
+        {
+          "source": "LigaInsider",
+          "title": "Top-Elf-Prognose: SV Werder Bremen im Check",
+          "url": "https://www.ligainsider.de/sv-werder-bremen/2/top-elf-prognose-sv-werder-bremen-im-check-414006/"
+        },
+        {
+          "source": "LigaInsider",
+          "title": "XL-Test zwischen Werder und SCP endet 2:2",
+          "url": "https://www.ligainsider.de/sv-werder-bremen/2/xl-test-zwischen-werder-und-scp-endet-2-2-415959/"
+        },
+        {
+          "source": "LigaInsider",
+          "title": "Schmid steht vor Absprung nach Italien",
+          "url": "https://www.ligainsider.de/romano-schmid_16771/schmid-steht-vor-absprung-nach-italien-415956/"
+        },
+        {
+          "source": "LigaInsider",
+          "title": "Werder ohne Agu ins Trainingslager",
+          "url": "https://www.ligainsider.de/felix-agu_21590/werder-ohne-agu-ins-trainingslager-416021/"
+        }
+      ]
+    },
+    "tm-k00000007": {
+      "ligaInsiderUrl": "https://www.ligainsider.de/sc-freiburg/18/",
+      "transfermarktUrl": "https://www.transfermarkt.de/-/startseite/verein/60",
+      "sourceUpdatedAt": "06.08.2026 16:59",
+      "matchedPlayers": 16,
+      "matchedStarters": 11,
+      "unmatchedStarters": [],
+      "headlines": [
+        {
+          "source": "LigaInsider",
+          "title": "Sommerfahrplan der Bundesliga-Klubs 2026/27",
+          "url": "https://www.ligainsider.de/ligainsider_1381/sommerfahrplan-der-bundesliga-klubs-2026-27-413573/"
+        },
+        {
+          "source": "LigaInsider",
+          "title": "Top-Elf-Prognose: SC Freiburg im Check",
+          "url": "https://www.ligainsider.de/sc-freiburg/18/top-elf-prognose-sc-freiburg-im-check-414060/"
+        },
+        {
+          "source": "LigaInsider",
+          "title": "Teamcheck: \nFreiburg die große Überraschung der Saison?",
+          "url": "https://www.ligainsider.de/sc-freiburg/18/teamcheck-freiburg-die-grosse-ueberraschung-der-saison-415982/"
+        },
+        {
+          "source": "LigaInsider",
+          "title": "Freiburg gewinnt Doppeltest gegen Straßburg",
+          "url": "https://www.ligainsider.de/sc-freiburg/18/freiburg-gewinnt-doppeltest-gegen-strassburg-415955/"
+        },
+        {
+          "source": "LigaInsider",
+          "title": "Schuster sieht Yilmaz als flexible Option",
+          "url": "https://www.ligainsider.de/berkay-yilmaz_37208/schuster-sieht-yilmaz-als-flexible-option-415909/"
+        }
+      ]
+    },
+    "tm-k00000009": {
+      "ligaInsiderUrl": "https://www.ligainsider.de/bayer-04-leverkusen/4/",
+      "transfermarktUrl": "https://www.transfermarkt.de/-/startseite/verein/15",
+      "sourceUpdatedAt": "11.08.2026 17:57",
+      "matchedPlayers": 12,
+      "matchedStarters": 8,
+      "unmatchedStarters": [
+        "Medina",
+        "Gutiérrez"
+      ],
+      "headlines": [
+        {
+          "source": "LigaInsider",
+          "title": "Sommerfahrplan der Bundesliga-Klubs 2026/27",
+          "url": "https://www.ligainsider.de/ligainsider_1381/sommerfahrplan-der-bundesliga-klubs-2026-27-413573/"
+        },
+        {
+          "source": "LigaInsider",
+          "title": "Top-Elf-Prognose: Bayer Leverkusen im Check",
+          "url": "https://www.ligainsider.de/bayer-04-leverkusen/4/top-elf-prognose-bayer-leverkusen-im-check-414012/"
+        },
+        {
+          "source": "LigaInsider",
+          "title": "Bayer 04 steht vor Verpflichtung von Medina",
+          "url": "https://www.ligainsider.de/facundo-medina_36418/bayer-04-steht-vor-verpflichtung-von-medina-415907/"
+        },
+        {
+          "source": "LigaInsider",
+          "title": "Schick dreht Test gegen Sevilla mit Doppelpack",
+          "url": "https://www.ligainsider.de/bayer-04-leverkusen/4/schick-dreht-test-gegen-sevilla-mit-doppelpack-415977/"
+        },
+        {
+          "source": "LigaInsider",
+          "title": "Ipswich bietet für Palacios",
+          "url": "https://www.ligainsider.de/exequiel-palacios_20382/ipswich-bietet-fuer-palacios-416014/"
+        }
+      ]
+    },
+    "tm-k00000011": {
+      "ligaInsiderUrl": "https://www.ligainsider.de/vfb-stuttgart/12/",
+      "transfermarktUrl": "https://www.transfermarkt.de/-/startseite/verein/79",
+      "sourceUpdatedAt": "10.08.2026 16:56",
+      "matchedPlayers": 17,
+      "matchedStarters": 11,
+      "unmatchedStarters": [],
+      "headlines": [
+        {
+          "source": "LigaInsider",
+          "title": "Sommerfahrplan der Bundesliga-Klubs 2026/27",
+          "url": "https://www.ligainsider.de/ligainsider_1381/sommerfahrplan-der-bundesliga-klubs-2026-27-413573/"
+        },
+        {
+          "source": "LigaInsider",
+          "title": "Top-Elf-Prognose: VfB Stuttgart im Check",
+          "url": "https://www.ligainsider.de/vfb-stuttgart/12/top-elf-prognose-vfb-stuttgart-im-check-414287/"
+        },
+        {
+          "source": "LigaInsider",
+          "title": "Joker Bouanani glänzt: VfB schlägt Everton mit 3:1",
+          "url": "https://www.ligainsider.de/vfb-stuttgart/12/joker-bouanani-glaenzt-vfb-schlaegt-everton-mit-3-1-415966/"
+        },
+        {
+          "source": "LigaInsider",
+          "title": "Nartey überzeugt als Rechtsverteidiger",
+          "url": "https://www.ligainsider.de/nikolas-nartey_13737/nartey-ueberzeugt-als-rechtsverteidiger-415904/"
+        },
+        {
+          "source": "LigaInsider",
+          "title": "Einigung: Pejčinović vor VfB-Wechsel",
+          "url": "https://www.ligainsider.de/dzenan-pejcinovic_26158/einigung-pej-inovi-vor-vfb-wechsel-416007/"
+        }
+      ]
+    },
+    "tm-k00000012": {
+      "ligaInsiderUrl": "https://www.ligainsider.de/hamburger-sv/9/",
+      "transfermarktUrl": "https://www.transfermarkt.de/-/startseite/verein/41",
+      "sourceUpdatedAt": "06.08.2026 17:58",
+      "matchedPlayers": 10,
+      "matchedStarters": 8,
+      "unmatchedStarters": [],
+      "headlines": [
+        {
+          "source": "LigaInsider",
+          "title": "Sommerfahrplan der Bundesliga-Klubs 2026/27",
+          "url": "https://www.ligainsider.de/ligainsider_1381/sommerfahrplan-der-bundesliga-klubs-2026-27-413573/"
+        },
+        {
+          "source": "LigaInsider",
+          "title": "Top-Elf-Prognose: Hamburger SV im Check",
+          "url": "https://www.ligainsider.de/hamburger-sv/9/top-elf-prognose-hamburger-sv-im-check-413958/"
+        },
+        {
+          "source": "LigaInsider",
+          "title": "Kein Sieger im XXL-Spiel zwischen HSV und Lille",
+          "url": "https://www.ligainsider.de/hamburger-sv/9/kein-sieger-im-xxl-spiel-zwischen-hsv-und-lille-415983/"
+        },
+        {
+          "source": "LigaInsider",
+          "title": "Erste Entwarnung bei Grønbæk nach Knieverletzung",
+          "url": "https://www.ligainsider.de/albert-groenbaek_35437/erste-entwarnung-bei-gronb-aelig-k-nach-knieverletzung-415989/"
+        },
+        {
+          "source": "LigaInsider",
+          "title": "Grønbæk kommt ohne strukturelle Verletzung davon",
+          "url": "https://www.ligainsider.de/albert-groenbaek_35437/gronb-aelig-k-kommt-ohne-strukturelle-verletzung-davon-416033/"
+        }
+      ]
+    },
+    "tm-k00000014": {
+      "ligaInsiderUrl": "https://www.ligainsider.de/fc-bayern-muenchen/1/",
+      "transfermarktUrl": "https://www.transfermarkt.de/-/startseite/verein/27",
+      "sourceUpdatedAt": "06.08.2026 15:14",
+      "matchedPlayers": 17,
+      "matchedStarters": 11,
+      "unmatchedStarters": [],
+      "headlines": [
+        {
+          "source": "LigaInsider",
+          "title": "Sommerfahrplan der Bundesliga-Klubs 2026/27",
+          "url": "https://www.ligainsider.de/ligainsider_1381/sommerfahrplan-der-bundesliga-klubs-2026-27-413573/"
+        },
+        {
+          "source": "LigaInsider",
+          "title": "Top-Elf-Prognose: Bayern München im Check",
+          "url": "https://www.ligainsider.de/fc-bayern-muenchen/1/top-elf-prognose-bayern-muenchen-im-check-414049/"
+        },
+        {
+          "source": "LigaInsider",
+          "title": "2:1-Sieg: Bayern schlägt Aston Villa",
+          "url": "https://www.ligainsider.de/fc-bayern-muenchen/1/2-1-sieg-bayern-schlaegt-aston-villa-415936/"
+        },
+        {
+          "source": "LigaInsider",
+          "title": "Teamcheck: Unterschätzen die Bayern die Liga?",
+          "url": "https://www.ligainsider.de/fc-bayern-muenchen/1/teamcheck-unterschaetzen-die-bayern-die-liga-415933/"
+        },
+        {
+          "source": "LigaInsider",
+          "title": "Kimmich fehlt angeschlagen im Training",
+          "url": "https://www.ligainsider.de/joshua-kimmich_5768/kimmich-fehlt-angeschlagen-im-training-415893/"
+        }
+      ]
+    },
+    "tm-k00000015": {
+      "ligaInsiderUrl": "https://www.ligainsider.de/borussia-moenchengladbach/5/",
+      "transfermarktUrl": "https://www.transfermarkt.de/-/startseite/verein/18",
+      "sourceUpdatedAt": "08.08.2026 15:59",
+      "matchedPlayers": 14,
+      "matchedStarters": 10,
+      "unmatchedStarters": [
+        "Konoplya"
+      ],
+      "headlines": [
+        {
+          "source": "LigaInsider",
+          "title": "Sommerfahrplan der Bundesliga-Klubs 2026/27",
+          "url": "https://www.ligainsider.de/ligainsider_1381/sommerfahrplan-der-bundesliga-klubs-2026-27-413573/"
+        },
+        {
+          "source": "LigaInsider",
+          "title": "Gladbach dreht Testspiel gegen die TSG",
+          "url": "https://www.ligainsider.de/borussia-moenchengladbach/5/gladbach-dreht-testspiel-gegen-die-tsg-415941/"
+        },
+        {
+          "source": "LigaInsider",
+          "title": "Castrop fällt vorerst aus",
+          "url": "https://www.ligainsider.de/jens-castrop_24405/castrop-faellt-vorerst-aus-415900/"
+        },
+        {
+          "source": "LigaInsider",
+          "title": "Ngoumou trainiert bei ausländischem Klub mit",
+          "url": "https://www.ligainsider.de/nathan-ngoumou_35229/ngoumou-trainiert-bei-auslaendischem-klub-mit-415970/"
+        },
+        {
+          "source": "LigaInsider",
+          "title": "Beidfüßig und mutig: Leszczyński überzeugt",
+          "url": "https://www.ligainsider.de/jan-leszczynski_38925/beidfuessig-und-mutig-leszczy-ski-ueberzeugt-415873/"
+        }
+      ]
+    },
+    "tm-k00000016": {
+      "ligaInsiderUrl": "https://www.ligainsider.de/1-fc-koeln/15/",
+      "transfermarktUrl": "https://www.transfermarkt.de/-/startseite/verein/3",
+      "sourceUpdatedAt": "06.08.2026 18:14",
+      "matchedPlayers": 15,
+      "matchedStarters": 8,
+      "unmatchedStarters": [],
+      "headlines": [
+        {
+          "source": "LigaInsider",
+          "title": "Sommerfahrplan der Bundesliga-Klubs 2026/27",
+          "url": "https://www.ligainsider.de/ligainsider_1381/sommerfahrplan-der-bundesliga-klubs-2026-27-413573/"
+        },
+        {
+          "source": "LigaInsider",
+          "title": "Top-Elf-Prognose: 1. FC Köln im Check",
+          "url": "https://www.ligainsider.de/1-fc-koeln/15/top-elf-prognose-1-fc-koeln-im-check-414249/"
+        },
+        {
+          "source": "LigaInsider",
+          "title": "BVB blitzt bei El Mala erneut ab",
+          "url": "https://www.ligainsider.de/said-el-mala_38546/bvb-blitzt-bei-el-mala-erneut-ab-415929/"
+        },
+        {
+          "source": "LigaInsider",
+          "title": "BVB bereitet nächstes El-Mala-Angebot vor",
+          "url": "https://www.ligainsider.de/said-el-mala_38546/bvb-bereitet-naechstes-el-mala-angebot-vor-415892/"
+        },
+        {
+          "source": "LigaInsider",
+          "title": "Köln einig mit Moore – Warten auf De Zerbi",
+          "url": "https://www.ligainsider.de/mikey-moore_38448/koeln-einig-mit-moore-ndash-warten-auf-de-zerbi-416009/"
+        }
+      ]
+    },
+    "tm-k00000017": {
+      "ligaInsiderUrl": "https://www.ligainsider.de/borussia-dortmund/14/",
+      "transfermarktUrl": "https://www.transfermarkt.de/-/startseite/verein/16",
+      "sourceUpdatedAt": "06.08.2026 15:25",
+      "matchedPlayers": 15,
+      "matchedStarters": 10,
+      "unmatchedStarters": [],
+      "headlines": [
+        {
+          "source": "LigaInsider",
+          "title": "Sommerfahrplan der Bundesliga-Klubs 2026/27",
+          "url": "https://www.ligainsider.de/ligainsider_1381/sommerfahrplan-der-bundesliga-klubs-2026-27-413573/"
+        },
+        {
+          "source": "LigaInsider",
+          "title": "Top-Elf-Prognose: Borussia Dortmund im Check",
+          "url": "https://www.ligainsider.de/borussia-dortmund/14/top-elf-prognose-borussia-dortmund-im-check-413979/"
+        },
+        {
+          "source": "LigaInsider",
+          "title": "Newcastle bereitet Angebot für Nmecha vor",
+          "url": "https://www.ligainsider.de/felix-nmecha_25090/newcastle-bereitet-angebot-fuer-nmecha-vor-415910/"
+        },
+        {
+          "source": "LigaInsider",
+          "title": "BVB blitzt bei El Mala erneut ab",
+          "url": "https://www.ligainsider.de/said-el-mala_38546/bvb-blitzt-bei-el-mala-erneut-ab-415929/"
+        },
+        {
+          "source": "LigaInsider",
+          "title": "BVB bezwingt Arsenal in London mit 3:2",
+          "url": "https://www.ligainsider.de/borussia-dortmund/14/bvb-bezwingt-arsenal-in-london-mit-3-2-416029/"
+        }
+      ]
+    },
+    "tm-k00000030": {
+      "ligaInsiderUrl": "https://www.ligainsider.de/1-fsv-mainz-05/17/",
+      "transfermarktUrl": "https://www.transfermarkt.de/-/startseite/verein/39",
+      "sourceUpdatedAt": "12.08.2026 12:16",
+      "matchedPlayers": 13,
+      "matchedStarters": 10,
+      "unmatchedStarters": [
+        "Posch"
+      ],
+      "headlines": [
+        {
+          "source": "LigaInsider",
+          "title": "Sommerfahrplan der Bundesliga-Klubs 2026/27",
+          "url": "https://www.ligainsider.de/ligainsider_1381/sommerfahrplan-der-bundesliga-klubs-2026-27-413573/"
+        },
+        {
+          "source": "LigaInsider",
+          "title": "Traumtore ebnen Mainz den Weg zum 4:0-Sieg",
+          "url": "https://www.ligainsider.de/1-fsv-mainz-05/17/traumtore-ebnen-mainz-den-weg-zum-4-0-sieg-415991/"
+        },
+        {
+          "source": "LigaInsider",
+          "title": "Verletzung setzt Nebel vorerst außer Gefecht",
+          "url": "https://www.ligainsider.de/paul-nebel_20674/verletzung-setzt-nebel-vorerst-ausser-gefecht-415934/"
+        },
+        {
+          "source": "LigaInsider",
+          "title": "Teamcheck: Mainz 05 und Urs Fischer - Ist das ein Match?",
+          "url": "https://www.ligainsider.de/1-fsv-mainz-05/17/teamcheck-mainz-05-und-urs-fischer-ist-das-ein-match-416060/"
+        },
+        {
+          "source": "LigaInsider",
+          "title": "Posch vor festem Wechsel nach Mainz",
+          "url": "https://www.ligainsider.de/stefan-posch_12798/posch-vor-festem-wechsel-nach-mainz-416084/"
+        }
+      ]
+    },
+    "tm-k00000032": {
+      "ligaInsiderUrl": "https://www.ligainsider.de/eintracht-frankfurt/3/",
+      "transfermarktUrl": "https://www.transfermarkt.de/-/startseite/verein/24",
+      "sourceUpdatedAt": "06.08.2026 17:04",
+      "matchedPlayers": 15,
+      "matchedStarters": 8,
+      "unmatchedStarters": [
+        "Kauã S."
+      ],
+      "headlines": [
+        {
+          "source": "LigaInsider",
+          "title": "Sommerfahrplan der Bundesliga-Klubs 2026/27",
+          "url": "https://www.ligainsider.de/ligainsider_1381/sommerfahrplan-der-bundesliga-klubs-2026-27-413573/"
+        },
+        {
+          "source": "LigaInsider",
+          "title": "Top-Elf-Prognose: Eintracht Frankfurt im Check",
+          "url": "https://www.ligainsider.de/eintracht-frankfurt/3/top-elf-prognose-eintracht-frankfurt-im-check-414027/"
+        },
+        {
+          "source": "LigaInsider",
+          "title": "Eintracht setzt Testspielserie gegen Hull City fort",
+          "url": "https://www.ligainsider.de/eintracht-frankfurt/3/eintracht-setzt-testspielserie-gegen-hull-city-fort-415974/"
+        },
+        {
+          "source": "LigaInsider",
+          "title": "Offiziell: Schalke verpflichtet Dina Ebimbe",
+          "url": "https://www.ligainsider.de/junior-dina-ebimbe_26881/offiziell-schalke-verpflichtet-dina-ebimbe-415924/"
+        },
+        {
+          "source": "LigaInsider",
+          "title": "Hütter plant fest mit Arrhov",
+          "url": "https://www.ligainsider.de/love-arrhov_38440/huetter-plant-fest-mit-arrhov-416036/"
+        }
+      ]
+    },
+    "tm-k00000062": {
+      "ligaInsiderUrl": "https://www.ligainsider.de/1-fc-union-berlin/1246/",
+      "transfermarktUrl": "https://www.transfermarkt.de/-/startseite/verein/89",
+      "sourceUpdatedAt": "06.08.2026 17:41",
+      "matchedPlayers": 17,
+      "matchedStarters": 11,
+      "unmatchedStarters": [],
+      "headlines": [
+        {
+          "source": "LigaInsider",
+          "title": "Sommerfahrplan der Bundesliga-Klubs 2026/27",
+          "url": "https://www.ligainsider.de/ligainsider_1381/sommerfahrplan-der-bundesliga-klubs-2026-27-413573/"
+        },
+        {
+          "source": "LigaInsider",
+          "title": "3:2 im XXL-Test: Union schlägt Limassol",
+          "url": "https://www.ligainsider.de/1-fc-union-berlin/1246/3-2-im-xxl-test-union-schlaegt-limassol-416035/"
+        },
+        {
+          "source": "LigaInsider",
+          "title": "Rønnow droht Pflichtspielauftakt zu verpassen",
+          "url": "https://www.ligainsider.de/frederik-roennow_7943/ronnow-droht-pflichtspielauftakt-zu-verpassen-416013/"
+        },
+        {
+          "source": "LigaInsider",
+          "title": "Ilić reist krankheitsbedingt aus Trainingslager ab",
+          "url": "https://www.ligainsider.de/andrej-ilic_37532/ili-reist-krankheitsbedingt-aus-trainingslager-ab-415911/"
+        },
+        {
+          "source": "LigaInsider",
+          "title": "Union verlängert mit Talent Bogdanov",
+          "url": "https://www.ligainsider.de/dmytro-bogdanov_37476/union-verlaengert-mit-talent-bogdanov-415937/"
+        }
+      ]
+    },
+    "tm-k00000091": {
+      "ligaInsiderUrl": "https://www.ligainsider.de/fc-augsburg/21/",
+      "transfermarktUrl": "https://www.transfermarkt.de/-/startseite/verein/167",
+      "sourceUpdatedAt": "06.08.2026 17:14",
+      "matchedPlayers": 15,
+      "matchedStarters": 10,
+      "unmatchedStarters": [],
+      "headlines": [
+        {
+          "source": "LigaInsider",
+          "title": "Sommerfahrplan der Bundesliga-Klubs 2026/27",
+          "url": "https://www.ligainsider.de/ligainsider_1381/sommerfahrplan-der-bundesliga-klubs-2026-27-413573/"
+        },
+        {
+          "source": "LigaInsider",
+          "title": "Top-Elf-Prognose: FC Augsburg im Check",
+          "url": "https://www.ligainsider.de/fc-augsburg/21/top-elf-prognose-fc-augsburg-im-check-413977/"
+        },
+        {
+          "source": "LigaInsider",
+          "title": "Augsburg dreht Partie gegen Sassuolo",
+          "url": "https://www.ligainsider.de/fc-augsburg/21/augsburg-dreht-partie-gegen-sassuolo-415988/"
+        },
+        {
+          "source": "LigaInsider",
+          "title": "Hannover 96 nimmt Stuttgarts Ulrich ins Visier",
+          "url": "https://www.ligainsider.de/laurin-ulrich_27568/hannover-96-nimmt-stuttgarts-ulrich-ins-visier-415903/"
+        },
+        {
+          "source": "LigaInsider",
+          "title": "FC Augsburg verabschiedet Giannoulis",
+          "url": "https://www.ligainsider.de/dimitrios-giannoulis_11820/fc-augsburg-verabschiedet-giannoulis-415890/"
+        }
+      ]
+    },
+    "tm-k00000109": {
+      "ligaInsiderUrl": "https://www.ligainsider.de/sc-paderborn-07/1249/",
+      "transfermarktUrl": "https://www.transfermarkt.de/-/startseite/verein/127",
+      "sourceUpdatedAt": "12.08.2026 13:24",
+      "matchedPlayers": 14,
+      "matchedStarters": 8,
+      "unmatchedStarters": [
+        "Đurić"
+      ],
+      "headlines": [
+        {
+          "source": "LigaInsider",
+          "title": "Sommerfahrplan der Bundesliga-Klubs 2026/27",
+          "url": "https://www.ligainsider.de/ligainsider_1381/sommerfahrplan-der-bundesliga-klubs-2026-27-413573/"
+        },
+        {
+          "source": "LigaInsider",
+          "title": "Top-Elf-Prognose: SC Paderborn 07 im Check",
+          "url": "https://www.ligainsider.de/sc-paderborn-07/1249/top-elf-prognose-sc-paderborn-07-im-check-414089/"
+        },
+        {
+          "source": "LigaInsider",
+          "title": "XL-Test zwischen Werder und SCP endet 2:2",
+          "url": "https://www.ligainsider.de/sv-werder-bremen/2/xl-test-zwischen-werder-und-scp-endet-2-2-415959/"
+        },
+        {
+          "source": "LigaInsider",
+          "title": "Neuzugang Millgramm klopft an SCP-Startelf an",
+          "url": "https://www.ligainsider.de/albert-millgramm_38879/neuzugang-millgramm-klopft-an-scp-startelf-an-415872/"
+        },
+        {
+          "source": "LigaInsider",
+          "title": "Hannover 96 nimmt Stuttgarts Ulrich ins Visier",
+          "url": "https://www.ligainsider.de/laurin-ulrich_27568/hannover-96-nimmt-stuttgarts-ulrich-ins-visier-415903/"
+        }
+      ]
+    },
+    "tm-k00000118": {
+      "ligaInsiderUrl": "https://www.ligainsider.de/sv-07-elversberg/1331/",
+      "transfermarktUrl": "https://www.transfermarkt.de/-/startseite/verein/64",
+      "sourceUpdatedAt": "06.08.2026 18:48",
+      "matchedPlayers": 14,
+      "matchedStarters": 10,
+      "unmatchedStarters": [],
+      "headlines": [
+        {
+          "source": "LigaInsider",
+          "title": "Sommerfahrplan der Bundesliga-Klubs 2026/27",
+          "url": "https://www.ligainsider.de/ligainsider_1381/sommerfahrplan-der-bundesliga-klubs-2026-27-413573/"
+        },
+        {
+          "source": "LigaInsider",
+          "title": "Top-Elf-Prognose: Borussia Dortmund im Check",
+          "url": "https://www.ligainsider.de/borussia-dortmund/14/top-elf-prognose-borussia-dortmund-im-check-413979/"
+        },
+        {
+          "source": "LigaInsider",
+          "title": "Top-Elf-Prognose: Bayern München im Check",
+          "url": "https://www.ligainsider.de/fc-bayern-muenchen/1/top-elf-prognose-bayern-muenchen-im-check-414049/"
+        },
+        {
+          "source": "LigaInsider",
+          "title": "Top-Elf-Prognose: Bayer Leverkusen im Check",
+          "url": "https://www.ligainsider.de/bayer-04-leverkusen/4/top-elf-prognose-bayer-leverkusen-im-check-414012/"
+        },
+        {
+          "source": "LigaInsider",
+          "title": "Top-Elf-Prognose: RB Leipzig im Check",
+          "url": "https://www.ligainsider.de/rb-leipzig/1311/top-elf-prognose-rb-leipzig-im-check-413947/"
+        }
+      ]
+    },
+    "tm-k00003209": {
+      "ligaInsiderUrl": "https://www.ligainsider.de/tsg-hoffenheim/10/",
+      "transfermarktUrl": "https://www.transfermarkt.de/-/startseite/verein/533",
+      "sourceUpdatedAt": "11.08.2026 12:51",
+      "matchedPlayers": 15,
+      "matchedStarters": 11,
+      "unmatchedStarters": [],
+      "headlines": [
+        {
+          "source": "LigaInsider",
+          "title": "Sommerfahrplan der Bundesliga-Klubs 2026/27",
+          "url": "https://www.ligainsider.de/ligainsider_1381/sommerfahrplan-der-bundesliga-klubs-2026-27-413573/"
+        },
+        {
+          "source": "LigaInsider",
+          "title": "Top-Elf-Prognose: TSG Hoffenheim im Check",
+          "url": "https://www.ligainsider.de/tsg-hoffenheim/10/top-elf-prognose-tsg-hoffenheim-im-check-414078/"
+        },
+        {
+          "source": "LigaInsider",
+          "title": "Asllani-Transfer zu RB Leipzig gescheitert",
+          "url": "https://www.ligainsider.de/fisnik-asllani_21986/asllani-transfer-zu-rb-leipzig-gescheitert-415947/"
+        },
+        {
+          "source": "LigaInsider",
+          "title": "Gladbach dreht Testspiel gegen die TSG",
+          "url": "https://www.ligainsider.de/borussia-moenchengladbach/5/gladbach-dreht-testspiel-gegen-die-tsg-415941/"
+        },
+        {
+          "source": "LigaInsider",
+          "title": "Asllani-Wechsel zu RB Leipzig vor dem Abschluss",
+          "url": "https://www.ligainsider.de/fisnik-asllani_21986/asllani-wechsel-zu-rb-leipzig-vor-dem-abschluss-415883/"
+        }
+      ]
+    },
+    "tm-k00015778": {
+      "ligaInsiderUrl": "https://www.ligainsider.de/rb-leipzig/1311/",
+      "transfermarktUrl": "https://www.transfermarkt.de/-/startseite/verein/23826",
+      "sourceUpdatedAt": "08.08.2026 12:33",
+      "matchedPlayers": 14,
+      "matchedStarters": 11,
+      "unmatchedStarters": [],
+      "headlines": [
+        {
+          "source": "LigaInsider",
+          "title": "Sommerfahrplan der Bundesliga-Klubs 2026/27",
+          "url": "https://www.ligainsider.de/ligainsider_1381/sommerfahrplan-der-bundesliga-klubs-2026-27-413573/"
+        },
+        {
+          "source": "LigaInsider",
+          "title": "Top-Elf-Prognose: RB Leipzig im Check",
+          "url": "https://www.ligainsider.de/rb-leipzig/1311/top-elf-prognose-rb-leipzig-im-check-413947/"
+        },
+        {
+          "source": "LigaInsider",
+          "title": "Asllani-Transfer zu RB Leipzig gescheitert",
+          "url": "https://www.ligainsider.de/fisnik-asllani_21986/asllani-transfer-zu-rb-leipzig-gescheitert-415947/"
+        },
+        {
+          "source": "LigaInsider",
+          "title": "BVB blitzt bei El Mala erneut ab",
+          "url": "https://www.ligainsider.de/said-el-mala_38546/bvb-blitzt-bei-el-mala-erneut-ab-415929/"
+        },
+        {
+          "source": "LigaInsider",
+          "title": "Offiziell: Diomande wechselt zu Real Madrid",
+          "url": "https://www.ligainsider.de/yan-diomande_38631/offiziell-diomande-wechselt-zu-real-madrid-415901/"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "leagues": {
+    "0001": {
+      "lineupProvider": "LigaInsider",
+      "lineupCoverage": "Topelf 2026/27; first listed player in every slot is treated as the current preferred starter",
+      "teams": {
+        "tm-k00000002": { "ligaInsiderUrl": "https://www.ligainsider.de/fc-schalke-04/13/", "transfermarktClubId": 33 },
+        "tm-k00000004": { "ligaInsiderUrl": "https://www.ligainsider.de/sv-werder-bremen/2/", "transfermarktClubId": 86 },
+        "tm-k00000007": { "ligaInsiderUrl": "https://www.ligainsider.de/sc-freiburg/18/", "transfermarktClubId": 60 },
+        "tm-k00000009": { "ligaInsiderUrl": "https://www.ligainsider.de/bayer-04-leverkusen/4/", "transfermarktClubId": 15 },
+        "tm-k00000011": { "ligaInsiderUrl": "https://www.ligainsider.de/vfb-stuttgart/12/", "transfermarktClubId": 79 },
+        "tm-k00000012": { "ligaInsiderUrl": "https://www.ligainsider.de/hamburger-sv/9/", "transfermarktClubId": 41 },
+        "tm-k00000014": { "ligaInsiderUrl": "https://www.ligainsider.de/fc-bayern-muenchen/1/", "transfermarktClubId": 27 },
+        "tm-k00000015": { "ligaInsiderUrl": "https://www.ligainsider.de/borussia-moenchengladbach/5/", "transfermarktClubId": 18 },
+        "tm-k00000016": { "ligaInsiderUrl": "https://www.ligainsider.de/1-fc-koeln/15/", "transfermarktClubId": 3 },
+        "tm-k00000017": { "ligaInsiderUrl": "https://www.ligainsider.de/borussia-dortmund/14/", "transfermarktClubId": 16 },
+        "tm-k00000030": { "ligaInsiderUrl": "https://www.ligainsider.de/1-fsv-mainz-05/17/", "transfermarktClubId": 39 },
+        "tm-k00000032": { "ligaInsiderUrl": "https://www.ligainsider.de/eintracht-frankfurt/3/", "transfermarktClubId": 24 },
+        "tm-k00000062": { "ligaInsiderUrl": "https://www.ligainsider.de/1-fc-union-berlin/1246/", "transfermarktClubId": 89 },
+        "tm-k00000091": { "ligaInsiderUrl": "https://www.ligainsider.de/fc-augsburg/21/", "transfermarktClubId": 167 },
+        "tm-k00000109": { "ligaInsiderUrl": "https://www.ligainsider.de/sc-paderborn-07/1249/", "transfermarktClubId": 127 },
+        "tm-k00000118": { "ligaInsiderUrl": "https://www.ligainsider.de/sv-07-elversberg/1331/", "transfermarktClubId": 64 },
+        "tm-k00003209": { "ligaInsiderUrl": "https://www.ligainsider.de/tsg-hoffenheim/10/", "transfermarktClubId": 533 },
+        "tm-k00015778": { "ligaInsiderUrl": "https://www.ligainsider.de/rb-leipzig/1311/", "transfermarktClubId": 23826 }
+      }
+    }
+  }
+}

@@ -28,9 +28,9 @@ Die Featurefamilien umfassen:
 - Erfahrung, letzte Teilnahme, Ligawechsel, Position und Preisperzentil;
 - Verein, Gegner, Heim/Auswärts sowie rollierende Vereins- und Gegnerform.
 
-CatBoost verarbeitet die kategorialen Felder direkt. Für Spieler mit wenig verwertbarer Historie werden Rollenwahrscheinlichkeiten und bedingte Punkte in Richtung eines aus Liga, Position und Preisstufe gelernten Priors geschrumpft.
+CatBoost verarbeitet die kategorialen Felder direkt. Für Spieler mit wenig verwertbarer Historie werden Rollenwahrscheinlichkeiten und bedingte Punkte in Richtung eines aus Liga, Position und Preisstufe gelernten Priors geschrumpft. In der Bundesliga verankert ein datierter LigaInsider-Topelf-Snapshot die finalen Produktionswahrscheinlichkeiten an der aktuellen Kaderhierarchie. Transfermarkt bleibt wegen Bot-Schutz eine verlinkte Kontrollquelle und kein harter automatischer Build-Input.
 
-Der CatBoost-Anteil an der Punkteprognose wird auf einer früheren Vorsaison aus der festen Menge 0/25/50/75/100 Prozent gewählt. Danach folgt eine zeitlich spätere, nicht zur Gewichtswahl verwendete Vorsaison als Champion-/Challenger-Gate: schlägt die gewählte Mischung dort das feste v1-Team nicht, bleibt für diese Liga der v1-Punkteforecast Champion. Wegen der oben beschriebenen Snapshot-Lücke ist „zeitlich getrennt“ hier bewusst nicht gleichbedeutend mit „vollständig leakage-sicher“. Auch beim Rückfall nutzt Interactive-v2 weiterhin den Mehrspieltags- und Winteroptimierer.
+Der CatBoost-Anteil an der Punkteprognose wird auf einer früheren Vorsaison aus der festen Menge 0/25/50/75/100 Prozent gewählt. Gemischt wird die bedingte Punktestärke bei einem Einsatz, nicht ein von der aktuellen Rolle losgelöster Saisonwert. Danach werden Start-, Einwechsel- und DNP-Wahrscheinlichkeiten angewendet. Eine zeitlich spätere, nicht zur Gewichtswahl verwendete Vorsaison dient als Champion-/Challenger-Gate. Wegen der oben beschriebenen Snapshot-Lücke ist „zeitlich getrennt“ hier bewusst nicht gleichbedeutend mit „vollständig leakage-sicher“. Auch bei Baselinegewicht 100 Prozent bleiben aktuelle Verfügbarkeit und der Mehrspieltags- und Winteroptimierer bindend.
 
 ## Optimierung
 

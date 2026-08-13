@@ -19,6 +19,7 @@ const NEWS_DOMAINS: &[(&str, &str)] = &[
     ("skysports.com", "Sky Sports"),
     ("espn.com", "ESPN"),
     ("transfermarkt.de", "Transfermarkt"),
+    ("ligainsider.de", "LigaInsider"),
     ("11freunde.de", "11FREUNDE"),
 ];
 const RSS_FEEDS: &[(&str, &str, &str)] = &[

@@ -39,7 +39,10 @@ type ManagerRules = {
   reserveWeight: number;
 };
 
-type Candidate = Omit<ManagerPickPlayer, "role" | "currentPoints"> & { projectionWeight: number };
+type Candidate = Omit<ManagerPickPlayer, "role" | "currentPoints"> & {
+  projectionWeight: number;
+  projectedAvailability: number;
+};
 type SquadRole = "start" | "reserve";
 type PlanPick = { player: Candidate; role: SquadRole };
 type PlanPath = { pick: PlanPick; previous: PlanPath | null };
@@ -137,11 +140,12 @@ function candidateHistory(catalog: Catalog, season: ManagerSeason, playerId: str
     const projectionFactor = leagueProjectionFactor(historical.leagueCode, season.leagueCode, position);
     const availability = 0.55 + 0.45 * Math.min(1, membership.appearances / Math.max(1, historical.latestRound));
     const projected = membership.points / membership.appearances * season.roundCount * availability * projectionFactor;
-    return [{ projected, weight: recency * sample * currentSeasonFactor * leagueFactor, appearances: membership.appearances, projectionFactor }];
+    return [{ projected, availability, weight: recency * sample * currentSeasonFactor * leagueFactor, appearances: membership.appearances, projectionFactor }];
   });
   const totalWeight = observations.reduce((sum, item) => sum + item.weight, 0);
   return {
     estimate: totalWeight > 0 ? observations.reduce((sum, item) => sum + item.projected * item.weight, 0) / totalWeight : null,
+    availability: totalWeight > 0 ? observations.reduce((sum, item) => sum + item.availability * item.weight, 0) / totalWeight : null,
     seasons: observations.length,
     appearances: observations.reduce((sum, item) => sum + item.appearances, 0),
     promotionAdjusted: observations.some((item) => item.projectionFactor < 1) && observations.every((item) => item.projectionFactor < 1),
@@ -157,16 +161,24 @@ function buildCandidates(catalog: Catalog, season: ManagerSeason, rules: Manager
       return [{ player, team, history: candidateHistory(catalog, season, player.id, player.position) }];
     });
   const positionBaselines = new Map<Position, number>();
+  const positionAvailabilities = new Map<Position, number>();
   const positionPrices = new Map<Position, number[]>();
   for (const position of positionOrder) {
     const positionPlayers = raw.filter((item) => item.player.position === position);
     positionBaselines.set(position, median(positionPlayers.flatMap((item) => item.history.estimate == null ? [] : [item.history.estimate])) || 85);
+    positionAvailabilities.set(position, median(positionPlayers.flatMap((item) => item.history.availability == null ? [] : [item.history.availability])) || 0.75);
     positionPrices.set(position, positionPlayers.map((item) => item.player.priceM));
   }
   return raw.map(({ player, team, history }) => {
     const prior = pricePrior(player.priceM, positionPrices.get(player.position) ?? [], positionBaselines.get(player.position) ?? 85);
     const projectionWeight = history.estimate == null ? 0 : clamp(history.appearances / 55 + history.seasons * 0.09, 0.12, 0.88);
     const projectedPoints = Math.max(0, (history.estimate ?? prior) * projectionWeight + prior * (1 - projectionWeight));
+    const typicalAvailability = positionAvailabilities.get(player.position) ?? 0.75;
+    const projectedAvailability = clamp(
+      (history.availability ?? typicalAvailability) * projectionWeight + typicalAvailability * (1 - projectionWeight),
+      0.15,
+      1,
+    );
     const confidence: ProjectionConfidence = !history.promotionAdjusted && history.appearances >= 45 && history.seasons >= 2
       ? "high"
       : history.appearances >= 15 || history.seasons >= 2
@@ -188,6 +200,7 @@ function buildCandidates(catalog: Catalog, season: ManagerSeason, rules: Manager
       appearancesUsed: history.appearances,
       promotionAdjusted: history.promotionAdjusted,
       projectionWeight,
+      projectedAvailability,
     };
   });
 }
@@ -197,6 +210,7 @@ export function managerCandidateProjections(catalog: Catalog, season: ManagerSea
   return buildCandidates(catalog, season, rules).map((candidate) => ({
     id: candidate.id,
     projectedPoints: candidate.projectedPoints,
+    projectedAvailability: candidate.projectedAvailability,
   }));
 }
 

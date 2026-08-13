@@ -74,8 +74,10 @@ docker compose build web
 - `frontend/public/data/catalog.json`: unterstützte Ligen und Saisons.
 - `frontend/public/data/seasons/`: ein normalisierter Snapshot je Liga-Saison.
 - `frontend/public/data/recommendations/`: vorberechnete Classic- und Interactive-Empfehlungen der neuesten Saison.
+- `frontend/public/data/current-role-signals.json`: statischer Bundesliga-Snapshot für aktuelle Topelf-, Spieler- und Vereinsquellen.
 - `scripts/generate-manager-recommendations.ts`: deterministisches v1-Vergleichsmodell.
 - `scripts/generate-interactive-v2.py`: rollenabhängige Prognose, szenariobasierte Classic-Rekursentscheidung, echter Winterlauf und Mehrspieltags-MILPs.
+- `scripts/fetch-current-role-signals.py`: lokal ausgeführter, fail-closed Import der LigaInsider-Topelf und Vereinsthemen.
 - `pyproject.toml` und `uv.lock`: reproduzierbare Offline-Modellumgebung.
 - `.github/workflows/`: CI sowie täglicher Pages-Datenbuild.
 - `docs/`: Architektur, Betrieb und Architekturentscheidung.

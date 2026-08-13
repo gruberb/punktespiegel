@@ -29,6 +29,7 @@ ROOT = Path(__file__).resolve().parents[1]
 DATA_DIR = ROOT / "frontend" / "public" / "data"
 SEASON_DIR = DATA_DIR / "seasons"
 RECOMMENDATION_DIR = DATA_DIR / "recommendations"
+ROLE_SIGNAL_PATH = DATA_DIR / "current-role-signals.json"
 
 POSITIONS = ("GK", "DEF", "MID", "FWD")
 ROSTER_COUNTS = {"GK": 3, "DEF": 7, "MID": 7, "FWD": 5}
@@ -166,6 +167,14 @@ class Forecast:
     p10_points: float
     median_points: float
     p90_points: float
+    sub_mean: float
+    sub_q10: float
+    sub_q50: float
+    sub_q90: float
+    start_mean: float
+    start_q10: float
+    start_q50: float
+    start_q90: float
 
 
 @dataclass
@@ -783,6 +792,134 @@ def weighted_quantile_atoms(atoms: Sequence[Tuple[float, float]], q: float) -> f
     return ordered[-1][0] if ordered else 0.0
 
 
+def role_conditioned_forecast(
+    forecast: Forecast,
+    *,
+    p_start: Optional[float] = None,
+    p_sub: Optional[float] = None,
+    p_dnp: Optional[float] = None,
+    sub_mean: Optional[float] = None,
+    sub_quantiles: Optional[Sequence[float]] = None,
+    start_mean: Optional[float] = None,
+    start_quantiles: Optional[Sequence[float]] = None,
+) -> Forecast:
+    """Rebuild an unconditional forecast from role probabilities and conditional points."""
+    probabilities = {
+        ROLE_START: forecast.p_start if p_start is None else p_start,
+        ROLE_SUB: forecast.p_sub if p_sub is None else p_sub,
+        ROLE_DNP: forecast.p_dnp if p_dnp is None else p_dnp,
+    }
+    total = sum(max(0.0, value) for value in probabilities.values())
+    if total <= 0:
+        raise RuntimeError(f"Ungültige Rollenwahrscheinlichkeiten für {forecast.player_id}.")
+    probabilities = {role: max(0.0, value) / total for role, value in probabilities.items()}
+    resolved_sub_mean = forecast.sub_mean if sub_mean is None else sub_mean
+    resolved_start_mean = forecast.start_mean if start_mean is None else start_mean
+    resolved_sub = tuple(sub_quantiles or (forecast.sub_q10, forecast.sub_q50, forecast.sub_q90))
+    resolved_start = tuple(start_quantiles or (forecast.start_q10, forecast.start_q50, forecast.start_q90))
+    if len(resolved_sub) != 3 or len(resolved_start) != 3:
+        raise RuntimeError("Bedingte Quantile müssen jeweils drei Werte enthalten.")
+    resolved_sub = tuple(sorted(float(value) for value in resolved_sub))
+    resolved_start = tuple(sorted(float(value) for value in resolved_start))
+    mean_points = (
+        probabilities[ROLE_START] * resolved_start_mean
+        + probabilities[ROLE_SUB] * resolved_sub_mean
+    )
+    atoms = [(0.0, probabilities[ROLE_DNP])]
+    for probability, values in (
+        (probabilities[ROLE_SUB], resolved_sub),
+        (probabilities[ROLE_START], resolved_start),
+    ):
+        atoms.extend(
+            (
+                (values[0], probability * 0.2),
+                (values[1], probability * 0.6),
+                (values[2], probability * 0.2),
+            )
+        )
+    return Forecast(
+        player_id=forecast.player_id,
+        round=forecast.round,
+        opponent_id=forecast.opponent_id,
+        home=forecast.home,
+        p_start=probabilities[ROLE_START],
+        p_sub=probabilities[ROLE_SUB],
+        p_dnp=probabilities[ROLE_DNP],
+        mean_points=mean_points,
+        p10_points=weighted_quantile_atoms(atoms, 0.1),
+        median_points=weighted_quantile_atoms(atoms, 0.5),
+        p90_points=weighted_quantile_atoms(atoms, 0.9),
+        sub_mean=resolved_sub_mean,
+        sub_q10=resolved_sub[0],
+        sub_q50=resolved_sub[1],
+        sub_q90=resolved_sub[2],
+        start_mean=resolved_start_mean,
+        start_q10=resolved_start[0],
+        start_q50=resolved_start[1],
+        start_q90=resolved_start[2],
+    )
+
+
+def load_current_role_signals(season: Mapping[str, Any]) -> Optional[Mapping[str, Any]]:
+    if not ROLE_SIGNAL_PATH.exists():
+        return None
+    artifact = json.loads(ROLE_SIGNAL_PATH.read_text(encoding="utf-8"))
+    if (
+        int(artifact.get("schemaVersion", 0)) != 1
+        or str(artifact.get("league")) != str(season["leagueCode"])
+        or int(artifact.get("season", -1)) != int(season["startYear"])
+    ):
+        return None
+    covered_teams = set(artifact.get("teams", {}))
+    if covered_teams != {str(team["id"]) for team in season["teams"]}:
+        raise RuntimeError("Aktuelle Rollensignale decken nicht alle Vereine der Zielsaison ab.")
+    return artifact
+
+
+def apply_current_role_signals(
+    season: Mapping[str, Any],
+    players: Mapping[str, Mapping[str, Any]],
+    forecasts: Sequence[Forecast],
+    artifact: Optional[Mapping[str, Any]],
+) -> List[Forecast]:
+    """Anchor production availability to a dated external squad-hierarchy snapshot."""
+    if artifact is None:
+        return list(forecasts)
+    player_signals = artifact.get("players", {})
+    covered_teams = set(artifact.get("teams", {}))
+    outfield_targets = {
+        "starter": (0.72, 0.12, 0.16),
+        "alternative": (0.25, 0.30, 0.45),
+        "squad": (0.08, 0.18, 0.74),
+    }
+    goalkeeper_targets = {
+        "starter": (0.82, 0.01, 0.17),
+        "alternative": (0.18, 0.02, 0.80),
+        "squad": (0.03, 0.02, 0.95),
+    }
+    source_weight = 0.75
+    adjusted: List[Forecast] = []
+    for forecast in forecasts:
+        player = players[forecast.player_id]
+        signal = player_signals.get(forecast.player_id)
+        if signal is not None:
+            role = str(signal["role"])
+        elif str(player["teamId"]) in covered_teams:
+            role = "squad"
+        else:
+            adjusted.append(forecast)
+            continue
+        targets = goalkeeper_targets if player["position"] == "GK" else outfield_targets
+        target_start, target_sub, target_dnp = targets[role]
+        adjusted.append(role_conditioned_forecast(
+            forecast,
+            p_start=(1.0 - source_weight) * forecast.p_start + source_weight * target_start,
+            p_sub=(1.0 - source_weight) * forecast.p_sub + source_weight * target_sub,
+            p_dnp=(1.0 - source_weight) * forecast.p_dnp + source_weight * target_dnp,
+        ))
+    return adjusted
+
+
 def predict_forecasts(
     season: Mapping[str, Any],
     bundle: ModelBundle,
@@ -882,6 +1019,14 @@ def predict_forecasts(
                 p10_points=weighted_quantile_atoms(atoms, 0.1),
                 median_points=weighted_quantile_atoms(atoms, 0.5),
                 p90_points=weighted_quantile_atoms(atoms, 0.9),
+                sub_mean=conditional[(ROLE_SUB, "mean")],
+                sub_q10=conditional[(ROLE_SUB, "q10")],
+                sub_q50=conditional[(ROLE_SUB, "q50")],
+                sub_q90=conditional[(ROLE_SUB, "q90")],
+                start_mean=conditional[(ROLE_START, "mean")],
+                start_q10=conditional[(ROLE_START, "q10")],
+                start_q50=conditional[(ROLE_START, "q50")],
+                start_q90=conditional[(ROLE_START, "q90")],
             )
         )
     return players, forecasts
@@ -901,81 +1046,92 @@ def load_baseline(year: int, mode: str = "interactive") -> Dict[str, Any]:
 def blend_forecasts(
     forecasts: Sequence[Forecast],
     player_projections: Mapping[str, float],
+    player_availability: Mapping[str, float],
     round_count: int,
     model_weight: float,
 ) -> List[Forecast]:
+    """Blend conditional scoring strength, then apply current role probabilities.
+
+    The v1 season projection contains historical availability. Dividing by its
+    estimated availability recovers an appearance-conditioned scoring rate. This
+    prevents a historical starter who is now a reserve from retaining a full
+    season of points merely because the baseline receives a high ensemble weight.
+    """
     blended: List[Forecast] = []
     for forecast in forecasts:
-        baseline_points = float(player_projections.get(forecast.player_id, 0.0)) / max(1, round_count)
-        blended_mean = model_weight * forecast.mean_points + (1.0 - model_weight) * baseline_points
-        if abs(forecast.mean_points) > 1e-9:
-            scale = max(0.0, blended_mean / forecast.mean_points)
-            p10 = forecast.p10_points * scale
-            median_points = forecast.median_points * scale
-            p90 = forecast.p90_points * scale
-        else:
-            p10 = median_points = p90 = blended_mean
-        ordered = sorted((p10, median_points, p90))
-        blended.append(
-            Forecast(
-                player_id=forecast.player_id,
-                round=forecast.round,
-                opponent_id=forecast.opponent_id,
-                home=forecast.home,
-                p_start=forecast.p_start,
-                p_sub=forecast.p_sub,
-                p_dnp=forecast.p_dnp,
-                mean_points=blended_mean,
-                p10_points=ordered[0],
-                median_points=ordered[1],
-                p90_points=ordered[2],
-            )
-        )
+        baseline_season = float(player_projections.get(forecast.player_id, 0.0))
+        baseline_availability = min(1.0, max(0.15, float(player_availability.get(forecast.player_id, 0.75))))
+        baseline_start = baseline_season / max(1, round_count) / baseline_availability
+        sub_ratio = min(1.0, max(0.15, forecast.sub_mean / max(0.25, forecast.start_mean)))
+        baseline_sub = baseline_start * sub_ratio
+        blended_start = model_weight * forecast.start_mean + (1.0 - model_weight) * baseline_start
+        blended_sub = model_weight * forecast.sub_mean + (1.0 - model_weight) * baseline_sub
+        start_shift = blended_start - forecast.start_mean
+        sub_shift = blended_sub - forecast.sub_mean
+        blended.append(role_conditioned_forecast(
+            forecast,
+            start_mean=blended_start,
+            start_quantiles=(
+                forecast.start_q10 + start_shift,
+                forecast.start_q50 + start_shift,
+                forecast.start_q90 + start_shift,
+            ),
+            sub_mean=blended_sub,
+            sub_quantiles=(
+                forecast.sub_q10 + sub_shift,
+                forecast.sub_q50 + sub_shift,
+                forecast.sub_q90 + sub_shift,
+            ),
+        ))
     return blended
 
 
 def classic_residual_forecasts(
     forecasts: Sequence[Forecast],
     player_projections: Mapping[str, float],
+    player_availability: Mapping[str, float],
     round_count: int,
     residual_weight: float,
 ) -> List[Forecast]:
-    """Keep the stable season prior while restoring fixture-level variation."""
+    """Keep stable conditional strength while restoring fixture variation."""
     by_player: Dict[str, List[Forecast]] = defaultdict(list)
     for forecast in forecasts:
         by_player[forecast.player_id].append(forecast)
-    raw_means = {
-        player_id: mean([forecast.mean_points for forecast in player_rows])
+    raw_start_means = {
+        player_id: mean([forecast.start_mean for forecast in player_rows])
+        for player_id, player_rows in by_player.items()
+    }
+    raw_sub_means = {
+        player_id: mean([forecast.sub_mean for forecast in player_rows])
         for player_id, player_rows in by_player.items()
     }
     adjusted: List[Forecast] = []
     for forecast in forecasts:
-        baseline_mean = float(player_projections.get(forecast.player_id, 0.0)) / max(1, round_count)
-        fixture_residual = forecast.mean_points - raw_means[forecast.player_id]
-        adjusted_mean = baseline_mean + residual_weight * fixture_residual
-        shift = adjusted_mean - forecast.mean_points
-        ordered = sorted(
-            (
-                forecast.p10_points + shift,
-                forecast.median_points + shift,
-                forecast.p90_points + shift,
-            )
-        )
-        adjusted.append(
-            Forecast(
-                player_id=forecast.player_id,
-                round=forecast.round,
-                opponent_id=forecast.opponent_id,
-                home=forecast.home,
-                p_start=forecast.p_start,
-                p_sub=forecast.p_sub,
-                p_dnp=forecast.p_dnp,
-                mean_points=adjusted_mean,
-                p10_points=ordered[0],
-                median_points=ordered[1],
-                p90_points=ordered[2],
-            )
-        )
+        baseline_season = float(player_projections.get(forecast.player_id, 0.0))
+        baseline_availability = min(1.0, max(0.15, float(player_availability.get(forecast.player_id, 0.75))))
+        baseline_start = baseline_season / max(1, round_count) / baseline_availability
+        average_start = raw_start_means[forecast.player_id]
+        average_sub = raw_sub_means[forecast.player_id]
+        baseline_sub = baseline_start * min(1.0, max(0.15, average_sub / max(0.25, average_start)))
+        adjusted_start = baseline_start + residual_weight * (forecast.start_mean - average_start)
+        adjusted_sub = baseline_sub + residual_weight * (forecast.sub_mean - average_sub)
+        start_shift = adjusted_start - forecast.start_mean
+        sub_shift = adjusted_sub - forecast.sub_mean
+        adjusted.append(role_conditioned_forecast(
+            forecast,
+            start_mean=adjusted_start,
+            start_quantiles=(
+                forecast.start_q10 + start_shift,
+                forecast.start_q50 + start_shift,
+                forecast.start_q90 + start_shift,
+            ),
+            sub_mean=adjusted_sub,
+            sub_quantiles=(
+                forecast.sub_q10 + sub_shift,
+                forecast.sub_q50 + sub_shift,
+                forecast.sub_q90 + sub_shift,
+            ),
+        ))
     return adjusted
 
 
@@ -1654,29 +1810,24 @@ def classic_winter_scenarios(
             new_start = new_appearance * start_share
             new_sub = new_appearance - new_start
             performance_factor = math.exp(player_points[forecast.player_id] + team_points[team_id])
-            value_factor = performance_factor * new_appearance / old_appearance
-            ordered = sorted(
-                (
-                    forecast.p10_points * value_factor,
-                    forecast.median_points * value_factor,
-                    forecast.p90_points * value_factor,
-                )
-            )
-            scenario.append(
-                Forecast(
-                    player_id=forecast.player_id,
-                    round=forecast.round,
-                    opponent_id=forecast.opponent_id,
-                    home=forecast.home,
-                    p_start=new_start,
-                    p_sub=new_sub,
-                    p_dnp=new_dnp,
-                    mean_points=forecast.mean_points * value_factor,
-                    p10_points=ordered[0],
-                    median_points=ordered[1],
-                    p90_points=ordered[2],
-                )
-            )
+            scenario.append(role_conditioned_forecast(
+                forecast,
+                p_start=new_start,
+                p_sub=new_sub,
+                p_dnp=new_dnp,
+                start_mean=forecast.start_mean * performance_factor,
+                start_quantiles=(
+                    forecast.start_q10 * performance_factor,
+                    forecast.start_q50 * performance_factor,
+                    forecast.start_q90 * performance_factor,
+                ),
+                sub_mean=forecast.sub_mean * performance_factor,
+                sub_quantiles=(
+                    forecast.sub_q10 * performance_factor,
+                    forecast.sub_q50 * performance_factor,
+                    forecast.sub_q90 * performance_factor,
+                ),
+            ))
         scenarios.append(scenario)
     return scenarios
 
@@ -1864,52 +2015,6 @@ def score_classic_assignments(
     return total, details
 
 
-def fixed_classic_optimization(
-    season: Mapping[str, Any],
-    players: Mapping[str, Mapping[str, Any]],
-    forecasts: Sequence[Forecast],
-    baseline_roster: Sequence[Mapping[str, Any]],
-) -> ClassicOptimizationResult:
-    """Represent the fixed v1 champion in the v2 artifact/validation contract."""
-    selected_ids = [player["id"] for player in baseline_roster]
-    starter_ids = [player["id"] for player in baseline_roster if player["role"] == "start"]
-    reserve_ids = [player["id"] for player in baseline_roster if player["role"] == "reserve"]
-    missing = [player_id for player_id in selected_ids if player_id not in players]
-    if missing:
-        raise RuntimeError(f"Classic-v1-Kader enthält unbekannte Spieler: {', '.join(missing)}")
-
-    forecast_map = {(forecast.player_id, forecast.round): forecast for forecast in forecasts}
-    reserve_activation: Dict[Tuple[int, str], float] = {}
-    objective = 0.0
-    for round_number in range(1, int(season["roundCount"]) + 1):
-        for player_id in starter_ids:
-            objective += forecast_map[(player_id, round_number)].mean_points
-        for position in POSITIONS:
-            position_starters = [player_id for player_id in starter_ids if players[player_id]["position"] == position]
-            activation = 1.0 - math.prod(
-                1.0 - forecast_map[(player_id, round_number)].p_dnp
-                for player_id in position_starters
-            )
-            reserve_activation[(round_number, position)] = activation
-            reserve_id = next(player_id for player_id in reserve_ids if players[player_id]["position"] == position)
-            objective += forecast_map[(reserve_id, round_number)].mean_points * activation
-
-    return ClassicOptimizationResult(
-        selected_ids=selected_ids,
-        starter_ids=starter_ids,
-        reserve_ids=reserve_ids,
-        winter_selected_ids=selected_ids,
-        winter_starter_ids=starter_ids,
-        winter_reserve_ids=reserve_ids,
-        transfers_out=[],
-        transfers_in=[],
-        reserve_activation=reserve_activation,
-        objective=objective,
-        solver_status="fixed-roster",
-        mip_gap=0.0,
-    )
-
-
 def pair_transfers(
     players: Mapping[str, Mapping[str, Any]],
     teams: Mapping[str, Mapping[str, Any]],
@@ -2085,6 +2190,7 @@ def run_classic_winter(
     forecasts = classic_residual_forecasts(
         raw_forecasts,
         baselines[args.league]["playerProjections"],
+        baselines[args.league]["playerAvailability"],
         int(season["roundCount"]),
         residual_weight,
     )
@@ -2665,6 +2771,7 @@ def run_classic_validation(
             forecasts = classic_residual_forecasts(
                 raw_forecasts,
                 baselines[league]["playerProjections"],
+                baselines[league]["playerAvailability"],
                 int(season["roundCount"]),
                 residual_weight,
             )
@@ -2697,6 +2804,7 @@ def run_classic_validation(
             winter_forecasts = classic_residual_forecasts(
                 winter_raw,
                 baselines[league]["playerProjections"],
+                baselines[league]["playerAvailability"],
                 int(season["roundCount"]),
                 residual_weight,
             )
@@ -2759,8 +2867,8 @@ def run_classic_validation(
             "foldCount": len(folds),
             "aggregateDeltaVsBaseline": aggregate_delta,
             "winningFolds": wins,
-            "deploymentModel": "scenario-recourse-v2" if deploy else "fixed-v1-champion",
-            "fallbackReason": None if deploy else "recourse challenger did not win the rolling-origin baseline ladder",
+            "deploymentModel": "scenario-recourse-v2" if deploy else "availability-aware-stable-v2",
+            "fallbackReason": None if deploy else "recourse challenger did not win the rolling-origin baseline ladder; stable forecasts are reoptimized with current availability",
         }
     return (
         {
@@ -2812,6 +2920,7 @@ def run_validation(
             forecasts = blend_forecasts(
                 raw_forecasts,
                 selection_baselines[league]["playerProjections"],
+                selection_baselines[league]["playerAvailability"],
                 int(season["roundCount"]),
                 weight,
             )
@@ -2846,6 +2955,7 @@ def run_validation(
         selected_forecasts = blend_forecasts(
             raw_forecasts,
             holdout_baselines[league]["playerProjections"],
+            holdout_baselines[league]["playerAvailability"],
             int(season["roundCount"]),
             selected_weights[league],
         )
@@ -2860,6 +2970,7 @@ def run_validation(
             fallback_forecasts = blend_forecasts(
                 raw_forecasts,
                 holdout_baselines[league]["playerProjections"],
+                holdout_baselines[league]["playerAvailability"],
                 int(season["roundCount"]),
                 deployment_weight,
             )
@@ -2897,6 +3008,30 @@ def run_validation(
     }, deployment_weights
 
 
+def validate_publication(recommendation: Mapping[str, Any]) -> None:
+    """Fail closed on implausible or internally inconsistent published teams."""
+    starters = [player for player in recommendation["players"] if player["role"] == "start"]
+    if len(starters) != 11:
+        raise RuntimeError("Veröffentlichung abgebrochen: Startelf enthält nicht genau 11 Spieler.")
+    for player in starters:
+        appearance = float(player.get("pStart", 0.0)) + float(player.get("pSub", 0.0))
+        minimum = 0.50 if player["position"] == "GK" else 0.18
+        if appearance < minimum:
+            raise RuntimeError(
+                f"Veröffentlichung abgebrochen: {player['name']} ({player['position']}) hat nur "
+                f"{appearance:.1%} erwartete Einsatzwahrscheinlichkeit."
+            )
+    for matchday in recommendation.get("projectedMatchdays", []):
+        for player in matchday["players"]:
+            appearance = float(player["pStart"]) + float(player["pSub"])
+            maximum_consistent_mean = appearance * 25.0 + 0.05
+            if float(player["meanPoints"]) > maximum_consistent_mean:
+                raise RuntimeError(
+                    f"Veröffentlichung abgebrochen: {player['name']} erhält an Spieltag "
+                    f"{matchday['matchday']} Punkte ohne ausreichende Einsatzwahrscheinlichkeit."
+                )
+
+
 def write_artifact(
     catalog: Mapping[str, Any],
     season: Mapping[str, Any],
@@ -2907,6 +3042,8 @@ def write_artifact(
     model_weight: float,
     output_dir: Path = RECOMMENDATION_DIR,
 ) -> None:
+    validate_publication(recommendation)
+    role_signals = load_current_role_signals(season)
     artifact = {
         "schemaVersion": 2,
         "modelVersion": 2,
@@ -2931,6 +3068,11 @@ def write_artifact(
             "historicalMarketSnapshots": "unavailable; validation is experimental until archived snapshots exist",
             "catBoostWeight": model_weight,
             "baselineWeight": rounded(1.0 - model_weight, 2),
+            "currentRoleSignals": None if role_signals is None else {
+                "provider": role_signals["provider"],
+                "generatedAt": role_signals["generatedAt"],
+                "method": role_signals["method"],
+            },
             "trainingRows": training_rows,
             "trainingThroughSeason": f"{training_end_year}/{str(training_end_year + 1)[-2:]}",
         },
@@ -2957,6 +3099,8 @@ def write_classic_artifact(
     deploy_challenger: bool,
     output_dir: Path = RECOMMENDATION_DIR,
 ) -> None:
+    validate_publication(recommendation)
+    role_signals = load_current_role_signals(season)
     artifact = {
         "schemaVersion": 2,
         "modelVersion": 2,
@@ -2967,8 +3111,8 @@ def write_classic_artifact(
             "seasonId": season["id"],
         },
         "model": {
-            "name": "Classic-v2 recourse" if deploy_challenger else "Classic-v1 champion (v2 artifact)",
-            "deploymentModel": "scenario-recourse-v2" if deploy_challenger else "fixed-v1-champion",
+            "name": "Classic-v2 recourse" if deploy_challenger else "Classic-v2 availability-aware stable",
+            "deploymentModel": "scenario-recourse-v2" if deploy_challenger else "availability-aware-stable-v2",
             "roleModel": "CatBoost multiclass DNP/sub/starter",
             "pointsModel": "stable season prior plus configured CatBoost fixture residual",
             "quantiles": "heuristic unconditional UI intervals; not calibrated decision intervals",
@@ -2979,17 +3123,22 @@ def write_classic_artifact(
             "optimizer": (
                 "sample-average preseason recourse with a separate legal HiGHS winter response per scenario"
                 if deploy_challenger
-                else "validated fixed-v1 champion roster"
+                else "fresh availability-aware optimization over the stable conditional scoring prior"
             ),
             "objective": (
                 "average expected points across latent winter states with the opening slots shared across scenarios"
                 if deploy_challenger
-                else "fixed-v1 champion retained after the challenger regressed in validation"
+                else "stable conditional scoring prior retained after the recourse challenger regressed; roster is never copied"
             ),
             "starterEligibility": "all selectable players; availability is priced into expected points",
             "historicalMarketSnapshots": "unavailable; validation is experimental until archived snapshots exist",
             "classicResidualWeight": validation.get("residualWeight"),
             "winterScenarioCount": validation.get("scenarioCount") if deploy_challenger else None,
+            "currentRoleSignals": None if role_signals is None else {
+                "provider": role_signals["provider"],
+                "generatedAt": role_signals["generatedAt"],
+                "method": role_signals["method"],
+            },
             "trainingRows": training_rows,
             "trainingThroughSeason": f"{training_end_year}/{str(training_end_year + 1)[-2:]}",
         },
@@ -3078,9 +3227,16 @@ def main() -> int:
     output_dir = Path(args.recommendation_output_dir)
     for league, season in sorted(targets.items()):
         players, raw_forecasts = predict_forecasts(season, bundle, priors, player_states, team_states)
+        raw_forecasts = apply_current_role_signals(
+            season,
+            players,
+            raw_forecasts,
+            load_current_role_signals(season),
+        )
         forecasts = blend_forecasts(
             raw_forecasts,
             production_baselines[league]["playerProjections"],
+            production_baselines[league]["playerAvailability"],
             int(season["roundCount"]),
             selected_weights[league],
         )
@@ -3099,6 +3255,7 @@ def main() -> int:
         classic_forecasts = classic_residual_forecasts(
             raw_forecasts,
             classic_baselines[league]["playerProjections"],
+            classic_baselines[league]["playerAvailability"],
             int(season["roundCount"]),
             args.classic_residual_weight,
         )
@@ -3111,11 +3268,11 @@ def main() -> int:
                 time_limit=args.time_limit,
             )
         else:
-            classic_optimization = fixed_classic_optimization(
+            classic_optimization = optimize_classic_roster(
                 season,
                 players,
                 classic_forecasts,
-                classic_baselines[league]["roster"],
+                time_limit=args.time_limit,
             )
         classic_recommendation = build_classic_recommendation(
             season,

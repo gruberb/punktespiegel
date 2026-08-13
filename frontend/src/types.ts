@@ -167,6 +167,7 @@ export type PlayerDetail = {
   kickerUrl: string;
   kickerNewsUrl: string;
   transfermarktUrl: string;
+  ligaInsiderUrl: string | null;
   position: Position;
   priceM: number;
   seasonPoints: number;
@@ -258,7 +259,7 @@ export type ManagerProjectedMatchday = {
 
 export type ManagerRecommendation = {
   modelVersion?: number;
-  deploymentModel?: "two-stage-v2" | "scenario-recourse-v2" | "fixed-v1-champion";
+  deploymentModel?: "two-stage-v2" | "scenario-recourse-v2" | "fixed-v1-champion" | "availability-aware-stable-v2";
   league: string;
   leagueName: string;
   season: string;
@@ -374,6 +375,12 @@ export type TeamDetail = {
   logoUrl: string | null;
   players: TeamDetailPlayer[];
   matches: TeamDetailMatch[];
+  externalSources: {
+    generatedAt: string;
+    ligaInsiderUrl: string;
+    transfermarktUrl: string;
+    headlines: { source: string; title: string; url: string }[];
+  } | null;
 };
 
 export type BestElevenPlayer = {

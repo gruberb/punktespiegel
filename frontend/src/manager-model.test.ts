@@ -126,9 +126,28 @@ for (const league of ["0001", "0002", "0003"]) {
         published.players.forEach((player) => teamCounts.set(player.teamId, (teamCounts.get(player.teamId) ?? 0) + 1));
         assert.ok([...teamCounts.values()].every((count) => count <= published.rules.maxFromTeam!));
       }
+      const starters = published.players.filter((player) => player.role === "start");
+      assert.ok(starters.every((player) => (player.pStart ?? 0) + (player.pSub ?? 0) >= (player.position === "GK" ? 0.5 : 0.18)));
+      for (const matchday of published.projectedMatchdays ?? []) {
+        assert.ok(matchday.players.every((player) => player.meanPoints <= (player.pStart + player.pSub) * 25 + 0.051));
+      }
     });
   }
 }
+
+test("published Bundesliga recommendations do not start the externally identified backup goalkeeper", () => {
+  const roleSignals = JSON.parse(readFileSync(new URL("../public/data/current-role-signals.json", import.meta.url), "utf8")) as {
+    players: Record<string, { role: string }>;
+  };
+  assert.equal(roleSignals.players["pl-k00051437"]?.role, "starter");
+  assert.equal(roleSignals.players["pl-k00064802"]?.role, "squad");
+  for (const mode of ["classic", "interactive"] as ManagerMode[]) {
+    const artifact = JSON.parse(readFileSync(new URL(`../public/data/recommendations/se-k00012026-${mode}.json`, import.meta.url), "utf8")) as {
+      recommendation: ManagerRecommendation;
+    };
+    assert.notEqual(artifact.recommendation.players.find((player) => player.id === "pl-k00064802")?.role, "start");
+  }
+});
 
 for (const league of ["0001", "0002", "0003"]) {
   test(`published ${league} Classic-v2 recommendation has exact roster roles and winter constraints`, () => {
