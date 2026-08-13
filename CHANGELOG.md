@@ -2,6 +2,25 @@
 
 Alle wesentlichen Änderungen an Punktespiegel werden in dieser Datei dokumentiert.
 
+## [1.4.3] – 2026-08-12
+
+### Hinzugefügt
+
+- Echter Classic-Winterlauf, der den gekauften Septemberkader samt Starter-/Reserveslots sperrt, den aktuellen Saisonstand bis zum Cutoff einspielt und nur die drei legalen Wechsel für die verbleibenden Spieltage optimiert.
+- Szenariobasierte Classic-Rekursentscheidung: Ein gemeinsamer Septemberkader wird gegen mehrere mögliche Winterzustände bewertet, ohne heute eine feste Transferliste vorzugeben.
+- Rolling-Origin-Classic-Prüfung mit identischem Winterfenster für Challenger und v1-Vergleich sowie Solverstatus, MIP-Lücke und expliziten Kaderinvarianten in den Artefakten.
+
+### Geändert
+
+- Automatische Reserven verwenden `1 - product(1 - pDNP)`, behalten negative erwartete Punkte und verhindern kostenlose Starter-/Reserve-Umsortierungen im Winter.
+- Classic-Punkte kombinieren den stabilen Saisonprior mit spieltagsspezifischen CatBoost-Residuen; Ligawechselmerkmale bleiben innerhalb einer Saison semantisch stabil.
+- Interactive verwendet die saisonabhängigen Transferregeln mit vier Wechseln für 2026/27 und keinen harten 50-Prozent-Einsatzfilter.
+- Alle sechs Kaderempfehlungen wurden lokal neu berechnet und als statische Dateien eingecheckt. CI und Pages trainieren oder optimieren weiterhin kein Modell.
+
+### Sicherheit
+
+- Historische Validierung wird ausdrücklich als experimentell gekennzeichnet, solange keine archivierten Entscheidungszeit-Snapshots für Preise, Vereinszuordnung und Marktwählbarkeit vorliegen.
+
 ## [1.4.2] – 2026-08-12
 
 ### Entfernt
@@ -116,3 +135,4 @@ Alle wesentlichen Änderungen an Punktespiegel werden in dieser Datei dokumentie
 [1.4.0]: https://github.com/gruberb/punktespiegel/releases/tag/v1.4.0
 [1.4.1]: https://github.com/gruberb/punktespiegel/releases/tag/v1.4.1
 [1.4.2]: https://github.com/gruberb/punktespiegel/releases/tag/v1.4.2
+[1.4.3]: https://github.com/gruberb/punktespiegel/releases/tag/v1.4.3

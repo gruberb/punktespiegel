@@ -15,9 +15,11 @@ Saisonartefakte
   → Interactive-v2-Artefakt
 ```
 
-## Leakage-Schutz
+## Zeitliche Trennung und verbleibende Snapshot-Lücke
 
-Eine Trainingszeile wird unmittelbar vor dem zugehörigen Spiel erzeugt. Rollierende Features sehen nur frühere Spiele. Für die Vorsaison-Prüfung werden alle Modelle ausschließlich mit noch älteren Saisons trainiert; der vollständige Holdout-Spielplan wird aus dem Informationsstand vor Saisonbeginn prognostiziert. Reale Punkte fließen erst in die Auswertung ein.
+Eine Trainingszeile wird unmittelbar vor dem zugehörigen Spiel erzeugt. Rollierende Features sehen nur frühere Spiele. Für die Vorsaison-Prüfung werden alle Modelle ausschließlich mit noch älteren Saisons trainiert; reale Punkte fließen erst in die Auswertung ein. `previousSeasonLeague` bleibt für eine ganze Saison stabil, während `currentLeagueAppearances` den Erfahrungszuwachs innerhalb der Saison abbildet.
+
+Die vorhandenen historischen Saisondateien sind jedoch keine archivierten Vorsaison-Marktsnapshots. Preise, Vereinszuordnung, `active` und `selectable` können daher einen späteren Wissensstand enthalten. Bis echte Entscheidungszeit-Snapshots vorliegen, ist die Validierung experimentell und nicht als vollständig leakage-sicher zu bezeichnen.
 
 Die Featurefamilien umfassen:
 
@@ -28,7 +30,7 @@ Die Featurefamilien umfassen:
 
 CatBoost verarbeitet die kategorialen Felder direkt. Für Spieler mit wenig verwertbarer Historie werden Rollenwahrscheinlichkeiten und bedingte Punkte in Richtung eines aus Liga, Position und Preisstufe gelernten Priors geschrumpft.
 
-Der CatBoost-Anteil an der Punkteprognose wird auf einer früheren Vorsaison aus der festen Menge 0/25/50/75/100 Prozent gewählt. Danach folgt eine unangetastete spätere Vorsaison als Champion-/Challenger-Gate: schlägt die gewählte Mischung dort das feste v1-Team nicht, bleibt für diese Liga der v1-Punkteforecast Champion. Auch in diesem Fall nutzt Interactive-v2 weiterhin den korrekten Mehrspieltags- und Winteroptimierer. Das verhindert, dass ein komplizierteres Modell allein wegen seiner Neuheit die eine reale Septemberentscheidung steuert.
+Der CatBoost-Anteil an der Punkteprognose wird auf einer früheren Vorsaison aus der festen Menge 0/25/50/75/100 Prozent gewählt. Danach folgt eine zeitlich spätere, nicht zur Gewichtswahl verwendete Vorsaison als Champion-/Challenger-Gate: schlägt die gewählte Mischung dort das feste v1-Team nicht, bleibt für diese Liga der v1-Punkteforecast Champion. Wegen der oben beschriebenen Snapshot-Lücke ist „zeitlich getrennt“ hier bewusst nicht gleichbedeutend mit „vollständig leakage-sicher“. Auch beim Rückfall nutzt Interactive-v2 weiterhin den Mehrspieltags- und Winteroptimierer.
 
 ## Optimierung
 
@@ -38,7 +40,9 @@ Das gemischt-ganzzahlige Modell enthält:
 - `y[i,t]`: Spieler gehört an Spieltag `t` zur Elf;
 - `z[f,t]`: Formation `f` wird an Spieltag `t` verwendet.
 
-Es erzwingt Budget, 3/7/7/5-Kaderquoten, genau elf aufgestellte Kaderspieler und eine der sieben zulässigen Formationen je Spieltag. Ein Spieler mit weniger als 50 Prozent prognostizierter Einsatzwahrscheinlichkeit darf nicht in die geplante Elf gelangen; dieser strengere Wert wurde auf der Vorsaison vor dem finalen Holdout gewählt. In Interactive existiert kein Vereinslimit. Es gibt einen September- und einen Winterkader; beide sind regelkonform und unterscheiden sich um höchstens drei positionsgleiche Kauf-/Verkaufspaare. Optimiert wird die Summe der erwarteten Spieltagspunkte aller geplanten Elfen beider Saisonhälften. Ein numerisch winziger, datenabhängiger Tie-Break bevorzugt bei exakt gleicher Hauptzielfunktion die stärkere Bank; er kann keine schlechtere Hauptlösung auswählen.
+Es erzwingt Budget, 3/7/7/5-Kaderquoten, genau elf aufgestellte Kaderspieler und eine der sieben zulässigen Formationen je Spieltag. Es gibt keinen harten 50-Prozent-Filter: Ausfallrisiko steckt bereits in den erwarteten Punkten. In Interactive existiert kein Vereinslimit. Die Transferzahl kommt aus der Regeln-Konfiguration; für 2026/27 sind es vier, für ältere Saisons drei. Optimiert wird die Summe der erwarteten Spieltagspunkte aller geplanten Elfen beider Saisonhälften. Ein numerisch winziger, datenabhängiger Tie-Break bevorzugt bei exakt gleicher Hauptzielfunktion die stärkere Bank; er kann keine schlechtere Hauptlösung auswählen.
+
+HiGHS-Ergebnisse werden nur geschrieben, wenn ein zulässiger Incumbent existiert, alle Kaderinvarianten erfüllt sind und die MIP-Lücke höchstens 0,5 Prozent beträgt. Status und Lücke stehen im Artefakt.
 
 ## Validierung
 
@@ -50,7 +54,7 @@ Das Artefakt enthält für die letzte abgeschlossene Saison:
 - projizierte und realisierte Punkte des vom Modell gewählten Interactive-Kaders.
 - realisierte Punkte des festen v1-Champions, die Differenz und eine mögliche Rückfallentscheidung.
 
-Diese Prüfung ist ein sauberer Vorsaison-Holdout. Sie ist noch kein vollständiger Kickoff-Block-Simulator. Die drei Winterwechsel werden bereits im Vorsaisonplan als zweite Optimierungsstufe berücksichtigt; im echten Winter muss die Stufe mit den dann bekannten Preisen, Verletzungen und Rollen erneut gerechnet werden. Alle Spieltagsentscheidungen werden derzeit auf Rundenebene getroffen.
+Diese Prüfung ist zeitlich getrennt, besitzt wegen der fehlenden historischen Marktsnapshots aber noch keine vollständig belegte Leakage-Sicherheit. Sie ist außerdem noch kein vollständiger Kickoff-Block-Simulator. Alle Spieltagsentscheidungen werden derzeit auf Rundenebene getroffen.
 
 ## Reproduzieren
 

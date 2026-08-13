@@ -258,7 +258,7 @@ export type ManagerProjectedMatchday = {
 
 export type ManagerRecommendation = {
   modelVersion?: number;
-  deploymentModel?: "two-stage-v2" | "fixed-v1-champion";
+  deploymentModel?: "two-stage-v2" | "scenario-recourse-v2" | "fixed-v1-champion";
   league: string;
   leagueName: string;
   season: string;
@@ -271,8 +271,30 @@ export type ManagerRecommendation = {
     transferLimit: number;
     transferCount: number;
     spentM: number;
+    strategy?: string;
+    scenarioCount?: number;
+    openingCandidates?: number;
+    likelySales?: {
+      playerId: string;
+      count: number;
+      frequency: number;
+      name: string;
+      position: Position;
+      team: string;
+      priceM: number;
+    }[];
+    likelyTargets?: {
+      playerId: string;
+      count: number;
+      frequency: number;
+      name: string;
+      position: Position;
+      team: string;
+      priceM: number;
+    }[];
     transfers: {
       position: Position;
+      role?: "start" | "reserve";
       sell: { id: string; name: string; team: string; priceM: number };
       buy: { id: string; name: string; team: string; priceM: number };
     }[];

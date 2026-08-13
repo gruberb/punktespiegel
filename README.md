@@ -46,7 +46,7 @@ uv sync --frozen
 npm run generate:recommendations
 ```
 
-Der erste Schritt erzeugt v1 als Vergleichsmodell. Anschließend trainiert die v2-Pipeline chronologisch, prüft die Modelle auf der abgeschlossenen Vorsaison und löst Classic und Interactive für alle drei Ligen. `npm run dev` und `npm run build` verwenden die bereits erzeugten Artefakte und starten deshalb ohne erneutes Modelltraining.
+Der erste Schritt erzeugt v1 als Vergleichsmodell. Anschließend trainiert die v2-Pipeline chronologisch, prüft Interactive zeitlich getrennt und Classic in Rolling-Origin-Folds und löst beide Modi für alle drei Ligen. Die Classic-Prüfung bleibt bis zur Archivierung echter historischer Marktsnapshots ausdrücklich experimentell. `npm run dev` und `npm run build` verwenden die bereits erzeugten Artefakte und starten deshalb ohne erneutes Modelltraining.
 
 ## GitHub Pages
 
@@ -75,7 +75,7 @@ docker compose build web
 - `frontend/public/data/seasons/`: ein normalisierter Snapshot je Liga-Saison.
 - `frontend/public/data/recommendations/`: vorberechnete Classic- und Interactive-Empfehlungen der neuesten Saison.
 - `scripts/generate-manager-recommendations.ts`: deterministisches v1-Vergleichsmodell.
-- `scripts/generate-interactive-v2.py`: rollenabhängige Prognose, Holdout-Prüfung und zweistufige MILPs für Classic und Interactive.
+- `scripts/generate-interactive-v2.py`: rollenabhängige Prognose, szenariobasierte Classic-Rekursentscheidung, echter Winterlauf und Mehrspieltags-MILPs.
 - `pyproject.toml` und `uv.lock`: reproduzierbare Offline-Modellumgebung.
 - `.github/workflows/`: CI sowie täglicher Pages-Datenbuild.
 - `docs/`: Architektur, Betrieb und Architekturentscheidung.
