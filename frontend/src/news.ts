@@ -171,8 +171,15 @@ function relationPriority(relation: NewsRelation) {
   return relation === "player" ? 2 : relation === "automatic" ? 1 : 0;
 }
 
-export function newsAttribution(article: NewsArticle) {
+function isKickerArticle(article: NewsArticle) {
   const domain = article.domain.replace(/^www\./i, "");
-  const isKicker = domain === "kicker.de" || domain.endsWith(".kicker.de") || article.source.toLocaleLowerCase("de") === "kicker";
-  return `Quelle: ${isKicker ? "www.kicker.de" : article.domain || article.source}`;
+  return domain === "kicker.de" || domain.endsWith(".kicker.de") || article.source.toLocaleLowerCase("de") === "kicker";
+}
+
+export function newsAttribution(article: NewsArticle) {
+  return `Quelle: ${isKickerArticle(article) ? "www.kicker.de" : article.domain || article.source}`;
+}
+
+export function newsSourceLabel(article: NewsArticle) {
+  return isKickerArticle(article) ? null : article.source;
 }

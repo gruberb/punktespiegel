@@ -3,7 +3,7 @@ import type { MouseEvent as ReactMouseEvent, ReactNode, RefObject } from "react"
 import { createPortal } from "react-dom";
 import { api } from "./api";
 import { DataTable } from "./DataTable";
-import { newsAttribution } from "./news";
+import { newsAttribution, newsSourceLabel } from "./news";
 import type { DataTableColumn } from "./DataTable";
 import { initialAvailableRound, latestAvailableRound } from "./rounds";
 import type {
@@ -1358,7 +1358,6 @@ function PlayerNewsSection({ news, kickerNewsUrl, kickerNewsDirect }: {
   kickerNewsUrl: string;
   kickerNewsDirect: boolean;
 }) {
-  const showClubContext = news.clubArticles.length > 0;
   const visibleArticles = [...news.articles, ...news.clubArticles]
     .sort((left, right) => Date.parse(right.publishedAt) - Date.parse(left.publishedAt));
   const emptyMessage = news.status === "failed"
@@ -1376,10 +1375,7 @@ function PlayerNewsSection({ news, kickerNewsUrl, kickerNewsDirect }: {
         </div>
       </div>
       <NewsHealthNotice status={news.status} feedSummary={news.feedSummary} />
-      <ClubFeedStatusNotice status={news.clubFeedStatus} hasArticles={news.clubArticles.length > 0} />
-      {showClubContext && <p className="news-context-note"><span className="news-relation team">Vereinsumfeld</span>{news.articles.length
-        ? ` Meldungen aus ${news.clubFeedStatus === "ok" ? "dem offiziellen Vereinsfeed" : "dem vorliegenden Vereinskontext"} ergänzen die direkten Spielernennungen bis zu insgesamt 15 Einträgen.`
-        : ` Keine sichere direkte Spielernennung gefunden – deshalb zeigen wir Meldungen aus ${news.clubFeedStatus === "ok" ? "dem offiziellen Vereinsfeed" : "dem vorliegenden Vereinskontext"}.`}</p>}
+      <ClubFeedStatusNotice status={news.clubFeedStatus} />
       {visibleArticles.length
         ? <NewsList articles={visibleArticles} />
         : <p className={`news-empty news-empty--${news.status}`}>{emptyMessage}</p>}
@@ -1401,15 +1397,12 @@ function NewsHealthNotice({ status, feedSummary, includeUnmapped = false }: Pick
   return <p className={`news-health news-health--${status}`} role={status === "failed" ? "alert" : "status"}>{message}</p>;
 }
 
-function ClubFeedStatusNotice({ status, hasArticles }: { status: PlayerDetail["news"]["clubFeedStatus"]; hasArticles: boolean }) {
-  const label = status === "ok" ? "Verfügbar" : status === "error" ? "Abruffehler" : status === "unavailable" ? "Nicht verfügbar" : "Status unbekannt";
-  const message = status === "ok"
-    ? hasArticles ? "Vereinsmeldungen wurden berücksichtigt." : "In dieser auf 15 Einträge begrenzten Ansicht werden keine zusätzlichen Vereinsmeldungen angezeigt."
-    : status === "error"
-      ? "Der Vereinsfeed konnte beim letzten Lauf nicht gelesen werden; es wird kein neuer Vereinskontext ergänzt."
-      : status === "unavailable"
-        ? "Für diesen Verein ist derzeit kein Vereinsfeed im kicker-Feedkatalog vorhanden."
-        : "Das ältere Nachrichtenformat enthält noch keinen Status für Vereinsfeeds.";
+function ClubFeedStatusNotice({ status }: { status: PlayerDetail["news"]["clubFeedStatus"] }) {
+  if (status === "ok" || status === "unknown") return null;
+  const label = status === "error" ? "Abruffehler" : "Nicht verfügbar";
+  const message = status === "error"
+    ? "Der Vereinsfeed konnte beim letzten Lauf nicht gelesen werden; es wird kein neuer Vereinskontext ergänzt."
+    : "Für diesen Verein ist derzeit kein Vereinsfeed im kicker-Feedkatalog vorhanden.";
   return <p className={`club-feed-status club-feed-status--${status}`}><strong>Vereinsfeed: {label}.</strong> {message}</p>;
 }
 
@@ -1418,16 +1411,17 @@ function NewsList<Article extends NewsArticle>({ articles, context }: {
   context?: (article: Article) => string;
 }) {
   return (
-    <ol className="news-list">
+    <ol className="news-list news-list--scroll">
       {articles.map((article) => {
         const articleRelation = article.relation ?? "automatic";
         const relationLabel = articleRelation === "team" ? "Vereinsumfeld" : articleRelation === "player" ? "Spielerbezug" : "Automatisch zugeordnet";
+        const sourceLabel = newsSourceLabel(article);
         return (
           <li key={article.url}>
             <a href={article.url} target="_blank" rel="noreferrer">
               <span className="news-meta">
                 <time dateTime={article.publishedAt}>{formatNewsDate(article.publishedAt)}</time>
-                <b>{article.source}</b>
+                {sourceLabel && <b>{sourceLabel}</b>}
                 <em className={`news-relation ${articleRelation}`} title={article.matchedAlias ? `Erkannter Name: ${article.matchedAlias}` : undefined}>{relationLabel}</em>
               </span>
               <span className="news-article-copy"><strong>{article.title}</strong>{context && <small>{context(article)}</small>}</span>

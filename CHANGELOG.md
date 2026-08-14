@@ -2,6 +2,13 @@
 
 Alle wesentlichen Änderungen an Punktespiegel werden in dieser Datei dokumentiert.
 
+## [1.8.1] – 2026-08-14
+
+### Geändert
+
+- Die Medienbeobachtung zeigt ungefähr vier Meldungen und hält weitere Einträge in einer kompakten, intern scrollbaren Liste bereit.
+- Redundante kicker-Quellennamen sowie Hinweise auf erfolgreich verfügbare Vereinsfeeds und den ergänzenden Vereinskontext wurden entfernt; relevante Fehler- und Verfügbarkeitshinweise bleiben sichtbar.
+
 ## [1.8.0] – 2026-08-14
 
 ### Hinzugefügt
@@ -226,3 +233,4 @@ Alle wesentlichen Änderungen an Punktespiegel werden in dieser Datei dokumentie
 [1.6.0]: https://github.com/gruberb/punktespiegel/releases/tag/v1.6.0
 [1.7.0]: https://github.com/gruberb/punktespiegel/releases/tag/v1.7.0
 [1.8.0]: https://github.com/gruberb/punktespiegel/releases/tag/v1.8.0
+[1.8.1]: https://github.com/gruberb/punktespiegel/releases/tag/v1.8.1

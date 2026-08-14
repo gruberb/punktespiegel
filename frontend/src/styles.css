@@ -282,6 +282,7 @@ tbody tr:hover { background: #fbfcf9; }
 .news-actions > a { padding: 7px 10px; border: 1px solid #cfd9cf; border-radius: 999px; color: var(--green-deep); font-size: 9px; font-weight: 650; text-decoration: none; }
 .news-actions > a:hover { border-color: var(--green); background: white; }
 .news-list { list-style: none; padding: 0; margin: 0; border-top: 1px solid var(--line); }
+.news-list--scroll { max-height: 306px; overflow-y: auto; overscroll-behavior: contain; scrollbar-gutter: stable; }
 .news-list li { border-bottom: 1px solid var(--line-soft); }
 .news-list li:last-child { border-bottom: 0; }
 .news-list a { display: grid; grid-template-columns: 155px minmax(0, 1fr) auto; align-items: center; gap: 18px; min-height: 72px; padding: 12px 4px; color: var(--ink); text-decoration: none; }
@@ -1967,7 +1968,6 @@ html[data-theme="dark"] select optgroup {
 
 /* Current player and squad news ---------------------------------------- */
 .news-health,
-.news-context-note,
 .club-feed-status {
   margin: 0 0 12px;
   padding: 10px 12px;
@@ -1981,9 +1981,7 @@ html[data-theme="dark"] select optgroup {
 .news-health--stale { border-color: light-dark(var(--color-yellow-30), var(--color-yellow-60)); background: light-dark(var(--color-yellow-0), var(--color-yellow-90)); }
 .news-health--failed { border-color: light-dark(var(--color-red-30), var(--color-red-60)); background: light-dark(var(--color-red-0), var(--color-red-90)); }
 .club-feed-status strong { color: var(--text-color); }
-.club-feed-status--ok { border-color: light-dark(var(--color-green-30), var(--color-green-60)); background: var(--color-accent-primary-deemphasized); }
 .club-feed-status--error { border-color: light-dark(var(--color-red-30), var(--color-red-60)); background: light-dark(var(--color-red-0), var(--color-red-90)); }
-.news-context-note { display: flex; align-items: center; gap: 9px; }
 .news-list a > .news-meta,
 .news-list a > .news-article-copy { display: grid; gap: 5px; }
 .news-list a > .news-article-copy { min-width: 0; }
@@ -2016,5 +2014,4 @@ html[data-theme="dark"] select optgroup {
 
 @media (max-width: 490px) {
   .manager-squad-news { padding: 16px; }
-  .news-context-note { align-items: flex-start; }
 }

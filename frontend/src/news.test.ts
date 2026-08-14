@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { buildPlayerNews, buildSquadNews, canonicalNewsUrl, clubFeedStatus, newsAttribution, newsHealthStatus } from "./news.ts";
+import { buildPlayerNews, buildSquadNews, canonicalNewsUrl, clubFeedStatus, newsAttribution, newsHealthStatus, newsSourceLabel } from "./news.ts";
 import type { NewsArtifact, NewsFeedHealth } from "./news.ts";
 import type { ManagerPickPlayer, NewsArticle } from "./types.ts";
 
@@ -122,6 +122,10 @@ test("reserves squad slots for direct mentions despite newer team-feed volume", 
 });
 
 test("uses the exact visible kicker attribution", () => {
-  assert.equal(newsAttribution(article("https://www.kicker.de/example/artikel", "2026-08-14T10:00:00Z")), "Quelle: www.kicker.de");
-  assert.equal(newsAttribution({ ...article("https://example.test", "2026-08-14T10:00:00Z"), source: "Sportschau", domain: "sportschau.de" }), "Quelle: sportschau.de");
+  const kickerArticle = article("https://www.kicker.de/example/artikel", "2026-08-14T10:00:00Z");
+  const sportschauArticle = { ...article("https://example.test", "2026-08-14T10:00:00Z"), source: "Sportschau", domain: "sportschau.de" };
+  assert.equal(newsAttribution(kickerArticle), "Quelle: www.kicker.de");
+  assert.equal(newsSourceLabel(kickerArticle), null);
+  assert.equal(newsAttribution(sportschauArticle), "Quelle: sportschau.de");
+  assert.equal(newsSourceLabel(sportschauArticle), "Sportschau");
 });
