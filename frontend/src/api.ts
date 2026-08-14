@@ -387,41 +387,41 @@ function roundMetric(player: Player, metric: LeaderboardMetric) {
 
 function buildLeaderboards(players: Player[], exact: boolean): Dashboard["leaderboards"] {
   const points = (player: Player) => exact ? player.roundPoints : player.observedPoints;
-  const top = (position: Position | null, limit: number) => players
+  const top = (position: Position | null, limit?: number) => {
+    const ranked = players
     .filter((player) => points(player) !== 0 && (!position || player.position === position))
-    .sort((left, right) => points(right) - points(left) || left.name.localeCompare(right.name, "de"))
-    .slice(0, limit);
+      .sort((left, right) => points(right) - points(left) || left.name.localeCompare(right.name, "de"));
+    return limit == null ? ranked : ranked.slice(0, limit);
+  };
   const grades = players
     .filter((player) => (exact ? player.roundGrade : player.averageGrade) != null)
     .sort((left, right) => {
       const leftGrade = exact ? left.roundGrade! : left.averageGrade!;
       const rightGrade = exact ? right.roundGrade! : right.averageGrade!;
       return leftGrade - rightGrade || (exact ? right.roundPoints - left.roundPoints : right.gradedMatches - left.gradedMatches);
-    })
-    .slice(0, exact ? 30 : 8);
-  const metric = (name: LeaderboardMetric, position: Position | null, limit: number) => players
+    });
+  const metric = (name: LeaderboardMetric, position: Position | null) => players
     .filter((player) => (exact ? roundMetric(player, name) : seasonMetric(player, name)) > 0 && (!position || player.position === position))
     .sort((left, right) => {
       const difference = (exact ? roundMetric(right, name) : seasonMetric(right, name)) - (exact ? roundMetric(left, name) : seasonMetric(left, name));
       return difference || points(right) - points(left) || left.name.localeCompare(right.name, "de");
-    })
-    .slice(0, limit);
+    });
   return {
-    overall: top(null, exact ? 30 : 8),
+    overall: top(null, exact ? 30 : 10),
     positions: {
-      GK: top("GK", exact ? 30 : 20),
-      DEF: top("DEF", exact ? 30 : 20),
-      MID: top("MID", exact ? 30 : 20),
-      FWD: top("FWD", exact ? 30 : 20),
+      GK: top("GK"),
+      DEF: top("DEF"),
+      MID: top("MID"),
+      FWD: top("FWD"),
     },
     grades,
-    goals: metric("goals", null, exact ? 30 : 8),
-    assists: metric("assists", null, exact ? 30 : 8),
-    cleanSheets: metric("cleanSheets", "GK", exact ? 30 : 20),
-    starterPoints: metric("starterPoints", null, exact ? 30 : 20),
-    cardDeductions: metric("cardDeductions", null, exact ? 30 : 20),
-    mvpAwards: metric("mvpAwards", null, exact ? 30 : 20),
-    jokerAwards: metric("jokerAwards", null, exact ? 30 : 20),
+    goals: metric("goals", null),
+    assists: metric("assists", null),
+    cleanSheets: metric("cleanSheets", "GK"),
+    starterPoints: metric("starterPoints", null),
+    cardDeductions: metric("cardDeductions", null),
+    mvpAwards: metric("mvpAwards", null),
+    jokerAwards: metric("jokerAwards", null),
   };
 }
 

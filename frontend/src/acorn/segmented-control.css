@@ -1,0 +1,72 @@
+acorn-segmented-control {
+  display: inline-flex;
+}
+
+.acorn-segmented-control {
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--space-xsmall);
+  padding: var(--space-xsmall);
+  border-radius: var(--border-radius-circle);
+  border: var(--border-width) solid var(--segmented-control-border-color);
+  background: transparent;
+}
+
+acorn-segment {
+  display: inline-flex;
+}
+
+.acorn-segment {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-small);
+  padding: var(--space-xxsmall) var(--space-medium);
+  min-height: var(--button-min-height-small);
+  border-radius: var(--border-radius-circle);
+  border: none;
+  background: transparent;
+  color: var(--segmented-control-text-color);
+  font: inherit;
+  font-weight: var(--font-weight-semibold);
+  cursor: default;
+  user-select: none;
+  -webkit-user-select: none;
+  white-space: nowrap;
+  transition: background 0.12s ease, color 0.12s ease;
+}
+
+.acorn-segment--icon-only {
+  padding-inline: 0;
+  aspect-ratio: 1;
+}
+
+.acorn-segment__icon {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+}
+
+.acorn-segment:hover {
+  background-color: var(--button-background-color-hover);
+}
+
+.acorn-segment.is-selected {
+  color: var(--segmented-control-text-color-selected);
+  background: var(--segmented-control-segment-background-color-selected);
+}
+
+.acorn-segment:focus-visible {
+  outline: var(--focus-outline-width) solid var(--focus-outline-color);
+  outline-offset: var(--focus-outline-offset);
+}
+
+.acorn-segmented-control--large .acorn-segment {
+  min-height: var(--button-min-height);
+}
+
+.acorn-segmented-control.is-disabled {
+  opacity: var(--button-opacity-disabled);
+  pointer-events: none;
+}

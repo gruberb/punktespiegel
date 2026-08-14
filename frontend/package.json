@@ -1,6 +1,6 @@
 {
   "name": "@punktespiegel/frontend",
-  "version": "1.4.8",
+  "version": "1.5.0",
   "type": "module",
   "scripts": {
     "dev": "vite --host 0.0.0.0",

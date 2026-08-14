@@ -2,6 +2,24 @@
 
 Alle wesentlichen Änderungen an Punktespiegel werden in dieser Datei dokumentiert.
 
+## [1.5.0] – 2026-08-14
+
+### Hinzugefügt
+
+- Persistentes helles und dunkles Farbschema mit direktem Umschalter in der Navigation.
+- Wiederverwendbare Tabellen-, Seitenkopf- und Pfeilauswahl-Komponenten für einheitliche Größen, Abstände, Filter und responsive Darstellung.
+
+### Geändert
+
+- Vollständige Acorn-Neugestaltung für Desktop und Mobilgeräte mit größeren Spielerfotos, Vereinslogos, Punktwerten, Überschriften und Bedienelementen.
+- Überblick und Historie verwenden konsolidierte, filterbare Tabellen mit begrenzten Ansichten und internem Scrollen; die Mannschaftswertung zeigt elf vollständige Vereine auf gleicher Höhe wie die aktuelle Rangliste.
+- Mannschaftsprofile zeigen den Kader als einspaltige Tabelle, das Fantasy Team nutzt eine lesbarere Formation, Ersatzbank und Spieltagsauswertung, und „Top Players“ heißt nun „Topspieler“.
+- Liga-, Saison-, Spieltags-, Positions- und Sortierauswahlen in den Seitenköpfen lassen sich einheitlich über Pfeile oder das Auswahlfeld bedienen.
+
+### Behoben
+
+- Abgeschnittene Mannschaftsansichten, kollidierende mobile Tabellenspalten, unlesbare Hover-Zustände und uneinheitliche Punktewerte im Saisonverlauf.
+
 ## [1.4.3] – 2026-08-12
 
 ### Hinzugefügt
@@ -136,3 +154,4 @@ Alle wesentlichen Änderungen an Punktespiegel werden in dieser Datei dokumentie
 [1.4.1]: https://github.com/gruberb/punktespiegel/releases/tag/v1.4.1
 [1.4.2]: https://github.com/gruberb/punktespiegel/releases/tag/v1.4.2
 [1.4.3]: https://github.com/gruberb/punktespiegel/releases/tag/v1.4.3
+[1.5.0]: https://github.com/gruberb/punktespiegel/releases/tag/v1.5.0

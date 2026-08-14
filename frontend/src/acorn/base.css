@@ -1,0 +1,16 @@
+/* ============================================================
+ * components.css — prototype base styles
+ * ============================================================ */
+
+/* Icons use Mozilla's `context-fill` */
+img, svg { -moz-context-properties: fill, stroke; fill: currentColor; stroke: currentColor; }
+
+/* Form elements don't inherit font by default in browsers — force it */
+button, input, select, textarea { font: inherit; }
+
+body {
+  margin: 0;
+  font-size: var(--font-size-root);
+  background: var(--background-color-canvas);
+  color: var(--text-color);
+}
