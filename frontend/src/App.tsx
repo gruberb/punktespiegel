@@ -91,7 +91,7 @@ function initialTheme(): Theme {
   } catch {
     // Storage can be unavailable in privacy-restricted browser contexts.
   }
-  return window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+  return "light";
 }
 
 function initialView(): View {

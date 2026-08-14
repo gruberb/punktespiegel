@@ -2,6 +2,16 @@
 
 Alle wesentlichen Änderungen an Punktespiegel werden in dieser Datei dokumentiert.
 
+## [1.5.1] – 2026-08-14
+
+### Geändert
+
+- Helles Design ist für neue Besucher jetzt die Voreinstellung; eine bereits gespeicherte Auswahl bleibt erhalten.
+
+### Behoben
+
+- Auswahlmenüs verwenden in beiden Designs explizite Vorder- und Hintergrundfarben, damit Optionen auch im nativen Browser-Menü lesbar bleiben.
+
 ## [1.5.0] – 2026-08-14
 
 ### Hinzugefügt
@@ -155,3 +165,4 @@ Alle wesentlichen Änderungen an Punktespiegel werden in dieser Datei dokumentie
 [1.4.2]: https://github.com/gruberb/punktespiegel/releases/tag/v1.4.2
 [1.4.3]: https://github.com/gruberb/punktespiegel/releases/tag/v1.4.3
 [1.5.0]: https://github.com/gruberb/punktespiegel/releases/tag/v1.5.0
+[1.5.1]: https://github.com/gruberb/punktespiegel/releases/tag/v1.5.1

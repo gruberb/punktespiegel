@@ -3,18 +3,17 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta id="theme-color" name="theme-color" content="#131215" />
+    <meta id="theme-color" name="theme-color" content="#f7f6fb" />
     <meta name="color-scheme" content="light dark" />
     <script>
+      let theme = "light";
       try {
         const storedTheme = localStorage.getItem("punktespiegel-theme");
-        const theme = storedTheme === "light" || storedTheme === "dark"
-          ? storedTheme
-          : matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
-        document.documentElement.dataset.theme = theme;
-        document.documentElement.style.colorScheme = theme;
-        document.getElementById("theme-color").content = theme === "light" ? "#f7f6fb" : "#131215";
+        if (storedTheme === "light" || storedTheme === "dark") theme = storedTheme;
       } catch {}
+      document.documentElement.dataset.theme = theme;
+      document.documentElement.style.colorScheme = theme;
+      document.getElementById("theme-color").content = theme === "light" ? "#f7f6fb" : "#131215";
     </script>
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
