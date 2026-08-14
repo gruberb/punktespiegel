@@ -2,13 +2,13 @@
   "id": ".",
   "name": "Punktespiegel",
   "short_name": "Punktespiegel",
-  "description": "Fantasy-Fußball-Analyse auf Basis von kicker-Daten und der kicker Manager-Liga.",
+  "description": "Aktuelle und historische kicker-Noten und Managerpunkte für Bundesliga, 2. Bundesliga und 3. Liga.",
   "lang": "de",
   "start_url": ".",
   "scope": ".",
   "display": "standalone",
-  "background_color": "#f7f6f1",
-  "theme_color": "#f7f6f1",
+  "background_color": "#f7f6fb",
+  "theme_color": "#f7f6fb",
   "icons": [
     {
       "src": "icons/icon-192.png",

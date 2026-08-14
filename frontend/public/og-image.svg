@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">Punktespiegel</title>
+  <desc id="desc">kicker Manager-Daten für Bundesliga, 2. Bundesliga und 3. Liga.</desc>
+  <rect width="1200" height="630" fill="#F7F6FB"/>
+  <circle cx="1090" cy="-10" r="300" fill="#EAE2FF"/>
+  <circle cx="1120" cy="600" r="220" fill="#D7C7FF" opacity=".62"/>
+  <g transform="translate(72 78) scale(1.12)">
+    <path fill="#7547E3" d="M62 8C31.1 8 12 27.1 12 58v48c0 7.7 6.3 14 14 14h40c30.9 0 50-19.1 50-50V58C116 27.1 96.9 8 66 8h-4Z"/>
+    <circle cx="46" cy="50" r="10" fill="#FFFFFF"/>
+    <circle cx="82" cy="78" r="8" fill="none" stroke="#D7C7FF" stroke-width="5"/>
+  </g>
+  <text x="230" y="160" fill="#180E30" font-family="Noto Sans, Arial, sans-serif" font-size="64" font-weight="760" letter-spacing="-2">Punktespiegel</text>
+  <text x="74" y="280" fill="#180E30" font-family="Noto Sans, Arial, sans-serif" font-size="46" font-weight="720">kicker Manager-Daten.</text>
+  <text x="74" y="338" fill="#7547E3" font-family="Noto Sans, Arial, sans-serif" font-size="46" font-weight="720">Aktuell und historisch.</text>
+  <text x="76" y="402" fill="#5B526C" font-family="Noto Sans, Arial, sans-serif" font-size="23">Noten · Punkte · Spieler · Mannschaften · Beispielteams</text>
+  <rect x="74" y="474" width="612" height="66" rx="33" fill="#FFFFFF" stroke="#D7D2E0" stroke-width="2"/>
+  <text x="108" y="517" fill="#180E30" font-family="Noto Sans, Arial, sans-serif" font-size="23" font-weight="680">Bundesliga · 2. Bundesliga · 3. Liga</text>
+  <text x="1015" y="574" fill="#5B526C" font-family="Noto Sans, Arial, sans-serif" font-size="17" text-anchor="end">Unabhängiges Analyseprojekt</text>
+</svg>

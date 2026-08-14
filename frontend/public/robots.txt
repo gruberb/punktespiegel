@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://gruberb.github.io/punktespiegel/sitemap.xml

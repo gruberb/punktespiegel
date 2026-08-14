@@ -38,6 +38,7 @@ type TopPlayerSort = "previous" | "average" | "value" | "trend" | "price";
 type Theme = "light" | "dark";
 
 const themeStorageKey = "punktespiegel-theme";
+const siteBaseUrl = "https://gruberb.github.io/punktespiegel/";
 
 const positionName: Record<Position, string> = {
   GK: "Torwart",
@@ -215,6 +216,67 @@ export default function App() {
     && (filters.league !== selectedTeamSeason?.leagueCode || filters.season !== String(selectedTeamSeason?.startYear));
   const playerSelectionPending = Boolean(selectedPlayerSeason)
     && (filters.league !== selectedPlayerSeason?.leagueCode || filters.season !== String(selectedPlayerSeason?.startYear));
+
+  useEffect(() => {
+    const leagueName = catalog?.leagues.find((league) => league.code === filters.league)?.name ?? "Bundesliga";
+    const seasonName = selectedSeason?.displayName ?? filters.season;
+    const seo = ({
+      overview: {
+        title: `kicker Manager Punkte ${leagueName} ${seasonName}`,
+        description: `Aktuelle kicker-Noten und Managerpunkte der ${leagueName} ${seasonName}: Ranglisten nach Spielern, Positionen und Mannschaften.`,
+      },
+      players: {
+        title: `kicker Noten & Managerpunkte ${leagueName}`,
+        description: `Spieler, kicker-Noten, Managerpunkte, Tore, Vorlagen und Marktwerte der ${leagueName} ${seasonName} nach Spieltag durchsuchen.`,
+      },
+      player: {
+        title: `Spielerprofil: kicker Noten & Punkte ${leagueName}`,
+        description: `Kicker-Noten, Managerpunkte, Saisonverlauf, Einsätze und verlinkte Fußball-News für Spieler der ${leagueName}.`,
+      },
+      teams: {
+        title: `Mannschaftswertung ${leagueName}: kicker Punkte`,
+        description: `Kicker Managerpunkte aller Mannschaften der ${leagueName} ${seasonName} vergleichen und Kader, Positionen sowie Spiele öffnen.`,
+      },
+      team: {
+        title: `Mannschaftsprofil: kicker Punkte ${leagueName}`,
+        description: `Kader, Spielerpunkte und jedes Spiel im Detail für Mannschaften der ${leagueName} – mit historischen kicker Managerdaten.`,
+      },
+      history: {
+        title: `kicker Noten & Punkte Historie ${leagueName}`,
+        description: `Historische kicker-Noten, Managerpunkte, Saisonbestleistungen, Spieltage und Mannschaftswertungen der ${leagueName}.`,
+      },
+      top: {
+        title: `Topspieler für kicker Manager Interactive & Classic`,
+        description: `Topspieler für kicker Manager Interactive und Classic nach Vorsaisonpunkten, Durchschnitt, Marktwert und Position vergleichen.`,
+      },
+      manager: {
+        title: `Beispielteams für kicker Manager Interactive & Classic`,
+        description: `Datenbasierte Beispielkader und Aufstellungen für kicker Manager Interactive und Classic in Bundesliga, 2. Bundesliga und 3. Liga.`,
+      },
+    } satisfies Record<View, { title: string; description: string }>)[view];
+
+    const canonical = new URL(siteBaseUrl);
+    canonical.searchParams.set("view", view);
+    canonical.searchParams.set("league", filters.league);
+    canonical.searchParams.set("season", filters.season);
+    if (view === "players") canonical.searchParams.set("round", filters.round);
+    if (view === "player" && playerId) canonical.searchParams.set("player", playerId);
+    if (view === "team" && teamId) canonical.searchParams.set("team", teamId);
+
+    document.title = `${seo.title} | Punktespiegel`;
+    document.querySelector<HTMLLinkElement>('link[rel="canonical"]')?.setAttribute("href", canonical.href);
+    const metadata: ["name" | "property", string, string][] = [
+      ["name", "description", seo.description],
+      ["property", "og:title", `${seo.title} | Punktespiegel`],
+      ["property", "og:description", seo.description],
+      ["property", "og:url", canonical.href],
+      ["name", "twitter:title", `${seo.title} | Punktespiegel`],
+      ["name", "twitter:description", seo.description],
+    ];
+    metadata.forEach(([attribute, key, content]) => {
+      document.head.querySelector<HTMLMetaElement>(`meta[${attribute}="${key}"]`)?.setAttribute("content", content);
+    });
+  }, [catalog, filters.league, filters.round, filters.season, playerId, selectedSeason?.displayName, teamId, view]);
 
   useEffect(() => {
     if (initialRoundResolved.current || !selectedSeason) return;
@@ -498,7 +560,7 @@ export default function App() {
               latestRound < 1 ? <section className="detail-section"><Empty message="Für diese Saison liegen noch keine Daten eines abgeschlossenen Spieltags vor." /></section>
                 : dashboardError ? <ErrorState message={dashboardError} />
                 : dashboardLoading || !dashboard ? <LoadingState />
-                  : <Overview data={dashboard} onView={setView} onPlayer={openPlayer} onTeam={openTeam} />
+                  : <><Overview data={dashboard} onView={setView} onPlayer={openPlayer} onTeam={openTeam} /><SeoHub filters={filters} onView={setView} /></>
             )}
             {view === "players" && <PlayersView filters={filters} onPlayer={openPlayer} />}
             {view === "player" && playerId && (playerSelectionPending ? <LoadingState /> : <PlayerDetailView filters={filters} playerId={playerId} backLabel={backLabel} onBack={() => goBack("players")} onTeam={openTeam} onSeason={(year) => updatePlayerSeason(String(year))} />)}
@@ -571,6 +633,67 @@ function Overview({ data, onView, onPlayer, onTeam }: { data: Dashboard; onView:
           <OverviewPlayerTable players={activeMetric.players} metric={activeMetric.id} onPlayer={onPlayer} />
         </div>
       </article>
+    </section>
+  );
+}
+
+function SeoHub({ filters, onView }: { filters: Filters; onView: (view: NavView) => void }) {
+  const hrefFor = (view: NavView) => {
+    const params = scopeQuery(filters, view === "players");
+    params.set("view", view);
+    return `?${params}`;
+  };
+  const internalLink = (view: NavView, label: string) => (
+    <a href={hrefFor(view)} onClick={(event) => { event.preventDefault(); onView(view); }}>{label}</a>
+  );
+
+  return (
+    <section className="seo-hub" aria-labelledby="seo-hub-title">
+      <header className="seo-hub-intro">
+        <p className="kicker">Notenarchiv · Punkte-Datenbank · Fantasy-Planung</p>
+        <h2 id="seo-hub-title">Der Daten-Hub für das kicker Managerspiel</h2>
+        <p>Punktespiegel bündelt aktuelle und historische kicker-Noten und Managerpunkte für Bundesliga, 2. Bundesliga und 3. Liga. Vergleiche Spieler und Vereine, analysiere einzelne Spieltage und nutze datenbasierte Beispielkader für Interactive und Classic.</p>
+      </header>
+
+      <div className="seo-feature-grid">
+        <article>
+          <h3>Aktuelle Noten und Punkte</h3>
+          <p>Ranglisten nach Spieltag, Position und Mannschaft zeigen Punkte, Noten, Tore, Vorlagen und weitere kicker-Wertungen in einer konsistenten Tabelle.</p>
+          {internalLink("players", "Spielerdaten durchsuchen →")}
+        </article>
+        <article>
+          <h3>Historische Bundesliga-Daten</h3>
+          <p>Wechsle zwischen Saisons und Spieltagen, um Spielerwertungen, Leistungsdaten, Mannschaftspunkte und die beste Elf rückblickend zu vergleichen.</p>
+          {internalLink("history", "Noten- und Punktehistorie öffnen →")}
+        </article>
+        <article>
+          <h3>Interactive- und Classic-Beispielteams</h3>
+          <p>Beispielkader verbinden Marktwerte, Rollen, Verfügbarkeit und bisherige Leistungen zu nachvollziehbaren Startelf- und Reservevorschlägen.</p>
+          {internalLink("manager", "Fantasy-Teams ansehen →")}
+        </article>
+      </div>
+
+      <div className="seo-source-panel">
+        <div>
+          <h3>Spielerprofile mit weiterführenden Fußball-News</h3>
+          <p>Spieler- und Mannschaftsseiten verknüpfen die Punktedaten mit aktuellen Meldungen und Profilen externer Quellen. So bleibt die statistische Einordnung mit Verletzungen, Rollen und Transferkontext verbunden.</p>
+        </div>
+        <nav className="seo-source-links" aria-label="Externe Fußball- und Managerspiel-Quellen">
+          <a href="https://www.kicker.de/managerspiel/interactive" target="_blank" rel="noreferrer external">kicker Manager Interactive ↗</a>
+          <a href="https://www.kicker.de/managerspiel/classic" target="_blank" rel="noreferrer external">kicker Manager Classic ↗</a>
+          <a href="https://www.ligainsider.de/" target="_blank" rel="noreferrer external">LigaInsider ↗</a>
+          <a href="https://www.transfermarkt.de/" target="_blank" rel="noreferrer external">Transfermarkt ↗</a>
+          <a href="https://www.sportschau.de/fussball/" target="_blank" rel="noreferrer external">Sportschau Fußball ↗</a>
+        </nav>
+      </div>
+
+      <div className="seo-faq" aria-labelledby="seo-faq-title">
+        <h3 id="seo-faq-title">Häufige Fragen zu Punktespiegel</h3>
+        <details><summary>Welche Daten zeigt Punktespiegel?</summary><p>Die Website zeigt kicker-Noten, Managerpunkte, Tore, Vorlagen und weitere Wertungen nach Spieler, Verein, Position, Saison und Spieltag.</p></details>
+        <details><summary>Welche Ligen sind enthalten?</summary><p>Punktespiegel deckt die Bundesliga, die 2. Bundesliga und die 3. Liga ab.</p></details>
+        <details><summary>Gibt es Daten für Interactive und Classic?</summary><p>Ja. Die Fantasy-Team-Ansicht bietet datenbasierte Beispielkader und Aufstellungen für beide Varianten. Es handelt sich um unabhängige Beispiele, nicht um eine Erfolgsgarantie.</p></details>
+        <details><summary>Ist Punktespiegel ein offizielles kicker-Angebot?</summary><p>Nein. Punktespiegel ist ein unabhängiges Analyseprojekt und nicht mit kicker verbunden. Die Datenbasis und externe Quellen werden transparent ausgewiesen.</p></details>
+      </div>
     </section>
   );
 }

@@ -2,6 +2,18 @@
 
 Alle wesentlichen Änderungen an Punktespiegel werden in dieser Datei dokumentiert.
 
+## [1.6.0] – 2026-08-14
+
+### Hinzugefügt
+
+- Suchmaschinenoptimierte Seitentitel und Beschreibungen, kanonische URLs, Social-Media-Vorschauen, strukturierte WebSite-, WebApplication- und FAQ-Daten sowie Sitemap und robots.txt.
+- Sichtbarer Daten-Hub mit internen Links, FAQ und weiterführenden Quellen zu kicker Manager Interactive und Classic, LigaInsider, Transfermarkt und Sportschau.
+- Neues violettes Punktespiegel-Favicon, aktualisierte App-Icons und eine eigene Social-Media-Vorschaugrafik im Acorn-Stil.
+
+### Geändert
+
+- Die Startseite positioniert Punktespiegel klarer als aktuelle und historische Noten- und Punktedatenbank für Bundesliga, 2. Bundesliga und 3. Liga.
+
 ## [1.5.1] – 2026-08-14
 
 ### Geändert
@@ -166,3 +178,4 @@ Alle wesentlichen Änderungen an Punktespiegel werden in dieser Datei dokumentie
 [1.4.3]: https://github.com/gruberb/punktespiegel/releases/tag/v1.4.3
 [1.5.0]: https://github.com/gruberb/punktespiegel/releases/tag/v1.5.0
 [1.5.1]: https://github.com/gruberb/punktespiegel/releases/tag/v1.5.1
+[1.6.0]: https://github.com/gruberb/punktespiegel/releases/tag/v1.6.0
