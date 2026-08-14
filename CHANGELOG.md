@@ -2,6 +2,24 @@
 
 Alle wesentlichen Änderungen an Punktespiegel werden in dieser Datei dokumentiert.
 
+## [1.7.0] – 2026-08-14
+
+### Hinzugefügt
+
+- Eigene, direkt verlinkbare Seiten für „Über Punktespiegel“, Daten und Methodik, Quellen sowie häufige Fragen.
+- Kompakte, websiteweite Fußzeile mit sieben internen Navigationslinks, Datenhinweis, GitHub- und Sitemap-Verweis.
+- Separate Sitemap-Einträge und individuelle Metadaten für alle neuen Informationsseiten.
+
+### Geändert
+
+- Der große SEO-Daten-Hub wurde aus dem Überblick entfernt, damit die Startseite wieder auf Ranglisten und Wertungen fokussiert bleibt.
+- Strukturierte FAQ-Daten werden nur noch auf der sichtbaren FAQ-Seite ausgegeben und entsprechen dort allen dargestellten Fragen.
+- Der kompakte Mannschaftsfilter verwendet für Sturm jetzt analog zu GES, TW, ABW und MIT die Abkürzung ST.
+
+### Behoben
+
+- Die Mannschaftswertung nutzt die volle Höhe der benachbarten aktuellen Rangliste und zeigt elf vollständig ausgerichtete Einträge vor dem internen Scrollen.
+
 ## [1.6.0] – 2026-08-14
 
 ### Hinzugefügt
@@ -179,3 +197,4 @@ Alle wesentlichen Änderungen an Punktespiegel werden in dieser Datei dokumentie
 [1.5.0]: https://github.com/gruberb/punktespiegel/releases/tag/v1.5.0
 [1.5.1]: https://github.com/gruberb/punktespiegel/releases/tag/v1.5.1
 [1.6.0]: https://github.com/gruberb/punktespiegel/releases/tag/v1.6.0
+[1.7.0]: https://github.com/gruberb/punktespiegel/releases/tag/v1.7.0
