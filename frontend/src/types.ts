@@ -280,6 +280,44 @@ export type ManagerMatchday = {
   players: ManagerMatchdayPlayer[];
 };
 
+export type ManagerFixturePlayer = {
+  id: string;
+  name: string;
+  teamCode: string;
+  logoUrl: string | null;
+  photoUrl: string | null;
+  position: Position;
+  role: "start" | "reserve";
+  points: number | null;
+};
+
+export type ManagerFixtureTeam = {
+  id: string;
+  name: string;
+  code: string;
+  logoUrl: string | null;
+  players: ManagerFixturePlayer[];
+};
+
+export type ManagerFixture = {
+  id: string;
+  scheduledAt: string | null;
+  state: string;
+  homeScore: number | null;
+  awayScore: number | null;
+  home: ManagerFixtureTeam;
+  away: ManagerFixtureTeam;
+};
+
+export type ManagerScheduleRound = {
+  matchday: number;
+  name: string;
+  startAt: string | null;
+  endAt: string | null;
+  phase: string;
+  fixtures: ManagerFixture[];
+};
+
 export type ManagerProjectedMatchdayPlayer = Omit<ManagerMatchdayPlayer, "points"> & {
   opponentId: string;
   opponent: string;

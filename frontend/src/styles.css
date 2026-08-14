@@ -1335,7 +1335,7 @@ tbody tr:hover, .clickable-row:hover { background: var(--button-background-color
 }
 .data-table-count { flex: 0 0 auto; color: var(--text-color-deemphasized); font-size: 12px; font-weight: 700; white-space: nowrap; }
 .data-table-scroll { position: relative; overflow: auto; }
-.data-table table { width: 100%; border-collapse: collapse; color: inherit; }
+.data-table table { width: 100%; min-width: var(--data-table-min-width, 900px); border-collapse: collapse; color: inherit; }
 .data-table th {
   height: 52px;
   padding: 0 18px;
@@ -1452,11 +1452,53 @@ tbody tr:hover, .clickable-row:hover { background: var(--button-background-color
 .manager-methodology p { margin: 0 0 8px; }
 .manager-methodology a { color: var(--color-accent-primary); }
 
+.manager-section-tabs { width: max-content; margin: 0 auto 4px; }
+.manager-section-tabs button { min-width: 112px; }
+.manager-fixtures { padding: 24px; }
+.manager-fixtures-header { display: flex; align-items: end; justify-content: space-between; gap: 28px; }
+.manager-fixtures-header .section-copy { max-width: 680px; margin: 0; }
+.manager-fixtures-header .section-copy h3 { font-size: 24px; }
+.manager-fixtures-header .section-copy > p:last-child { margin: 6px 0 0; color: var(--text-color-deemphasized); font-size: 11px; line-height: 1.5; }
+.manager-fixtures-header .stepper-select { min-width: 250px; height: 50px; }
+.manager-fixtures-round { display: flex; align-items: baseline; justify-content: center; gap: 12px; padding: 18px 0 14px; margin-top: 18px; border-top: 1px solid var(--line-soft); }
+.manager-fixtures-round strong { color: var(--color-accent-primary); font-size: 17px; }
+.manager-fixtures-round span { color: var(--text-color-deemphasized); font-size: 13px; }
+.manager-fixtures-round em { padding: 4px 8px; border-radius: 999px; background: var(--color-accent-primary-deemphasized); color: var(--color-accent-primary); font-size: 8px; font-style: normal; font-weight: 750; letter-spacing: .04em; text-transform: uppercase; }
+.manager-fixture-slots { display: grid; gap: 18px; }
+.manager-fixture-slot { overflow: hidden; border: 1px solid var(--line); border-radius: 13px; background: var(--background-color-box); }
+.manager-fixture-slot > h4 { margin: 0; padding: 10px 18px; border-bottom: 1px solid var(--line); background: var(--background-color-canvas); color: var(--text-color-deemphasized); font-size: 11px; font-weight: 680; letter-spacing: .035em; text-align: center; text-transform: uppercase; }
+.manager-fixture-slot > div { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.manager-fixture-card { min-width: 0; min-height: 150px; padding: 18px; border-top: 1px solid var(--line-soft); }
+.manager-fixture-card:nth-child(-n+2) { border-top: 0; }
+.manager-fixture-card:nth-child(even) { border-left: 1px solid var(--line-soft); }
+.manager-fixture-matchup { display: grid; grid-template-columns: minmax(0, 1fr) 78px minmax(0, 1fr); align-items: center; gap: 10px; }
+.manager-fixture-team { min-width: 0; display: flex; align-items: center; gap: 9px; }
+.manager-fixture-team.home { justify-content: flex-end; text-align: right; }
+.manager-fixture-team.away { justify-content: flex-start; text-align: left; }
+.manager-fixture-team strong { overflow: hidden; color: var(--text-color); font-size: 13px; font-weight: 720; text-overflow: ellipsis; white-space: nowrap; }
+.manager-fixture-team .team-logo { flex: 0 0 auto; width: 34px; height: 34px; }
+.manager-fixture-score { min-height: 42px; display: grid; place-items: center; padding: 7px 8px; border-radius: 7px; background: light-dark(var(--color-gray-80), var(--color-gray-90)); color: var(--color-white); font-size: 17px; font-weight: 800; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.manager-fixture-squads { display: grid; grid-template-columns: minmax(0, 1fr) 78px minmax(0, 1fr); gap: 10px; margin-top: 11px; }
+.manager-fixture-players { min-width: 0; display: flex; flex-wrap: wrap; gap: 7px; list-style: none; padding: 0; margin: 0; }
+.manager-fixture-players.home { grid-column: 1; justify-content: flex-end; }
+.manager-fixture-players.away { grid-column: 3; justify-content: flex-start; }
+.manager-fixture-players button { width: 48px; display: grid; justify-items: center; gap: 3px; padding: 0; border: 0; background: transparent; color: var(--text-color); }
+.manager-fixture-players button.reserve { opacity: .72; }
+.manager-fixture-portrait { position: relative; display: block; }
+.manager-fixture-players .player-photo { width: 40px; height: 47px; border-radius: 8px; }
+.manager-fixture-players small { width: 100%; overflow: hidden; font-size: 7px; font-weight: 650; text-overflow: ellipsis; white-space: nowrap; }
+.manager-fixture-portrait > b { position: absolute; right: -5px; bottom: -3px; min-width: 20px; padding: 2px 4px; border: 2px solid var(--background-color-box); border-radius: 999px; background: var(--color-accent-primary); color: var(--button-text-color-primary); font-size: 7px; line-height: 1.2; text-align: center; }
+.manager-fixture-portrait > b.negative { background: var(--text-color-error); color: var(--color-white); }
+
 @media (max-width: 1280px) {
   .manager-content-grid { grid-template-columns: 1fr; }
+  .manager-fixture-slot > div { grid-template-columns: 1fr; }
+  .manager-fixture-card:nth-child(2) { border-top: 1px solid var(--line-soft); }
+  .manager-fixture-card:nth-child(even) { border-left: 0; }
 }
 
 @media (max-width: 790px) {
+  .data-table table { min-width: var(--data-table-mobile-min-width, var(--data-table-min-width, 900px)); }
   .data-table-toolbar { flex-wrap: wrap; min-height: 0; padding: 12px; }
   .data-table-search { flex: 1 0 100%; width: 100%; }
   .data-table-filter { flex: 1 1 150px; min-width: 140px; }
@@ -1482,10 +1524,26 @@ tbody tr:hover, .clickable-row:hover { background: var(--button-background-color
   .manager-player-card span strong { font-size: 10px; }
   .fantasy-matchday-card > summary { grid-template-columns: auto 1fr auto; }
   .fantasy-summary-positions { grid-column: 1 / -1; }
+  .manager-section-tabs { margin-bottom: 2px; }
+  .manager-fixtures { padding: 16px; }
+  .manager-fixtures-header { align-items: stretch; flex-direction: column; gap: 14px; }
+  .manager-fixtures-header .stepper-select { width: 100%; min-width: 0; }
+  .manager-fixtures-round { flex-wrap: wrap; gap: 5px 10px; margin-top: 14px; padding: 14px 0 12px; }
+  .manager-fixture-slot > h4 { padding-inline: 10px; font-size: 9px; }
+  .manager-fixture-card { min-height: 132px; padding: 14px 10px; }
+  .manager-fixture-matchup,
+  .manager-fixture-squads { grid-template-columns: minmax(0, 1fr) 62px minmax(0, 1fr); gap: 6px; }
+  .manager-fixture-team { gap: 6px; }
+  .manager-fixture-team strong { font-size: 11px; }
+  .manager-fixture-team .team-logo { width: 29px; height: 29px; border-radius: 7px; }
+  .manager-fixture-score { min-height: 37px; padding-inline: 4px; font-size: 14px; }
+  .manager-fixture-players { gap: 4px; }
+  .manager-fixture-players button { width: 41px; }
+  .manager-fixture-players .player-photo { width: 35px; height: 41px; }
 }
 
 @media (max-width: 490px) {
-  .data-table-filter { flex-basis: 100%; }
+  .data-table-filter { flex: 1 1 calc(50% - 6px); min-width: 0; }
   .data-table-count { width: 100%; margin-left: 0; }
   .manager-position-groups { min-height: 0; gap: 24px; padding-block: 28px; }
   .manager-position-groups > section > div { flex-wrap: wrap; justify-content: center; gap: 8px; }
@@ -1493,6 +1551,13 @@ tbody tr:hover, .clickable-row:hover { background: var(--button-background-color
   .manager-player-card .player-photo { width: 35px; height: 41px; }
   .manager-player-card span strong { font-size: 10px; }
   .manager-player-card span small { font-size: 8px; }
+  .manager-section-tabs { width: 100%; }
+  .manager-section-tabs button { flex: 1; min-width: 0; }
+  .manager-fixtures-header .section-copy h3 { font-size: 21px; }
+  .manager-fixtures-round { justify-content: flex-start; }
+  .manager-fixtures-round strong { width: 100%; }
+  .manager-fixture-players small { display: none; }
+  .manager-fixture-card { min-height: 118px; }
 }
 
 /* Unified page controls and table scale --------------------------------- */
@@ -1654,6 +1719,25 @@ tbody tr:hover, .clickable-row:hover { background: var(--button-background-color
   .data-table-scroll.is-bounded { max-height: var(--data-table-max-height-mobile); }
   .data-table .table-player,
   .data-table .table-team { min-width: 255px; }
+  .data-table--compact .data-table-toolbar { gap: 9px; padding: 10px; }
+  .data-table--compact .data-table-search,
+  .data-table--compact .data-table-filter { height: 40px; }
+  .data-table--compact .data-table-count { font-size: 11px; }
+  .data-table--compact th { height: 43px; padding-inline: 10px; font-size: 9px; }
+  .data-table--compact td { height: 61px; padding: 7px 10px; font-size: 12px; }
+  .data-table--compact .table-player,
+  .data-table--compact .table-team { min-width: 205px; gap: 9px; }
+  .data-table--compact .table-player strong,
+  .data-table--compact .table-team strong { font-size: 13px; }
+  .data-table--compact .table-player small,
+  .data-table--compact .table-team small { margin-top: 2px; font-size: 9px; }
+  .data-table--compact .rank { flex-basis: 18px; font-size: 10px; }
+  .data-table--compact .player-photo { width: 38px; height: 44px; border-radius: 9px; }
+  .data-table--compact .team-logo.large { width: 40px; height: 40px; border-radius: 9px; }
+  .data-table--compact .team-metric-cell { min-height: 60px; padding: 7px 10px; }
+  .data-table--compact .primary-num,
+  .data-table--compact .matchday-score,
+  .data-table--compact .team-score strong { font-size: 17px; }
   .top-players-context-inline { align-items: flex-start; flex-direction: column; gap: 2px; }
 }
 
@@ -1664,6 +1748,9 @@ tbody tr:hover, .clickable-row:hover { background: var(--button-background-color
   .overview-tab-panel { max-height: 700px; }
   .data-table-column-label-long.has-short { display: none; }
   .data-table-column-label-short { display: inline; }
+  .data-table--compact .data-table-search { min-width: 100%; }
+  .data-table--compact .data-table-filter { flex: 1 1 calc(50% - 5px); min-width: 125px; }
+  .data-table--compact .data-table-count { width: auto; min-height: 14px; margin: 0 2px; }
 }
 
 /* Team detail and overview clipping fixes ------------------------------ */

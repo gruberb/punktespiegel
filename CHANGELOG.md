@@ -2,6 +2,21 @@
 
 Alle wesentlichen Änderungen an Punktespiegel werden in dieser Datei dokumentiert.
 
+## [1.9.0] – 2026-08-14
+
+### Hinzugefügt
+
+- Das Fantasy Team besitzt jetzt getrennte Ansichten für Kaderübersicht und Spieltage. Die Spieltagsansicht lässt sich über alle Runden durchblättern, gruppiert Partien nach Anstoßzeit und ordnet sämtliche Classic- beziehungsweise Interactive-Kaderspieler ihrem tatsächlichen Vereinsspiel zu.
+- Bereits verfügbare Spieltagspunkte erscheinen direkt an den Spielerporträts; standardmäßig öffnet sich der nächste anstehende Spieltag.
+
+### Geändert
+
+- Spieler- und Mannschaftstabellen verwenden auf Mobilgeräten kürzere Spaltenüberschriften, kleinere Zeilen, kompaktere Bilder sowie dichtere Such- und Filterelemente.
+
+### Behoben
+
+- Die Spieler- und Mannschaftsranglisten übernehmen auf schmalen Bildschirmen nicht mehr die übergroßen Desktop-Abmessungen und verursachen keinen seitenweiten horizontalen Überlauf mehr.
+
 ## [1.8.1] – 2026-08-14
 
 ### Geändert

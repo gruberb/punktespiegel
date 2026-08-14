@@ -37,6 +37,7 @@ export type DataTableProps<Row> = {
   emptyMessage: string;
   loading?: boolean;
   minWidth?: string;
+  mobileMinWidth?: string;
   maxVisibleRows?: number;
   variant?: "default" | "compact";
   ariaLabel?: string;
@@ -53,6 +54,7 @@ export function DataTable<Row>({
   emptyMessage,
   loading = false,
   minWidth = "900px",
+  mobileMinWidth,
   maxVisibleRows,
   variant = "default",
   ariaLabel,
@@ -89,9 +91,12 @@ export function DataTable<Row>({
           "--data-table-max-height-mobile": `${46 + maxVisibleRows * 68}px`,
         } as CSSProperties : undefined}
       >
-        <table style={{ minWidth } as CSSProperties}>
+        <table style={{
+          "--data-table-min-width": minWidth,
+          "--data-table-mobile-min-width": mobileMinWidth ?? minWidth,
+        } as CSSProperties}>
           <colgroup>{columns.map((column) => <col key={column.id} style={column.width ? { width: column.width } : undefined} />)}</colgroup>
-          <thead><tr>{columns.map((column) => <th key={column.id} className={column.numeric ? "num" : undefined} aria-sort={column.sort?.active ? (column.sort.direction === "asc" ? "ascending" : "descending") : undefined}>
+          <thead><tr>{columns.map((column) => <th key={column.id} data-column={column.id} className={column.numeric ? "num" : undefined} aria-sort={column.sort?.active ? (column.sort.direction === "asc" ? "ascending" : "descending") : undefined}>
             {column.sort ? <button className="data-table-sort" onClick={column.sort.onSort}><ColumnLabel label={column.label} shortLabel={column.shortLabel} /><span aria-hidden="true">{column.sort.active ? column.sort.direction === "asc" ? "↑" : "↓" : "↕"}</span></button> : <ColumnLabel label={column.label} shortLabel={column.shortLabel} />}
           </th>)}</tr></thead>
           <tbody>
@@ -101,7 +106,7 @@ export function DataTable<Row>({
               tabIndex={onRowClick ? 0 : undefined}
               onClick={onRowClick ? () => onRowClick(row) : undefined}
               onKeyDown={onRowClick ? (event) => activateRow(event, row) : undefined}
-            >{columns.map((column) => <td key={column.id} className={[column.numeric ? "num" : "", column.className ?? ""].filter(Boolean).join(" ")}>{column.render(row, index)}</td>)}</tr>)}
+            >{columns.map((column) => <td key={column.id} data-column={column.id} className={[column.numeric ? "num" : "", column.className ?? ""].filter(Boolean).join(" ")}>{column.render(row, index)}</td>)}</tr>)}
           </tbody>
         </table>
         {!loading && !rows.length && <div className="data-table-empty">{emptyMessage}</div>}

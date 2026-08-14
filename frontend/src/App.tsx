@@ -14,7 +14,9 @@ import type {
   HistoricalPlayer,
   History,
   ManagerMode,
+  ManagerFixture,
   ManagerRecommendation,
+  ManagerScheduleRound,
   NewsArticle,
   Player,
   PlayerDetail,
@@ -41,6 +43,7 @@ type TeamMetric = "overall" | "goalkeeper" | "defence" | "midfield" | "forward";
 type PlayerSort = "name" | "position" | "price" | "round" | "points" | "grade" | "goals" | "assists" | "value";
 type TopPlayerSort = "previous" | "average" | "value" | "trend" | "price";
 type Theme = "light" | "dark";
+type ManagerSection = "overview" | "matchdays";
 
 const themeStorageKey = "punktespiegel-theme";
 const siteBaseUrl = "https://punktespiegel.org/";
@@ -1259,14 +1262,14 @@ function PlayersView({ filters, onPlayer }: { filters: Filters; onPlayer: (id: s
   const visiblePlayers = team ? players.filter((player) => player.team === team) : players;
   const columns: DataTableColumn<Player>[] = [
     { id: "player", label: "Spieler", width: "29%", sort: { active: sort === "name", direction, onSort: () => sortBy("name") }, render: (player, index) => <div className="table-player"><span className="rank">{index + 1}</span><PlayerPortrait name={player.name} url={player.photoUrl} teamCode={player.teamCode} teamLogoUrl={player.logoUrl} /><span><strong>{player.name}</strong><small>{player.team}</small></span></div> },
-    { id: "position", label: "Position", sort: { active: sort === "position", direction, onSort: () => sortBy("position") }, render: (player) => <PositionTag position={player.position} /> },
-    { id: "price", label: "Marktwert", numeric: true, sort: { active: sort === "price", direction, onSort: () => sortBy("price") }, render: (player) => formatMarketValue(player.priceM) },
-    { id: "round", label: `Spieltag ${filters.round}`, numeric: true, className: "matchday-score", sort: { active: sort === "round", direction, onSort: () => sortBy("round") }, render: (player) => player.roundPoints },
-    { id: "points", label: `Gesamt bis Spieltag ${filters.round}`, numeric: true, className: "primary-num", sort: { active: sort === "points", direction, onSort: () => sortBy("points") }, render: (player) => player.observedPoints },
+    { id: "position", label: "Position", shortLabel: "Pos.", sort: { active: sort === "position", direction, onSort: () => sortBy("position") }, render: (player) => <PositionTag position={player.position} /> },
+    { id: "price", label: "Marktwert", shortLabel: "Wert", numeric: true, sort: { active: sort === "price", direction, onSort: () => sortBy("price") }, render: (player) => formatMarketValue(player.priceM) },
+    { id: "round", label: `Spieltag ${filters.round}`, shortLabel: `ST ${filters.round}`, numeric: true, className: "matchday-score", sort: { active: sort === "round", direction, onSort: () => sortBy("round") }, render: (player) => player.roundPoints },
+    { id: "points", label: `Gesamt bis Spieltag ${filters.round}`, shortLabel: "Gesamt", numeric: true, className: "primary-num", sort: { active: sort === "points", direction, onSort: () => sortBy("points") }, render: (player) => player.observedPoints },
     { id: "goals", label: "Tore", numeric: true, sort: { active: sort === "goals", direction, onSort: () => sortBy("goals") }, render: (player) => player.goals },
-    { id: "assists", label: "Vorlagen", numeric: true, sort: { active: sort === "assists", direction, onSort: () => sortBy("assists") }, render: (player) => player.assists },
-    { id: "grade", label: "Ø-Note", numeric: true, sort: { active: sort === "grade", direction, onSort: () => sortBy("grade") }, render: (player) => player.averageGrade?.toFixed(2) ?? "—" },
-    { id: "value", label: "Wert · Pkt. / Mio. €", numeric: true, sort: { active: sort === "value", direction, onSort: () => sortBy("value") }, render: (player) => formatPlayerValue(player.value) },
+    { id: "assists", label: "Vorlagen", shortLabel: "Vorl.", numeric: true, sort: { active: sort === "assists", direction, onSort: () => sortBy("assists") }, render: (player) => player.assists },
+    { id: "grade", label: "Ø-Note", shortLabel: "Note", numeric: true, sort: { active: sort === "grade", direction, onSort: () => sortBy("grade") }, render: (player) => player.averageGrade?.toFixed(2) ?? "—" },
+    { id: "value", label: "Wert · Pkt. / Mio. €", shortLabel: "Pkt./Mio.", numeric: true, sort: { active: sort === "value", direction, onSort: () => sortBy("value") }, render: (player) => formatPlayerValue(player.value) },
   ];
 
   return (
@@ -1285,6 +1288,8 @@ function PlayersView({ filters, onPlayer }: { filters: Filters; onPlayer: (id: s
         emptyMessage="Keine Spieler entsprechen diesen Filtern."
         loading={loading}
         minWidth="1120px"
+        mobileMinWidth="760px"
+        variant="compact"
         onRowClick={(player) => onPlayer(player.id)}
       />}
     </section>
@@ -1436,7 +1441,12 @@ function NewsList<Article extends NewsArticle>({ articles, context }: {
 
 function ManagerPicksView({ filters, onPlayer }: { filters: Filters; onPlayer: (id: string) => void }) {
   const [mode, setMode] = useState<ManagerMode>("classic");
+  const [section, setSection] = useState<ManagerSection>("overview");
   const [recommendation, setRecommendation] = useState<ManagerRecommendation | null>(null);
+  const [schedule, setSchedule] = useState<ManagerScheduleRound[]>([]);
+  const [scheduleLoading, setScheduleLoading] = useState(false);
+  const [scheduleError, setScheduleError] = useState<string | null>(null);
+  const [selectedMatchday, setSelectedMatchday] = useState(1);
   const [squadNews, setSquadNews] = useState<SquadNews | null>(null);
   const [squadNewsLoading, setSquadNewsLoading] = useState(false);
   const [squadNewsError, setSquadNewsError] = useState<string | null>(null);
@@ -1448,6 +1458,9 @@ function ManagerPicksView({ filters, onPlayer }: { filters: Filters; onPlayer: (
     let active = true;
     setLoading(true);
     setError(null);
+    setSchedule([]);
+    setScheduleLoading(false);
+    setScheduleError(null);
     setSquadNews(null);
     setSquadNewsLoading(false);
     setSquadNewsError(null);
@@ -1457,6 +1470,18 @@ function ManagerPicksView({ filters, onPlayer }: { filters: Filters; onPlayer: (
         if (!active) return;
         setRecommendation(nextRecommendation);
         setLoading(false);
+        setScheduleLoading(true);
+        void api.managerSchedule(scopeQuery(filters, false), nextRecommendation.players, controller.signal)
+          .then((nextSchedule) => {
+            if (!active) return;
+            setSchedule(nextSchedule);
+            const throughMatchday = nextRecommendation.currentSeasonEvidence?.throughMatchday ?? 0;
+            setSelectedMatchday(Math.min(Math.max(throughMatchday + 1, 1), Math.max(nextSchedule.length, 1)));
+          })
+          .catch((reason: Error) => {
+            if (active && !isAbort(reason)) setScheduleError(reason.message);
+          })
+          .finally(() => { if (active) setScheduleLoading(false); });
         setSquadNewsLoading(true);
         try {
           const news = await api.managerNews(nextRecommendation.players, controller.signal);
@@ -1505,37 +1530,50 @@ function ManagerPicksView({ filters, onPlayer }: { filters: Filters; onPlayer: (
         </div>
         <p>{mode === "classic" ? "15 Spieler · feste 4-4-2-Aufstellung" : "22 Spieler · beste Elf und Formation für jeden Spieltag"}</p>
       </div>
+      <div className="scope-switch manager-section-tabs" aria-label="Fantasy-Team-Ansicht">
+        <button className={section === "overview" ? "active" : ""} aria-pressed={section === "overview"} onClick={() => setSection("overview")}>Übersicht</button>
+        <button className={section === "matchdays" ? "active" : ""} aria-pressed={section === "matchdays"} onClick={() => setSection("matchdays")}>Spieltage</button>
+      </div>
       {loading || !recommendation ? <LoadingState /> : (
         <>
-          <div className="manager-content-grid">
-            <div className="manager-squad-grid">
-              <section className="detail-section manager-lineup">
-              <div className="section-copy"><p className="kicker">Startelf</p><h3>Formation {recommendation.formation}</h3></div>
-              <div className="manager-position-groups">
-                {(["GK", "DEF", "MID", "FWD"] as Position[]).map((position) => (
-                  <section key={position}><h4>{positionName[position]}</h4><div>{starters.filter((player) => player.position === position).map((player) => <ManagerPlayerCard key={player.id} player={player} onClick={() => onPlayer(player.id)} />)}</div></section>
-                ))}
+          {section === "overview" ? <>
+            <div className="manager-content-grid">
+              <div className="manager-squad-grid">
+                <section className="detail-section manager-lineup">
+                <div className="section-copy"><p className="kicker">Startelf</p><h3>Formation {recommendation.formation}</h3></div>
+                <div className="manager-position-groups">
+                  {(["GK", "DEF", "MID", "FWD"] as Position[]).map((position) => (
+                    <section key={position}><h4>{positionName[position]}</h4><div>{starters.filter((player) => player.position === position).map((player) => <ManagerPlayerCard key={player.id} player={player} onClick={() => onPlayer(player.id)} />)}</div></section>
+                  ))}
+                </div>
+                <section className="manager-reserves manager-reserves-inline">
+                  <div className="section-copy"><p className="kicker">Reserve</p><h3>Ersatzbank</h3></div>
+                  <ol>{reserves.map((player) => <li key={player.id}><ManagerPlayerRow player={player} onClick={() => onPlayer(player.id)} /></li>)}</ol>
+                </section>
+                </section>
               </div>
-              <section className="manager-reserves manager-reserves-inline">
-                <div className="section-copy"><p className="kicker">Reserve</p><h3>Ersatzbank</h3></div>
-                <ol>{reserves.map((player) => <li key={player.id}><ManagerPlayerRow player={player} onClick={() => onPlayer(player.id)} /></li>)}</ol>
-              </section>
+              <section className="detail-section fantasy-matchdays">
+                <div className="section-copy"><p className="kicker">Saisonverlauf</p><h3>Punkte je Spieltag</h3><p>Gesamt- und Positionspunkte auf einen Blick. Aufklappen zeigt die Einzelwerte der Startelf.</p></div>
+                {recommendation.matchdays.length ? (
+                  <div className="fantasy-matchday-list">
+                    {recommendation.matchdays.map((matchday) => <FantasyMatchdayCard key={matchday.matchday} matchday={matchday} onPlayer={onPlayer} />)}
+                  </div>
+                ) : <p className="fantasy-matchdays-empty">Für diese Saison sind noch keine Spieltagspunkte verfügbar.</p>}
               </section>
             </div>
-            <section className="detail-section fantasy-matchdays">
-              <div className="section-copy"><p className="kicker">Saisonverlauf</p><h3>Punkte je Spieltag</h3><p>Gesamt- und Positionspunkte auf einen Blick. Aufklappen zeigt die Einzelwerte der Startelf.</p></div>
-              {recommendation.matchdays.length ? (
-                <div className="fantasy-matchday-list">
-                  {recommendation.matchdays.map((matchday) => <FantasyMatchdayCard key={matchday.matchday} matchday={matchday} onPlayer={onPlayer} />)}
-                </div>
-              ) : <p className="fantasy-matchdays-empty">Für diese Saison sind noch keine Spieltagspunkte verfügbar.</p>}
-            </section>
-          </div>
-          {squadNews
-            ? <SquadNewsSection news={squadNews} />
-            : squadNewsLoading
-              ? <SquadNewsLoadingSection />
-              : squadNewsError && <SquadNewsErrorSection message={squadNewsError} />}
+            {squadNews
+              ? <SquadNewsSection news={squadNews} />
+              : squadNewsLoading
+                ? <SquadNewsLoadingSection />
+                : squadNewsError && <SquadNewsErrorSection message={squadNewsError} />}
+          </> : <ManagerScheduleView
+            rounds={schedule}
+            selectedMatchday={selectedMatchday}
+            onMatchday={setSelectedMatchday}
+            onPlayer={onPlayer}
+            loading={scheduleLoading}
+            error={scheduleError}
+          />}
           <details className="manager-methodology">
             <summary>Methodik &amp; Datenstand</summary>
             <div><p>{methodology} Prognosen sind Erwartungswerte, keine Garantie.</p>
@@ -1622,6 +1660,91 @@ function FantasyMatchdayCard({ matchday, onPlayer }: { matchday: ManagerRecommen
         ))}
       </ol>
     </details>
+  );
+}
+
+function ManagerScheduleView({ rounds, selectedMatchday, onMatchday, onPlayer, loading, error }: {
+  rounds: ManagerScheduleRound[];
+  selectedMatchday: number;
+  onMatchday: (matchday: number) => void;
+  onPlayer: (id: string) => void;
+  loading: boolean;
+  error: string | null;
+}) {
+  if (loading && !rounds.length) return <LoadingState />;
+  if (error) return <ErrorState message={error} />;
+  const round = rounds.find((item) => item.matchday === selectedMatchday) ?? rounds[0];
+  if (!round) return <section className="detail-section"><Empty message="Für diese Saison ist noch kein Spielplan verfügbar." /></section>;
+  const slots = new Map<string, ManagerFixture[]>();
+  for (const fixture of round.fixtures) {
+    const slot = fixture.scheduledAt ?? "unknown";
+    slots.set(slot, [...(slots.get(slot) ?? []), fixture]);
+  }
+  return (
+    <section className="detail-section manager-fixtures" aria-labelledby="manager-fixtures-title">
+      <header className="manager-fixtures-header">
+        <div className="section-copy">
+          <p className="kicker">Dein Kader im Spielplan</p>
+          <h3 id="manager-fixtures-title">Spieltagswertung</h3>
+          <p>Alle Partien und die zugehörigen Spieler deines Fantasy Teams. Bereits verfügbare Punkte stehen direkt am Spieler.</p>
+        </div>
+        <StepperSelect
+          label="Spieltag"
+          value={String(round.matchday)}
+          options={rounds.map((item) => ({ value: String(item.matchday), label: `${item.matchday}. Spieltag` }))}
+          onChange={(value) => onMatchday(Number(value))}
+        />
+      </header>
+      <div className="manager-fixtures-round" aria-live="polite">
+        <strong>{round.name}</strong>
+        <span>{formatMatchdayRange(round.startAt, round.endAt)}</span>
+        <em>{formatRoundPhase(round.phase)}</em>
+      </div>
+      <div className="manager-fixture-slots">
+        {[...slots.entries()].map(([slot, fixtures]) => (
+          <section className="manager-fixture-slot" key={slot}>
+            <h4>{formatFixtureSlot(slot === "unknown" ? null : slot)}</h4>
+            <div>{fixtures.map((fixture) => <ManagerFixtureCard key={fixture.id} fixture={fixture} onPlayer={onPlayer} />)}</div>
+          </section>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function ManagerFixtureCard({ fixture, onPlayer }: { fixture: ManagerFixture; onPlayer: (id: string) => void }) {
+  const result = fixture.homeScore == null || fixture.awayScore == null ? "– : –" : `${fixture.homeScore} : ${fixture.awayScore}`;
+  return (
+    <article className="manager-fixture-card">
+      <div className="manager-fixture-matchup">
+        <span className="manager-fixture-team home"><strong>{fixture.home.name}</strong><TeamLogo code={fixture.home.code} url={fixture.home.logoUrl} /></span>
+        <span className={`manager-fixture-score ${fixture.state.toLocaleLowerCase()}`}>{result}</span>
+        <span className="manager-fixture-team away"><TeamLogo code={fixture.away.code} url={fixture.away.logoUrl} /><strong>{fixture.away.name}</strong></span>
+      </div>
+      <div className="manager-fixture-squads">
+        <FixturePlayers players={fixture.home.players} side="home" onPlayer={onPlayer} />
+        <FixturePlayers players={fixture.away.players} side="away" onPlayer={onPlayer} />
+      </div>
+    </article>
+  );
+}
+
+function FixturePlayers({ players, side, onPlayer }: {
+  players: ManagerFixture["home"]["players"];
+  side: "home" | "away";
+  onPlayer: (id: string) => void;
+}) {
+  return (
+    <ol className={`manager-fixture-players ${side}`} aria-label={`${side === "home" ? "Heimteam" : "Auswärtsteam"}: Spieler aus deinem Kader`}>
+      {players.map((player) => (
+        <li key={player.id}>
+          <button className={player.role === "reserve" ? "reserve" : ""} onClick={() => onPlayer(player.id)} title={`${player.name} · ${positionName[player.position]} · ${player.role === "start" ? "Startelf" : "Reserve"}`}>
+            <span className="manager-fixture-portrait"><PlayerPortrait name={player.name} url={player.photoUrl} teamCode={player.teamCode} teamLogoUrl={player.logoUrl} />{player.points != null && <b className={player.points < 0 ? "negative" : ""}>{formatSignedPoints(player.points)}</b>}</span>
+            <small>{lastName(player.name)}</small>
+          </button>
+        </li>
+      ))}
+    </ol>
   );
 }
 
@@ -1848,6 +1971,7 @@ function TeamsView({ filters, onTeam }: { filters: Filters; onTeam: (id: string)
     ...teamMetrics.map((metric): DataTableColumn<TeamScore> => ({
       id: metric.key,
       label: metric.label,
+      shortLabel: metric.short,
       numeric: true,
       className: "team-points-cell",
       sort: { active: sortMetric === metric.key, direction: sortDirection, onSort: () => sortTeams(metric.key) },
@@ -1866,6 +1990,8 @@ function TeamsView({ filters, onTeam }: { filters: Filters; onTeam: (id: string)
         emptyMessage="Für diese Saison liegen keine Mannschaftswertungen vor."
         loading={loading}
         minWidth="900px"
+        mobileMinWidth="580px"
+        variant="compact"
         onRowClick={(team) => onTeam(team.id)}
       />
     </section>
@@ -2098,6 +2224,20 @@ function formatCardCounts(redCards: number, yellowRedCards: number) {
   return parts.length ? parts.join(" · ") : "keine Platzverweise";
 }
 function formatDate(value: string | null) { return value ? new Intl.DateTimeFormat("de-DE", { day: "2-digit", month: "short" }).format(new Date(value)) : "—"; }
+function formatMatchdayRange(startAt: string | null, endAt: string | null) {
+  if (!startAt && !endAt) return "Termin noch offen";
+  const formatter = new Intl.DateTimeFormat("de-DE", { day: "2-digit", month: "long" });
+  if (!startAt) return formatter.format(new Date(endAt!));
+  if (!endAt) return formatter.format(new Date(startAt));
+  return `${formatter.format(new Date(startAt))} – ${formatter.format(new Date(endAt))}`;
+}
+function formatFixtureSlot(value: string | null) {
+  if (!value) return "Termin noch offen";
+  return new Intl.DateTimeFormat("de-DE", { weekday: "long", day: "2-digit", month: "long", hour: "2-digit", minute: "2-digit" }).format(new Date(value));
+}
+function formatRoundPhase(phase: string) {
+  return ({ COMPLETED: "Abgeschlossen", LIVE: "Live", SCHEDULED: "Anstehend" } as Record<string, string>)[phase] ?? phase;
+}
 function formatNewsDate(value: string | null) {
   if (!value) return "—";
   const date = new Date(value);

@@ -4,8 +4,10 @@ import type {
   Dashboard,
   HistoricalPlayer,
   History,
+  ManagerFixturePlayer,
   ManagerMode,
   ManagerRecommendation,
+  ManagerScheduleRound,
   Player,
   PlayerDetail,
   PlayerGame,
@@ -894,6 +896,59 @@ function topPlayers(index: SeasonIndex, catalog: StaticCatalog): TopPlayers {
   };
 }
 
+function managerSchedule(index: SeasonIndex, squad: ManagerRecommendation["players"]): ManagerScheduleRound[] {
+  const squadByTeam = new Map<string, ManagerRecommendation["players"]>();
+  for (const player of squad) {
+    const teamPlayers = squadByTeam.get(player.teamId) ?? [];
+    teamPlayers.push(player);
+    squadByTeam.set(player.teamId, teamPlayers);
+  }
+  const scoreByMatchAndPlayer = new Map(index.season.scores.map((score) => [`${score.matchId}:${score.playerId}`, score.totalPoints]));
+  const positionOrder: Record<Position, number> = { GK: 0, DEF: 1, MID: 2, FWD: 3 };
+
+  function fixturePlayers(teamId: string, matchId: string): ManagerFixturePlayer[] {
+    return [...(squadByTeam.get(teamId) ?? [])]
+      .sort((left, right) => Number(right.role === "start") - Number(left.role === "start")
+        || positionOrder[left.position] - positionOrder[right.position]
+        || left.name.localeCompare(right.name, "de"))
+      .map((player) => ({
+        id: player.id,
+        name: player.name,
+        teamCode: player.teamCode,
+        logoUrl: player.logoUrl,
+        photoUrl: player.photoUrl,
+        position: player.position,
+        role: player.role,
+        points: scoreByMatchAndPlayer.get(`${matchId}:${player.id}`) ?? null,
+      }));
+  }
+
+  return index.season.rounds.map((round) => ({
+    matchday: round.number,
+    name: round.name,
+    startAt: round.startAt,
+    endAt: round.endAt,
+    phase: round.phase,
+    fixtures: index.season.matches
+      .filter((match) => match.round === round.number)
+      .sort((left, right) => (left.scheduledAt ?? "").localeCompare(right.scheduledAt ?? "") || left.id.localeCompare(right.id))
+      .map((match) => {
+        const home = index.teams.get(match.homeTeamId);
+        const away = index.teams.get(match.awayTeamId);
+        if (!home || !away) throw new Error("Mannschaft wurde im Spielplan nicht gefunden.");
+        return {
+          id: match.id,
+          scheduledAt: match.scheduledAt,
+          state: match.state,
+          homeScore: match.homeScore,
+          awayScore: match.awayScore,
+          home: { ...home, players: fixturePlayers(home.id, match.id) },
+          away: { ...away, players: fixturePlayers(away.id, match.id) },
+        };
+      }),
+  }));
+}
+
 export const api = {
   catalog: (signal?: AbortSignal) => abortable(catalogCache.then(({ leagues, seasons }) => ({ leagues, seasons })), signal),
   dashboard: (params: URLSearchParams, signal?: AbortSignal) => abortable(loadSeason(params).then((index): Dashboard => {
@@ -927,5 +982,6 @@ export const api = {
   bestEleven: (params: URLSearchParams, signal?: AbortSignal) => abortable(loadSeason(params).then((index) => bestEleven(index, params.get("scope") === "season" ? "season" : "matchday", selectedRound(params, index.season))), signal),
   topPlayers: (params: URLSearchParams, signal?: AbortSignal): Promise<TopPlayers> => abortable(Promise.all([loadSeason(params), catalogCache]).then(([index, catalog]) => topPlayers(index, catalog)), signal),
   managerPicks: (params: URLSearchParams, mode: ManagerMode, signal?: AbortSignal): Promise<ManagerRecommendation> => abortable(loadManagerRecommendation(params, mode), signal),
+  managerSchedule: (params: URLSearchParams, players: ManagerRecommendation["players"], signal?: AbortSignal): Promise<ManagerScheduleRound[]> => abortable(loadSeason(params).then((index) => managerSchedule(index, players)), signal),
   managerNews: (players: ManagerRecommendation["players"], signal?: AbortSignal): Promise<SquadNews> => abortable(newsCache.then((news) => buildSquadNews(news, players)), signal),
 };
