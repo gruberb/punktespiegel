@@ -482,11 +482,7 @@ async fn main() -> anyhow::Result<()> {
         catalog.seasons.len(),
         args.output.display()
     );
-    if let Err(error) = news::refresh_news(&client, &args.output, &completed, current_year).await {
-        eprintln!(
-            "Nachrichtenabgleich fehlgeschlagen; vorhandener Stand bleibt erhalten: {error:#}"
-        );
-    }
+    news::refresh_news(&client, &args.output, &completed, current_year).await?;
     Ok(())
 }
 
@@ -978,6 +974,13 @@ fn validate_output(output: &Path) -> anyhow::Result<()> {
     if catalog.schema_version != SCHEMA_VERSION || catalog.seasons.is_empty() {
         bail!("Katalog ist leer oder verwendet einen unbekannten Datenvertrag");
     }
+    let current_year = catalog
+        .seasons
+        .iter()
+        .map(|season| season.start_year)
+        .max()
+        .context("Aktuelle Saison im Katalog bestimmen")?;
+    let mut validated_seasons = Vec::new();
     for entry in catalog.seasons {
         let path = season_path(output, &entry.id);
         let season = read_season(&path)?;
@@ -1030,7 +1033,9 @@ fn validate_output(output: &Path) -> anyhow::Result<()> {
         {
             bail!("Saisondatei enthält verwaiste Verweise: {}", entry.id);
         }
+        validated_seasons.push(season);
     }
+    news::validate_news_file(&output.join("news.json"), &validated_seasons, current_year)?;
     Ok(())
 }
 

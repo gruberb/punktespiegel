@@ -50,7 +50,7 @@ Der erste Schritt erzeugt v1 als Vergleichsmodell. Vor v2 werden aktuelle Rollen
 
 ## GitHub Pages
 
-`.github/workflows/pages.yml` erzeugt täglich um 12:15 Uhr deutscher Zeit die aktuelle Saison, baut React und stellt ausschließlich das fertige Pages-Artefakt unter <https://gruberb.github.io/punktespiegel/> bereit. Der Workflow benötigt weder PostgreSQL noch Repository-Secrets. Ein manueller Lauf kann bei Bedarf auch alle abgeschlossenen Saisons neu erzeugen.
+`.github/workflows/pages.yml` erzeugt täglich um 12:15 Uhr deutscher Zeit die aktuelle Saison, baut React und stellt ausschließlich das fertige Pages-Artefakt unter <https://punktespiegel.org/> bereit. Der Workflow benötigt weder PostgreSQL noch Repository-Secrets. Ein manueller Lauf kann bei Bedarf auch alle abgeschlossenen Saisons neu erzeugen.
 
 Für die erstmalige Aktivierung muss in GitHub unter **Settings → Pages → Build and deployment** die Quelle **GitHub Actions** ausgewählt sein. Danach veröffentlichen Pushes auf `main` und der tägliche Datenlauf automatisch einen neuen konsistenten Stand.
 

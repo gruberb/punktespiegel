@@ -70,7 +70,7 @@ export function DataTable<Row>({
     <section className={`data-table data-table--${variant} ${loading ? "is-loading" : ""}`} aria-label={ariaLabel} aria-busy={loading}>
       {hasToolbar && <div className="data-table-toolbar">
         {search && <label className="data-table-search">
-          <span className="data-table-search-icon" aria-hidden="true">⌕</span>
+          <span className="data-table-search-icon" aria-hidden="true" />
           <span className="visually-hidden">Suche</span>
           <input value={search.value} onChange={(event) => search.onChange(event.target.value)} placeholder={search.placeholder} />
         </label>}

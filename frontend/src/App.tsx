@@ -3,6 +3,7 @@ import type { MouseEvent as ReactMouseEvent, ReactNode, RefObject } from "react"
 import { createPortal } from "react-dom";
 import { api } from "./api";
 import { DataTable } from "./DataTable";
+import { newsAttribution } from "./news";
 import type { DataTableColumn } from "./DataTable";
 import { initialAvailableRound, latestAvailableRound } from "./rounds";
 import type {
@@ -14,10 +15,13 @@ import type {
   History,
   ManagerMode,
   ManagerRecommendation,
+  NewsArticle,
   Player,
   PlayerDetail,
   PlayerGame,
   Position,
+  SquadNews,
+  SquadNewsArticle,
   TeamLeaders,
   TeamDetail,
   TeamDetailMatch,
@@ -39,7 +43,7 @@ type TopPlayerSort = "previous" | "average" | "value" | "trend" | "price";
 type Theme = "light" | "dark";
 
 const themeStorageKey = "punktespiegel-theme";
-const siteBaseUrl = "https://gruberb.github.io/punktespiegel/";
+const siteBaseUrl = "https://punktespiegel.org/";
 
 const positionName: Record<Position, string> = {
   GK: "Torwart",
@@ -1321,7 +1325,7 @@ function PlayerDetailView({ filters, playerId, backLabel, onBack, onTeam, onSeas
           <a href={detail.availability.sourceUrl} target="_blank" rel="noreferrer">{detail.availability.source} · Stand {formatDate(detail.availability.generatedAt)} ↗</a>
         </aside>
       )}
-      <PlayerNewsSection news={detail.news} kickerNewsUrl={detail.kickerNewsUrl} />
+      <PlayerNewsSection news={detail.news} kickerNewsUrl={detail.kickerNewsUrl} kickerNewsDirect={detail.kickerNewsDirect} />
       <section className="player-seasons">
         <div className="section-copy"><h3>Punkte nach Saison</h3><p>Verein, Einsätze und benotete Spiele je Saison.</p></div>
         <div className="table-shell player-season-table">
@@ -1349,48 +1353,135 @@ function PlayerDetailView({ filters, playerId, backLabel, onBack, onTeam, onSeas
   );
 }
 
-function PlayerNewsSection({ news, kickerNewsUrl }: { news: PlayerDetail["news"]; kickerNewsUrl: string }) {
+function PlayerNewsSection({ news, kickerNewsUrl, kickerNewsDirect }: {
+  news: PlayerDetail["news"];
+  kickerNewsUrl: string;
+  kickerNewsDirect: boolean;
+}) {
+  const showClubContext = news.clubArticles.length > 0;
+  const visibleArticles = [...news.articles, ...news.clubArticles]
+    .sort((left, right) => Date.parse(right.publishedAt) - Date.parse(left.publishedAt));
+  const emptyMessage = news.status === "failed"
+    ? `Der automatische Nachrichtenimport konnte nicht geladen werden. ${kickerNewsDirect ? "Das kicker-Spielerarchiv ist über den Link oben weiterhin direkt erreichbar." : "Über den Link oben kann gezielt nach der kicker-Spielerseite gesucht werden."}`
+    : news.status === "stale"
+      ? `Im letzten verfügbaren, derzeit veralteten Datenstand gibt es keine passende Meldung. ${kickerNewsDirect ? "Das kicker-Spielerarchiv ist über den Link oben erreichbar." : "Über den Link oben kann gezielt bei kicker gesucht werden."}`
+      : `Der Nachrichtenfeed wurde erfolgreich geprüft, enthält aber aktuell keinen sicheren Spielerbezug. ${kickerNewsDirect ? "Das kicker-Spielerarchiv ist über den Link oben erreichbar." : "Über den Link oben kann gezielt bei kicker gesucht werden."}`;
   return (
     <section className="player-news" aria-labelledby="player-news-title">
       <div className="section-copy news-heading">
         <div><p className="kicker">Medienbeobachtung</p><h3 id="player-news-title">In den Nachrichten</h3></div>
         <div className="news-actions">
-          {news.generatedAt && <span>Stand {formatDate(news.generatedAt)}</span>}
-          <a href={kickerNewsUrl} target="_blank" rel="noreferrer">Alle kicker-Spieler-News ↗</a>
+          {news.generatedAt && <span>Stand {formatNewsDate(news.generatedAt)}</span>}
+          <a href={kickerNewsUrl} target="_blank" rel="noreferrer">{kickerNewsDirect ? "Alle kicker-Spieler-News" : "Spieler-News bei kicker suchen"} ↗</a>
         </div>
       </div>
-      {news.articles.length ? (
-        <ol className="news-list">
-          {news.articles.map((article) => (
-            <li key={article.url}>
-              <a href={article.url} target="_blank" rel="noreferrer">
-                <span><time dateTime={article.publishedAt}>{formatDate(article.publishedAt)}</time><b>{article.source}</b></span>
-                <strong>{article.title}</strong>
-                <small>{article.domain} ↗</small>
-              </a>
-            </li>
-          ))}
-        </ol>
-      ) : <p className="news-empty">Im automatischen Nachrichtenfeed wurden keine passenden Überschriften gefunden. Das vollständige kicker-Spielerarchiv ist über den Link oben erreichbar.</p>}
+      <NewsHealthNotice status={news.status} feedSummary={news.feedSummary} />
+      <ClubFeedStatusNotice status={news.clubFeedStatus} hasArticles={news.clubArticles.length > 0} />
+      {showClubContext && <p className="news-context-note"><span className="news-relation team">Vereinsumfeld</span>{news.articles.length
+        ? ` Meldungen aus ${news.clubFeedStatus === "ok" ? "dem offiziellen Vereinsfeed" : "dem vorliegenden Vereinskontext"} ergänzen die direkten Spielernennungen bis zu insgesamt 15 Einträgen.`
+        : ` Keine sichere direkte Spielernennung gefunden – deshalb zeigen wir Meldungen aus ${news.clubFeedStatus === "ok" ? "dem offiziellen Vereinsfeed" : "dem vorliegenden Vereinskontext"}.`}</p>}
+      {visibleArticles.length
+        ? <NewsList articles={visibleArticles} />
+        : <p className={`news-empty news-empty--${news.status}`}>{emptyMessage}</p>}
     </section>
+  );
+}
+
+function NewsHealthNotice({ status, feedSummary, includeUnmapped = false }: Pick<PlayerDetail["news"], "status" | "feedSummary"> & { includeUnmapped?: boolean }) {
+  if (status === "healthy" && feedSummary.error === 0 && (!includeUnmapped || feedSummary.unmapped === 0)) return null;
+  const issues = [
+    feedSummary.error > 0 ? `${feedSummary.error} Quelle${feedSummary.error === 1 ? "" : "n"} nicht erreichbar` : "",
+    includeUnmapped && feedSummary.unmapped > 0 ? `${feedSummary.unmapped} Feed${feedSummary.unmapped === 1 ? "" : "s"} keinem Verein zugeordnet` : "",
+  ].filter(Boolean).join("; ");
+  const message = status === "failed"
+    ? `Beim letzten Lauf war keine nutzbare Nachrichtenquelle verfügbar${issues ? `: ${issues}` : ""}.`
+    : status === "stale"
+      ? `Der Nachrichtenstand ist älter als 36 Stunden${issues ? `; zusätzlich: ${issues}` : ""}.`
+      : `Der Datenstand ist aktuell, jedoch sind einzelne Quellen eingeschränkt: ${issues}.`;
+  return <p className={`news-health news-health--${status}`} role={status === "failed" ? "alert" : "status"}>{message}</p>;
+}
+
+function ClubFeedStatusNotice({ status, hasArticles }: { status: PlayerDetail["news"]["clubFeedStatus"]; hasArticles: boolean }) {
+  const label = status === "ok" ? "Verfügbar" : status === "error" ? "Abruffehler" : status === "unavailable" ? "Nicht verfügbar" : "Status unbekannt";
+  const message = status === "ok"
+    ? hasArticles ? "Vereinsmeldungen wurden berücksichtigt." : "In dieser auf 15 Einträge begrenzten Ansicht werden keine zusätzlichen Vereinsmeldungen angezeigt."
+    : status === "error"
+      ? "Der Vereinsfeed konnte beim letzten Lauf nicht gelesen werden; es wird kein neuer Vereinskontext ergänzt."
+      : status === "unavailable"
+        ? "Für diesen Verein ist derzeit kein Vereinsfeed im kicker-Feedkatalog vorhanden."
+        : "Das ältere Nachrichtenformat enthält noch keinen Status für Vereinsfeeds.";
+  return <p className={`club-feed-status club-feed-status--${status}`}><strong>Vereinsfeed: {label}.</strong> {message}</p>;
+}
+
+function NewsList<Article extends NewsArticle>({ articles, context }: {
+  articles: Article[];
+  context?: (article: Article) => string;
+}) {
+  return (
+    <ol className="news-list">
+      {articles.map((article) => {
+        const articleRelation = article.relation ?? "automatic";
+        const relationLabel = articleRelation === "team" ? "Vereinsumfeld" : articleRelation === "player" ? "Spielerbezug" : "Automatisch zugeordnet";
+        return (
+          <li key={article.url}>
+            <a href={article.url} target="_blank" rel="noreferrer">
+              <span className="news-meta">
+                <time dateTime={article.publishedAt}>{formatNewsDate(article.publishedAt)}</time>
+                <b>{article.source}</b>
+                <em className={`news-relation ${articleRelation}`} title={article.matchedAlias ? `Erkannter Name: ${article.matchedAlias}` : undefined}>{relationLabel}</em>
+              </span>
+              <span className="news-article-copy"><strong>{article.title}</strong>{context && <small>{context(article)}</small>}</span>
+              <small className="news-attribution">{newsAttribution(article)} ↗</small>
+            </a>
+          </li>
+        );
+      })}
+    </ol>
   );
 }
 
 function ManagerPicksView({ filters, onPlayer }: { filters: Filters; onPlayer: (id: string) => void }) {
   const [mode, setMode] = useState<ManagerMode>("classic");
   const [recommendation, setRecommendation] = useState<ManagerRecommendation | null>(null);
+  const [squadNews, setSquadNews] = useState<SquadNews | null>(null);
+  const [squadNewsLoading, setSquadNewsLoading] = useState(false);
+  const [squadNewsError, setSquadNewsError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const controller = new AbortController();
+    let active = true;
     setLoading(true);
     setError(null);
-    api.managerPicks(scopeQuery(filters, false), mode, controller.signal)
-      .then(setRecommendation)
-      .catch((reason: Error) => { if (!isAbort(reason)) setError(reason.message); })
-      .finally(() => setLoading(false));
-    return () => controller.abort();
+    setSquadNews(null);
+    setSquadNewsLoading(false);
+    setSquadNewsError(null);
+    void (async () => {
+      try {
+        const nextRecommendation = await api.managerPicks(scopeQuery(filters, false), mode, controller.signal);
+        if (!active) return;
+        setRecommendation(nextRecommendation);
+        setLoading(false);
+        setSquadNewsLoading(true);
+        try {
+          const news = await api.managerNews(nextRecommendation.players, controller.signal);
+          if (active) setSquadNews(news);
+        } catch (reason) {
+          if (active && !isAbort(reason)) setSquadNewsError(reason instanceof Error ? reason.message : "Kadernachrichten konnten nicht geladen werden.");
+        } finally {
+          if (active) setSquadNewsLoading(false);
+        }
+      } catch (reason) {
+        if (active && !isAbort(reason)) setError(reason instanceof Error ? reason.message : "Kaderempfehlung konnte nicht geladen werden.");
+      } finally {
+        if (active) setLoading(false);
+      }
+    })();
+    return () => {
+      active = false;
+      controller.abort();
+    };
   }, [filters.league, filters.season, mode]);
 
   if (error) return <ErrorState message={error} />;
@@ -1446,6 +1537,11 @@ function ManagerPicksView({ filters, onPlayer }: { filters: Filters; onPlayer: (
               ) : <p className="fantasy-matchdays-empty">Für diese Saison sind noch keine Spieltagspunkte verfügbar.</p>}
             </section>
           </div>
+          {squadNews
+            ? <SquadNewsSection news={squadNews} />
+            : squadNewsLoading
+              ? <SquadNewsLoadingSection />
+              : squadNewsError && <SquadNewsErrorSection message={squadNewsError} />}
           <details className="manager-methodology">
             <summary>Methodik &amp; Datenstand</summary>
             <div><p>{methodology} Prognosen sind Erwartungswerte, keine Garantie.</p>
@@ -1458,6 +1554,47 @@ function ManagerPicksView({ filters, onPlayer }: { filters: Filters; onPlayer: (
         </>
       )}
     </div>
+  );
+}
+
+function SquadNewsLoadingSection() {
+  return (
+    <section className="detail-section manager-squad-news" aria-labelledby="manager-squad-news-loading-title" aria-busy="true">
+      <div className="section-copy"><p className="kicker">Kaderbeobachtung</p><h3 id="manager-squad-news-loading-title">Neueste Entwicklungen im Kader</h3></div>
+      <p className="news-empty">Kadernachrichten werden unabhängig von der bereits geladenen Empfehlung ergänzt …</p>
+    </section>
+  );
+}
+
+function SquadNewsErrorSection({ message }: { message: string }) {
+  return (
+    <section className="detail-section manager-squad-news" aria-labelledby="manager-squad-news-error-title">
+      <div className="section-copy"><p className="kicker">Kaderbeobachtung</p><h3 id="manager-squad-news-error-title">Neueste Entwicklungen im Kader</h3></div>
+      <p className="news-health news-health--failed" role="alert">Die optionale Nachrichtenansicht konnte nicht geladen werden: {message}</p>
+    </section>
+  );
+}
+
+function SquadNewsSection({ news }: { news: SquadNews }) {
+  const emptyMessage = news.status === "failed"
+    ? "Die Kadernachrichten konnten beim letzten Lauf nicht geladen werden."
+    : news.status === "stale"
+      ? "Der letzte verfügbare Nachrichtenstand ist veraltet und enthält keine Meldung zu diesem Kader."
+      : "Die Quellen wurden erfolgreich geprüft; aktuell gibt es keine Meldung zu den ausgewählten Spielern oder ihren Vereinen.";
+  const context = (article: SquadNewsArticle) => article.relatedPlayers.length
+    ? `Spieler: ${article.relatedPlayers.join(", ")}`
+    : `Verein: ${article.relatedTeams.join(", ")}`;
+  return (
+    <section className="detail-section manager-squad-news" aria-labelledby="manager-squad-news-title">
+      <div className="section-copy news-heading">
+        <div><p className="kicker">Kaderbeobachtung</p><h3 id="manager-squad-news-title">Neueste Entwicklungen im Kader</h3><p>Spielerzuordnungen und Meldungen aus dem Vereinsumfeld, URL-genau zusammengeführt.</p></div>
+        <div className="news-actions">{news.generatedAt && <span>Stand {formatNewsDate(news.generatedAt)}</span>}</div>
+      </div>
+      <NewsHealthNotice status={news.status} feedSummary={news.feedSummary} includeUnmapped />
+      {news.articles.length
+        ? <NewsList articles={news.articles} context={context} />
+        : <p className={`news-empty news-empty--${news.status}`}>{emptyMessage}</p>}
+    </section>
   );
 }
 
@@ -1967,6 +2104,12 @@ function formatCardCounts(redCards: number, yellowRedCards: number) {
   return parts.length ? parts.join(" · ") : "keine Platzverweise";
 }
 function formatDate(value: string | null) { return value ? new Intl.DateTimeFormat("de-DE", { day: "2-digit", month: "short" }).format(new Date(value)) : "—"; }
+function formatNewsDate(value: string | null) {
+  if (!value) return "—";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+  return new Intl.DateTimeFormat("de-DE", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" }).format(date);
+}
 function formatVenue(value: PlayerGame["venue"]) { return value === "Home" ? "Heim" : "Auswärts"; }
 function lastName(name: string) { return name.split(" ").at(-1) ?? name; }
 function Empty({ message }: { message: string }) { return <div className="empty"><span>○</span><p>{message}</p></div>; }

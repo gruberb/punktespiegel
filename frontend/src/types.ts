@@ -166,6 +166,7 @@ export type PlayerDetail = {
   photoUrl: string | null;
   kickerUrl: string;
   kickerNewsUrl: string;
+  kickerNewsDirect: boolean;
   transfermarktUrl: string;
   ligaInsiderUrl: string | null;
   position: Position;
@@ -188,18 +189,52 @@ export type PlayerAvailability = {
   generatedAt: string;
 };
 
+export type NewsRelation = "player" | "team" | "automatic";
+export type ClubFeedStatus = "ok" | "error" | "unavailable" | "unknown";
+
 export type NewsArticle = {
   source: string;
   domain: string;
   title: string;
   url: string;
   publishedAt: string;
+  relation?: NewsRelation;
+  matchedAlias?: string;
+  matchedBy?: "fullName" | "teamContextSurname" | "officialTeamFeed";
+  teamId?: string | null;
+};
+
+export type NewsHealthStatus = "healthy" | "stale" | "failed";
+
+export type NewsFeedSummary = {
+  total: number;
+  ok: number;
+  error: number;
+  unmapped: number;
 };
 
 export type PlayerNews = {
   generatedAt: string | null;
   provider: string | null;
+  status: NewsHealthStatus;
+  feedSummary: NewsFeedSummary;
+  clubFeedStatus: ClubFeedStatus;
   articles: NewsArticle[];
+  clubArticles: NewsArticle[];
+};
+
+export type SquadNewsArticle = NewsArticle & {
+  relation: NewsRelation;
+  relatedPlayers: string[];
+  relatedTeams: string[];
+};
+
+export type SquadNews = {
+  generatedAt: string | null;
+  provider: string | null;
+  status: NewsHealthStatus;
+  feedSummary: NewsFeedSummary;
+  articles: SquadNewsArticle[];
 };
 
 export type ManagerMode = "classic" | "interactive";

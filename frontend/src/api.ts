@@ -6,12 +6,12 @@ import type {
   History,
   ManagerMode,
   ManagerRecommendation,
-  NewsArticle,
   Player,
   PlayerDetail,
   PlayerGame,
   PlayerSeasonSummary,
   Position,
+  SquadNews,
   TeamDetail,
   TeamDetailMatch,
   TeamDetailPlayer,
@@ -21,6 +21,9 @@ import type {
   TopPlayerAnalysis,
   TopPlayers,
 } from "./types";
+import { buildPlayerNews, buildSquadNews } from "./news";
+import type { NewsArtifact } from "./news";
+import { kickerPlayerNewsLink } from "./kicker-links";
 type StaticCatalog = Catalog & { schemaVersion: number; generatedAt: string };
 
 type StaticManagerRecommendation = {
@@ -36,13 +39,6 @@ type StaticManagerRecommendation = {
     deploymentModel?: "two-stage-v2" | "scenario-recourse-v2" | "fixed-v1-champion" | "availability-aware-stable-v2";
   };
   recommendation: ManagerRecommendation;
-};
-
-type StaticNews = {
-  schemaVersion: number;
-  generatedAt: string;
-  provider: string;
-  players: Record<string, NewsArticle[]>;
 };
 
 type StaticRoleSignals = {
@@ -169,11 +165,12 @@ type PlayerAccumulator = {
 };
 
 const catalogCache = loadJson<StaticCatalog>(asset("data/catalog.json"));
-const newsCache = loadJson<StaticNews>(asset("data/news.json")).catch((): StaticNews => ({
+const newsCache = loadJson<NewsArtifact>(asset("data/news.json")).catch((): NewsArtifact => ({
   schemaVersion: 1,
   generatedAt: "",
   provider: "",
   players: {},
+  loadFailed: true,
 }));
 const roleSignalsCache = loadJson<StaticRoleSignals>(asset("data/current-role-signals.json")).catch(() => null);
 const availabilitySignalsCache = loadJson<StaticAvailabilitySignals>(asset("data/current-availability-signals.json")).catch(() => null);
@@ -537,7 +534,7 @@ async function playerDetail(
   index: SeasonIndex,
   playerId: string,
   catalog: StaticCatalog,
-  news: StaticNews,
+  news: NewsArtifact,
   roleSignals: StaticRoleSignals | null,
   availabilitySignals: StaticAvailabilitySignals | null,
 ): Promise<PlayerDetail> {
@@ -545,6 +542,7 @@ async function playerDetail(
   if (!player) throw new Error("Spieler wurde in dieser Saison nicht gefunden.");
   const team = index.teams.get(player.teamId);
   if (!team) throw new Error("Verein des Spielers wurde nicht gefunden.");
+  const kickerNews = kickerPlayerNewsLink(player.id, player.name);
   const games = index.season.scores.filter((score) => score.playerId === playerId).flatMap((score): PlayerGame[] => {
     const match = index.matches.get(score.matchId);
     if (!match) return [];
@@ -592,7 +590,8 @@ async function playerDetail(
     logoUrl: team.logoUrl,
     photoUrl: player.photoUrl,
     kickerUrl: kickerProfileUrl(index.season, player.name, team.name),
-    kickerNewsUrl: `https://www.kicker.de/${profileSlug(player.name)}/spieler-news`,
+    kickerNewsUrl: kickerNews.url,
+    kickerNewsDirect: kickerNews.direct,
     transfermarktUrl: `https://www.transfermarkt.de/schnellsuche/ergebnis/schnellsuche?query=${encodeURIComponent(player.name)}`,
     ligaInsiderUrl: roleSignals?.league === index.season.leagueCode && roleSignals.season === index.season.startYear
       ? roleSignals.players[player.id]?.sourceUrl ?? null
@@ -603,11 +602,7 @@ async function playerDetail(
     value: player.priceM > 0 && player.priceM < 999 ? seasonPoints / player.priceM : null,
     seasons,
     games,
-    news: {
-      generatedAt: news.generatedAt || null,
-      provider: news.provider || null,
-      articles: news.players[player.id] ?? [],
-    },
+    news: buildPlayerNews(news, player.id, team.id),
     availability: availability ? {
       status: availability.status,
       reason: availability.reason,
@@ -932,4 +927,5 @@ export const api = {
   bestEleven: (params: URLSearchParams, signal?: AbortSignal) => abortable(loadSeason(params).then((index) => bestEleven(index, params.get("scope") === "season" ? "season" : "matchday", selectedRound(params, index.season))), signal),
   topPlayers: (params: URLSearchParams, signal?: AbortSignal): Promise<TopPlayers> => abortable(Promise.all([loadSeason(params), catalogCache]).then(([index, catalog]) => topPlayers(index, catalog)), signal),
   managerPicks: (params: URLSearchParams, mode: ManagerMode, signal?: AbortSignal): Promise<ManagerRecommendation> => abortable(loadManagerRecommendation(params, mode), signal),
+  managerNews: (players: ManagerRecommendation["players"], signal?: AbortSignal): Promise<SquadNews> => abortable(newsCache.then((news) => buildSquadNews(news, players)), signal),
 };

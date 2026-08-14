@@ -2,6 +2,33 @@
 
 Alle wesentlichen Änderungen an Punktespiegel werden in dieser Datei dokumentiert.
 
+## [1.8.0] – 2026-08-14
+
+### Hinzugefügt
+
+- Bis zu 15 aktuelle, direkt verlinkte Meldungen je Spieler mit Datum, Quelle, Überschrift und einer klaren Kennzeichnung als Spielerbezug oder Vereinsumfeld.
+- Kaderweite Nachrichtenübersicht im Fantasy Team, die direkte Spielernennungen und Vereinsmeldungen URL-genau zusammenführt.
+- Offizielle kicker-Vereinsfeeds aus dem OPML-Katalog, Feedstatus je Quelle und Verein sowie sichtbare Hinweise für veraltete, fehlgeschlagene oder nicht verfügbare Feeds.
+- Ausführlicher Recherchebericht zu kicker-Schutzmaßnahmen, RSS-Nutzungsbedingungen, vorhandenen Nachrichtenquellen und empfohlenem Ausbaupfad.
+
+### Geändert
+
+- Der Nachrichtencompiler verwendet einen versionierten v2-Datenvertrag, kontextbezogene Namens- und Vereinszuordnung, eine rollierende 14-Tage-Sicht und maximal 15 eindeutige Links.
+- Nicht-kicker-Quellen und NewsAPI sind standardmäßig deaktiviert und erfordern eine explizite anbieterspezifische Veröffentlichungsfreigabe.
+- Verifizierte kicker-Spielerarchive werden über stabile Spieler-IDs verlinkt; unbekannte Slugs verwenden eine klar bezeichnete, auf kicker beschränkte Suche.
+- Kanonische URLs, Social-Media-Metadaten, Sitemap und Dokumentation verwenden `punktespiegel.org`.
+- Interaktive Elemente zeigen konsistente Zeiger-Cursor; das Suchfeld verwendet ein CSS-gezeichnetes Suchsymbol.
+
+### Behoben
+
+- Globale Nachnamensuche ordnet allgemeine Wörter und gleichnamige Spieler nicht mehr fälschlich zu; bekannte Fälle wie Young, Sommer, Glück, Pauli und Fernandes sind regressionsgetestet.
+- Ein fehlgeschlagener Nachrichtenlauf behält keine veralteten kicker-Inhalte mehr als vermeintlich aktuellen Stand.
+- Build-Validierung prüft Nachrichten-IDs, Beziehungen, Vereinszuordnung sowie die Übereinstimmung von Ziel-URL, Domain und sichtbarer Quellenangabe.
+
+### Sicherheit
+
+- Geschützte kicker-Spielerseiten und interne APIs werden nicht automatisiert ausgelesen; dargestellt werden nur freigegebene RSS-Metadaten und direkte externe Links ohne Bilder oder Artikeltexte.
+
 ## [1.7.0] – 2026-08-14
 
 ### Hinzugefügt
@@ -198,3 +225,4 @@ Alle wesentlichen Änderungen an Punktespiegel werden in dieser Datei dokumentie
 [1.5.1]: https://github.com/gruberb/punktespiegel/releases/tag/v1.5.1
 [1.6.0]: https://github.com/gruberb/punktespiegel/releases/tag/v1.6.0
 [1.7.0]: https://github.com/gruberb/punktespiegel/releases/tag/v1.7.0
+[1.8.0]: https://github.com/gruberb/punktespiegel/releases/tag/v1.8.0
