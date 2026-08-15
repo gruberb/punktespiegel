@@ -67,9 +67,10 @@ button:focus-visible, input:focus-visible, select:focus-visible, [tabindex]:focu
   grid-column: 2; display: flex; align-items: center; gap: 3px; padding: 4px;
   border: 1px solid var(--line); border-radius: 999px; background: rgba(255, 255, 255, .72);
 }
-.main-nav button { padding: 9px 16px; border: 0; border-radius: 999px; background: transparent; color: var(--soft-ink); font-size: 13px; }
-.main-nav button:hover { background: #f2f5ef; color: var(--green-deep); }
-.main-nav button.active { background: var(--sage); color: var(--green-deep); font-weight: 650; }
+.main-nav a { display: inline-flex; align-items: center; justify-content: center; padding: 9px 16px; border: 0; border-radius: 999px; background: transparent; color: var(--soft-ink); font-size: 13px; text-decoration: none; }
+.main-nav a:hover { background: #f2f5ef; color: var(--green-deep); }
+.main-nav a.active { background: var(--sage); color: var(--green-deep); font-weight: 650; }
+.main-nav a:focus-visible { outline: 3px solid rgba(86, 131, 106, .24); outline-offset: 2px; }
 
 main { max-width: 1520px; margin: 0 auto; padding: 48px 30px 38px; }
 .control-deck { display: grid; grid-template-columns: minmax(390px, 1fr) auto; align-items: end; gap: 58px; margin-bottom: 34px; }
@@ -565,7 +566,7 @@ tbody tr:hover { background: #fbfcf9; }
 @media (max-width: 790px) {
   .site-header { position: static; height: auto; grid-template-columns: 1fr; gap: 12px; padding: 14px 16px; }
   .main-nav { grid-column: 1; width: 100%; justify-self: stretch; overflow-x: auto; }
-  .main-nav button { flex: 1; padding: 8px 12px; white-space: nowrap; }
+  .main-nav a { flex: 1; padding: 8px 12px; white-space: nowrap; }
   main { padding: 30px 15px; }
   .intro h1 { font-size: 43px; }
   .selectors { width: 100%; overflow-x: auto; }
@@ -623,7 +624,7 @@ tbody tr:hover { background: #fbfcf9; }
 
 @media (max-width: 490px) {
   .brand { font-size: 16px; }
-  .main-nav button { font-size: 10px; padding: 8px 9px; }
+  .main-nav a { font-size: 10px; padding: 8px 9px; }
   .intro h1 { font-size: 38px; }
   .intro > p:last-child { font-size: 13px; }
   .dashboard-card { padding: 18px; }
@@ -720,9 +721,9 @@ button:focus-visible, input:focus-visible, select:focus-visible, [tabindex]:focu
   border-color: light-dark(var(--color-gray-25), var(--color-gray-55));
   background: var(--background-color-box);
 }
-.main-nav button { min-height: 38px; padding: 7px 19px; color: var(--button-text-color); font-size: 12px; font-weight: 650; }
-.main-nav button:hover { color: var(--button-text-color); background: var(--button-background-color-hover); }
-.main-nav button.active { color: var(--button-text-color-primary); background: var(--color-accent-primary); font-weight: 700; }
+.main-nav a { min-height: 38px; padding: 7px 19px; color: var(--button-text-color); font-size: 12px; font-weight: 650; }
+.main-nav a:hover { color: var(--button-text-color); background: var(--button-background-color-hover); }
+.main-nav a.active { color: var(--button-text-color-primary); background: var(--color-accent-primary); font-weight: 700; }
 
 main { max-width: 1440px; padding: 28px 24px 40px; }
 .control-deck { min-height: 78px; grid-template-columns: minmax(260px, 1fr) auto; align-items: center; gap: 28px; margin-bottom: 20px; }
@@ -1127,7 +1128,7 @@ tbody tr:hover, .clickable-row:hover { background: var(--button-background-color
 @media (max-width: 1180px) {
   .site-header { grid-template-columns: auto 1fr; }
   .main-nav { justify-self: end; }
-  .main-nav button { padding-inline: 13px; }
+  .main-nav a { padding-inline: 13px; }
   .history-toolbar { max-width: 100%; margin: 0 0 16px; overflow-x: auto; justify-self: stretch; }
   .history-hero-grid { grid-template-columns: 1fr; }
   .history-top-list, .history-eleven { height: auto; min-height: 570px; }
@@ -1140,7 +1141,7 @@ tbody tr:hover, .clickable-row:hover { background: var(--button-background-color
   .site-header { position: sticky; height: auto; grid-template-columns: 1fr; gap: 10px; padding: 12px; }
   .brand { padding-left: 3px; }
   .main-nav { grid-column: 1; width: 100%; justify-content: flex-start; overflow-x: auto; padding: 3px; }
-  .main-nav button { flex: 0 0 auto; min-height: 34px; padding: 6px 13px; font-size: 11px; }
+  .main-nav a { flex: 0 0 auto; min-height: 34px; padding: 6px 13px; font-size: 11px; }
   main { padding: 20px 12px 32px; }
   .control-deck { min-height: 0; grid-template-columns: 1fr; gap: 14px; margin-bottom: 18px; }
   .intro h1 { font-size: 30px; }

@@ -3,8 +3,12 @@ import type { MouseEvent as ReactMouseEvent, ReactNode, RefObject } from "react"
 import { createPortal } from "react-dom";
 import { api } from "./api";
 import { DataTable } from "./DataTable";
+import { applyManagerLocation, managerLocationFromSearch } from "./manager-location";
 import { newsAttribution, newsSourceLabel } from "./news";
+import { hrefForView, pathForView, viewFromPathname } from "./routes";
 import type { DataTableColumn } from "./DataTable";
+import type { ManagerLocation, ManagerSection } from "./manager-location";
+import type { RouteView } from "./routes";
 import { initialAvailableRound, latestAvailableRound } from "./rounds";
 import type {
   BestEleven,
@@ -35,15 +39,14 @@ import type {
 } from "./types";
 
 type InfoView = "about" | "methodology" | "sources" | "faq";
-type View = "overview" | "players" | "player" | "teams" | "team" | "history" | "top" | "manager" | InfoView;
+type View = RouteView;
 type NavView = Exclude<View, "player" | "team">;
 type Filters = { league: string; season: string; round: string };
-type ViewLocation = { view: View; filters: Filters; playerId: string | null; teamId: string | null; scrollY: number };
+type ViewLocation = { view: View; filters: Filters; playerId: string | null; teamId: string | null; managerLocation: ManagerLocation; scrollY: number };
 type TeamMetric = "overall" | "goalkeeper" | "defence" | "midfield" | "forward";
 type PlayerSort = "name" | "position" | "price" | "round" | "points" | "grade" | "goals" | "assists" | "value";
 type TopPlayerSort = "previous" | "average" | "value" | "trend" | "price";
 type Theme = "light" | "dark";
-type ManagerSection = "overview" | "matchdays";
 
 const themeStorageKey = "punktespiegel-theme";
 const siteBaseUrl = "https://punktespiegel.org/";
@@ -132,7 +135,11 @@ function initialTheme(): Theme {
 
 function initialView(): View {
   const params = new URLSearchParams(window.location.search);
-  const value = params.get("view");
+  const playerId = params.get("player");
+  const teamId = params.get("team");
+  const pathView = viewFromPathname(window.location.pathname, playerId, teamId);
+  const legacyView = params.get("view");
+  const value = pathView === "overview" && legacyView ? legacyView : pathView ?? legacyView;
   if (value === "player" && !params.get("player")) return "players";
   if (value === "team" && !params.get("team")) return "teams";
   return (["overview", "players", "player", "teams", "team", "history", "top", "manager", ...infoViews] as View[]).includes(value as View)
@@ -151,9 +158,8 @@ function scopeQuery(filters: Filters, includeRound = true) {
 }
 
 function viewHref(view: NavView, filters: Filters) {
-  const params = isInfoView(view) ? new URLSearchParams({ view }) : scopeQuery(filters, view === "players");
-  if (!isInfoView(view)) params.set("view", view);
-  return `?${params}`;
+  const params = isInfoView(view) ? new URLSearchParams() : scopeQuery(filters, view === "players");
+  return hrefForView(view, params);
 }
 
 function isAbort(reason: unknown) {
@@ -220,6 +226,7 @@ export default function App() {
   const [view, setViewState] = useState<View>(initialView);
   const [playerId, setPlayerId] = useState<string | null>(() => new URLSearchParams(window.location.search).get("player"));
   const [teamId, setTeamId] = useState<string | null>(() => new URLSearchParams(window.location.search).get("team"));
+  const [managerLocation, setManagerLocation] = useState<ManagerLocation>(() => managerLocationFromSearch(window.location.search));
   const [backStack, setBackStack] = useState<ViewLocation[]>([]);
   const [dashboard, setDashboard] = useState<Dashboard | null>(null);
   const [dashboardError, setDashboardError] = useState<string | null>(null);
@@ -238,6 +245,11 @@ export default function App() {
       // The selected theme still applies for this page view without persistence.
     }
   }, [theme]);
+
+  useEffect(() => {
+    if (!new URLSearchParams(window.location.search).has("view")) return;
+    syncUrl(filters, view, playerId, teamId, managerLocation);
+  }, []);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -320,8 +332,7 @@ export default function App() {
       },
     } satisfies Record<View, { title: string; description: string }>)[view];
 
-    const canonical = new URL(siteBaseUrl);
-    canonical.searchParams.set("view", view);
+    const canonical = new URL(pathForView(view), siteBaseUrl);
     if (!isInfoView(view)) {
       canonical.searchParams.set("league", filters.league);
       canonical.searchParams.set("season", filters.season);
@@ -434,16 +445,21 @@ export default function App() {
 
   const showMatchday = view === "players";
 
-  function syncUrl(nextFilters: Filters, nextView: View, nextPlayer: string | null, nextTeam: string | null) {
-    const params = isInfoView(nextView) ? new URLSearchParams({ view: nextView }) : scopeQuery(nextFilters);
-    if (!isInfoView(nextView)) params.set("view", nextView);
+  function syncUrl(nextFilters: Filters, nextView: View, nextPlayer: string | null, nextTeam: string | null, nextManagerLocation = managerLocation) {
+    const params = isInfoView(nextView) ? new URLSearchParams() : scopeQuery(nextFilters);
     if (nextView === "player" && nextPlayer) params.set("player", nextPlayer);
     if (nextView === "team" && nextTeam) params.set("team", nextTeam);
-    window.history.replaceState({}, "", `${window.location.pathname}?${params}`);
+    if (nextView === "manager") applyManagerLocation(params, nextManagerLocation);
+    window.history.replaceState({}, "", hrefForView(nextView, params));
+  }
+
+  function updateManagerLocation(nextManagerLocation: ManagerLocation) {
+    setManagerLocation(nextManagerLocation);
+    syncUrl(filters, "manager", null, null, nextManagerLocation);
   }
 
   function rememberCurrentLocation() {
-    setBackStack((stack) => [...stack, { view, filters: { ...filters }, playerId, teamId, scrollY: window.scrollY }]);
+    setBackStack((stack) => [...stack, { view, filters: { ...filters }, playerId, teamId, managerLocation: { ...managerLocation }, scrollY: window.scrollY }]);
   }
 
   function scrollToTop() {
@@ -575,8 +591,9 @@ export default function App() {
     setFilters(previous.filters);
     setPlayerId(previous.playerId);
     setTeamId(previous.teamId);
+    setManagerLocation(previous.managerLocation);
     setViewState(previous.view);
-    syncUrl(previous.filters, previous.view, previous.playerId, previous.teamId);
+    syncUrl(previous.filters, previous.view, previous.playerId, previous.teamId, previous.managerLocation);
     restoreScrollPosition(previous.scrollY);
   }
 
@@ -603,21 +620,19 @@ export default function App() {
   const navActive: NavView | null = isInfoView(view) ? null : view === "player" ? "players" : view === "team" ? "teams" : view;
   const previousView = backStack.at(-1)?.view;
   const backLabel = previousView ? `Zurück ${viewBackLabel(previousView)}` : view === "team" ? "Zurück zu den Mannschaften" : "Zurück zu den Spielern";
-  const homeParams = scopeQuery(filters, false);
-  homeParams.set("view", "overview");
 
   return (
     <div className={`app-shell view-${view}`}>
       <header className="site-header">
-        <a className="brand" href={`?${homeParams}`} onClick={(event) => { event.preventDefault(); setView("overview"); }} aria-label="Punktespiegel Startseite">
+        <a className="brand" href={viewHref("overview", filters)} onClick={(event) => { event.preventDefault(); setView("overview"); }} aria-label="Punktespiegel Startseite">
           <img src={`${import.meta.env.BASE_URL}brand/punktespiegel-mark.svg`} alt="" aria-hidden="true" />
           <span>Punktespiegel</span>
         </a>
         <nav className="main-nav" aria-label="Bereiche">
           {nav.map((item) => (
-            <button key={item.id} className={navActive === item.id ? "active" : ""} aria-current={navActive === item.id ? "page" : undefined} onClick={() => setView(item.id)}>
+            <a key={item.id} href={viewHref(item.id, filters)} className={navActive === item.id ? "active" : ""} aria-current={navActive === item.id ? "page" : undefined} onClick={(event) => { event.preventDefault(); setView(item.id); }}>
               {item.label}
-            </button>
+            </a>
           ))}
         </nav>
         <button
@@ -660,7 +675,14 @@ export default function App() {
             {view === "team" && teamId && (teamSelectionPending ? <LoadingState /> : <TeamDetailView filters={filters} teamId={teamId} backLabel={backLabel} onBack={() => goBack("teams")} onPlayer={openPlayer} onTeam={openTeam} />)}
             {view === "history" && <HistoryView filters={filters} leagues={catalog.leagues} seasons={seasons} onFilter={updateFilter} onPlayer={openPlayerAt} onTeam={openTeamAt} />}
             {view === "top" && <TopPlayersView filters={filters} leagues={catalog.leagues} onFilter={updateFilter} onPlayer={openPlayer} />}
-            {view === "manager" && <ManagerPicksView filters={filters} onPlayer={openPlayer} />}
+            {view === "manager" && <ManagerPicksView
+              filters={filters}
+              section={managerLocation.section}
+              selectedMatchday={managerLocation.matchday}
+              onSection={(section) => updateManagerLocation({ ...managerLocation, section })}
+              onMatchday={(matchday) => updateManagerLocation({ ...managerLocation, matchday })}
+              onPlayer={openPlayer}
+            />}
           </>
         )}
         <SiteFooter currentView={view} filters={filters} onView={setView} />
@@ -1439,14 +1461,19 @@ function NewsList<Article extends NewsArticle>({ articles, context }: {
   );
 }
 
-function ManagerPicksView({ filters, onPlayer }: { filters: Filters; onPlayer: (id: string) => void }) {
+function ManagerPicksView({ filters, section, selectedMatchday, onSection, onMatchday, onPlayer }: {
+  filters: Filters;
+  section: ManagerSection;
+  selectedMatchday: number | null;
+  onSection: (section: ManagerSection) => void;
+  onMatchday: (matchday: number) => void;
+  onPlayer: (id: string) => void;
+}) {
   const [mode, setMode] = useState<ManagerMode>("classic");
-  const [section, setSection] = useState<ManagerSection>("overview");
   const [recommendation, setRecommendation] = useState<ManagerRecommendation | null>(null);
   const [schedule, setSchedule] = useState<ManagerScheduleRound[]>([]);
   const [scheduleLoading, setScheduleLoading] = useState(false);
   const [scheduleError, setScheduleError] = useState<string | null>(null);
-  const [selectedMatchday, setSelectedMatchday] = useState(1);
   const [squadNews, setSquadNews] = useState<SquadNews | null>(null);
   const [squadNewsLoading, setSquadNewsLoading] = useState(false);
   const [squadNewsError, setSquadNewsError] = useState<string | null>(null);
@@ -1475,8 +1502,6 @@ function ManagerPicksView({ filters, onPlayer }: { filters: Filters; onPlayer: (
           .then((nextSchedule) => {
             if (!active) return;
             setSchedule(nextSchedule);
-            const throughMatchday = nextRecommendation.currentSeasonEvidence?.throughMatchday ?? 0;
-            setSelectedMatchday(Math.min(Math.max(throughMatchday + 1, 1), Math.max(nextSchedule.length, 1)));
           })
           .catch((reason: Error) => {
             if (active && !isAbort(reason)) setScheduleError(reason.message);
@@ -1502,6 +1527,13 @@ function ManagerPicksView({ filters, onPlayer }: { filters: Filters; onPlayer: (
       controller.abort();
     };
   }, [filters.league, filters.season, mode]);
+
+  useEffect(() => {
+    if (!schedule.length || (selectedMatchday !== null && schedule.some((round) => round.matchday === selectedMatchday))) return;
+    const nextMatchday = (recommendation?.currentSeasonEvidence?.throughMatchday ?? 0) + 1;
+    const availableMatchday = schedule.find((round) => round.matchday >= nextMatchday)?.matchday ?? schedule.at(-1)!.matchday;
+    onMatchday(availableMatchday);
+  }, [recommendation?.currentSeasonEvidence?.throughMatchday, schedule, selectedMatchday]);
 
   if (error) return <ErrorState message={error} />;
   const starters = recommendation?.players.filter((player) => player.role === "start") ?? [];
@@ -1531,8 +1563,8 @@ function ManagerPicksView({ filters, onPlayer }: { filters: Filters; onPlayer: (
         <p>{mode === "classic" ? "15 Spieler · feste 4-4-2-Aufstellung" : "22 Spieler · beste Elf und Formation für jeden Spieltag"}</p>
       </div>
       <div className="scope-switch manager-section-tabs" aria-label="Fantasy-Team-Ansicht">
-        <button className={section === "overview" ? "active" : ""} aria-pressed={section === "overview"} onClick={() => setSection("overview")}>Übersicht</button>
-        <button className={section === "matchdays" ? "active" : ""} aria-pressed={section === "matchdays"} onClick={() => setSection("matchdays")}>Spieltage</button>
+        <button className={section === "overview" ? "active" : ""} aria-pressed={section === "overview"} onClick={() => onSection("overview")}>Übersicht</button>
+        <button className={section === "matchdays" ? "active" : ""} aria-pressed={section === "matchdays"} onClick={() => onSection("matchdays")}>Spieltage</button>
       </div>
       {loading || !recommendation ? <LoadingState /> : (
         <>
@@ -1569,7 +1601,7 @@ function ManagerPicksView({ filters, onPlayer }: { filters: Filters; onPlayer: (
           </> : <ManagerScheduleView
             rounds={schedule}
             selectedMatchday={selectedMatchday}
-            onMatchday={setSelectedMatchday}
+            onMatchday={onMatchday}
             onPlayer={onPlayer}
             loading={scheduleLoading}
             error={scheduleError}
@@ -1665,7 +1697,7 @@ function FantasyMatchdayCard({ matchday, onPlayer }: { matchday: ManagerRecommen
 
 function ManagerScheduleView({ rounds, selectedMatchday, onMatchday, onPlayer, loading, error }: {
   rounds: ManagerScheduleRound[];
-  selectedMatchday: number;
+  selectedMatchday: number | null;
   onMatchday: (matchday: number) => void;
   onPlayer: (id: string) => void;
   loading: boolean;

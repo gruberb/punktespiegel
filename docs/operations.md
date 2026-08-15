@@ -110,7 +110,7 @@ Die kicker-Spielerarchive und internen APIs werden nicht gescrapt. Der Browser v
 3. Den Workflow einmal manuell starten.
 4. Die in der `github-pages`-Umgebung angezeigte URL prüfen.
 
-Vite erzeugt relative Asset- und Datenpfade. Derselbe Build funktioniert deshalb auf einer Projekt-URL wie `/punktespiegel/`, auf einer eigenen Domain und im lokalen Nginx-Container.
+Vite erzeugt Asset- und Datenpfade relativ zur Domainwurzel. Das unterstützt die festen Einstiegspfade wie `/fantasy-team` auf `punktespiegel.org` und im lokalen Nginx-Container. Eine Veröffentlichung unter einem Unterpfad wie `/punktespiegel/` benötigt dagegen einen entsprechend angepassten Vite-`base` und passende Routeneinstiegspunkte.
 
 ## Saisonwechsel
 

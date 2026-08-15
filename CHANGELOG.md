@@ -2,6 +2,18 @@
 
 Alle wesentlichen Änderungen an Punktespiegel werden in dieser Datei dokumentiert.
 
+## [1.10.0] – 2026-08-15
+
+### Hinzugefügt
+
+- Die Hauptnavigation verwendet feste, direkt teilbare Pfade wie `/spieler`, `/mannschaften`, `/historie`, `/topspieler` und `/fantasy-team`.
+- Der Produktionsbuild erzeugt statische Einstiegspunkte und eine 404-Fallbackseite, damit diese Pfade auch auf GitHub Pages direkt geladen werden können.
+
+### Geändert
+
+- Das Fantasy Team speichert die gewählte Ansicht und den ausgewählten Spieltag in der URL und stellt beide Werte nach dem Öffnen eines Spielerprofils wieder her.
+- Frühere Links mit `?view=...` werden automatisch auf die entsprechenden festen Pfade normalisiert; Sitemap und kanonische URLs verwenden die neue Struktur.
+
 ## [1.9.0] – 2026-08-14
 
 ### Hinzugefügt

@@ -27,6 +27,8 @@ flowchart LR
 | React/Vite | Filter, Navigation, Tabellen, Detailseiten und sämtliche Aggregationen |
 | GitHub Pages/Nginx | Unveränderte statische Dateien ausliefern |
 
+Die Hauptansichten besitzen feste Pfade wie `/spieler`, `/mannschaften`, `/historie` und `/fantasy-team`. Der Produktionsbuild schreibt für jeden dieser Pfade einen statischen HTML-Einstiegspunkt, damit direkte Aufrufe auch auf GitHub Pages ohne Laufzeit-Router funktionieren. Liga, Saison, Spieltag und Unteransichten bleiben als Query-Parameter erhalten. Frühere Links mit `?view=...` werden beim Öffnen automatisch auf den entsprechenden festen Pfad normalisiert.
+
 ## Datenvertrag
 
 Jede Datei unter `frontend/public/data/seasons` enthält:
