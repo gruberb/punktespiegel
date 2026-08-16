@@ -47,7 +47,7 @@ type ViewLocation = { view: View; filters: Filters; playerId: string | null; tea
 type TeamMetric = "overall" | "goalkeeper" | "defence" | "midfield" | "forward";
 type PlayerSort = "name" | "position" | "price" | "round" | "points" | "grade" | "goals" | "assists" | "value" | "roundGrade" | "roundGoals" | "roundAssists";
 type PlayerScope = "season" | "round";
-type TopPlayerSort = "previous" | "average" | "value" | "trend" | "price";
+type TopPlayerSort = "current" | "previous" | "average" | "value" | "trend" | "price";
 type Theme = "light" | "dark";
 
 const themeStorageKey = "punktespiegel-theme";
@@ -260,6 +260,7 @@ export default function App() {
   const [dashboard, setDashboard] = useState<Dashboard | null>(null);
   const [dashboardError, setDashboardError] = useState<string | null>(null);
   const [dashboardLoading, setDashboardLoading] = useState(false);
+  const [overviewScope, setOverviewScope] = useState<"through" | "matchday">("through");
   const navigationToken = useRef(0);
   const initialRoundRequest = useRef(requestedInitialRound());
   const initialRoundResolved = useRef(false);
@@ -304,6 +305,7 @@ export default function App() {
   const selectedSeason = view === "overview" ? latestPublishedSeason : view === "manager" || view === "top" ? newestSeason : view === "team" ? selectedTeamSeason : view === "player" ? selectedPlayerSeason : requestedSeason;
   const roundCount = selectedSeason?.roundCount ?? (filters.league === "0003" ? 38 : 34);
   const latestRound = selectedSeason?.latestRound ?? 0;
+  const overviewRound = Math.min(Math.max(1, Number(filters.round) || 1), Math.max(1, latestRound));
   const teamSelectionPending = Boolean(selectedTeamSeason)
     && (filters.league !== selectedTeamSeason?.leagueCode || filters.season !== String(selectedTeamSeason?.startYear));
   const playerSelectionPending = Boolean(selectedPlayerSeason)
@@ -467,12 +469,12 @@ export default function App() {
     const controller = new AbortController();
     setDashboardLoading(true);
     setDashboardError(null);
-    api.dashboard(scopeQuery({ ...filters, season: String(selectedSeason.startYear), round: String(latestRound) }), controller.signal)
+    api.dashboard(scopeQuery({ ...filters, season: String(selectedSeason.startYear), round: String(overviewRound) }), controller.signal)
       .then(setDashboard)
       .catch((reason: Error) => { if (!isAbort(reason)) setDashboardError(reason.message); })
       .finally(() => setDashboardLoading(false));
     return () => controller.abort();
-  }, [filters.league, filters.season, latestRound, selectedSeason, view]);
+  }, [filters.league, filters.season, overviewRound, latestRound, selectedSeason, view]);
 
   const showMatchday = view === "players";
 
@@ -614,7 +616,9 @@ export default function App() {
   };
   const title = isInfoView(view) ? infoTitle[view] : view === "overview" ? "Überblick" : view === "player" ? "Spielerprofil" : view === "team" ? "Mannschaftsprofil" : nav.find((item) => item.id === view)?.label;
   const description = view === "overview"
-    ? latestRound > 0 ? `${selectedSeason?.displayName ?? "Gewählte Saison"} · kumuliert bis Spieltag ${latestRound}` : `${selectedSeason?.displayName ?? "Gewählte Saison"} · noch ohne abgeschlossenen Spieltag`
+    ? latestRound > 0
+      ? `${selectedSeason?.displayName ?? "Gewählte Saison"} · ${overviewScope === "matchday" ? `nur Spieltag ${overviewRound}` : `kumuliert bis Spieltag ${overviewRound}`}`
+      : `${selectedSeason?.displayName ?? "Gewählte Saison"} · noch ohne abgeschlossenen Spieltag`
     : view === "teams"
       ? `${selectedSeason?.displayName ?? "Gewählte Saison"} · gesamte Saison`
       : view === "team"
@@ -668,6 +672,13 @@ export default function App() {
             {showMatchday && (
               <StepperSelect label="Spieltag" value={filters.round} options={Array.from({ length: roundCount }, (_, index) => ({ value: String(index + 1), label: `Spieltag ${index + 1}` }))} onChange={(value) => updateFilter("round", value)} />
             )}
+            {view === "overview" && latestRound > 0 && <>
+              <div className="scope-switch acorn-segmented-control header-scope-switch" aria-label="Zeitraum">
+                <button className={`acorn-segment ${overviewScope === "through" ? "active is-selected" : ""}`} onClick={() => setOverviewScope("through")}>Gesamt</button>
+                <button className={`acorn-segment ${overviewScope === "matchday" ? "active is-selected" : ""}`} onClick={() => setOverviewScope("matchday")}>Nur Spieltag</button>
+              </div>
+              <StepperSelect label="Spieltag" value={String(overviewRound)} options={Array.from({ length: Math.max(1, latestRound) }, (_, index) => ({ value: String(index + 1), label: `Spieltag ${index + 1}` }))} onChange={(value) => updateFilter("round", value)} />
+            </>}
           </div>} />}
 
         {isInfoView(view) ? <InfoPage view={view} filters={filters} onView={setView} /> : catalogError ? <ErrorState message={catalogError} /> : !catalog ? <LoadingState /> : (
@@ -676,7 +687,7 @@ export default function App() {
               latestRound < 1 ? <section className="detail-section"><Empty message="Für diese Saison liegen noch keine Daten eines abgeschlossenen Spieltags vor." /></section>
                 : dashboardError ? <ErrorState message={dashboardError} />
                 : dashboardLoading || !dashboard ? <LoadingState />
-                  : <Overview data={dashboard} eleven={{ league: filters.league, season: String(selectedSeason?.startYear ?? filters.season), round: latestRound }} onView={setView} onPlayer={openPlayer} onTeam={openTeam} />
+                  : <Overview data={dashboard} scope={overviewScope} eleven={{ league: filters.league, season: String(selectedSeason?.startYear ?? filters.season), round: overviewRound }} onView={setView} onPlayer={openPlayer} onTeam={openTeam} />
             )}
             {view === "players" && <PlayersView filters={filters} onPlayer={openPlayer} />}
             {view === "player" && playerId && (playerSelectionPending ? <LoadingState /> : <PlayerDetailView filters={filters} playerId={playerId} backLabel={backLabel} onBack={() => goBack("players")} onTeam={openTeam} onSeason={(year) => updatePlayerSeason(String(year))} />)}
@@ -728,36 +739,40 @@ function MobileNav({ active, filters, onView }: { active: NavView | null; filter
   </nav>;
 }
 
-function Overview({ data, eleven, onView, onPlayer, onTeam }: { data: Dashboard; eleven: { league: string; season: string; round: number }; onView: (view: NavView) => void; onPlayer: (id: string) => void; onTeam: (id: string) => void }) {
+function Overview({ data, scope, eleven, onView, onPlayer, onTeam }: { data: Dashboard; scope: "through" | "matchday"; eleven: { league: string; season: string; round: number }; onView: (view: NavView) => void; onPlayer: (id: string) => void; onTeam: (id: string) => void }) {
   const [position, setPosition] = useState<Position>("FWD");
   const [metric, setMetric] = useState<Exclude<RankingMetric, "points">>("grade");
+  const round = data.context.round;
+  const matchdayOnly = scope === "matchday";
+  const leaderboards = matchdayOnly ? data.matchdayLeaderboards : data.leaderboards;
+  const playerScope = matchdayOnly ? "matchday" as const : "season" as const;
   const metrics: { id: Exclude<RankingMetric, "points">; label: string; players: Player[] }[] = [
-    { id: "grade", label: "Noten", players: data.leaderboards.grades },
-    { id: "goals", label: "Tore", players: data.leaderboards.goals },
-    { id: "assists", label: "Vorlagen", players: data.leaderboards.assists },
-    { id: "cleanSheets", label: "Weiße Westen", players: data.leaderboards.cleanSheets },
-    { id: "starterPoints", label: "Startelf", players: data.leaderboards.starterPoints },
-    { id: "cardDeductions", label: "Platzverweise", players: data.leaderboards.cardDeductions },
-    { id: "mvpAwards", label: "SdS", players: data.leaderboards.mvpAwards },
-    { id: "jokerAwards", label: "Joker", players: data.leaderboards.jokerAwards },
+    { id: "grade", label: "Noten", players: leaderboards.grades },
+    { id: "goals", label: "Tore", players: leaderboards.goals },
+    { id: "assists", label: "Vorlagen", players: leaderboards.assists },
+    { id: "cleanSheets", label: "Weiße Westen", players: leaderboards.cleanSheets },
+    { id: "starterPoints", label: "Startelf", players: leaderboards.starterPoints },
+    { id: "cardDeductions", label: "Platzverweise", players: leaderboards.cardDeductions },
+    { id: "mvpAwards", label: "SdS", players: leaderboards.mvpAwards },
+    { id: "jokerAwards", label: "Joker", players: leaderboards.jokerAwards },
   ];
   const activeMetric = metrics.find((item) => item.id === metric) ?? metrics[0];
   return (
     <section className="overview-grid" aria-label="Saisonüberblick">
       <article className="dashboard-card team-pulse-card">
-        <CardHead eyebrow={`Bis einschließlich Spieltag ${data.context.round}`} title="Mannschaftswertung" subtitle="Gesamtpunkte aller Spieler des Vereins" action={<button onClick={() => onView("teams")}>Alle Mannschaften</button>} />
-        <TeamRanking teams={data.seasonTeams} matchday={data.context.round} scope="through" onTeam={onTeam} />
+        <CardHead eyebrow={matchdayOnly ? `Nur Spieltag ${round}` : `Bis einschließlich Spieltag ${round}`} title="Mannschaftswertung" subtitle={matchdayOnly ? "Punkte aller Spieler des Vereins an diesem Spieltag" : "Gesamtpunkte aller Spieler des Vereins"} action={<button onClick={() => onView("teams")}>Alle Mannschaften</button>} />
+        <TeamRanking teams={matchdayOnly ? data.matchdayTeams : data.seasonTeams} matchday={round} scope={matchdayOnly ? "matchday" : "through"} onTeam={onTeam} />
       </article>
       <article className="dashboard-card">
-        <CardHead eyebrow="Gesamt" title="Aktuelle Rangliste" subtitle={`Gesamtpunkte bis Spieltag ${data.context.round}`} action={<button onClick={() => onView("players")}>Alle Spieler</button>} />
-        <PlayerRanking players={data.leaderboards.overall} metric="points" onPlayer={onPlayer} />
+        <CardHead eyebrow={matchdayOnly ? `Spieltag ${round}` : "Gesamt"} title={matchdayOnly ? "Spieltagsrangliste" : "Aktuelle Rangliste"} subtitle={matchdayOnly ? `Punkte an Spieltag ${round}` : `Gesamtpunkte bis Spieltag ${round}`} action={<button onClick={() => onView("players")}>Alle Spieler</button>} />
+        <PlayerRanking players={leaderboards.overall} metric="points" scope={playerScope} onPlayer={onPlayer} />
       </article>
       <article className="dashboard-card position-card">
         <SimpleCardHead title="Nach Position" action={<div className="metric-tabs overview-tabs" aria-label="Position">
           {(["GK", "DEF", "MID", "FWD"] as Position[]).map((item) => <button key={item} className={position === item ? "active" : ""} onClick={() => setPosition(item)}>{positionName[item]}</button>)}
         </div>} />
         <div className="overview-tab-panel">
-          <OverviewPlayerTable players={data.leaderboards.positions[position] ?? []} metric="points" onPlayer={onPlayer} />
+          <OverviewPlayerTable players={leaderboards.positions[position] ?? []} metric="points" scope={playerScope} onPlayer={onPlayer} />
         </div>
       </article>
       <article className="dashboard-card overview-metrics-card">
@@ -765,16 +780,15 @@ function Overview({ data, eleven, onView, onPlayer, onTeam }: { data: Dashboard;
           {metrics.map((item) => <button key={item.id} className={metric === item.id ? "active" : ""} onClick={() => setMetric(item.id)}>{item.label}</button>)}
         </div>} />
         <div className="overview-tab-panel">
-          <OverviewPlayerTable players={activeMetric.players} metric={activeMetric.id} onPlayer={onPlayer} />
+          <OverviewPlayerTable players={activeMetric.players} metric={activeMetric.id} scope={playerScope} onPlayer={onPlayer} />
         </div>
       </article>
-      <OverviewBestEleven league={eleven.league} season={eleven.season} round={eleven.round} onPlayer={onPlayer} />
+      <OverviewBestEleven league={eleven.league} season={eleven.season} round={eleven.round} scope={matchdayOnly ? "matchday" : "season"} onPlayer={onPlayer} />
     </section>
   );
 }
 
-function OverviewBestEleven({ league, season, round, onPlayer }: { league: string; season: string; round: number; onPlayer: (id: string) => void }) {
-  const [scope, setScope] = useState<"season" | "matchday">("season");
+function OverviewBestEleven({ league, season, round, scope, onPlayer }: { league: string; season: string; round: number; scope: "season" | "matchday"; onPlayer: (id: string) => void }) {
   const [eleven, setEleven] = useState<BestEleven | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -790,10 +804,7 @@ function OverviewBestEleven({ league, season, round, onPlayer }: { league: strin
   const grouped = eleven ? groupBestEleven(eleven.players) : null;
   return (
     <article className="dashboard-card overview-eleven-card">
-      <SimpleCardHead title="Beste Elf" action={<div className="metric-tabs overview-tabs" aria-label="Zeitraum">
-        <button className={scope === "season" ? "active" : ""} onClick={() => setScope("season")}>Saison</button>
-        <button className={scope === "matchday" ? "active" : ""} onClick={() => setScope("matchday")}>Spieltag {round}</button>
-      </div>} />
+      <SimpleCardHead title={scope === "season" ? `Beste Elf · bis Spieltag ${round}` : `Beste Elf · Spieltag ${round}`} />
       {error ? <Empty message={error} /> : !eleven || !grouped ? <LoadingState /> : <>
         <p className="overview-eleven-summary"><strong>{eleven.points}</strong> Punkte · Formation {eleven.formation} · {scope === "season" ? "beste Elf der Saison" : `beste Elf von Spieltag ${round}`}</p>
         <div className="best-pitch compact-pitch">
@@ -1019,7 +1030,7 @@ function PlayerRanking({ players, metric, onPlayer, scrollable = false, scope = 
   );
 }
 
-function OverviewPlayerTable({ players, metric, onPlayer }: { players: Player[]; metric: RankingMetric; onPlayer: (id: string) => void }) {
+function OverviewPlayerTable({ players, metric, scope = "season", onPlayer }: { players: Player[]; metric: RankingMetric; scope?: "season" | "matchday"; onPlayer: (id: string) => void }) {
   const columns: DataTableColumn<Player>[] = [
     {
       id: "player",
@@ -1040,7 +1051,7 @@ function OverviewPlayerTable({ players, metric, onPlayer }: { players: Player[];
       numeric: true,
       className: "point-value",
       width: "15%",
-      render: (player) => <>{playerRankingValue(player, metric)}<small>{playerRankingSuffix(metric)}</small></>,
+      render: (player) => <>{playerRankingValue(player, metric, scope)}<small>{playerRankingSuffix(metric)}</small></>,
     },
   ];
   return <DataTable
@@ -1328,7 +1339,7 @@ function CrossTableCard({ standings, onTeam }: { standings: LeagueStandings; onT
                     if (home.id === away.id) return <td key={away.id} className="cross-self" />;
                     const cell = standings.cross.cells[`${home.id}|${away.id}`];
                     if (!cell || cell.homeScore == null || cell.awayScore == null) {
-                      const planned = cell ? `${home.name} – ${nameById.get(away.id)} · Spieltag ${cell.round}${cell.scheduledAt ? ` · ${formatDate(cell.scheduledAt)}` : ""}` : `${home.name} – ${nameById.get(away.id)}`;
+                      const planned = cell ? `${home.name} – ${nameById.get(away.id)} · Spieltag ${cell.round}${cell.scheduledAt ? ` · ${formatDateWithYear(cell.scheduledAt)}` : ""}` : `${home.name} – ${nameById.get(away.id)}`;
                       return <td key={away.id} className="cross-open" title={planned}>–</td>;
                     }
                     const outcome = cell.homeScore > cell.awayScore ? "s" : cell.homeScore < cell.awayScore ? "n" : "u";
@@ -2265,6 +2276,7 @@ function TopPlayersView({ filters, leagues, onFilter, onPlayer }: { filters: Fil
       <StepperSelect label="Position" value={position} options={[{ value: "", label: "Alle Positionen" }, ...(["GK", "DEF", "MID", "FWD"] as Position[]).map((item) => ({ value: item, label: positionName[item] }))]} onChange={(value) => setPosition(value as Position | "")} />
       <StepperSelect label="Sortierung" value={sort} options={[
         { value: "previous", label: "Punkte Vorsaison" },
+        { value: "current", label: "Punkte diese Saison" },
         { value: "average", label: "Saisonschnitt" },
         { value: "value", label: "Preis-Leistung" },
         { value: "trend", label: "Jüngster Trend" },
@@ -2281,6 +2293,7 @@ function TopPlayersView({ filters, leagues, onFilter, onPlayer }: { filters: Fil
     { id: "player", label: "Spieler", width: "31%", render: (player, index) => <div className="table-player"><span className="rank">{index + 1}</span><PlayerPortrait name={player.name} url={player.photoUrl} teamCode={player.teamCode} teamLogoUrl={player.logoUrl} /><span><PlayerName name={player.name} /><small>{player.team}</small></span></div> },
     { id: "position", label: "Position", render: (player) => <PositionTag position={player.position} /> },
     { id: "price", label: "Marktwert", numeric: true, render: (player) => formatMarketValue(player.priceM) },
+    { id: "current", label: "Diese Saison", numeric: true, className: "point-value", render: (player) => <>{player.currentPoints ?? "—"}<small>{data?.context.currentRound ? `bis ST ${data.context.currentRound}` : "noch kein Spieltag"}</small></> },
     { id: "previous", label: "Vorsaison", numeric: true, className: "point-value", render: (player) => <>{player.previousPoints ?? "—"}<small>{player.previousSeason ?? "keine Historie"}</small></> },
     { id: "average", label: "Ø Punkte", numeric: true, className: "point-value", render: (player) => player.averagePoints ?? "—" },
     { id: "value", label: "Pkt. / Mio. €", numeric: true, render: (player) => formatPlayerValue(player.value) },
@@ -2296,56 +2309,15 @@ function TopPlayersView({ filters, leagues, onFilter, onPlayer }: { filters: Fil
     <div className="top-players-view">
       <PageHeader title="Topspieler" description="Kaufbarer Spielerpool auf Basis abgeschlossener Saisons" controls={controls} />
       {data && <p className="top-players-context-inline"><strong>{data.context.playerCount} kaufbare Spieler</strong><span>{data.context.cutoffSeason ? `Leistungsdaten bis einschließlich ${data.context.cutoffSeason}` : "noch keine abgeschlossene Vorsaison importiert"}</span></p>}
-      {error ? <ErrorState message={error} /> : loading || !data ? <LoadingState /> : <DataTable ariaLabel="Topspieler" rows={visiblePlayers} columns={columns} getRowKey={(player) => player.id} emptyMessage="Für diese Position sind keine kaufbaren Spieler importiert." minWidth="1120px" mobileMinWidth="820px" onRowClick={(player) => onPlayer(player.id)} />}
-      <p className="top-players-note">Keine Punkte der neuen Saison und keine Prognose: Auch Spieler ohne importierte Historie bleiben sichtbar. Die Einordnung verwendet ausschließlich abgeschlossene kicker-Wertungen aus Bundesliga, 2. Bundesliga und 3. Liga.</p>
+      {error ? <ErrorState message={error} /> : loading || !data ? <LoadingState /> : <DataTable ariaLabel="Topspieler" rows={visiblePlayers} columns={columns} getRowKey={(player) => player.id} emptyMessage="Für diese Position sind keine kaufbaren Spieler importiert." minWidth="1200px" mobileMinWidth="880px" onRowClick={(player) => onPlayer(player.id)} />}
+      <p className="top-players-note">„Diese Saison" zeigt bereits erzielte Punkte der laufenden Saison bis zum letzten importierten Spieltag. Einordnung, Schnitt und Trend verwenden weiterhin ausschließlich abgeschlossene kicker-Wertungen aus Bundesliga, 2. Bundesliga und 3. Liga; auch Spieler ohne importierte Historie bleiben sichtbar.</p>
     </div>
-  );
-}
-
-function TopPlayerGroup({ title, positions, players, sort, onPlayer }: { title: string; positions: Position[]; players: TopPlayers["positions"]; sort: TopPlayerSort; onPlayer: (id: string) => void }) {
-  const sortLabel: Record<TopPlayerSort, string> = {
-    previous: "Punkte der letzten abgeschlossenen Saison",
-    average: "Punkte im Schnitt je abgeschlossener Saison",
-    value: "Schnittpunkte je Mio. € Marktwert",
-    trend: "Veränderung zwischen den letzten zwei Saisons",
-    price: "Aktueller Marktwert",
-  };
-  return (
-    <section className="detail-section top-player-group">
-      <div className="top-player-group-head"><div><p className="kicker">Kaufbare Spieler</p><h2>{title}</h2></div><span>{sortLabel[sort]}</span></div>
-      <div className="top-player-columns">
-        {positions.map((position) => (
-          <section key={position}>
-            <h3>{positionName[position]} <span>{players[position].length}</span></h3>
-            {players[position].length ? <ol>{sortTopPlayers(players[position], sort).map((player, index) => <li key={player.id}><TopPlayerRow player={player} rank={index + 1} onClick={() => onPlayer(player.id)} /></li>)}</ol> : <Empty message="Für diese Position sind keine kaufbaren Spieler importiert." />}
-          </section>
-        ))}
-      </div>
-    </section>
-  );
-}
-
-function TopPlayerRow({ player, rank, onClick }: { player: TopPlayerAnalysis; rank: number; onClick: () => void }) {
-  const historyLabel = player.history.map((season) => `${season.season} · ${season.league}: ${season.points} Punkte`).join("\n");
-  const maxPoints = Math.max(1, ...player.history.map((season) => Math.max(0, season.points)));
-  return (
-    <button onClick={onClick} title={historyLabel}>
-      <span className="rank">{rank}</span>
-      <PlayerPortrait name={player.name} url={player.photoUrl} teamCode={player.teamCode} teamLogoUrl={player.logoUrl} />
-      <span className="top-player-copy"><strong>{player.name}</strong><small>{player.team}</small><em>{player.signal}</em></span>
-      <span className="top-player-history" aria-label={historyLabel || "Keine Vergleichssaison"}>
-        {player.history.map((season) => <i key={`${season.season}-${season.league}`} style={{ height: `${Math.max(12, Math.round((Math.max(0, season.points) / maxPoints) * 100))}%` }} />)}
-      </span>
-      <span className="top-player-stat top-player-price"><strong>{formatMarketValue(player.priceM)}</strong><small>Marktwert</small></span>
-      <span className={`top-player-stat top-player-previous ${player.trend}`}><strong>{player.previousPoints ?? "—"}</strong><small>{player.previousSeason ?? "Vorsaison"}</small></span>
-      <span className="top-player-stat top-player-average"><strong>{player.averagePoints ?? "—"}</strong><small>Ø Pkt.</small></span>
-      <span className="top-player-stat top-player-value"><strong>{formatPlayerValue(player.value)}</strong><small>Pkt./Mio.</small></span>
-    </button>
   );
 }
 
 function sortTopPlayers(players: TopPlayerAnalysis[], sort: TopPlayerSort) {
   function metric(player: TopPlayerAnalysis) {
+    if (sort === "current") return player.currentPoints ?? -Infinity;
     if (sort === "previous") return player.previousPoints ?? -Infinity;
     if (sort === "average") return player.averagePoints ?? -Infinity;
     if (sort === "value") return player.value ?? -Infinity;
@@ -2401,6 +2373,7 @@ function formatCardCounts(redCards: number, yellowRedCards: number) {
   return parts.length ? parts.join(" · ") : "keine Platzverweise";
 }
 function formatDate(value: string | null) { return value ? new Intl.DateTimeFormat("de-DE", { day: "2-digit", month: "short" }).format(new Date(value)) : "—"; }
+function formatDateWithYear(value: string | null) { return value ? new Intl.DateTimeFormat("de-DE", { day: "2-digit", month: "short", year: "numeric" }).format(new Date(value)) : "—"; }
 function formatMatchdayRange(startAt: string | null, endAt: string | null) {
   if (!startAt && !endAt) return "Termin noch offen";
   const formatter = new Intl.DateTimeFormat("de-DE", { day: "2-digit", month: "long" });

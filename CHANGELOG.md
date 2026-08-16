@@ -2,6 +2,19 @@
 
 Alle wesentlichen Änderungen an Punktespiegel werden in dieser Datei dokumentiert.
 
+## [1.12.0] – 2026-08-16
+
+### Hinzugefügt
+
+- Topspieler: Die neue Spalte „Diese Saison" zeigt die bereits erzielten Punkte der laufenden Saison bis zum letzten importierten Spieltag, inklusive der neuen Sortierung „Punkte diese Saison". Einordnung, Schnitt und Trend basieren weiterhin auf abgeschlossenen Saisons.
+- Überblick: Ein Umschalter „Gesamt / Nur Spieltag" samt Spieltag-Stepper blättert durch alle bereits gespielten Spieltage. Mannschaftswertung, Ranglisten, Positions- und Wertungstabellen sowie die Beste Elf folgen der Auswahl.
+
+### Geändert
+
+- Die Kreuztabelle zeigt alle Teams ohne innere Bildlaufleiste; Termin-Hinweise offener Paarungen nennen jetzt das Jahr, damit Rückrundenspiele nicht wie Vorsaison-Daten wirken.
+- Fantasy-Team-Spieltage: Beendete Partien, deren kicker-Benotung noch aussteht, zeigen keine irreführenden 0-Punkte-Abzeichen mehr; die Punkte erscheinen, sobald der nächste Datenlauf die Benotung importiert.
+- Die Betriebsdokumentation nennt die tatsächliche Laufzeit des täglichen Datenlaufs (12:15 UTC; der Zeitzonen-Schlüssel im GitHub-Cron wird ignoriert) und den zusätzlichen Lauf bei jedem Push.
+
 ## [1.11.0] – 2026-08-16
 
 ### Hinzugefügt

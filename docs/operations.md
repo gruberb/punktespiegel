@@ -78,7 +78,7 @@ docker compose build web
 
 ## Täglicher Pages-Build
 
-`.github/workflows/pages.yml` läuft täglich um **12:15 Uhr in `Europe/Berlin`**. Der Lauf deckt damit sowohl die üblichen Montagswertungen als auch Donnerstagswertungen nach englischen Wochen ab. Er lässt sich unter **Actions → Daten aktualisieren und Pages bauen → Run workflow** wiederholen.
+`.github/workflows/pages.yml` läuft täglich um **12:15 Uhr UTC** (GitHub-Cron kennt keine Zeitzonen, der `timezone`-Schlüssel wird ignoriert; das entspricht 14:15 deutscher Sommer- bzw. 13:15 Winterzeit). Zusätzlich läuft der Workflow bei jedem Push auf `main`. Der tägliche Lauf deckt sowohl die üblichen Montagswertungen als auch Donnerstagswertungen nach englischen Wochen ab. Er lässt sich unter **Actions → Daten aktualisieren und Pages bauen → Run workflow** wiederholen.
 
 Der Workflow:
 

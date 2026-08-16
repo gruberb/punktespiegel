@@ -2120,7 +2120,7 @@ circle.bump-line { fill: light-dark(#ded9ea, #4a4460); stroke: none; }
 .cross-legend span { display: inline-flex; align-items: center; gap: 6px; color: var(--text-color-deemphasized); font-size: 10px; font-weight: 650; }
 .cross-swatch { width: 10px; height: 10px; display: inline-block; border-radius: 3px; }
 .cross-card { padding: 10px; }
-.cross-scroll { overflow: auto; max-height: 640px; scrollbar-width: thin; }
+.cross-scroll { overflow-x: auto; scrollbar-width: thin; }
 .cross-table { border-collapse: separate; border-spacing: 0; }
 .cross-table th, .cross-table td { border-bottom: 1px solid var(--line-soft); border-right: 1px solid var(--line-soft); }
 .cross-table thead th { position: sticky; top: 0; z-index: 3; height: 38px; min-width: 36px; padding: 4px; background: var(--background-color-box); text-align: center; }
@@ -2145,6 +2145,8 @@ circle.bump-line { fill: light-dark(#ded9ea, #4a4460); stroke: none; }
 
 .players-scope-switch { height: 48px; flex: 0 0 auto; align-items: center; }
 .players-scope-switch .acorn-segment { white-space: nowrap; }
+.header-scope-switch { height: 48px; flex: 0 0 auto; align-items: center; }
+.header-scope-switch .acorn-segment { white-space: nowrap; }
 
 @media (max-width: 790px) {
   .tabelle-view { gap: 16px; }

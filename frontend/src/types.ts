@@ -592,6 +592,7 @@ export type TopPlayerAnalysis = {
   photoUrl: string | null;
   position: Position;
   priceM: number;
+  currentPoints: number | null;
   previousSeason: string | null;
   previousLeague: string | null;
   previousPoints: number | null;
@@ -609,6 +610,7 @@ export type TopPlayers = {
     season: string;
     cutoffSeason: string | null;
     playerCount: number;
+    currentRound: number;
   };
   positions: Record<Position, TopPlayerAnalysis[]>;
 };

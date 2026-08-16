@@ -789,7 +789,7 @@ function bestEleven(index: SeasonIndex, scope: "matchday" | "season", round: num
   const grouped = new Map<string, { points: number; teamId: string }>();
   for (const score of index.season.scores) {
     const match = index.matches.get(score.matchId);
-    if (!match || (scope === "matchday" && match.round !== round)) continue;
+    if (!match || (scope === "matchday" ? match.round !== round : match.round > round)) continue;
     const value = grouped.get(score.playerId) ?? { points: 0, teamId: scope === "matchday" ? score.teamId : index.players.get(score.playerId)?.teamId ?? score.teamId };
     value.points += score.totalPoints;
     grouped.set(score.playerId, value);
@@ -818,6 +818,11 @@ function bestEleven(index: SeasonIndex, scope: "matchday" | "season", round: num
 
 function topPlayers(index: SeasonIndex, catalog: StaticCatalog): TopPlayers {
   const leagueName = catalog.leagues.find((league) => league.code === index.season.leagueCode)?.name ?? index.season.leagueName;
+  const currentRound = Math.max(0, index.season.latestRound);
+  const currentPointsById = new Map<string, number>();
+  if (currentRound > 0) {
+    for (const player of summarizePlayers(index, currentRound).players) currentPointsById.set(player.id, player.observedPoints);
+  }
 
   function historyFor(playerId: string) {
     const candidates = catalog.seasons.flatMap((season) => {
@@ -881,6 +886,7 @@ function topPlayers(index: SeasonIndex, catalog: StaticCatalog): TopPlayers {
       photoUrl: player.photoUrl,
       position: player.position,
       priceM: player.priceM,
+      currentPoints: currentRound > 0 ? currentPointsById.get(player.id) ?? 0 : null,
       previousSeason: priorSeason?.season ?? null,
       previousLeague: priorSeason?.league ?? null,
       previousPoints: priorSeason?.points ?? null,
@@ -912,6 +918,7 @@ function topPlayers(index: SeasonIndex, catalog: StaticCatalog): TopPlayers {
       season: index.season.displayName,
       cutoffSeason,
       playerCount: analyzed.length,
+      currentRound,
     },
     positions,
   };
@@ -925,6 +932,12 @@ function managerSchedule(index: SeasonIndex, squad: ManagerRecommendation["playe
     squadByTeam.set(player.teamId, teamPlayers);
   }
   const scoreByMatchAndPlayer = new Map(index.season.scores.map((score) => [`${score.matchId}:${score.playerId}`, score.totalPoints]));
+  // kicker publishes score rows before grading; until at least one row of a match
+  // carries a grade or points, the match counts as ungraded and shows no badges.
+  const gradedMatches = new Set<string>();
+  for (const score of index.season.scores) {
+    if ((score.grade != null && score.grade > 0) || score.totalPoints !== 0) gradedMatches.add(score.matchId);
+  }
   const positionOrder: Record<Position, number> = { GK: 0, DEF: 1, MID: 2, FWD: 3 };
 
   function fixturePlayers(teamId: string, matchId: string): ManagerFixturePlayer[] {
@@ -940,7 +953,7 @@ function managerSchedule(index: SeasonIndex, squad: ManagerRecommendation["playe
         photoUrl: player.photoUrl,
         position: player.position,
         role: player.role,
-        points: scoreByMatchAndPlayer.get(`${matchId}:${player.id}`) ?? null,
+        points: gradedMatches.has(matchId) ? scoreByMatchAndPlayer.get(`${matchId}:${player.id}`) ?? null : null,
       }));
   }
 
