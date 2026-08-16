@@ -520,7 +520,10 @@ function leagueStandings(index: SeasonIndex, round: number): LeagueStandings {
       const matchScores = scoresByMatch.get(match.id) ?? [];
       const contributors = (teamId: string, key: "goals" | "assists"): MatchdayContributor[] => matchScores
         .filter((score) => score.teamId === teamId && score[key] > 0)
-        .map((score) => ({ id: score.playerId, name: index.players.get(score.playerId)?.name ?? "Unbekannt", count: score[key] }))
+        .map((score) => {
+          const player = index.players.get(score.playerId);
+          return { id: score.playerId, name: player?.name ?? "Unbekannt", photoUrl: player?.photoUrl ?? null, count: score[key] };
+        })
         .sort((left, right) => right.count - left.count || left.name.localeCompare(right.name, "de"));
       const side = (teamId: string) => ({ team: toTeam(teamId), goals: contributors(teamId, "goals"), assists: contributors(teamId, "assists") });
       return {

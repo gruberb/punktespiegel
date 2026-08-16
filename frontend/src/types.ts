@@ -92,6 +92,7 @@ export type LeagueStandingsCrossCell = {
 export type MatchdayContributor = {
   id: string;
   name: string;
+  photoUrl: string | null;
   count: number;
 };
 

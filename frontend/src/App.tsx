@@ -1114,6 +1114,28 @@ function TabelleView({ filters, leagues, seasons, onFilter, onTeam, onPlayer }: 
     return () => controller.abort();
   }, [filters.league, filters.season, round]);
 
+  // Squad membership marks scorers from the fantasy teams; recommendations
+  // only exist for the current season, so missing artifacts leave the map empty.
+  const [squad, setSquad] = useState<Map<string, string[]>>(new Map());
+  useEffect(() => {
+    const controller = new AbortController();
+    const params = new URLSearchParams({ league: filters.league, season: filters.season });
+    Promise.allSettled([
+      api.managerPicks(params, "classic", controller.signal),
+      api.managerPicks(params, "interactive", controller.signal),
+    ]).then((results) => {
+      if (controller.signal.aborted) return;
+      const membership = new Map<string, string[]>();
+      results.forEach((result, index) => {
+        if (result.status !== "fulfilled") return;
+        const mode = index === 0 ? "Classic" : "Interactive";
+        for (const player of result.value.players) membership.set(player.id, [...(membership.get(player.id) ?? []), mode]);
+      });
+      setSquad(membership);
+    });
+    return () => controller.abort();
+  }, [filters.league, filters.season]);
+
   return (
     <div className="tabelle-view">
       <PageHeader title="Tabelle" description={`${selectedSeason?.displayName ?? "Gewählte Saison"} · Stand nach Spieltag ${round}`} controls={<div className="selectors">
@@ -1125,7 +1147,7 @@ function TabelleView({ filters, leagues, seasons, onFilter, onTeam, onPlayer }: 
         : loading || !standings ? <LoadingState />
           : standings.context.playedMatchCount < 1 ? <section className="detail-section"><Empty message="Für diese Auswahl liegen noch keine gespielten Partien vor." /></section>
             : <>
-              <MatchdayFixturesCard standings={standings} onTeam={onTeam} onPlayer={onPlayer} />
+              <MatchdayFixturesCard standings={standings} squad={squad} onTeam={onTeam} onPlayer={onPlayer} />
               <FormTableCard standings={standings} league={filters.league} onTeam={onTeam} />
               <BumpChartCard standings={standings} zones={leagueZones[filters.league] ?? []} />
               <CrossTableCard standings={standings} onTeam={onTeam} />
@@ -1134,7 +1156,7 @@ function TabelleView({ filters, leagues, seasons, onFilter, onTeam, onPlayer }: 
   );
 }
 
-function MatchdayFixturesCard({ standings, onTeam, onPlayer }: { standings: LeagueStandings; onTeam: (id: string) => void; onPlayer: (id: string) => void }) {
+function MatchdayFixturesCard({ standings, squad, onTeam, onPlayer }: { standings: LeagueStandings; squad: Map<string, string[]>; onTeam: (id: string) => void; onPlayer: (id: string) => void }) {
   if (!standings.fixtures.length) return null;
   const groups: { slot: string | null; fixtures: MatchdayFixture[] }[] = [];
   for (const fixture of standings.fixtures) {
@@ -1149,7 +1171,7 @@ function MatchdayFixturesCard({ standings, onTeam, onPlayer }: { standings: Leag
         {groups.map((group) => (
           <div className="fixture-slot" key={group.slot ?? "offen"}>
             <h4>{formatFixtureSlot(group.slot)}</h4>
-            {group.fixtures.map((fixture) => <TabelleFixture key={fixture.id} fixture={fixture} onTeam={onTeam} onPlayer={onPlayer} />)}
+            {group.fixtures.map((fixture) => <TabelleFixture key={fixture.id} fixture={fixture} squad={squad} onTeam={onTeam} onPlayer={onPlayer} />)}
           </div>
         ))}
       </div>
@@ -1157,7 +1179,7 @@ function MatchdayFixturesCard({ standings, onTeam, onPlayer }: { standings: Leag
   );
 }
 
-function TabelleFixture({ fixture, onTeam, onPlayer }: { fixture: MatchdayFixture; onTeam: (id: string) => void; onPlayer: (id: string) => void }) {
+function TabelleFixture({ fixture, squad, onTeam, onPlayer }: { fixture: MatchdayFixture; squad: Map<string, string[]>; onTeam: (id: string) => void; onPlayer: (id: string) => void }) {
   const played = fixture.homeScore != null && fixture.awayScore != null;
   const contributorCount = fixture.home.goals.length + fixture.home.assists.length + fixture.away.goals.length + fixture.away.assists.length;
   const teamButton = (side: MatchdayFixtureSide, align: "home" | "away") => (
@@ -1181,22 +1203,39 @@ function TabelleFixture({ fixture, onTeam, onPlayer }: { fixture: MatchdayFixtur
     <details className="fixture-card">
       <summary>{head}<span className="fixture-toggle" aria-hidden="true">⌄</span></summary>
       <div className="fixture-detail">
-        <FixtureSideDetail side={fixture.home} align="home" onPlayer={onPlayer} />
-        <FixtureSideDetail side={fixture.away} align="away" onPlayer={onPlayer} />
+        <FixtureSideDetail side={fixture.home} align="home" squad={squad} onPlayer={onPlayer} />
+        <FixtureSideDetail side={fixture.away} align="away" squad={squad} onPlayer={onPlayer} />
       </div>
     </details>
   );
 }
 
-function FixtureSideDetail({ side, align, onPlayer }: { side: MatchdayFixtureSide; align: "home" | "away"; onPlayer: (id: string) => void }) {
-  const list = (label: string, contributors: MatchdayContributor[]) => contributors.length > 0 && (
-    <p><span className="fixture-detail-label">{label}</span>{contributors.map((contributor, index) => <span key={contributor.id}>{index > 0 && ", "}<button onClick={() => onPlayer(contributor.id)}>{contributor.name}{contributor.count > 1 ? ` (${contributor.count})` : ""}</button></span>)}</p>
+function FixtureSideDetail({ side, align, squad, onPlayer }: { side: MatchdayFixtureSide; align: "home" | "away"; squad: Map<string, string[]>; onPlayer: (id: string) => void }) {
+  const group = (label: string, contributors: MatchdayContributor[]) => contributors.length > 0 && (
+    <div className="fixture-people">
+      <span className="fixture-detail-label">{label}</span>
+      <div className="fixture-people-row">
+        {contributors.map((contributor) => {
+          const modes = squad.get(contributor.id);
+          const title = `${contributor.name}${contributor.count > 1 ? ` · ${contributor.count}×` : ""}${modes ? ` · im Fantasy-Team (${modes.join(" & ")})` : ""}`;
+          return (
+            <button key={contributor.id} className={`fixture-person${modes ? " in-squad" : ""}`} title={title} onClick={() => onPlayer(contributor.id)}>
+              <span className="fixture-person-portrait">
+                <PlayerPortrait name={contributor.name} url={contributor.photoUrl} teamCode={side.team.code} teamLogoUrl={side.team.logoUrl} />
+                {contributor.count > 1 && <b>{contributor.count}×</b>}
+              </span>
+              <small>{lastName(contributor.name)}</small>
+            </button>
+          );
+        })}
+      </div>
+    </div>
   );
   const empty = !side.goals.length && !side.assists.length;
   return (
     <div className={`fixture-side ${align}`}>
-      {list("Tore", side.goals)}
-      {list("Vorlagen", side.assists)}
+      {group("Tore", side.goals)}
+      {group("Vorlagen", side.assists)}
       {empty && <p className="fixture-detail-none">–</p>}
     </div>
   );

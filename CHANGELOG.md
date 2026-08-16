@@ -2,6 +2,12 @@
 
 Alle wesentlichen Änderungen an Punktespiegel werden in dieser Datei dokumentiert.
 
+## [1.14.0] – 2026-08-16
+
+### Geändert
+
+- Spiele des Spieltags: Torschützen und Vorlagengeber erscheinen als Portraitkarten mit Nachname und einer Mengen-Markierung bei Mehrfachtreffern (etwa „2ד). Spieler aus den Fantasy-Kadern (Classic oder Interactive) der laufenden Saison tragen einen violetten Rahmen samt Hinweis im Tooltip. Ein Spielverlauf mit Zwischenständen je Treffer ist mit der Quelldatenlage nicht möglich, da kicker nur Summen je Spieler liefert, keine Torreihenfolge.
+
 ## [1.13.0] – 2026-08-16
 
 ### Hinzugefügt

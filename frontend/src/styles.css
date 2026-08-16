@@ -2230,3 +2230,32 @@ circle.bump-line { fill: light-dark(#ded9ea, #4a4460); stroke: none; }
   .fixture-detail { grid-template-columns: 1fr; gap: 2px; }
   .fixture-side.home { text-align: left; }
 }
+
+/* Tabelle: Torschützen als Portraitkarten -------------------------------- */
+.fixture-people { margin-top: 6px; }
+.fixture-people > .fixture-detail-label { display: block; margin: 0 0 5px; }
+.fixture-people-row { display: flex; flex-wrap: wrap; gap: 6px 10px; }
+.fixture-side.home .fixture-people-row { justify-content: flex-end; }
+.fixture-person { display: grid; justify-items: center; gap: 3px; width: 58px; padding: 2px 0; border: 0; background: transparent; }
+.fixture-person-portrait { position: relative; }
+.fixture-person .player-photo { width: 36px; height: 42px; border-radius: 10px; }
+.fixture-person .player-photo .team-logo { width: 14px; height: 14px; border-radius: 4px; }
+.fixture-person-portrait > b {
+  position: absolute; right: -6px; bottom: -4px; min-width: 17px; padding: 2px 4px;
+  border: 2px solid var(--background-color-box); border-radius: 999px;
+  background: var(--color-accent-primary); color: var(--button-text-color-primary);
+  font-size: 7.5px; font-weight: 800; line-height: 1.2; text-align: center;
+}
+.fixture-person > small { max-width: 100%; overflow: hidden; color: var(--text-color-deemphasized); font-size: 9.5px; font-weight: 650; text-overflow: ellipsis; white-space: nowrap; }
+.fixture-person:hover > small { color: var(--color-accent-primary); }
+.fixture-person.in-squad .player-photo {
+  border: 2px solid var(--color-accent-primary);
+  box-shadow: 0 0 0 3px var(--color-accent-primary-deemphasized);
+}
+.fixture-person.in-squad > small { color: var(--color-accent-primary); font-weight: 750; }
+
+@media (max-width: 490px) {
+  .fixture-side.home .fixture-people-row { justify-content: flex-start; }
+  .fixture-person { width: 52px; }
+  .fixture-person .player-photo { width: 32px; height: 38px; }
+}
