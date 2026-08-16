@@ -1,10 +1,10 @@
 export type RouteView =
   | "overview"
+  | "table"
   | "players"
   | "player"
   | "teams"
   | "team"
-  | "history"
   | "top"
   | "manager"
   | "about"
@@ -14,17 +14,23 @@ export type RouteView =
 
 const routePaths: Record<RouteView, string> = {
   overview: "/",
+  table: "/tabelle",
   players: "/spieler",
   player: "/spieler",
   teams: "/mannschaften",
   team: "/mannschaften",
-  history: "/historie",
   top: "/topspieler",
   manager: "/fantasy-team",
   about: "/ueber",
   methodology: "/daten-methodik",
   sources: "/quellen",
   faq: "/faq",
+};
+
+// The Historie page was folded into the Tabelle, Spieler and Überblick views;
+// old links and the crawled /historie path keep resolving to the Tabelle.
+const legacyPaths: Record<string, RouteView> = {
+  "/historie": "table",
 };
 
 function normalizedPathname(pathname: string) {
@@ -46,6 +52,7 @@ export function viewFromPathname(pathname: string, playerId: string | null, team
   if (normalized === "/") return "overview";
   if (normalized === "/spieler") return playerId ? "player" : "players";
   if (normalized === "/mannschaften") return teamId ? "team" : "teams";
+  if (legacyPaths[normalized]) return legacyPaths[normalized];
   return (Object.entries(routePaths) as [RouteView, string][])
     .find(([view, path]) => view !== "player" && view !== "team" && path === normalized)?.[0] ?? null;
 }

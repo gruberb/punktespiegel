@@ -27,6 +27,7 @@ export type DataTableProps<Row> = {
   rows: Row[];
   columns: DataTableColumn<Row>[];
   getRowKey: (row: Row) => string;
+  leading?: ReactNode;
   search?: {
     value: string;
     placeholder: string;
@@ -48,6 +49,7 @@ export function DataTable<Row>({
   rows,
   columns,
   getRowKey,
+  leading,
   search,
   filters = [],
   countLabel,
@@ -60,7 +62,7 @@ export function DataTable<Row>({
   ariaLabel,
   onRowClick,
 }: DataTableProps<Row>) {
-  const hasToolbar = Boolean(search || filters.length || countLabel);
+  const hasToolbar = Boolean(leading || search || filters.length || countLabel);
 
   function activateRow(event: KeyboardEvent<HTMLTableRowElement>, row: Row) {
     if (!onRowClick || (event.key !== "Enter" && event.key !== " ")) return;
@@ -71,6 +73,7 @@ export function DataTable<Row>({
   return (
     <section className={`data-table data-table--${variant} ${loading ? "is-loading" : ""}`} aria-label={ariaLabel} aria-busy={loading}>
       {hasToolbar && <div className="data-table-toolbar">
+        {leading}
         {search && <label className="data-table-search">
           <span className="data-table-search-icon" aria-hidden="true" />
           <span className="visually-hidden">Suche</span>

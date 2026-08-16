@@ -2,8 +2,6 @@ import type {
   BestEleven,
   Catalog,
   Dashboard,
-  HistoricalPlayer,
-  History,
   ManagerFixturePlayer,
   ManagerMode,
   ManagerRecommendation,
@@ -26,6 +24,8 @@ import type {
 import { buildPlayerNews, buildSquadNews } from "./news";
 import type { NewsArtifact } from "./news";
 import { kickerPlayerNewsLink } from "./kicker-links";
+import { computeTable, crossTable, formLastN, formPoints, positionsByRound, trendVsRound } from "./standings";
+import type { LeagueStandings, LeagueTableRow, LeagueTableTeam } from "./types";
 type StaticCatalog = Catalog & { schemaVersion: number; generatedAt: string };
 
 type StaticManagerRecommendation = {
@@ -472,39 +472,57 @@ function buildTeamScores(index: SeasonIndex, window: TeamWindow): TeamScore[] {
   return result.sort((left, right) => right.overall - left.overall || left.name.localeCompare(right.name, "de"));
 }
 
-function history(index: SeasonIndex): History {
-  const { players, appearances } = summarizePlayers(index, index.season.roundCount);
-  const historical = players.filter((player) => (appearances.get(player.id) ?? 0) > 0).map((player): HistoricalPlayer => ({
-    id: player.id,
-    name: player.name,
-    team: player.team,
-    teamCode: player.teamCode,
-    logoUrl: player.logoUrl,
-    photoUrl: player.photoUrl,
-    position: player.position,
-    points: player.observedPoints,
-    averageGrade: player.averageGrade,
-    gradedMatches: player.gradedMatches,
-    goals: player.goals,
-    assists: player.assists,
-  }));
-  const points = (position: Position | null) => historical
-    .filter((player) => !position || player.position === position)
-    .sort((left, right) => right.points - left.points || left.name.localeCompare(right.name, "de"))
-    .slice(0, 30);
-  const metrics = (metric: "goals" | "assists") => historical
-    .filter((player) => player[metric] > 0)
-    .sort((left, right) => right[metric] - left[metric] || right.points - left.points)
-    .slice(0, 30);
-  return { leaderboards: {
-    overall: points(null),
-    positions: { GK: points("GK"), DEF: points("DEF"), MID: points("MID"), FWD: points("FWD") },
-    grades: historical.filter((player) => player.averageGrade != null)
-      .sort((left, right) => left.averageGrade! - right.averageGrade! || right.gradedMatches - left.gradedMatches)
-      .slice(0, 30),
-    goals: metrics("goals"),
-    assists: metrics("assists"),
-  } };
+function leagueStandings(index: SeasonIndex, round: number): LeagueStandings {
+  const matches = index.season.matches;
+  const teamIds = index.season.teams.map((team) => team.id);
+  const teamName = (teamId: string) => index.teams.get(teamId)?.name ?? teamId;
+  const toTeam = (teamId: string): LeagueTableTeam => {
+    const team = index.teams.get(teamId);
+    return { id: teamId, name: team?.name ?? "Unbekannter Verein", code: team?.code ?? "—", logoUrl: team?.logoUrl ?? null };
+  };
+  const table = computeTable(matches, teamIds, round, teamName);
+  const positions = positionsByRound(matches, teamIds, round, teamName);
+  const rows = table.map((row): LeagueTableRow => {
+    const form = formLastN(matches, row.teamId, round, 5);
+    const teamPositions = positions.get(row.teamId) ?? [];
+    return {
+      team: toTeam(row.teamId),
+      rank: row.rank,
+      played: row.played,
+      wins: row.wins,
+      draws: row.draws,
+      losses: row.losses,
+      goalsFor: row.goalsFor,
+      goalsAgainst: row.goalsAgainst,
+      goalDifference: row.goalDifference,
+      points: row.points,
+      trend: trendVsRound(teamPositions, round),
+      form: form.map((result) => ({
+        round: result.round,
+        outcome: result.outcome,
+        score: `${result.goalsFor}:${result.goalsAgainst}`,
+        home: result.home,
+        opponent: toTeam(result.opponentId),
+      })),
+      formPoints: formPoints(form),
+      positions: teamPositions,
+    };
+  });
+  return {
+    context: {
+      league: index.season.leagueCode,
+      leagueName: index.season.leagueName,
+      season: index.season.displayName,
+      round,
+      roundCount: index.season.roundCount,
+      playedMatchCount: matches.filter((match) => match.round <= round && match.homeScore != null && match.awayScore != null).length,
+    },
+    rows,
+    cross: {
+      order: rows.map((row) => row.team.id),
+      cells: Object.fromEntries(crossTable(matches, round)),
+    },
+  };
 }
 
 function compareNullable(left: number | null, right: number | null, direction: "asc" | "desc") {
@@ -526,6 +544,9 @@ function sortPlayers(players: Player[], sort: string, direction: "asc" | "desc")
       if (sort === "goals") return player.goals;
       if (sort === "assists") return player.assists;
       if (sort === "value") return player.value;
+      if (sort === "roundGrade") return player.roundGrade;
+      if (sort === "roundGoals") return player.roundGoals;
+      if (sort === "roundAssists") return player.roundAssists;
       return player.observedPoints;
     };
     return compareNullable(value(left), value(right), direction) || left.name.localeCompare(right.name, "de");
@@ -962,7 +983,7 @@ export const api = {
       matchdayTeams: buildTeamScores(index, { kind: "exact", round }),
     };
   }), signal),
-  history: (params: URLSearchParams, signal?: AbortSignal) => abortable(loadSeason(params).then(history), signal),
+  standings: (params: URLSearchParams, signal?: AbortSignal): Promise<LeagueStandings> => abortable(loadSeason(params).then((index) => leagueStandings(index, selectedRound(params, index.season))), signal),
   players: (params: URLSearchParams, signal?: AbortSignal) => abortable(loadSeason(params).then((index) => {
     const round = selectedRound(params, index.season);
     const query = (params.get("q") ?? "").trim().toLocaleLowerCase("de");

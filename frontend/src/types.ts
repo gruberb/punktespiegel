@@ -50,6 +50,61 @@ export type Player = {
   value: number | null;
 };
 
+export type LeagueTableTeam = {
+  id: string;
+  name: string;
+  code: string;
+  logoUrl: string | null;
+};
+
+export type LeagueTableFormEntry = {
+  round: number;
+  outcome: "S" | "U" | "N";
+  score: string;
+  home: boolean;
+  opponent: LeagueTableTeam;
+};
+
+export type LeagueTableRow = {
+  team: LeagueTableTeam;
+  rank: number;
+  played: number;
+  wins: number;
+  draws: number;
+  losses: number;
+  goalsFor: number;
+  goalsAgainst: number;
+  goalDifference: number;
+  points: number;
+  trend: number | null;
+  form: LeagueTableFormEntry[];
+  formPoints: number;
+  positions: number[];
+};
+
+export type LeagueStandingsCrossCell = {
+  round: number;
+  scheduledAt: string | null;
+  homeScore: number | null;
+  awayScore: number | null;
+};
+
+export type LeagueStandings = {
+  context: {
+    league: string;
+    leagueName: string;
+    season: string;
+    round: number;
+    roundCount: number;
+    playedMatchCount: number;
+  };
+  rows: LeagueTableRow[];
+  cross: {
+    order: string[];
+    cells: Record<string, LeagueStandingsCrossCell>;
+  };
+};
+
 export type TeamPlayerScore = {
   id: string;
   name: string;

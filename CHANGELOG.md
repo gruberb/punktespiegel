@@ -2,6 +2,20 @@
 
 Alle wesentlichen Änderungen an Punktespiegel werden in dieser Datei dokumentiert.
 
+## [1.11.0] – 2026-08-16
+
+### Hinzugefügt
+
+- Neue Seite „Tabelle" unter `/tabelle` für Bundesliga, 2. Bundesliga und 3. Liga: die echte Ligatabelle zu jedem Spieltag, berechnet aus den bereits ausgelieferten Saisondaten. Der Platzierungsverlauf zeichnet den Weg jedes Teams durch die Tabelle mit ligaspezifischen Auf- und Abstiegszonen; bis zu drei Teams lassen sich per Antippen hervorheben, Tabellenführer und stärkster Kletterer sind vorausgewählt. Die Formtabelle ergänzt Trendpfeile gegenüber dem Stand vor fünf Spieltagen, die letzten fünf Ergebnisse als beschriftete Chips samt Punktausbeute und eine Saison-Sparkline je Team. Die Kreuztabelle zeigt alle bisher gespielten Paarungen mit Ergebnis und die offenen mit Termin. Saison- und Spieltagswahl decken auch alle archivierten Saisons ab.
+- Untere Tab-Navigation auf Mobilgeräten: Auf schmalen Bildschirmen ersetzt eine App-artige Leiste mit Symbolen die horizontal scrollende Pillen-Navigation, der Kopfbereich schrumpft auf eine Zeile.
+- Spieler-Ansicht mit Zeitraum-Umschalter: „Bis Spieltag N" zeigt wie bisher kumulierte Werte, „Nur Spieltag N" zeigt Punkte, Note, Tore und Vorlagen des einzelnen Spieltags; alle Spalten bleiben sortierbar.
+- Der Überblick enthält die „Beste Elf" als eigene Karte mit Umschalter zwischen Saisonelf und Spieltagself.
+
+### Geändert
+
+- Spielertabellen zeigen auf Telefonen nur noch den Nachnamen in leicht verkleinerter Schrift; zusammen mit schmaleren Namensspalten und reduzierten Mindestbreiten sind Punkte- und Wertspalten ohne langes horizontales Scrollen sichtbar.
+- Die Seite „Historie" wurde aufgelöst: Tabellenstände und Spieltagsdaten liegen jetzt in der Tabelle beziehungsweise der Spieler-Ansicht, die Beste Elf im Überblick. Der Pfad `/historie` leitet dauerhaft auf `/tabelle` weiter; Navigation, Fußzeile, Sitemap und kanonische URLs verwenden die neue Seite.
+
 ## [1.10.0] – 2026-08-15
 
 ### Hinzugefügt

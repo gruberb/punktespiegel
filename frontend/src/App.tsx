@@ -15,8 +15,9 @@ import type {
   BestElevenPlayer,
   Catalog,
   Dashboard,
-  HistoricalPlayer,
-  History,
+  LeagueStandings,
+  LeagueTableFormEntry,
+  LeagueTableRow,
   ManagerMode,
   ManagerFixture,
   ManagerRecommendation,
@@ -44,7 +45,8 @@ type NavView = Exclude<View, "player" | "team">;
 type Filters = { league: string; season: string; round: string };
 type ViewLocation = { view: View; filters: Filters; playerId: string | null; teamId: string | null; managerLocation: ManagerLocation; scrollY: number };
 type TeamMetric = "overall" | "goalkeeper" | "defence" | "midfield" | "forward";
-type PlayerSort = "name" | "position" | "price" | "round" | "points" | "grade" | "goals" | "assists" | "value";
+type PlayerSort = "name" | "position" | "price" | "round" | "points" | "grade" | "goals" | "assists" | "value" | "roundGrade" | "roundGoals" | "roundAssists";
+type PlayerScope = "season" | "round";
 type TopPlayerSort = "previous" | "average" | "value" | "trend" | "price";
 type Theme = "light" | "dark";
 
@@ -64,14 +66,40 @@ const availabilityStatusName: Record<NonNullable<PlayerDetail["availability"]>["
   not_considered: "Nicht berücksichtigt",
   unavailable: "Nicht verfügbar",
 };
-const nav: { id: NavView; label: string }[] = [
+const nav = [
   { id: "overview", label: "Überblick" },
+  { id: "table", label: "Tabelle" },
   { id: "players", label: "Spieler" },
   { id: "teams", label: "Mannschaften" },
-  { id: "history", label: "Historie" },
   { id: "top", label: "Topspieler" },
   { id: "manager", label: "Fantasy Team" },
-];
+] satisfies { id: NavView; label: string }[];
+const navMobile: Record<(typeof nav)[number]["id"], { label: string; icon: ReactNode }> = {
+  overview: {
+    label: "Überblick",
+    icon: <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3.7 10.9 8.3-7 8.3 7" /><path d="M6 9.7V20h12V9.7" /></svg>,
+  },
+  table: {
+    label: "Tabelle",
+    icon: <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 20V9.5h6V20" /><path d="M3.5 20v-6.7H9" /><path d="M20.5 20v-5.2H15" /><path d="M2.5 20h19" /></svg>,
+  },
+  players: {
+    label: "Spieler",
+    icon: <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="7.7" r="3.5" /><path d="M5.3 20c.9-3.7 3.6-5.7 6.7-5.7s5.8 2 6.7 5.7" /></svg>,
+  },
+  teams: {
+    label: "Teams",
+    icon: <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.3 5.4 5.7v5.6c0 4.2 2.7 7.3 6.6 8.8 3.9-1.5 6.6-4.6 6.6-8.8V5.7Z" /></svg>,
+  },
+  top: {
+    label: "Topspieler",
+    icon: <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3.7 2.4 5 5.5.8-4 3.9.9 5.5-4.8-2.6-4.8 2.6.9-5.5-4-3.9 5.5-.8Z" /></svg>,
+  },
+  manager: {
+    label: "Fantasy",
+    icon: <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4.4" y="3.4" width="15.2" height="17.2" rx="2.2" /><path d="M4.4 12h15.2" /><circle cx="12" cy="12" r="2.4" /></svg>,
+  },
+};
 const infoViews: InfoView[] = ["about", "methodology", "sources", "faq"];
 const faqItems = [
   {
@@ -142,7 +170,8 @@ function initialView(): View {
   const value = pathView === "overview" && legacyView ? legacyView : pathView ?? legacyView;
   if (value === "player" && !params.get("player")) return "players";
   if (value === "team" && !params.get("team")) return "teams";
-  return (["overview", "players", "player", "teams", "team", "history", "top", "manager", ...infoViews] as View[]).includes(value as View)
+  if (value === "history") return "table";
+  return (["overview", "table", "players", "player", "teams", "team", "top", "manager", ...infoViews] as View[]).includes(value as View)
     ? (value as View)
     : "overview";
 }
@@ -208,7 +237,7 @@ function viewBackLabel(view: View) {
     player: "zum Spielerprofil",
     teams: "zu den Mannschaften",
     team: "zur Mannschaft",
-    history: "zur Historie",
+    table: "zur Tabelle",
     top: "zu den Topspielern",
     manager: "zum Fantasy Team",
     about: "zu Über Punktespiegel",
@@ -247,7 +276,9 @@ export default function App() {
   }, [theme]);
 
   useEffect(() => {
-    if (!new URLSearchParams(window.location.search).has("view")) return;
+    const hasLegacyViewParam = new URLSearchParams(window.location.search).has("view");
+    const currentPath = window.location.pathname.replace(/\/+$/, "") || "/";
+    if (!hasLegacyViewParam && currentPath === pathForView(view)) return;
     syncUrl(filters, view, playerId, teamId, managerLocation);
   }, []);
 
@@ -302,9 +333,9 @@ export default function App() {
         title: `Mannschaftsprofil: kicker Punkte ${leagueName}`,
         description: `Kader, Spielerpunkte und jedes Spiel im Detail für Mannschaften der ${leagueName} – mit historischen kicker Managerdaten.`,
       },
-      history: {
-        title: `kicker Noten & Punkte Historie ${leagueName}`,
-        description: `Historische kicker-Noten, Managerpunkte, Saisonbestleistungen, Spieltage und Mannschaftswertungen der ${leagueName}.`,
+      table: {
+        title: `Tabelle & Formkurve ${leagueName} ${seasonName}`,
+        description: `Tabelle der ${leagueName} ${seasonName} nach Spieltag: Platzierungsverlauf, Form der letzten fünf Spiele und Kreuztabelle aller Paarungen.`,
       },
       top: {
         title: `Topspieler für kicker Manager Interactive & Classic`,
@@ -529,7 +560,7 @@ export default function App() {
       ? { ...filters, season: String(latestPublishedSeason.startYear), round: String(Math.max(1, latestPublishedSeason.latestRound)) }
       : (next === "manager" || next === "top") && newestSeason
         ? { ...filters, season: String(newestSeason.startYear), round: String(Math.max(1, newestSeason.latestRound)) }
-      : next === "history" && requestedSeason
+      : next === "table" && requestedSeason
         ? { ...filters, round: String(Math.max(1, requestedSeason.latestRound)) }
         : filters;
     if (nextFilters !== filters) setFilters(nextFilters);
@@ -550,34 +581,12 @@ export default function App() {
     scrollToTop();
   }
 
-  function openPlayerAt(id: string, season: string, round: number) {
-    rememberCurrentLocation();
-    const next = { ...filters, season, round: String(round) };
-    setFilters(next);
-    setPlayerId(id);
-    setTeamId(null);
-    setViewState("player");
-    syncUrl(next, "player", id, null);
-    scrollToTop();
-  }
-
   function openTeam(id: string) {
     rememberCurrentLocation();
     setPlayerId(null);
     setTeamId(id);
     setViewState("team");
     syncUrl(filters, "team", null, id);
-    scrollToTop();
-  }
-
-  function openTeamAt(id: string, season: string, round: number) {
-    rememberCurrentLocation();
-    const next = { ...filters, season, round: String(round) };
-    setFilters(next);
-    setPlayerId(null);
-    setTeamId(id);
-    setViewState("team");
-    syncUrl(next, "team", null, id);
     scrollToTop();
   }
 
@@ -610,8 +619,8 @@ export default function App() {
       ? `${selectedSeason?.displayName ?? "Gewählte Saison"} · gesamte Saison`
       : view === "team"
         ? "Kader und Saisonverlauf"
-      : view === "history"
-        ? "Gesamtsaison und einzelne Spieltage"
+      : view === "table"
+        ? "Tabellenstand, Verlauf und Form"
         : view === "manager"
           ? `${newestSeason?.displayName ?? "Aktuelle Saison"} · Classic und Interactive`
         : view === "top"
@@ -647,7 +656,7 @@ export default function App() {
       </header>
 
       <main>
-        {!isInfoView(view) && view !== "history" && view !== "top" && <PageHeader title={title ?? ""} description={description} controls={<div className="selectors">
+        {!isInfoView(view) && view !== "table" && view !== "top" && <PageHeader title={title ?? ""} description={description} controls={<div className="selectors">
             {view !== "team" && view !== "player" && <StepperSelect label="Liga" value={filters.league} options={(catalog?.leagues ?? []).map((league) => ({ value: league.code, label: league.name }))} onChange={(value) => updateFilter("league", value)} />}
             {view === "team"
               ? <StepperSelect label="Saison" value={String(selectedTeamSeason?.startYear ?? filters.season)} options={[...teamSeasons].reverse().map((season) => ({ value: String(season.startYear), label: season.displayName }))} onChange={updateTeamSeason} />
@@ -667,13 +676,13 @@ export default function App() {
               latestRound < 1 ? <section className="detail-section"><Empty message="Für diese Saison liegen noch keine Daten eines abgeschlossenen Spieltags vor." /></section>
                 : dashboardError ? <ErrorState message={dashboardError} />
                 : dashboardLoading || !dashboard ? <LoadingState />
-                  : <Overview data={dashboard} onView={setView} onPlayer={openPlayer} onTeam={openTeam} />
+                  : <Overview data={dashboard} eleven={{ league: filters.league, season: String(selectedSeason?.startYear ?? filters.season), round: latestRound }} onView={setView} onPlayer={openPlayer} onTeam={openTeam} />
             )}
             {view === "players" && <PlayersView filters={filters} onPlayer={openPlayer} />}
             {view === "player" && playerId && (playerSelectionPending ? <LoadingState /> : <PlayerDetailView filters={filters} playerId={playerId} backLabel={backLabel} onBack={() => goBack("players")} onTeam={openTeam} onSeason={(year) => updatePlayerSeason(String(year))} />)}
             {view === "teams" && <TeamsView filters={filters} onTeam={openTeam} />}
             {view === "team" && teamId && (teamSelectionPending ? <LoadingState /> : <TeamDetailView filters={filters} teamId={teamId} backLabel={backLabel} onBack={() => goBack("teams")} onPlayer={openPlayer} onTeam={openTeam} />)}
-            {view === "history" && <HistoryView filters={filters} leagues={catalog.leagues} seasons={seasons} onFilter={updateFilter} onPlayer={openPlayerAt} onTeam={openTeamAt} />}
+            {view === "table" && <TabelleView filters={filters} leagues={catalog.leagues} seasons={seasons} onFilter={updateFilter} onTeam={openTeam} />}
             {view === "top" && <TopPlayersView filters={filters} leagues={catalog.leagues} onFilter={updateFilter} onPlayer={openPlayer} />}
             {view === "manager" && <ManagerPicksView
               filters={filters}
@@ -687,6 +696,7 @@ export default function App() {
         )}
         <SiteFooter currentView={view} filters={filters} onView={setView} />
       </main>
+      <MobileNav active={navActive} filters={filters} onView={setView} />
     </div>
   );
 }
@@ -707,7 +717,18 @@ function StepperSelect({ label, value, options, onChange }: { label: string; val
   </div>;
 }
 
-function Overview({ data, onView, onPlayer, onTeam }: { data: Dashboard; onView: (view: NavView) => void; onPlayer: (id: string) => void; onTeam: (id: string) => void }) {
+function MobileNav({ active, filters, onView }: { active: NavView | null; filters: Filters; onView: (view: NavView) => void }) {
+  return <nav className="mobile-nav" aria-label="Bereiche">
+    {nav.map((item) => (
+      <a key={item.id} href={viewHref(item.id, filters)} className={active === item.id ? "active" : ""} aria-current={active === item.id ? "page" : undefined} onClick={(event) => { event.preventDefault(); onView(item.id); }}>
+        <span className="mobile-nav-icon" aria-hidden="true">{navMobile[item.id].icon}</span>
+        <span>{navMobile[item.id].label}</span>
+      </a>
+    ))}
+  </nav>;
+}
+
+function Overview({ data, eleven, onView, onPlayer, onTeam }: { data: Dashboard; eleven: { league: string; season: string; round: number }; onView: (view: NavView) => void; onPlayer: (id: string) => void; onTeam: (id: string) => void }) {
   const [position, setPosition] = useState<Position>("FWD");
   const [metric, setMetric] = useState<Exclude<RankingMetric, "points">>("grade");
   const metrics: { id: Exclude<RankingMetric, "points">; label: string; players: Player[] }[] = [
@@ -747,7 +768,41 @@ function Overview({ data, onView, onPlayer, onTeam }: { data: Dashboard; onView:
           <OverviewPlayerTable players={activeMetric.players} metric={activeMetric.id} onPlayer={onPlayer} />
         </div>
       </article>
+      <OverviewBestEleven league={eleven.league} season={eleven.season} round={eleven.round} onPlayer={onPlayer} />
     </section>
+  );
+}
+
+function OverviewBestEleven({ league, season, round, onPlayer }: { league: string; season: string; round: number; onPlayer: (id: string) => void }) {
+  const [scope, setScope] = useState<"season" | "matchday">("season");
+  const [eleven, setEleven] = useState<BestEleven | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    setError(null);
+    api.bestEleven(new URLSearchParams({ league, season, round: String(round), scope }), controller.signal)
+      .then(setEleven)
+      .catch((reason: Error) => { if (!isAbort(reason)) { setEleven(null); setError(reason.message); } });
+    return () => controller.abort();
+  }, [league, season, round, scope]);
+
+  const grouped = eleven ? groupBestEleven(eleven.players) : null;
+  return (
+    <article className="dashboard-card overview-eleven-card">
+      <SimpleCardHead title="Beste Elf" action={<div className="metric-tabs overview-tabs" aria-label="Zeitraum">
+        <button className={scope === "season" ? "active" : ""} onClick={() => setScope("season")}>Saison</button>
+        <button className={scope === "matchday" ? "active" : ""} onClick={() => setScope("matchday")}>Spieltag {round}</button>
+      </div>} />
+      {error ? <Empty message={error} /> : !eleven || !grouped ? <LoadingState /> : <>
+        <p className="overview-eleven-summary"><strong>{eleven.points}</strong> Punkte · Formation {eleven.formation} · {scope === "season" ? "beste Elf der Saison" : `beste Elf von Spieltag ${round}`}</p>
+        <div className="best-pitch compact-pitch">
+          {(["FWD", "MID", "DEF", "GK"] as Position[]).map((position) => <div className="best-row" key={position}>
+            {grouped[position].map((player) => <BestPlayerCard key={player.id} player={player} onClick={() => onPlayer(player.id)} />)}
+          </div>)}
+        </div>
+      </>}
+    </article>
   );
 }
 
@@ -787,11 +842,11 @@ function InfoPage({ view, filters, onView }: { view: InfoView; filters: Filters;
 
     {view === "about" && <>
       <div className="info-grid">
-        <section className="info-card info-card-wide"><h2>Ein Überblick, der Details nicht versteckt</h2><p>Ranglisten führen direkt zu Spieler- und Mannschaftsprofilen. Saison- und Spieltagsfilter machen Entwicklungen sichtbar; die Historie bündelt Noten, Punkte, Leistungsdaten und die beste Elf. Die Fantasy-Ansicht ergänzt datenbasierte Beispielkader für kicker Manager Interactive und Classic.</p></section>
+        <section className="info-card info-card-wide"><h2>Ein Überblick, der Details nicht versteckt</h2><p>Ranglisten führen direkt zu Spieler- und Mannschaftsprofilen. Saison- und Spieltagsfilter machen Entwicklungen sichtbar; die Tabelle zeigt Platzierungsverlauf, Formkurve und Kreuztabelle jeder Liga, auch für vergangene Saisons. Die Fantasy-Ansicht ergänzt datenbasierte Beispielkader für kicker Manager Interactive und Classic.</p></section>
         <section className="info-card"><h2>Drei Ligen, mehrere Saisons</h2><p>Bundesliga, 2. Bundesliga und 3. Liga verwenden dieselben Tabellen und Metriken. So lassen sich Positionen, Vereine und Spieltage konsistent vergleichen.</p></section>
         <section className="info-card"><h2>Unabhängig und transparent</h2><p>Punktespiegel ist ein unabhängiges Analyseprojekt und nicht mit kicker verbunden. Quellen, Modellgrenzen und Aktualisierungswege werden offen beschrieben.</p></section>
       </div>
-      <nav className="info-actions" aria-label="Punktespiegel entdecken">{link("players", "Spielerdaten durchsuchen →")}{link("history", "Historie öffnen →")}{link("manager", "Fantasy-Teams ansehen →")}</nav>
+      <nav className="info-actions" aria-label="Punktespiegel entdecken">{link("players", "Spielerdaten durchsuchen →")}{link("table", "Tabelle öffnen →")}{link("manager", "Fantasy-Teams ansehen →")}</nav>
     </>}
 
     {view === "methodology" && <>
@@ -837,8 +892,8 @@ function SiteFooter({ currentView, filters, onView }: { currentView: View; filte
     { view: "methodology", label: "Daten & Methodik" },
     { view: "sources", label: "Quellen" },
     { view: "faq", label: "FAQ" },
+    { view: "table", label: "Tabelle" },
     { view: "players", label: "Spieler" },
-    { view: "history", label: "Historie" },
     { view: "manager", label: "Fantasy Team" },
   ];
   const openView = (event: ReactMouseEvent<HTMLAnchorElement>, target: NavView) => {
@@ -973,7 +1028,7 @@ function OverviewPlayerTable({ players, metric, onPlayer }: { players: Player[];
       render: (player, index) => <div className="table-player">
         <span className="rank">{index + 1}</span>
         <PlayerPortrait name={player.name} url={player.photoUrl} teamCode={player.teamCode} teamLogoUrl={player.logoUrl} />
-        <span><strong>{player.name}</strong></span>
+        <span><PlayerName name={player.name} /></span>
       </div>,
     },
     { id: "team", label: "Team", width: "28%", render: (player) => <span className="overview-table-text" title={player.team}>{player.team}</span> },
@@ -1000,243 +1055,300 @@ function OverviewPlayerTable({ players, metric, onPlayer }: { players: Player[];
   />;
 }
 
-function HistoryView({ filters, leagues, seasons, onFilter, onPlayer, onTeam }: { filters: Filters; leagues: Catalog["leagues"]; seasons: Catalog["seasons"]; onFilter: (key: keyof Filters, value: string) => void; onPlayer: (id: string, season: string, round: number) => void; onTeam: (id: string, season: string, round: number) => void }) {
+type LeagueZone = { from: number; to: number; tone: "up" | "up-soft" | "down-soft" | "down"; label: string };
+
+const leagueZones: Record<string, LeagueZone[]> = {
+  "0001": [
+    { from: 1, to: 4, tone: "up", label: "Champions League (1–4)" },
+    { from: 5, to: 6, tone: "up-soft", label: "Europapokal (5–6)" },
+    { from: 16, to: 16, tone: "down-soft", label: "Relegation (16)" },
+    { from: 17, to: 18, tone: "down", label: "Abstieg (17–18)" },
+  ],
+  "0002": [
+    { from: 1, to: 2, tone: "up", label: "Aufstieg (1–2)" },
+    { from: 3, to: 3, tone: "up-soft", label: "Aufstiegsrelegation (3)" },
+    { from: 16, to: 16, tone: "down-soft", label: "Abstiegsrelegation (16)" },
+    { from: 17, to: 18, tone: "down", label: "Abstieg (17–18)" },
+  ],
+  "0003": [
+    { from: 1, to: 2, tone: "up", label: "Aufstieg (1–2)" },
+    { from: 3, to: 3, tone: "up-soft", label: "Aufstiegsrelegation (3)" },
+    { from: 17, to: 20, tone: "down", label: "Abstieg (17–20)" },
+  ],
+};
+
+function zoneForRank(league: string, rank: number) {
+  return (leagueZones[league] ?? []).find((zone) => rank >= zone.from && rank <= zone.to) ?? null;
+}
+
+function TabelleView({ filters, leagues, seasons, onFilter, onTeam }: { filters: Filters; leagues: Catalog["leagues"]; seasons: Catalog["seasons"]; onFilter: (key: keyof Filters, value: string) => void; onTeam: (id: string) => void }) {
   const selectedSeason = seasons.find((season) => String(season.startYear) === filters.season);
-  const [scope, setScope] = useState<"season" | "matchday">("season");
-  const [history, setHistory] = useState<History | null>(null);
-  const [seasonDashboard, setSeasonDashboard] = useState<Dashboard | null>(null);
-  const [seasonEleven, setSeasonEleven] = useState<BestEleven | null>(null);
-  const [archive, setArchive] = useState<Dashboard | null>(null);
-  const [archiveEleven, setArchiveEleven] = useState<BestEleven | null>(null);
-  const [historyError, setHistoryError] = useState<string | null>(null);
-  const [seasonError, setSeasonError] = useState<string | null>(null);
-  const [archiveError, setArchiveError] = useState<string | null>(null);
+  const maximumRound = Math.max(1, selectedSeason?.latestRound ?? 0);
+  const round = Math.min(maximumRound, Math.max(1, Number(filters.round) || 1));
+  const [standings, setStandings] = useState<LeagueStandings | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  const archiveMaximum = Math.max(1, selectedSeason?.latestRound ?? 0);
-  const archiveRound = Math.min(archiveMaximum, Math.max(1, Number(filters.round) || 1));
-  const seasonDetailRound = Math.max(1, selectedSeason?.latestRound ?? 0);
 
   useEffect(() => {
     const controller = new AbortController();
     setLoading(true);
-    setHistoryError(null);
-    api.history(new URLSearchParams({ league: filters.league, season: filters.season }), controller.signal)
-      .then(setHistory)
-      .catch((reason: Error) => { if (!isAbort(reason)) setHistoryError(reason.message); })
+    setError(null);
+    api.standings(new URLSearchParams({ league: filters.league, season: filters.season, round: String(round) }), controller.signal)
+      .then(setStandings)
+      .catch((reason: Error) => { if (!isAbort(reason)) { setStandings(null); setError(reason.message); } })
       .finally(() => setLoading(false));
     return () => controller.abort();
-  }, [filters.league, filters.season]);
+  }, [filters.league, filters.season, round]);
 
-  useEffect(() => {
-    if (!filters.season || seasonDetailRound < 1) return;
-    const controller = new AbortController();
-    const params = new URLSearchParams({ league: filters.league, season: filters.season, round: String(seasonDetailRound) });
-    const bestParams = new URLSearchParams(params);
-    bestParams.set("scope", "season");
-    setSeasonError(null);
-    Promise.all([api.dashboard(params, controller.signal), api.bestEleven(bestParams, controller.signal)])
-      .then(([dashboard, eleven]) => { setSeasonDashboard(dashboard); setSeasonEleven(eleven); })
-      .catch((reason: Error) => { if (!isAbort(reason)) { setSeasonDashboard(null); setSeasonEleven(null); setSeasonError(reason.message); } });
-    return () => controller.abort();
-  }, [filters.league, filters.season, seasonDetailRound]);
-
-  useEffect(() => {
-    if (!filters.season) return;
-    const controller = new AbortController();
-    const params = new URLSearchParams({ league: filters.league, season: filters.season, round: String(archiveRound) });
-    const bestParams = new URLSearchParams(params);
-    bestParams.set("scope", "matchday");
-    setArchiveError(null);
-    Promise.all([api.dashboard(params, controller.signal), api.bestEleven(bestParams, controller.signal)])
-      .then(([dashboard, eleven]) => { setArchive(dashboard); setArchiveEleven(eleven); })
-      .catch((reason: Error) => { if (!isAbort(reason)) { setArchive(null); setArchiveEleven(null); setArchiveError(reason.message); } });
-    return () => controller.abort();
-  }, [archiveRound, filters.league, filters.season]);
-
-  if (historyError) return <ErrorState message={historyError} />;
-  if (loading || !history) return <LoadingState />;
-  const activeDashboard = scope === "season" ? seasonDashboard : archive;
-  const activeEleven = scope === "season" ? seasonEleven : archiveEleven;
-  const activeError = scope === "season" ? seasonError : archiveError;
-  const activeRound = scope === "season" ? seasonDetailRound : archiveRound;
   return (
-    <div className="history-view">
-      <PageHeader title="Historie" description="Gesamtsaison und einzelne Spieltage" className="history-page-header" controls={<div className="history-toolbar" aria-label="Historienauswahl">
-        <div className="scope-switch acorn-segmented-control" aria-label="Zeitraum">
-          <button className={`acorn-segment ${scope === "season" ? "active is-selected" : ""}`} onClick={() => setScope("season")}>Gesamtsaison</button>
-          <button className={`acorn-segment ${scope === "matchday" ? "active is-selected" : ""}`} onClick={() => setScope("matchday")}>Spieltag</button>
-        </div>
+    <div className="tabelle-view">
+      <PageHeader title="Tabelle" description={`${selectedSeason?.displayName ?? "Gewählte Saison"} · Stand nach Spieltag ${round}`} controls={<div className="selectors">
         <StepperSelect label="Liga" value={filters.league} options={leagues.map((league) => ({ value: league.code, label: league.name }))} onChange={(value) => onFilter("league", value)} />
         <StepperSelect label="Saison" value={filters.season} options={[...seasons].reverse().map((season) => ({ value: String(season.startYear), label: season.displayName }))} onChange={(value) => onFilter("season", value)} />
-        {scope === "matchday" && <StepperSelect label="Spieltag" value={String(archiveRound)} options={Array.from({ length: archiveMaximum }, (_, index) => ({ value: String(index + 1), label: `Spieltag ${index + 1}` }))} onChange={(value) => onFilter("round", value)} />}
+        <StepperSelect label="Spieltag" value={String(round)} options={Array.from({ length: maximumRound }, (_, index) => ({ value: String(index + 1), label: `Spieltag ${index + 1}` }))} onChange={(value) => onFilter("round", value)} />
       </div>} />
-      {activeError ? <ErrorState message={activeError} /> : activeDashboard && activeEleven ? <>
-        <div className="history-hero-grid">
-          <section className="detail-section history-section history-top-list">
-            <SimpleCardHead title={scope === "season" ? "Beste Saisonleistungen · Top 30" : `Spieltagsrangliste · Spieltag ${archiveRound}`} />
-            {scope === "season"
-              ? <HistoricalRanking players={history.leaderboards.overall} metric="points" onPlayer={(id) => onPlayer(id, filters.season, seasonDetailRound)} />
-              : <PlayerRanking players={activeDashboard.matchdayLeaderboards.overall} metric="points" scope="matchday" scrollable onPlayer={(id) => onPlayer(id, filters.season, archiveRound)} />}
-          </section>
-          <HistoryBestEleven eleven={activeEleven} context={scope === "season" ? selectedSeason?.displayName ?? "Gesamtsaison" : `Spieltag ${archiveRound}`} onPlayer={(id) => onPlayer(id, filters.season, activeRound)} />
-        </div>
-
-        <HistoryTables
-          history={history}
-          dashboard={activeDashboard}
-          scope={scope}
-          onPlayer={(id) => onPlayer(id, filters.season, activeRound)}
-          onTeam={(id) => onTeam(id, filters.season, activeRound)}
-        />
-      </> : <LoadingState />}
+      {error ? <ErrorState message={error} />
+        : loading || !standings ? <LoadingState />
+          : standings.context.playedMatchCount < 1 ? <section className="detail-section"><Empty message="Für diese Auswahl liegen noch keine gespielten Partien vor." /></section>
+            : <>
+              <BumpChartCard standings={standings} zones={leagueZones[filters.league] ?? []} />
+              <FormTableCard standings={standings} league={filters.league} onTeam={onTeam} />
+              <CrossTableCard standings={standings} onTeam={onTeam} />
+            </>}
     </div>
   );
 }
 
-function HistoryBestEleven({ eleven, context, onPlayer }: { eleven: BestEleven; context: string; onPlayer: (id: string) => void }) {
-  const grouped = groupBestEleven(eleven.players);
-  return <section className="detail-section history-eleven"><div className="simple-card-head"><h2>Beste Elf · {context}</h2><div className="best-inline-summary"><strong>{eleven.points}</strong><span>Punkte · {eleven.formation}</span></div></div><div className="best-pitch compact-pitch">{(["FWD", "MID", "DEF", "GK"] as Position[]).map((position) => <div className="best-row" key={position}>{grouped[position].map((player) => <BestPlayerCard key={player.id} player={player} onClick={() => onPlayer(player.id)} />)}</div>)}</div></section>;
+function defaultBumpSelection(standings: LeagueStandings) {
+  const leader = standings.rows[0];
+  if (!leader) return [];
+  const climber = standings.rows.reduce((best, row) => ((row.trend ?? -Infinity) > (best.trend ?? -Infinity) ? row : best), leader);
+  return climber.team.id !== leader.team.id && (climber.trend ?? 0) > 0
+    ? [leader.team.id, climber.team.id]
+    : [leader.team.id];
 }
 
-function HistoricalRanking({ players, metric, onPlayer }: { players: HistoricalPlayer[]; metric: "points" | "grade" | "goals" | "assists"; onPlayer: (id: string) => void }) {
-  const value = (player: HistoricalPlayer) => metric === "grade" ? player.averageGrade?.toFixed(2) ?? "—" : metric === "goals" ? player.goals : metric === "assists" ? player.assists : player.points;
-  const suffix = metric === "grade" ? "Note" : metric === "points" ? "Pkt." : metric === "goals" ? "Tore" : "Vorlagen";
-  return <ol className="historical-ranking">{players.map((player, index) => <li key={player.id}><button onClick={() => onPlayer(player.id)}><span className="history-rank">{String(index + 1).padStart(2, "0")}</span><PlayerPortrait name={player.name} url={player.photoUrl} teamCode={player.teamCode} teamLogoUrl={player.logoUrl} /><span className="player-identity"><strong>{player.name}</strong><small>{player.team} · {positionName[player.position]}</small></span><span className="ranking-value"><strong>{value(player)}</strong><small>{suffix}</small></span></button></li>)}</ol>;
-}
+function BumpChartCard({ standings, zones }: { standings: LeagueStandings; zones: LeagueZone[] }) {
+  const rounds = standings.context.round;
+  const teamCount = standings.rows.length;
+  const [pinned, setPinned] = useState<string[]>(() => defaultBumpSelection(standings));
+  const [hovered, setHovered] = useState<string | null>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const seasonKey = `${standings.context.league}:${standings.context.season}`;
 
-type HistoryTableRow = HistoricalPlayer;
-type HistoryMetricSort = "grade" | "goals" | "assists";
+  useEffect(() => {
+    setPinned(defaultBumpSelection(standings));
+  }, [seasonKey]);
 
-function HistoryTables({ history, dashboard, scope, onPlayer, onTeam }: { history: History; dashboard: Dashboard; scope: "season" | "matchday"; onPlayer: (id: string) => void; onTeam: (id: string) => void }) {
-  const [playerQuery, setPlayerQuery] = useState("");
-  const [playerPosition, setPlayerPosition] = useState("");
-  const [metricQuery, setMetricQuery] = useState("");
-  const [metricPosition, setMetricPosition] = useState("");
-  const [metricSort, setMetricSort] = useState<HistoryMetricSort>("grade");
-  const [teamQuery, setTeamQuery] = useState("");
-  const [teamSort, setTeamSort] = useState<TeamMetric>("overall");
-  const [teamDirection, setTeamDirection] = useState<"asc" | "desc">("desc");
+  useEffect(() => {
+    const node = scrollRef.current;
+    if (node) node.scrollLeft = node.scrollWidth;
+  }, [seasonKey]);
 
-  const players = useMemo(() => {
-    const merged = new Map<string, HistoryTableRow>();
-    if (scope === "season") {
-      const lists = [
-        history.leaderboards.overall,
-        ...Object.values(history.leaderboards.positions),
-        history.leaderboards.grades,
-        history.leaderboards.goals,
-        history.leaderboards.assists,
-      ];
-      lists.flat().forEach((player) => merged.set(player.id, player));
-    } else {
-      const lists = [
-        dashboard.matchdayLeaderboards.overall,
-        ...Object.values(dashboard.matchdayLeaderboards.positions),
-        dashboard.matchdayLeaderboards.grades,
-        dashboard.matchdayLeaderboards.goals,
-        dashboard.matchdayLeaderboards.assists,
-      ];
-      lists.flat().forEach((player) => merged.set(player.id, {
-        id: player.id,
-        name: player.name,
-        team: player.team,
-        teamCode: player.teamCode,
-        logoUrl: player.logoUrl,
-        photoUrl: player.photoUrl,
-        position: player.position,
-        points: player.roundPoints,
-        averageGrade: player.roundGrade,
-        gradedMatches: player.roundGrade == null ? 0 : 1,
-        goals: player.roundGoals,
-        assists: player.roundAssists,
-      }));
-    }
-    return [...merged.values()];
-  }, [dashboard, history, scope]);
-
-  const normalizedPlayerQuery = playerQuery.trim().toLocaleLowerCase("de");
-  const pointRows = players
-    .filter((player) => (!playerPosition || player.position === playerPosition) && (!normalizedPlayerQuery || `${player.name} ${player.team}`.toLocaleLowerCase("de").includes(normalizedPlayerQuery)))
-    .sort((left, right) => right.points - left.points || left.name.localeCompare(right.name, "de"));
-  const normalizedMetricQuery = metricQuery.trim().toLocaleLowerCase("de");
-  const metricRows = players
-    .filter((player) => (!metricPosition || player.position === metricPosition) && (!normalizedMetricQuery || `${player.name} ${player.team}`.toLocaleLowerCase("de").includes(normalizedMetricQuery)))
-    .sort((left, right) => {
-      if (metricSort === "grade") {
-        if (left.averageGrade == null) return 1;
-        if (right.averageGrade == null) return -1;
-        return left.averageGrade - right.averageGrade || right.points - left.points;
-      }
-      return right[metricSort] - left[metricSort] || right.points - left.points;
-    });
-
-  const teams = (scope === "season" ? dashboard.seasonTeams : dashboard.matchdayTeams)
-    .filter((team) => team.name.toLocaleLowerCase("de").includes(teamQuery.trim().toLocaleLowerCase("de")))
-    .sort((left, right) => {
-      const difference = left[teamSort] - right[teamSort];
-      return difference ? (teamDirection === "asc" ? difference : -difference) : left.name.localeCompare(right.name, "de");
-    });
-  const positionOptions = [{ value: "", label: "Alle Positionen" }, ...(["GK", "DEF", "MID", "FWD"] as Position[]).map((position) => ({ value: position, label: positionName[position] }))];
-
-  function sortTeams(metric: TeamMetric) {
-    if (metric === teamSort) setTeamDirection((direction) => direction === "desc" ? "asc" : "desc");
-    else { setTeamSort(metric); setTeamDirection("desc"); }
+  function toggleTeam(teamId: string) {
+    setPinned((current) => current.includes(teamId)
+      ? current.filter((id) => id !== teamId)
+      : [...current.slice(current.length >= 3 ? current.length - 2 : 0), teamId]);
   }
 
-  const identityColumn: DataTableColumn<HistoryTableRow> = {
-    id: "player",
-    label: "Spieler",
-    width: "55%",
-    render: (player, index) => <div className="table-player"><span className="rank">{index + 1}</span><PlayerPortrait name={player.name} url={player.photoUrl} teamCode={player.teamCode} teamLogoUrl={player.logoUrl} /><span><strong>{player.name}</strong><small>{player.team}</small></span></div>,
+  const columnWidth = Math.max(24, Math.min(72, Math.floor(1010 / Math.max(1, rounds - 1))));
+  const rowHeight = 27;
+  const leftPad = 30;
+  const labelGutter = 170;
+  const topPad = 14;
+  const bottomPad = 30;
+  const width = leftPad + Math.max(1, rounds - 1) * columnWidth + labelGutter;
+  const height = topPad + (teamCount - 1) * rowHeight + bottomPad;
+  const x = (matchday: number) => leftPad + (matchday - 1) * columnWidth;
+  const y = (rank: number) => topPad + (rank - 1) * rowHeight;
+  const tickStep = columnWidth >= 34 ? 1 : columnWidth >= 28 ? 2 : 5;
+
+  const emphasisClass = (teamId: string) => {
+    const pinIndex = pinned.indexOf(teamId);
+    return `${pinIndex >= 0 ? ` is-pinned pin-${pinIndex}` : ""}${hovered === teamId ? " is-hovered" : ""}`;
   };
-  const playerColumns: DataTableColumn<HistoryTableRow>[] = [
-    identityColumn,
-    { id: "position", label: "Position", render: (player) => <PositionTag position={player.position} /> },
-    { id: "points", label: "Punkte", numeric: true, className: "primary-num", render: (player) => player.points },
-  ];
-  const metricColumns: DataTableColumn<HistoryTableRow>[] = [
-    { ...identityColumn, width: "40%" },
-    { id: "position", label: "Position", render: (player) => <PositionTag position={player.position} /> },
-    { id: "grade", label: "Ø-Note", numeric: true, render: (player) => player.averageGrade?.toFixed(2) ?? "—" },
-    { id: "goals", label: "Tore", numeric: true, render: (player) => player.goals },
-    { id: "assists", label: "Vorlagen", numeric: true, render: (player) => player.assists },
-    { id: "graded", label: "Benotet", numeric: true, render: (player) => player.gradedMatches },
-  ];
-  const teamColumns: DataTableColumn<TeamScore>[] = [
-    { id: "team", label: "Verein", width: "36%", render: (team, index) => <div className="table-team"><span className="rank">{index + 1}</span><TeamLogo code={team.code} url={team.logoUrl} large /><span><strong>{team.name}</strong><small>{team.sampleSize} Spieler mit Wertung</small></span></div> },
-    ...teamMetrics.map((metric): DataTableColumn<TeamScore> => ({
-      id: metric.key,
-      label: metric.label,
-      numeric: true,
-      className: "team-points-cell",
-      sort: { active: teamSort === metric.key, direction: teamDirection, onSort: () => sortTeams(metric.key) },
-      render: (team) => <TeamMetricCell value={team[metric.key]} label={metric.label} players={team.topPlayers[metric.leaders]} contextLabel={scope === "season" ? "Saisonpunkte" : "Spieltagspunkte"} />,
-    })),
+  const paintOrder = [...standings.rows].sort((left, right) => {
+    const weight = (row: LeagueTableRow) => (pinned.includes(row.team.id) ? 2 : 0) + (hovered === row.team.id ? 3 : 0);
+    return weight(left) - weight(right);
+  });
+  const emphasized = standings.rows.filter((row) => pinned.includes(row.team.id) || hovered === row.team.id);
+
+  return (
+    <section className="detail-section bump-card">
+      <CardHead eyebrow="Saisonverlauf" title="Platzierung je Spieltag" subtitle="Der Weg jedes Teams durch die Tabelle · antippen hebt bis zu drei Teams hervor" action={zones.length ? <div className="bump-legend" aria-hidden="true">{zones.map((zone) => <span key={zone.label}><i className={`bump-legend-swatch bump-zone-${zone.tone}`} />{zone.label}</span>)}</div> : undefined} />
+      <div className="bump-scroll" ref={scrollRef}>
+        <svg className="bump-chart" width={width} height={height} role="img" aria-label={`Platzierungsverlauf über ${rounds} Spieltage`}>
+          {zones.filter((zone) => zone.from <= teamCount).map((zone) => (
+            <rect key={zone.label} className={`bump-zone bump-zone-${zone.tone}`} x="0" y={y(zone.from) - rowHeight / 2 + 2} width={width - labelGutter + 62} height={(Math.min(zone.to, teamCount) - zone.from + 1) * rowHeight - 4} rx="6" />
+          ))}
+          {Array.from({ length: rounds }, (_, index) => index + 1).map((matchday) => (
+            <g key={matchday}>
+              <line className="bump-grid" x1={x(matchday)} y1={topPad - 6} x2={x(matchday)} y2={height - bottomPad + 8} />
+              {(matchday % tickStep === 0 || matchday === 1 || matchday === rounds) && <text className="bump-tick" x={x(matchday)} y={height - 8} textAnchor="middle">{matchday}</text>}
+            </g>
+          ))}
+          {paintOrder.map((row) => rounds === 1
+            ? <circle key={row.team.id} className={`bump-line${emphasisClass(row.team.id)}`} cx={x(1)} cy={y(row.positions[0] ?? row.rank)} r="3.4" onMouseEnter={() => setHovered(row.team.id)} onMouseLeave={() => setHovered(null)} onClick={() => toggleTeam(row.team.id)} />
+            : <polyline
+                key={row.team.id}
+                className={`bump-line${emphasisClass(row.team.id)}`}
+                points={row.positions.map((rank, index) => `${x(index + 1)},${y(rank)}`).join(" ")}
+                onMouseEnter={() => setHovered(row.team.id)}
+                onMouseLeave={() => setHovered(null)}
+                onClick={() => toggleTeam(row.team.id)}
+              ><title>{row.team.name}</title></polyline>)}
+          {emphasized.map((row) => row.positions.map((rank, index) => (
+            <circle key={`${row.team.id}-${index}`} className={`bump-dot${emphasisClass(row.team.id)}`} cx={x(index + 1)} cy={y(rank)} r="3">
+              <title>{`${row.team.name} · Spieltag ${index + 1}: Platz ${rank}`}</title>
+            </circle>
+          )))}
+          {standings.rows.map((row) => (
+            <g key={row.team.id} className={`bump-label${emphasisClass(row.team.id)}`} transform={`translate(${x(rounds) + 12}, ${y(row.rank)})`} onMouseEnter={() => setHovered(row.team.id)} onMouseLeave={() => setHovered(null)} onClick={() => toggleTeam(row.team.id)}>
+              <rect className="bump-label-hit" x="-4" y={-rowHeight / 2} width={labelGutter - 10} height={rowHeight} fill="transparent" stroke="none" />
+              <text className="bump-rank" x="0" y="3.5">{String(row.rank).padStart(2, "0")}</text>
+              {row.team.logoUrl && <image href={row.team.logoUrl} x="22" y="-9" width="18" height="18" />}
+              <text className="bump-code" x="46" y="3.5">{row.team.code}</text>
+              <title>{row.team.name}</title>
+            </g>
+          ))}
+          <text className="bump-tick bump-axis" x="4" y={height - 8} textAnchor="start">ST</text>
+        </svg>
+      </div>
+    </section>
+  );
+}
+
+type FormTableSort = "rank" | "form" | "difference";
+
+function FormTableCard({ standings, league, onTeam }: { standings: LeagueStandings; league: string; onTeam: (id: string) => void }) {
+  const [sort, setSort] = useState<FormTableSort>("rank");
+  const [direction, setDirection] = useState<"asc" | "desc">("asc");
+
+  const rows = useMemo(() => {
+    const sorted = [...standings.rows];
+    if (sort === "form") sorted.sort((left, right) => right.formPoints - left.formPoints || left.rank - right.rank);
+    if (sort === "difference") sorted.sort((left, right) => right.goalDifference - left.goalDifference || left.rank - right.rank);
+    if ((sort === "rank") === (direction === "desc")) sorted.reverse();
+    return sorted;
+  }, [standings.rows, sort, direction]);
+
+  function sortBy(column: FormTableSort) {
+    if (column === sort) setDirection((value) => value === "asc" ? "desc" : "asc");
+    else {
+      setSort(column);
+      setDirection(column === "rank" ? "asc" : "desc");
+    }
+  }
+
+  const sortProps = (column: FormTableSort) => ({ active: sort === column, direction, onSort: () => sortBy(column) });
+  const columns: DataTableColumn<LeagueTableRow>[] = [
+    { id: "rank", label: "Platz", shortLabel: "#", sort: sortProps("rank"), render: (row) => { const zone = zoneForRank(league, row.rank); return <span className={`tabelle-rank${zone ? ` tabelle-rank-${zone.tone}` : ""}`} title={zone?.label}>{row.rank}</span>; } },
+    { id: "trend", label: "Trend", shortLabel: "±", render: (row) => <TrendBadge trend={row.trend} /> },
+    { id: "team", label: "Verein", width: "24%", render: (row) => <div className="table-team tabelle-team"><TeamLogo code={row.team.code} url={row.team.logoUrl} /><span><strong><span className="player-name-full">{row.team.name}</span><span className="player-name-short">{row.team.code}</span></strong></span></div> },
+    { id: "played", label: "Spiele", shortLabel: "Sp", numeric: true, render: (row) => row.played },
+    { id: "wins", label: "S", numeric: true, render: (row) => row.wins },
+    { id: "draws", label: "U", numeric: true, render: (row) => row.draws },
+    { id: "losses", label: "N", numeric: true, render: (row) => row.losses },
+    { id: "goals", label: "Tore", numeric: true, render: (row) => `${row.goalsFor}:${row.goalsAgainst}` },
+    { id: "difference", label: "Tordifferenz", shortLabel: "TD", numeric: true, sort: sortProps("difference"), render: (row) => row.goalDifference > 0 ? `+${row.goalDifference}` : row.goalDifference },
+    { id: "points", label: "Punkte", shortLabel: "Pkt", numeric: true, className: "primary-num", render: (row) => row.points },
+    { id: "form", label: "Letzte 5", shortLabel: "Form", sort: sortProps("form"), render: (row) => <span className="form-cell"><FormChips form={row.form} /><small>{row.formPoints}/{row.form.length * 3}</small></span> },
+    { id: "course", label: "Verlauf", render: (row) => <RankSparkline positions={row.positions} teamCount={standings.rows.length} /> },
   ];
 
-  return <div className="history-table-stack">
-    <section className="history-table-block">
-      <div className="section-copy"><p className="kicker">{scope === "season" ? "Gesamtsaison" : "Ausgewählter Spieltag"}</p><h2>Spielerwertungen</h2></div>
-      <DataTable ariaLabel="Spielerwertungen" rows={pointRows} columns={playerColumns} getRowKey={(player) => player.id} search={{ value: playerQuery, onChange: setPlayerQuery, placeholder: "Spieler oder Mannschaft suchen" }} filters={[{ id: "position", label: "Position", value: playerPosition, onChange: setPlayerPosition, options: positionOptions }]} countLabel={`${pointRows.length} Spieler`} emptyMessage="Keine Spieler entsprechen diesen Filtern." minWidth="720px" maxVisibleRows={10} onRowClick={(player) => onPlayer(player.id)} />
+  return (
+    <section className="tabelle-block">
+      <div className="section-copy"><p className="kicker">Stand nach Spieltag {standings.context.round}</p><h2>Formtabelle</h2></div>
+      <DataTable
+        ariaLabel={`Tabelle der ${standings.context.leagueName}`}
+        rows={rows}
+        columns={columns}
+        getRowKey={(row) => row.team.id}
+        emptyMessage="Für diese Auswahl liegen keine Tabellendaten vor."
+        minWidth="1080px"
+        mobileMinWidth="640px"
+        onRowClick={(row) => onTeam(row.team.id)}
+      />
     </section>
-    <section className="history-table-block">
-      <div className="section-copy"><p className="kicker">Leistungsdaten</p><h2>Noten, Tore und Vorlagen</h2></div>
-      <DataTable ariaLabel="Leistungsdaten der Spieler" rows={metricRows} columns={metricColumns} getRowKey={(player) => player.id} search={{ value: metricQuery, onChange: setMetricQuery, placeholder: "Spieler oder Mannschaft suchen" }} filters={[
-        { id: "position", label: "Position", value: metricPosition, onChange: setMetricPosition, options: positionOptions },
-        { id: "metric", label: "Sortierung", value: metricSort, onChange: (value) => setMetricSort(value as HistoryMetricSort), options: [{ value: "grade", label: "Nach Note" }, { value: "goals", label: "Nach Toren" }, { value: "assists", label: "Nach Vorlagen" }] },
-      ]} countLabel={`${metricRows.length} Spieler`} emptyMessage="Keine Leistungsdaten entsprechen diesen Filtern." minWidth="880px" maxVisibleRows={10} onRowClick={(player) => onPlayer(player.id)} />
+  );
+}
+
+function TrendBadge({ trend }: { trend: number | null }) {
+  const title = trend == null ? "Noch kein Vergleich möglich" : "Plätze gewonnen oder verloren gegenüber dem Stand vor fünf Spieltagen";
+  if (trend == null) return <span className="trend-badge trend-flat" title={title}>–</span>;
+  if (trend > 0) return <span className="trend-badge trend-up" title={title}>▲{trend}</span>;
+  if (trend < 0) return <span className="trend-badge trend-down" title={title}>▼{Math.abs(trend)}</span>;
+  return <span className="trend-badge trend-flat" title={title}>＝</span>;
+}
+
+function FormChips({ form }: { form: LeagueTableFormEntry[] }) {
+  if (!form.length) return <span className="form-chips-empty">—</span>;
+  return <span className="form-chips">{form.map((entry) => (
+    <i key={entry.round} className={`form-chip form-chip-${entry.outcome.toLowerCase()}`} title={`Spieltag ${entry.round} · ${entry.home ? "gegen" : "bei"} ${entry.opponent.name} · ${entry.score}`}>{entry.outcome}</i>
+  ))}</span>;
+}
+
+function RankSparkline({ positions, teamCount }: { positions: number[]; teamCount: number }) {
+  if (positions.length < 2) return <span className="form-chips-empty">—</span>;
+  const width = 86;
+  const height = 26;
+  const x = (index: number) => 2 + (index * (width - 4)) / (positions.length - 1);
+  const y = (rank: number) => 2 + ((rank - 1) * (height - 4)) / Math.max(1, teamCount - 1);
+  return (
+    <svg className="rank-sparkline" width={width} height={height} aria-hidden="true">
+      <polyline points={positions.map((rank, index) => `${x(index)},${y(rank)}`).join(" ")} />
+      <circle cx={x(positions.length - 1)} cy={y(positions[positions.length - 1])} r="2.4" />
+    </svg>
+  );
+}
+
+function CrossTableCard({ standings, onTeam }: { standings: LeagueStandings; onTeam: (id: string) => void }) {
+  const teams = standings.rows.map((row) => row.team);
+  const nameById = new Map(teams.map((team) => [team.id, team.name]));
+  return (
+    <section className="tabelle-block">
+      <div className="section-copy cross-copy">
+        <div><p className="kicker">Direktvergleich</p><h2>Kreuztabelle</h2></div>
+        <div className="cross-legend"><span><i className="cross-swatch cross-cell-s" />Heimsieg</span><span><i className="cross-swatch cross-cell-u" />Unentschieden</span><span><i className="cross-swatch cross-cell-n" />Auswärtssieg</span></div>
+      </div>
+      <div className="detail-section cross-card">
+        <div className="cross-scroll">
+          <table className="cross-table">
+            <thead>
+              <tr>
+                <th className="cross-corner">Heim \ Ausw.</th>
+                {teams.map((team) => <th key={team.id} title={team.name}><TeamLogo code={team.code} url={team.logoUrl} /></th>)}
+              </tr>
+            </thead>
+            <tbody>
+              {teams.map((home) => (
+                <tr key={home.id}>
+                  <th scope="row"><button className="cross-row-head" onClick={() => onTeam(home.id)} title={`${home.name}: Mannschaftsprofil öffnen`}><TeamLogo code={home.code} url={home.logoUrl} /><span>{home.code}</span></button></th>
+                  {teams.map((away) => {
+                    if (home.id === away.id) return <td key={away.id} className="cross-self" />;
+                    const cell = standings.cross.cells[`${home.id}|${away.id}`];
+                    if (!cell || cell.homeScore == null || cell.awayScore == null) {
+                      const planned = cell ? `${home.name} – ${nameById.get(away.id)} · Spieltag ${cell.round}${cell.scheduledAt ? ` · ${formatDate(cell.scheduledAt)}` : ""}` : `${home.name} – ${nameById.get(away.id)}`;
+                      return <td key={away.id} className="cross-open" title={planned}>–</td>;
+                    }
+                    const outcome = cell.homeScore > cell.awayScore ? "s" : cell.homeScore < cell.awayScore ? "n" : "u";
+                    return <td key={away.id} className={`cross-cell-${outcome}`} title={`${home.name} ${cell.homeScore}:${cell.awayScore} ${nameById.get(away.id)} · Spieltag ${cell.round}`}>{cell.homeScore}:{cell.awayScore}</td>;
+                  })}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
     </section>
-    <section className="history-table-block">
-      <div className="section-copy"><p className="kicker">{scope === "season" ? "Gesamtsaison" : "Ausgewählter Spieltag"}</p><h2>Mannschaftswertungen</h2></div>
-      <DataTable ariaLabel="Mannschaftswertungen" rows={teams} columns={teamColumns} getRowKey={(team) => team.id} search={{ value: teamQuery, onChange: setTeamQuery, placeholder: "Verein suchen" }} countLabel={`${teams.length} Vereine`} emptyMessage="Keine Mannschaftswertungen verfügbar." minWidth="900px" onRowClick={(team) => onTeam(team.id)} />
-    </section>
-  </div>;
+  );
 }
 
 function PlayersView({ filters, onPlayer }: { filters: Filters; onPlayer: (id: string) => void }) {
   const [query, setQuery] = useState("");
   const [position, setPosition] = useState("");
   const [team, setTeam] = useState("");
+  const [scope, setScope] = useState<PlayerScope>("season");
   const [sort, setSort] = useState<PlayerSort>("points");
   const [direction, setDirection] = useState<"asc" | "desc">("desc");
   const [players, setPlayers] = useState<Player[]>([]);
@@ -1276,22 +1388,51 @@ function PlayersView({ filters, onPlayer }: { filters: Filters; onPlayer: (id: s
     if (column === sort) setDirection((value) => value === "asc" ? "desc" : "asc");
     else {
       setSort(column);
-      setDirection(column === "name" || column === "position" || column === "grade" ? "asc" : "desc");
+      setDirection(column === "name" || column === "position" || column === "grade" || column === "roundGrade" ? "asc" : "desc");
+    }
+  }
+
+  function switchScope(next: PlayerScope) {
+    if (next === scope) return;
+    setScope(next);
+    const mapping: Partial<Record<PlayerSort, PlayerSort>> = next === "round"
+      ? { points: "round", grade: "roundGrade", goals: "roundGoals", assists: "roundAssists", value: "round" }
+      : { round: "points", roundGrade: "grade", roundGoals: "goals", roundAssists: "assists" };
+    const mapped = mapping[sort];
+    if (mapped) {
+      setSort(mapped);
+      setDirection(mapped === "grade" || mapped === "roundGrade" ? "asc" : "desc");
     }
   }
 
   const teamOptions = useMemo(() => [...new Set(players.map((player) => player.team))].sort((left, right) => left.localeCompare(right, "de")), [players]);
-  const visiblePlayers = team ? players.filter((player) => player.team === team) : players;
-  const columns: DataTableColumn<Player>[] = [
-    { id: "player", label: "Spieler", width: "29%", sort: { active: sort === "name", direction, onSort: () => sortBy("name") }, render: (player, index) => <div className="table-player"><span className="rank">{index + 1}</span><PlayerPortrait name={player.name} url={player.photoUrl} teamCode={player.teamCode} teamLogoUrl={player.logoUrl} /><span><strong>{player.name}</strong><small>{player.team}</small></span></div> },
-    { id: "position", label: "Position", shortLabel: "Pos.", sort: { active: sort === "position", direction, onSort: () => sortBy("position") }, render: (player) => <PositionTag position={player.position} /> },
-    { id: "price", label: "Marktwert", shortLabel: "Wert", numeric: true, sort: { active: sort === "price", direction, onSort: () => sortBy("price") }, render: (player) => formatMarketValue(player.priceM) },
-    { id: "round", label: `Spieltag ${filters.round}`, shortLabel: `ST ${filters.round}`, numeric: true, className: "matchday-score", sort: { active: sort === "round", direction, onSort: () => sortBy("round") }, render: (player) => player.roundPoints },
-    { id: "points", label: `Gesamt bis Spieltag ${filters.round}`, shortLabel: "Gesamt", numeric: true, className: "primary-num", sort: { active: sort === "points", direction, onSort: () => sortBy("points") }, render: (player) => player.observedPoints },
-    { id: "goals", label: "Tore", numeric: true, sort: { active: sort === "goals", direction, onSort: () => sortBy("goals") }, render: (player) => player.goals },
-    { id: "assists", label: "Vorlagen", shortLabel: "Vorl.", numeric: true, sort: { active: sort === "assists", direction, onSort: () => sortBy("assists") }, render: (player) => player.assists },
-    { id: "grade", label: "Ø-Note", shortLabel: "Note", numeric: true, sort: { active: sort === "grade", direction, onSort: () => sortBy("grade") }, render: (player) => player.averageGrade?.toFixed(2) ?? "—" },
-    { id: "value", label: "Wert · Pkt. / Mio. €", shortLabel: "Pkt./Mio.", numeric: true, sort: { active: sort === "value", direction, onSort: () => sortBy("value") }, render: (player) => formatPlayerValue(player.value) },
+  const visiblePlayers = (team ? players.filter((player) => player.team === team) : players)
+    .filter((player) => scope === "season"
+      || player.roundGrade != null
+      || player.roundPoints !== 0
+      || player.roundGoals > 0
+      || player.roundAssists > 0
+      || player.roundStarterPoints > 0);
+  const sortProps = (column: PlayerSort) => ({ active: sort === column, direction, onSort: () => sortBy(column) });
+  const identityColumns: DataTableColumn<Player>[] = [
+    { id: "player", label: "Spieler", width: "29%", sort: sortProps("name"), render: (player, index) => <div className="table-player"><span className="rank">{index + 1}</span><PlayerPortrait name={player.name} url={player.photoUrl} teamCode={player.teamCode} teamLogoUrl={player.logoUrl} /><span><PlayerName name={player.name} /><small>{player.team}</small></span></div> },
+    { id: "position", label: "Position", shortLabel: "Pos.", sort: sortProps("position"), render: (player) => <PositionTag position={player.position} /> },
+    { id: "price", label: "Marktwert", shortLabel: "Wert", numeric: true, sort: sortProps("price"), render: (player) => formatMarketValue(player.priceM) },
+  ];
+  const columns: DataTableColumn<Player>[] = scope === "round" ? [
+    ...identityColumns,
+    { id: "round", label: `Punkte · Spieltag ${filters.round}`, shortLabel: "Punkte", numeric: true, className: "primary-num", sort: sortProps("round"), render: (player) => player.roundPoints },
+    { id: "roundGrade", label: "Note", numeric: true, sort: sortProps("roundGrade"), render: (player) => player.roundGrade?.toFixed(2) ?? "—" },
+    { id: "roundGoals", label: "Tore", numeric: true, sort: sortProps("roundGoals"), render: (player) => player.roundGoals },
+    { id: "roundAssists", label: "Vorlagen", shortLabel: "Vorl.", numeric: true, sort: sortProps("roundAssists"), render: (player) => player.roundAssists },
+  ] : [
+    ...identityColumns,
+    { id: "round", label: `Spieltag ${filters.round}`, shortLabel: `ST ${filters.round}`, numeric: true, className: "matchday-score", sort: sortProps("round"), render: (player) => player.roundPoints },
+    { id: "points", label: `Gesamt bis Spieltag ${filters.round}`, shortLabel: "Gesamt", numeric: true, className: "primary-num", sort: sortProps("points"), render: (player) => player.observedPoints },
+    { id: "goals", label: "Tore", numeric: true, sort: sortProps("goals"), render: (player) => player.goals },
+    { id: "assists", label: "Vorlagen", shortLabel: "Vorl.", numeric: true, sort: sortProps("assists"), render: (player) => player.assists },
+    { id: "grade", label: "Ø-Note", shortLabel: "Note", numeric: true, sort: sortProps("grade"), render: (player) => player.averageGrade?.toFixed(2) ?? "—" },
+    { id: "value", label: "Wert · Pkt. / Mio. €", shortLabel: "Pkt./Mio.", numeric: true, sort: sortProps("value"), render: (player) => formatPlayerValue(player.value) },
   ];
 
   return (
@@ -1301,16 +1442,20 @@ function PlayersView({ filters, onPlayer }: { filters: Filters; onPlayer: (id: s
         rows={visiblePlayers}
         columns={columns}
         getRowKey={(player) => player.id}
+        leading={<div className="scope-switch acorn-segmented-control players-scope-switch" aria-label="Zeitraum">
+          <button className={`acorn-segment ${scope === "season" ? "active is-selected" : ""}`} onClick={() => switchScope("season")}>Bis Spieltag {filters.round}</button>
+          <button className={`acorn-segment ${scope === "round" ? "active is-selected" : ""}`} onClick={() => switchScope("round")}>Nur Spieltag {filters.round}</button>
+        </div>}
         search={{ value: query, onChange: setQuery, placeholder: "Spieler oder Mannschaft" }}
         filters={[
           { id: "position", label: "Position", value: position, onChange: setPosition, options: [{ value: "", label: "Alle Positionen" }, ...(["GK", "DEF", "MID", "FWD"] as Position[]).map((item) => ({ value: item, label: positionName[item] }))] },
           { id: "team", label: "Mannschaft", value: team, onChange: setTeam, options: [{ value: "", label: "Alle Mannschaften" }, ...teamOptions.map((item) => ({ value: item, label: item }))] },
         ]}
         countLabel={`${visiblePlayers.length} Spieler`}
-        emptyMessage="Keine Spieler entsprechen diesen Filtern."
+        emptyMessage={scope === "round" ? "Für diesen Spieltag liegen keine Wertungen vor." : "Keine Spieler entsprechen diesen Filtern."}
         loading={loading}
-        minWidth="1120px"
-        mobileMinWidth="760px"
+        minWidth={scope === "round" ? "880px" : "1120px"}
+        mobileMinWidth={scope === "round" ? "560px" : "700px"}
         variant="compact"
         onRowClick={(player) => onPlayer(player.id)}
       />}
@@ -1845,7 +1990,7 @@ function TeamDetailView({ filters, teamId, backLabel, onBack, onPlayer, onTeam }
       render: (player, index) => <div className="table-player">
         <span className="rank">{index + 1}</span>
         <PlayerPortrait name={player.name} url={player.photoUrl} teamCode={detail.code} teamLogoUrl={detail.logoUrl} />
-        <span><strong>{player.name}</strong><small>{positionName[player.position]}</small></span>
+        <span><PlayerName name={player.name} /><small>{positionName[player.position]}</small></span>
       </div>,
     },
     {
@@ -2133,7 +2278,7 @@ function TopPlayersView({ filters, leagues, onFilter, onPlayer }: { filters: Fil
     sort,
   ) : [];
   const columns: DataTableColumn<TopPlayerAnalysis>[] = [
-    { id: "player", label: "Spieler", width: "31%", render: (player, index) => <div className="table-player"><span className="rank">{index + 1}</span><PlayerPortrait name={player.name} url={player.photoUrl} teamCode={player.teamCode} teamLogoUrl={player.logoUrl} /><span><strong>{player.name}</strong><small>{player.team}</small></span></div> },
+    { id: "player", label: "Spieler", width: "31%", render: (player, index) => <div className="table-player"><span className="rank">{index + 1}</span><PlayerPortrait name={player.name} url={player.photoUrl} teamCode={player.teamCode} teamLogoUrl={player.logoUrl} /><span><PlayerName name={player.name} /><small>{player.team}</small></span></div> },
     { id: "position", label: "Position", render: (player) => <PositionTag position={player.position} /> },
     { id: "price", label: "Marktwert", numeric: true, render: (player) => formatMarketValue(player.priceM) },
     { id: "previous", label: "Vorsaison", numeric: true, className: "point-value", render: (player) => <>{player.previousPoints ?? "—"}<small>{player.previousSeason ?? "keine Historie"}</small></> },
@@ -2151,7 +2296,7 @@ function TopPlayersView({ filters, leagues, onFilter, onPlayer }: { filters: Fil
     <div className="top-players-view">
       <PageHeader title="Topspieler" description="Kaufbarer Spielerpool auf Basis abgeschlossener Saisons" controls={controls} />
       {data && <p className="top-players-context-inline"><strong>{data.context.playerCount} kaufbare Spieler</strong><span>{data.context.cutoffSeason ? `Leistungsdaten bis einschließlich ${data.context.cutoffSeason}` : "noch keine abgeschlossene Vorsaison importiert"}</span></p>}
-      {error ? <ErrorState message={error} /> : loading || !data ? <LoadingState /> : <DataTable ariaLabel="Topspieler" rows={visiblePlayers} columns={columns} getRowKey={(player) => player.id} emptyMessage="Für diese Position sind keine kaufbaren Spieler importiert." minWidth="1120px" onRowClick={(player) => onPlayer(player.id)} />}
+      {error ? <ErrorState message={error} /> : loading || !data ? <LoadingState /> : <DataTable ariaLabel="Topspieler" rows={visiblePlayers} columns={columns} getRowKey={(player) => player.id} emptyMessage="Für diese Position sind keine kaufbaren Spieler importiert." minWidth="1120px" mobileMinWidth="820px" onRowClick={(player) => onPlayer(player.id)} />}
       <p className="top-players-note">Keine Punkte der neuen Saison und keine Prognose: Auch Spieler ohne importierte Historie bleiben sichtbar. Die Einordnung verwendet ausschließlich abgeschlossene kicker-Wertungen aus Bundesliga, 2. Bundesliga und 3. Liga.</p>
     </div>
   );
@@ -2278,6 +2423,11 @@ function formatNewsDate(value: string | null) {
 }
 function formatVenue(value: PlayerGame["venue"]) { return value === "Home" ? "Heim" : "Auswärts"; }
 function lastName(name: string) { return name.split(" ").at(-1) ?? name; }
+function PlayerName({ name }: { name: string }) {
+  const short = lastName(name);
+  if (short === name) return <strong>{name}</strong>;
+  return <strong title={name}><span className="player-name-full">{name}</span><span className="player-name-short">{short}</span></strong>;
+}
 function Empty({ message }: { message: string }) { return <div className="empty"><span>○</span><p>{message}</p></div>; }
 function ErrorState({ message }: { message: string }) { return <div className="state-card error-state"><span>Ansicht konnte nicht geladen werden</span><strong>{message}</strong><p>Bitte prüfen, ob die statischen Datendateien vorhanden sind, und anschließend neu laden.</p></div>; }
 function LoadingState() { return <div className="loading-grid" aria-label="Dashboard wird geladen"><span /><span /><span /></div>; }
