@@ -89,6 +89,28 @@ export type LeagueStandingsCrossCell = {
   awayScore: number | null;
 };
 
+export type MatchdayContributor = {
+  id: string;
+  name: string;
+  count: number;
+};
+
+export type MatchdayFixtureSide = {
+  team: LeagueTableTeam;
+  goals: MatchdayContributor[];
+  assists: MatchdayContributor[];
+};
+
+export type MatchdayFixture = {
+  id: string;
+  scheduledAt: string | null;
+  state: string;
+  homeScore: number | null;
+  awayScore: number | null;
+  home: MatchdayFixtureSide;
+  away: MatchdayFixtureSide;
+};
+
 export type LeagueStandings = {
   context: {
     league: string;
@@ -99,6 +121,7 @@ export type LeagueStandings = {
     playedMatchCount: number;
   };
   rows: LeagueTableRow[];
+  fixtures: MatchdayFixture[];
   cross: {
     order: string[];
     cells: Record<string, LeagueStandingsCrossCell>;

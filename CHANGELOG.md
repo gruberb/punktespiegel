@@ -2,6 +2,16 @@
 
 Alle wesentlichen Änderungen an Punktespiegel werden in dieser Datei dokumentiert.
 
+## [1.13.0] – 2026-08-16
+
+### Hinzugefügt
+
+- Tabelle: Das neue Modul „Spiele des Spieltags" eröffnet die Seite mit allen Partien des gewählten Spieltags, gruppiert nach Anstoßzeit. Beendete Partien lassen sich aufklappen und zeigen Torschützen und Vorlagengeber je Team; Spieler- und Vereinsnamen führen direkt zu den Profilen.
+
+### Geändert
+
+- Die Tabelle ist neu geordnet: Spiele des Spieltags, Formtabelle, Platzierung je Spieltag, Kreuztabelle.
+
 ## [1.12.0] – 2026-08-16
 
 ### Hinzugefügt

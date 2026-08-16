@@ -2185,3 +2185,48 @@ circle.bump-line { fill: light-dark(#ded9ea, #4a4460); stroke: none; }
   .form-chips { gap: 2px; }
   .overview-eleven-summary strong { font-size: 17px; }
 }
+
+/* Tabelle: Spiele des Spieltags ----------------------------------------- */
+.fixtures-card { padding: 10px 12px; }
+.fixture-slot + .fixture-slot { margin-top: 12px; }
+.fixture-slot > h4 { margin: 0; padding: 8px 10px; border-radius: 9px; background: var(--background-color-canvas); color: var(--text-color-deemphasized); font-size: 9.5px; font-weight: 780; letter-spacing: .08em; text-align: center; text-transform: uppercase; }
+.fixture-card { display: block; }
+.fixture-card + .fixture-card { border-top: 1px solid var(--line-soft); }
+.fixture-card-flat,
+.fixture-card > summary { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr) 16px; align-items: center; gap: 12px; min-height: 56px; padding: 8px 6px; }
+.fixture-card > summary { cursor: pointer; list-style: none; border-radius: 10px; }
+.fixture-card > summary::-webkit-details-marker { display: none; }
+.fixture-card > summary:hover { background: var(--button-background-color-hover); }
+.fixture-team { display: flex; align-items: center; gap: 9px; min-width: 0; }
+.fixture-team.home { justify-content: flex-end; }
+.fixture-team .team-logo { width: 30px; height: 30px; flex: 0 0 auto; border-radius: 8px; }
+.fixture-team button { overflow: hidden; padding: 0; border: 0; background: transparent; color: var(--text-color); font-size: 13.5px; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
+.fixture-team button:hover { color: var(--color-accent-primary); }
+.fixture-score { min-width: 62px; padding: 8px 10px; border-radius: 10px; background: light-dark(var(--color-violet-desaturated-90), var(--color-violet-desaturated-0)); color: light-dark(var(--color-violet-desaturated-0), var(--color-violet-desaturated-90)); font-size: 14px; font-weight: 800; font-variant-numeric: tabular-nums; text-align: center; white-space: nowrap; }
+.fixture-score-open { border: 1px dashed var(--line); background: transparent; color: var(--text-color-deemphasized); }
+.fixture-toggle { color: var(--text-color-deemphasized); font-size: 13px; text-align: center; transition: transform .15s ease; }
+.fixture-card[open] .fixture-toggle { transform: rotate(180deg); }
+.fixture-detail { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 6px 40px; padding: 2px 10px 14px; }
+.fixture-side.home { text-align: right; }
+.fixture-side p { margin: 3px 0 0; color: var(--text-color-deemphasized); font-size: 11.5px; line-height: 1.6; }
+.fixture-detail-label { margin-right: 8px; color: var(--text-color-deemphasized); font-size: 8.5px; font-weight: 780; letter-spacing: .07em; text-transform: uppercase; }
+.fixture-side button { padding: 0; border: 0; background: transparent; color: var(--text-color); font-size: 11.5px; font-weight: 650; }
+.fixture-side button:hover { color: var(--color-accent-primary); }
+.fixture-detail-none { color: var(--text-color-deemphasized); }
+
+@media (max-width: 790px) {
+  .fixtures-card { padding: 8px; }
+}
+
+@media (max-width: 490px) {
+  .fixture-team .player-name-full { display: none; }
+  .fixture-team .player-name-short { display: inline; }
+  .fixture-team { gap: 6px; }
+  .fixture-team .team-logo { width: 24px; height: 24px; border-radius: 7px; }
+  .fixture-team button { font-size: 12px; }
+  .fixture-score { min-width: 50px; padding: 6px 7px; font-size: 12.5px; }
+  .fixture-card-flat,
+  .fixture-card > summary { gap: 8px; min-height: 50px; }
+  .fixture-detail { grid-template-columns: 1fr; gap: 2px; }
+  .fixture-side.home { text-align: left; }
+}

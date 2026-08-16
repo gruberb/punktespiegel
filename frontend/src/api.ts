@@ -25,7 +25,7 @@ import { buildPlayerNews, buildSquadNews } from "./news";
 import type { NewsArtifact } from "./news";
 import { kickerPlayerNewsLink } from "./kicker-links";
 import { computeTable, crossTable, formLastN, formPoints, positionsByRound, trendVsRound } from "./standings";
-import type { LeagueStandings, LeagueTableRow, LeagueTableTeam } from "./types";
+import type { LeagueStandings, LeagueTableRow, LeagueTableTeam, MatchdayContributor, MatchdayFixture } from "./types";
 type StaticCatalog = Catalog & { schemaVersion: number; generatedAt: string };
 
 type StaticManagerRecommendation = {
@@ -508,6 +508,32 @@ function leagueStandings(index: SeasonIndex, round: number): LeagueStandings {
       positions: teamPositions,
     };
   });
+  const scoresByMatch = new Map<string, StaticScore[]>();
+  for (const score of index.season.scores) {
+    const matchScores = scoresByMatch.get(score.matchId);
+    if (matchScores) matchScores.push(score);
+    else scoresByMatch.set(score.matchId, [score]);
+  }
+  const fixtures = matches.filter((match) => match.round === round)
+    .sort((left, right) => (left.scheduledAt ?? "").localeCompare(right.scheduledAt ?? "") || left.id.localeCompare(right.id))
+    .map((match): MatchdayFixture => {
+      const matchScores = scoresByMatch.get(match.id) ?? [];
+      const contributors = (teamId: string, key: "goals" | "assists"): MatchdayContributor[] => matchScores
+        .filter((score) => score.teamId === teamId && score[key] > 0)
+        .map((score) => ({ id: score.playerId, name: index.players.get(score.playerId)?.name ?? "Unbekannt", count: score[key] }))
+        .sort((left, right) => right.count - left.count || left.name.localeCompare(right.name, "de"));
+      const side = (teamId: string) => ({ team: toTeam(teamId), goals: contributors(teamId, "goals"), assists: contributors(teamId, "assists") });
+      return {
+        id: match.id,
+        scheduledAt: match.scheduledAt,
+        state: match.state,
+        homeScore: match.homeScore,
+        awayScore: match.awayScore,
+        home: side(match.homeTeamId),
+        away: side(match.awayTeamId),
+      };
+    });
+
   return {
     context: {
       league: index.season.leagueCode,
@@ -518,6 +544,7 @@ function leagueStandings(index: SeasonIndex, round: number): LeagueStandings {
       playedMatchCount: matches.filter((match) => match.round <= round && match.homeScore != null && match.awayScore != null).length,
     },
     rows,
+    fixtures,
     cross: {
       order: rows.map((row) => row.team.id),
       cells: Object.fromEntries(crossTable(matches, round)),
