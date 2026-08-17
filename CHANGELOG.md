@@ -2,6 +2,12 @@
 
 Alle wesentlichen Änderungen an Punktespiegel werden in dieser Datei dokumentiert.
 
+## [1.15.0] – 2026-08-17
+
+### Behoben
+
+- Fantasy Team: „Punkte je Spieltag", die aktuellen Punkte der Kaderspieler und die Summe der erreichten Startelfpunkte werden jetzt im Browser aus den täglich importierten Saisondaten berechnet. Bisher stammten sie aus dem Empfehlungs-Artefakt, das der tägliche Datenlauf nicht neu erzeugt, wodurch neue Spieltage dort erst mit einer manuellen Neuberechnung der Kader auftauchten. Die Aufstellungen je Spieltag kommen weiterhin aus der Empfehlung; nur die erzielten Punkte werden live ergänzt.
+
 ## [1.14.0] – 2026-08-16
 
 ### Geändert

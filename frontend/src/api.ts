@@ -3,6 +3,8 @@ import type {
   Catalog,
   Dashboard,
   ManagerFixturePlayer,
+  ManagerMatchday,
+  ManagerMatchdayPlayer,
   ManagerMode,
   ManagerRecommendation,
   ManagerScheduleRound,
@@ -954,6 +956,55 @@ function topPlayers(index: SeasonIndex, catalog: StaticCatalog): TopPlayers {
   };
 }
 
+// The recommendation artifacts are only regenerated when the squads change,
+// while the season file refreshes daily. Realized points therefore get
+// recomputed here from the season scores so the Fantasy view never lags a
+// data run behind: matchday lineups come from the artifact's projected
+// lineups, their points from the freshly imported score rows.
+function refreshRecommendation(recommendation: ManagerRecommendation, index: SeasonIndex): ManagerRecommendation {
+  const pointsByPlayerRound = new Map<string, number>();
+  const seasonPointsByPlayer = new Map<string, number>();
+  for (const score of index.season.scores) {
+    const match = index.matches.get(score.matchId);
+    if (!match) continue;
+    const key = `${score.playerId}:${match.round}`;
+    pointsByPlayerRound.set(key, (pointsByPlayerRound.get(key) ?? 0) + score.totalPoints);
+    seasonPointsByPlayer.set(score.playerId, (seasonPointsByPlayer.get(score.playerId) ?? 0) + score.totalPoints);
+  }
+  const players = recommendation.players.map((player) => ({ ...player, currentPoints: seasonPointsByPlayer.get(player.id) ?? 0 }));
+  if (!recommendation.projectedMatchdays?.length) return { ...recommendation, players };
+  const matchdays = recommendation.projectedMatchdays
+    .filter((projected) => projected.matchday <= index.season.latestRound)
+    .map((projected): ManagerMatchday => {
+      const lineup = projected.players.map((player): ManagerMatchdayPlayer => ({
+        id: player.id,
+        name: player.name,
+        team: player.team,
+        teamCode: player.teamCode,
+        logoUrl: player.logoUrl,
+        photoUrl: player.photoUrl,
+        position: player.position,
+        points: Math.round(pointsByPlayerRound.get(`${player.id}:${projected.matchday}`) ?? 0),
+      }));
+      const positionPoints = Object.fromEntries((["GK", "DEF", "MID", "FWD"] as Position[]).map((position) => [
+        position,
+        lineup.filter((player) => player.position === position).reduce((sum, player) => sum + player.points, 0),
+      ])) as Record<Position, number>;
+      return {
+        matchday: projected.matchday,
+        totalPoints: lineup.reduce((sum, player) => sum + player.points, 0),
+        positionPoints,
+        players: lineup,
+      };
+    });
+  return {
+    ...recommendation,
+    players,
+    matchdays,
+    currentStartingPoints: matchdays.reduce((sum, matchday) => sum + matchday.totalPoints, 0),
+  };
+}
+
 function managerSchedule(index: SeasonIndex, squad: ManagerRecommendation["players"]): ManagerScheduleRound[] {
   const squadByTeam = new Map<string, ManagerRecommendation["players"]>();
   for (const player of squad) {
@@ -1045,7 +1096,7 @@ export const api = {
   team: (teamId: string, params: URLSearchParams, signal?: AbortSignal) => abortable(Promise.all([loadSeason(params), roleSignalsCache]).then(([index, roleSignals]) => teamDetail(index, teamId, roleSignals)), signal),
   bestEleven: (params: URLSearchParams, signal?: AbortSignal) => abortable(loadSeason(params).then((index) => bestEleven(index, params.get("scope") === "season" ? "season" : "matchday", selectedRound(params, index.season))), signal),
   topPlayers: (params: URLSearchParams, signal?: AbortSignal): Promise<TopPlayers> => abortable(Promise.all([loadSeason(params), catalogCache]).then(([index, catalog]) => topPlayers(index, catalog)), signal),
-  managerPicks: (params: URLSearchParams, mode: ManagerMode, signal?: AbortSignal): Promise<ManagerRecommendation> => abortable(loadManagerRecommendation(params, mode), signal),
+  managerPicks: (params: URLSearchParams, mode: ManagerMode, signal?: AbortSignal): Promise<ManagerRecommendation> => abortable(Promise.all([loadManagerRecommendation(params, mode), loadSeason(params)]).then(([recommendation, index]) => refreshRecommendation(recommendation, index)), signal),
   managerSchedule: (params: URLSearchParams, players: ManagerRecommendation["players"], signal?: AbortSignal): Promise<ManagerScheduleRound[]> => abortable(loadSeason(params).then((index) => managerSchedule(index, players)), signal),
   managerNews: (players: ManagerRecommendation["players"], signal?: AbortSignal): Promise<SquadNews> => abortable(newsCache.then((news) => buildSquadNews(news, players)), signal),
 };
