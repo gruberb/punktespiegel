@@ -2,6 +2,18 @@
 
 Alle wesentlichen Änderungen an Punktespiegel werden in dieser Datei dokumentiert.
 
+## [1.16.0] – 2026-08-17
+
+### Geändert
+
+- Der Empfehlungsgenerator ist vom 3768-zeiligen Einzelskript in das Python-Paket `recommender/` mit klar getrennten Modulen umgebaut (Daten, Features, Prognose, Baseline-Ensemble, Optimierung, Artefakte, Validierung, Winterlauf, CLI). Die erzeugten Artefakte sind byte-identisch zur vorherigen Version; der Umbau wurde über den deterministischen Lauf (feste Seeds) gegen die eingecheckten Artefakte verifiziert.
+- Liga-Regeln liegen jetzt als Konfiguration unter `config/recommender/` mit je einer Datei für Bundesliga, 2. Bundesliga und 3. Liga (Budgets, Ligastufe, Winterrunde, Transferlimits inklusive der ab 2026 geltenden vier Interactive-Transfers) sowie `defaults.json` für spielweite Kaderregeln und Modell-Voreinstellungen. Alle Felder sind dort dokumentiert.
+- Der Generator läuft eigenständig: `uv run --frozen python -m recommender` mit `--data-dir`, `--config-dir`, `--recommendation-output-dir` und wiederholbarem `--league`-Filter; das Training nutzt weiterhin die Historie aller Saisons, sodass gefilterte Läufe dieselben Artefakte erzeugen wie vollständige.
+
+### Entfernt
+
+- `scripts/generate-interactive-v2.py` (ersetzt durch das Paket) und `scripts/generate-manager-recommendations.ts`: Der v1-Artefaktschreiber überschrieb im Sammelbefehl kurzzeitig die ausgelieferten Empfehlungen mit für die App unlesbaren modelVersion-1-Dateien, bevor der v2-Lauf sie erneut ersetzte. Das v1-Modell selbst bleibt als Ensemble-Baseline über `scripts/backtest-manager-baseline.ts` eingebunden.
+
 ## [1.15.0] – 2026-08-17
 
 ### Behoben

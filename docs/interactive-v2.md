@@ -70,7 +70,12 @@ npm run generate:recommendations
 Für einen schnellen Pipeline-Test ohne erneuten Holdout:
 
 ```bash
-npm run generate:recommendations:baseline
-uv run --frozen python scripts/generate-interactive-v2.py \
+uv run --frozen python -m recommender \
   --skip-validation --iterations 10 --time-limit 30
 ```
+
+Der Generator liegt als Paket unter `recommender/`; Liga-Budgets, Ligastufen,
+Winterrunden und Modell-Voreinstellungen sind in `config/recommender/`
+dokumentiert und je Liga getrennt konfigurierbar. `--league 0002` begrenzt
+einen Lauf auf eine Liga, `--data-dir`, `--config-dir` und
+`--recommendation-output-dir` erlauben den Betrieb gegen fremde Datenstände.

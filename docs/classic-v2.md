@@ -20,7 +20,7 @@ Veröffentlicht wird deshalb keine verbindliche Transferliste. Das Artefakt enth
 Der Wintermodus nimmt den tatsächlich gekauften Kader samt festen Slots entgegen, spielt alle Ergebnisse bis zum Cutoff in die rollierenden Zustände ein und prognostiziert nur die verbleibenden Spieltage:
 
 ```bash
-uv run --frozen python scripts/generate-interactive-v2.py \
+uv run --frozen python -m recommender \
   --mode classic-winter \
   --league 0001 \
   --season-year 2026 \

@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "league": {
+    "code": "0001",
+    "name": "Bundesliga",
+    "level": 1
+  },
+  "winterStartRound": 15,
+  "classic": {
+    "budgetM": 30.0,
+    "maxFromTeam": 3,
+    "transferLimit": 3
+  },
+  "interactive": {
+    "budgetM": 42.5,
+    "transferLimit": 3,
+    "transferLimitOverrides": [
+      {
+        "fromSeason": 2026,
+        "limit": 4
+      }
+    ]
+  }
+}

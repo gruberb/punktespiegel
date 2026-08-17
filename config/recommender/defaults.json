@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "model": {
+    "iterations": 180,
+    "validationIterations": 120,
+    "timeLimitSeconds": 180.0,
+    "classicResidualWeight": 0.5,
+    "classicScenarios": 4
+  },
+  "baseline": {
+    "command": [
+      "node",
+      "--experimental-strip-types",
+      "scripts/backtest-manager-baseline.ts"
+    ],
+    "cwdRelativeToRepoRoot": "."
+  },
+  "squadRules": {
+    "classic": {
+      "rosterCounts": {
+        "GK": 2,
+        "DEF": 5,
+        "MID": 5,
+        "FWD": 3
+      },
+      "starterCounts": {
+        "GK": 1,
+        "DEF": 4,
+        "MID": 4,
+        "FWD": 2
+      }
+    },
+    "interactive": {
+      "rosterCounts": {
+        "GK": 3,
+        "DEF": 7,
+        "MID": 7,
+        "FWD": 5
+      },
+      "goalkeepersFromSameTeam": true
+    }
+  }
+}

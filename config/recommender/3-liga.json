@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "league": {
+    "code": "0003",
+    "name": "3. Liga",
+    "level": 3
+  },
+  "winterStartRound": 19,
+  "classic": {
+    "budgetM": 4.0,
+    "maxFromTeam": 3,
+    "transferLimit": 3
+  },
+  "interactive": {
+    "budgetM": 6.0,
+    "transferLimit": 3,
+    "transferLimitOverrides": [
+      {
+        "fromSeason": 2026,
+        "limit": 4
+      }
+    ]
+  }
+}

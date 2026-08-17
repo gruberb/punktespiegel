@@ -77,8 +77,8 @@ docker compose build web
 - `frontend/public/data/current-role-signals.json`: statischer Bundesliga-Snapshot für aktuelle Topelf-, Spieler- und Vereinsquellen.
 - `frontend/public/data/current-availability-signals.json`: datierter Ausfallsnapshot für Bundesliga, 2. Bundesliga und 3. Liga.
 - `frontend/public/data/external-performance-benchmark.json`: unabhängiger Vergleich der LigaInsider-Leistungsrangfolge 2025/26 mit den historischen kicker-Punkten.
-- `scripts/generate-manager-recommendations.ts`: deterministisches v1-Vergleichsmodell.
-- `scripts/generate-interactive-v2.py`: rollenabhängige Prognose, szenariobasierte Classic-Rekursentscheidung, echter Winterlauf und Mehrspieltags-MILPs.
+- `recommender/`: der Empfehlungsgenerator als Python-Paket mit rollenabhängiger Prognose, szenariobasierter Classic-Rekursentscheidung, echtem Winterlauf und Mehrspieltags-MILPs; das deterministische v1-Vergleichsmodell (`frontend/src/manager-model.ts` über `scripts/backtest-manager-baseline.ts`) bleibt als Ensemble-Baseline eingebunden.
+- `config/recommender/`: Liga-Konfigurationen (Bundesliga, 2. Bundesliga, 3. Liga) und Modell-Voreinstellungen, dort dokumentiert.
 - `scripts/fetch-current-role-signals.py`: lokal ausgeführter, fail-closed Import der LigaInsider-Topelf, Vereinsthemen und medizinischen Verfügbarkeit aus LigaInsider/Transfermarkt.
 - `pyproject.toml` und `uv.lock`: reproduzierbare Offline-Modellumgebung.
 - `.github/workflows/`: CI sowie täglicher Pages-Datenbuild.

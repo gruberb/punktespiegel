@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "league": {
+    "code": "0002",
+    "name": "2. Bundesliga",
+    "level": 2
+  },
+  "winterStartRound": 17,
+  "classic": {
+    "budgetM": 7.5,
+    "maxFromTeam": 3,
+    "transferLimit": 3
+  },
+  "interactive": {
+    "budgetM": 10.0,
+    "transferLimit": 3,
+    "transferLimitOverrides": [
+      {
+        "fromSeason": 2026,
+        "limit": 4
+      }
+    ]
+  }
+}
