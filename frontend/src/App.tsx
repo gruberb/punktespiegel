@@ -3,35 +3,29 @@ import type { MouseEvent as ReactMouseEvent, ReactNode, RefObject } from "react"
 import { createPortal } from "react-dom";
 import { api } from "./api";
 import { DataTable } from "./DataTable";
-import { applyManagerLocation, managerLocationFromSearch } from "./manager-location";
 import { newsAttribution, newsSourceLabel } from "./news";
 import { hrefForView, pathForView, viewFromPathname } from "./routes";
 import type { DataTableColumn } from "./DataTable";
-import type { ManagerLocation, ManagerSection } from "./manager-location";
 import type { RouteView } from "./routes";
 import { initialAvailableRound, latestAvailableRound } from "./rounds";
 import type {
   BestEleven,
   BestElevenPlayer,
   Catalog,
+  ClubTransfer,
   Dashboard,
+  MoneyValue,
   LeagueStandings,
   LeagueTableFormEntry,
   LeagueTableRow,
   MatchdayContributor,
   MatchdayFixture,
   MatchdayFixtureSide,
-  ManagerMode,
-  ManagerFixture,
-  ManagerRecommendation,
-  ManagerScheduleRound,
   NewsArticle,
   Player,
   PlayerDetail,
   PlayerGame,
   Position,
-  SquadNews,
-  SquadNewsArticle,
   TeamLeaders,
   TeamDetail,
   TeamDetailMatch,
@@ -46,7 +40,7 @@ type InfoView = "about" | "methodology" | "sources" | "faq";
 type View = RouteView;
 type NavView = Exclude<View, "player" | "team">;
 type Filters = { league: string; season: string; round: string };
-type ViewLocation = { view: View; filters: Filters; playerId: string | null; teamId: string | null; managerLocation: ManagerLocation; scrollY: number };
+type ViewLocation = { view: View; filters: Filters; playerId: string | null; teamId: string | null; scrollY: number };
 type TeamMetric = "overall" | "goalkeeper" | "defence" | "midfield" | "forward";
 type PlayerSort = "name" | "position" | "price" | "round" | "points" | "grade" | "goals" | "assists" | "value" | "roundGrade" | "roundGoals" | "roundAssists";
 type PlayerScope = "season" | "round";
@@ -75,7 +69,6 @@ const nav = [
   { id: "players", label: "Spieler" },
   { id: "teams", label: "Mannschaften" },
   { id: "top", label: "Topspieler" },
-  { id: "manager", label: "Fantasy Team" },
 ] satisfies { id: NavView; label: string }[];
 const navMobile: Record<(typeof nav)[number]["id"], { label: string; icon: ReactNode }> = {
   overview: {
@@ -98,10 +91,6 @@ const navMobile: Record<(typeof nav)[number]["id"], { label: string; icon: React
     label: "Topspieler",
     icon: <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3.7 2.4 5 5.5.8-4 3.9.9 5.5-4.8-2.6-4.8 2.6.9-5.5-4-3.9 5.5-.8Z" /></svg>,
   },
-  manager: {
-    label: "Fantasy",
-    icon: <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4.4" y="3.4" width="15.2" height="17.2" rx="2.2" /><path d="M4.4 12h15.2" /><circle cx="12" cy="12" r="2.4" /></svg>,
-  },
 };
 const infoViews: InfoView[] = ["about", "methodology", "sources", "faq"];
 const faqItems = [
@@ -118,8 +107,8 @@ const faqItems = [
     answer: "Die laufende Saison wird täglich neu importiert und veröffentlicht. Abgeschlossene Saisons bleiben unverändert, sofern kein vollständiger manueller Neuaufbau angestoßen wird.",
   },
   {
-    question: "Gibt es Daten für Interactive und Classic?",
-    answer: "Ja. Die Fantasy-Team-Ansicht bietet datenbasierte Beispielkader und Aufstellungen für beide Varianten. Es handelt sich um unabhängige Beispiele, nicht um eine Erfolgsgarantie.",
+    question: "Was zeigen die Mannschafts- und Spielerprofile?",
+    answer: "Mannschaftsprofile bündeln Trainer, Kapitän, Kader nach Position, mögliche Startelf, Transfers und den Saisonverlauf. Spielerprofile zeigen Biografie, Marktwert, Vereinskarriere, Einsätze, Tore, Vorlagen, Noten und Punkteaktionen.",
   },
   {
     question: "Brauche ich ein Konto?",
@@ -174,7 +163,7 @@ function initialView(): View {
   if (value === "player" && !params.get("player")) return "players";
   if (value === "team" && !params.get("team")) return "teams";
   if (value === "history") return "table";
-  return (["overview", "table", "players", "player", "teams", "team", "top", "manager", ...infoViews] as View[]).includes(value as View)
+  return (["overview", "table", "players", "player", "teams", "team", "top", ...infoViews] as View[]).includes(value as View)
     ? (value as View)
     : "overview";
 }
@@ -242,7 +231,6 @@ function viewBackLabel(view: View) {
     team: "zur Mannschaft",
     table: "zur Tabelle",
     top: "zu den Topspielern",
-    manager: "zum Fantasy Team",
     about: "zu Über Punktespiegel",
     methodology: "zu Daten & Methodik",
     sources: "zu den Quellen",
@@ -258,7 +246,6 @@ export default function App() {
   const [view, setViewState] = useState<View>(initialView);
   const [playerId, setPlayerId] = useState<string | null>(() => new URLSearchParams(window.location.search).get("player"));
   const [teamId, setTeamId] = useState<string | null>(() => new URLSearchParams(window.location.search).get("team"));
-  const [managerLocation, setManagerLocation] = useState<ManagerLocation>(() => managerLocationFromSearch(window.location.search));
   const [backStack, setBackStack] = useState<ViewLocation[]>([]);
   const [dashboard, setDashboard] = useState<Dashboard | null>(null);
   const [dashboardError, setDashboardError] = useState<string | null>(null);
@@ -283,7 +270,7 @@ export default function App() {
     const hasLegacyViewParam = new URLSearchParams(window.location.search).has("view");
     const currentPath = window.location.pathname.replace(/\/+$/, "") || "/";
     if (!hasLegacyViewParam && currentPath === pathForView(view)) return;
-    syncUrl(filters, view, playerId, teamId, managerLocation);
+    syncUrl(filters, view, playerId, teamId);
   }, []);
 
   useEffect(() => {
@@ -305,7 +292,7 @@ export default function App() {
   const selectedPlayerSeason = playerSeasonCandidates.find((season) => season.leagueCode === filters.league && String(season.startYear) === filters.season)
     ?? playerSeasons.find((season) => String(season.startYear) === filters.season)
     ?? playerSeasons[0];
-  const selectedSeason = view === "overview" ? latestPublishedSeason : view === "manager" || view === "top" ? newestSeason : view === "team" ? selectedTeamSeason : view === "player" ? selectedPlayerSeason : requestedSeason;
+  const selectedSeason = view === "overview" ? latestPublishedSeason : view === "top" ? newestSeason : view === "team" ? selectedTeamSeason : view === "player" ? selectedPlayerSeason : requestedSeason;
   const roundCount = selectedSeason?.roundCount ?? (filters.league === "0003" ? 38 : 34);
   const latestRound = selectedSeason?.latestRound ?? 0;
   const overviewRound = Math.min(Math.max(1, Number(filters.round) || 1), Math.max(1, latestRound));
@@ -327,44 +314,40 @@ export default function App() {
         description: `Spieler, kicker-Noten, Managerpunkte, Tore, Vorlagen und Marktwerte der ${leagueName} ${seasonName} nach Spieltag durchsuchen.`,
       },
       player: {
-        title: `Spielerprofil: kicker Noten & Punkte ${leagueName}`,
-        description: `Kicker-Noten, Managerpunkte, Saisonverlauf, Einsätze und verlinkte Fußball-News für Spieler der ${leagueName}.`,
+        title: `Spielerprofil: Daten, Noten & Punkte ${leagueName}`,
+        description: `Alter, Nationalität, Größe, Marktwert, Vereinskarriere, Einsätze, Tore, kicker-Noten und Punkte für Spieler der ${leagueName}.`,
       },
       teams: {
         title: `Mannschaftswertung ${leagueName}: kicker Punkte`,
         description: `Kicker Managerpunkte aller Mannschaften der ${leagueName} ${seasonName} vergleichen und Kader, Positionen sowie Spiele öffnen.`,
       },
       team: {
-        title: `Mannschaftsprofil: kicker Punkte ${leagueName}`,
-        description: `Kader, Spielerpunkte und jedes Spiel im Detail für Mannschaften der ${leagueName} – mit historischen kicker Managerdaten.`,
+        title: `Mannschaftsprofil: Kader & Transfers ${leagueName}`,
+        description: `Trainer, Kapitän, Kader nach Position, mögliche Startelf, Transfers, Spielerpunkte und Saisonverlauf für Mannschaften der ${leagueName}.`,
       },
       table: {
         title: `Tabelle & Formkurve ${leagueName} ${seasonName}`,
         description: `Tabelle der ${leagueName} ${seasonName} nach Spieltag: Platzierungsverlauf, Form der letzten fünf Spiele und Kreuztabelle aller Paarungen.`,
       },
       top: {
-        title: `Topspieler für kicker Manager Interactive & Classic`,
-        description: `Topspieler für kicker Manager Interactive und Classic nach Vorsaisonpunkten, Durchschnitt, Marktwert und Position vergleichen.`,
-      },
-      manager: {
-        title: `Beispielteams für kicker Manager Interactive & Classic`,
-        description: `Datenbasierte Beispielkader und Aufstellungen für kicker Manager Interactive und Classic in Bundesliga, 2. Bundesliga und 3. Liga.`,
+        title: `Topspieler ${leagueName}: Form & Marktwert`,
+        description: `Topspieler der ${leagueName} nach Vorsaisonpunkten, Saisonschnitt, Marktwert und Position vergleichen.`,
       },
       about: {
         title: "Über Punktespiegel",
-        description: "Was Punktespiegel bietet: aktuelle und historische kicker-Noten, Managerpunkte und Beispielteams für drei deutsche Profiligen.",
+        description: "Was Punktespiegel bietet: aktuelle und historische kicker-Noten, Punkte und Statistikprofile für drei deutsche Profiligen.",
       },
       methodology: {
         title: "Daten & Methodik",
-        description: "So importiert, prüft und veröffentlicht Punktespiegel kicker-Wertungen, historische Saisondaten und Fantasy-Beispielkader.",
+        description: "So importiert, prüft und veröffentlicht Punktespiegel kicker-Wertungen und historische Saisondaten.",
       },
       sources: {
-        title: "Quellen für Punkte, Rollen & Fußball-News",
-        description: "Transparente Übersicht der Daten-, Profil-, Rollen-, Verfügbarkeits- und Nachrichtenquellen hinter Punktespiegel.",
+        title: "Quellen für Punkte, Profile & Fußball-News",
+        description: "Transparente Übersicht der Daten-, Profil-, Verfügbarkeits- und Nachrichtenquellen hinter Punktespiegel.",
       },
       faq: {
         title: "Häufige Fragen zu Punktespiegel",
-        description: "Antworten zu Datenumfang, Ligen, Aktualisierung, kicker Manager Interactive und Classic sowie zur Unabhängigkeit von Punktespiegel.",
+        description: "Antworten zu Datenumfang, Ligen, Aktualisierung und zur Unabhängigkeit von Punktespiegel.",
       },
     } satisfies Record<View, { title: string; description: string }>)[view];
 
@@ -427,7 +410,7 @@ export default function App() {
   }, [view, filters.league, filters.season, latestPublishedSeason?.startYear, latestPublishedSeason?.latestRound]);
 
   useEffect(() => {
-    if ((view !== "manager" && view !== "top") || !newestSeason || filters.season === String(newestSeason.startYear)) return;
+    if (view !== "top" || !newestSeason || filters.season === String(newestSeason.startYear)) return;
     const next = { ...filters, season: String(newestSeason.startYear), round: String(Math.max(1, newestSeason.latestRound)) };
     setFilters(next);
     syncUrl(next, view, null, null);
@@ -481,21 +464,15 @@ export default function App() {
 
   const showMatchday = view === "players";
 
-  function syncUrl(nextFilters: Filters, nextView: View, nextPlayer: string | null, nextTeam: string | null, nextManagerLocation = managerLocation) {
+  function syncUrl(nextFilters: Filters, nextView: View, nextPlayer: string | null, nextTeam: string | null) {
     const params = isInfoView(nextView) ? new URLSearchParams() : scopeQuery(nextFilters);
     if (nextView === "player" && nextPlayer) params.set("player", nextPlayer);
     if (nextView === "team" && nextTeam) params.set("team", nextTeam);
-    if (nextView === "manager") applyManagerLocation(params, nextManagerLocation);
     window.history.replaceState({}, "", hrefForView(nextView, params));
   }
 
-  function updateManagerLocation(nextManagerLocation: ManagerLocation) {
-    setManagerLocation(nextManagerLocation);
-    syncUrl(filters, "manager", null, null, nextManagerLocation);
-  }
-
   function rememberCurrentLocation() {
-    setBackStack((stack) => [...stack, { view, filters: { ...filters }, playerId, teamId, managerLocation: { ...managerLocation }, scrollY: window.scrollY }]);
+    setBackStack((stack) => [...stack, { view, filters: { ...filters }, playerId, teamId, scrollY: window.scrollY }]);
   }
 
   function scrollToTop() {
@@ -563,7 +540,7 @@ export default function App() {
   function setView(next: NavView) {
     const nextFilters = next === "overview" && latestPublishedSeason
       ? { ...filters, season: String(latestPublishedSeason.startYear), round: String(Math.max(1, latestPublishedSeason.latestRound)) }
-      : (next === "manager" || next === "top") && newestSeason
+      : next === "top" && newestSeason
         ? { ...filters, season: String(newestSeason.startYear), round: String(Math.max(1, newestSeason.latestRound)) }
       : next === "table" && requestedSeason
         ? { ...filters, round: String(Math.max(1, requestedSeason.latestRound)) }
@@ -605,9 +582,8 @@ export default function App() {
     setFilters(previous.filters);
     setPlayerId(previous.playerId);
     setTeamId(previous.teamId);
-    setManagerLocation(previous.managerLocation);
     setViewState(previous.view);
-    syncUrl(previous.filters, previous.view, previous.playerId, previous.teamId, previous.managerLocation);
+    syncUrl(previous.filters, previous.view, previous.playerId, previous.teamId);
     restoreScrollPosition(previous.scrollY);
   }
 
@@ -628,10 +604,8 @@ export default function App() {
         ? "Kader und Saisonverlauf"
       : view === "table"
         ? "Tabellenstand, Verlauf und Form"
-        : view === "manager"
-          ? `${newestSeason?.displayName ?? "Aktuelle Saison"} · Classic und Interactive`
         : view === "top"
-          ? `${newestSeason?.displayName ?? "Aktuelle Saison"} · kaufbarer Spielerpool`
+          ? `${newestSeason?.displayName ?? "Aktuelle Saison"} · Form- und Marktwertvergleich`
           : `${selectedSeason?.displayName ?? "Gewählte Saison"} · Spieltag ${filters.round}`;
   const navActive: NavView | null = isInfoView(view) ? null : view === "player" ? "players" : view === "team" ? "teams" : view;
   const previousView = backStack.at(-1)?.view;
@@ -669,8 +643,6 @@ export default function App() {
               ? <StepperSelect label="Saison" value={String(selectedTeamSeason?.startYear ?? filters.season)} options={[...teamSeasons].reverse().map((season) => ({ value: String(season.startYear), label: season.displayName }))} onChange={updateTeamSeason} />
               : view === "player"
                 ? <StepperSelect label="Saison" value={String(selectedPlayerSeason?.startYear ?? filters.season)} options={[...playerSeasons].reverse().map((season) => ({ value: String(season.startYear), label: season.displayName }))} onChange={updatePlayerSeason} />
-              : view === "manager" && newestSeason
-                ? <StepperSelect label="Saison" value={String(newestSeason.startYear)} options={[{ value: String(newestSeason.startYear), label: newestSeason.displayName }]} onChange={() => undefined} />
                 : view !== "overview" && <StepperSelect label="Saison" value={filters.season} options={[...seasons].reverse().map((season) => ({ value: String(season.startYear), label: season.displayName }))} onChange={(value) => updateFilter("season", value)} />}
             {showMatchday && (
               <StepperSelect label="Spieltag" value={filters.round} options={Array.from({ length: roundCount }, (_, index) => ({ value: String(index + 1), label: `Spieltag ${index + 1}` }))} onChange={(value) => updateFilter("round", value)} />
@@ -698,14 +670,6 @@ export default function App() {
             {view === "team" && teamId && (teamSelectionPending ? <LoadingState /> : <TeamDetailView filters={filters} teamId={teamId} backLabel={backLabel} onBack={() => goBack("teams")} onPlayer={openPlayer} onTeam={openTeam} />)}
             {view === "table" && <TabelleView filters={filters} leagues={catalog.leagues} seasons={seasons} onFilter={updateFilter} onTeam={openTeam} onPlayer={openPlayer} />}
             {view === "top" && <TopPlayersView filters={filters} leagues={catalog.leagues} onFilter={updateFilter} onPlayer={openPlayer} />}
-            {view === "manager" && <ManagerPicksView
-              filters={filters}
-              section={managerLocation.section}
-              selectedMatchday={managerLocation.matchday}
-              onSection={(section) => updateManagerLocation({ ...managerLocation, section })}
-              onMatchday={(matchday) => updateManagerLocation({ ...managerLocation, matchday })}
-              onPlayer={openPlayer}
-            />}
           </>
         )}
         <SiteFooter currentView={view} filters={filters} onView={setView} />
@@ -826,22 +790,22 @@ function InfoPage({ view, filters, onView }: { view: InfoView; filters: Filters;
     about: {
       eyebrow: "Unabhängiges Datenprojekt",
       title: "Über Punktespiegel",
-      intro: "Punktespiegel macht aktuelle und historische kicker-Noten und Managerpunkte für Bundesliga, 2. Bundesliga und 3. Liga vergleichbar – ohne Anmeldung und ohne Paywall.",
+      intro: "Punktespiegel macht aktuelle und historische kicker-Noten und Punkte für Bundesliga, 2. Bundesliga und 3. Liga vergleichbar – ohne Anmeldung und ohne Paywall.",
     },
     methodology: {
       eyebrow: "Nachvollziehbar statt Blackbox",
       title: "Daten & Methodik",
-      intro: "Vom öffentlichen Quellwert bis zur Tabelle im Browser: Hier ist dokumentiert, wie Punktespiegel Daten importiert, prüft, verdichtet und für Beispielteams einordnet.",
+      intro: "Vom öffentlichen Quellwert bis zur Tabelle im Browser: Hier ist dokumentiert, wie Punktespiegel Daten importiert, prüft und verdichtet.",
     },
     sources: {
       eyebrow: "Transparente Datenbasis",
       title: "Quellen",
-      intro: "Punktespiegel trennt Wertungsdaten, Rollen- und Verfügbarkeitssignale sowie Fußball-News. Externe Profile und Meldungen bleiben mit ihrer Originalquelle verlinkt.",
+      intro: "Punktespiegel trennt Wertungsdaten, Profil- und Verfügbarkeitssignale sowie Fußball-News. Externe Profile und Meldungen bleiben mit ihrer Originalquelle verlinkt.",
     },
     faq: {
       eyebrow: "Kurz erklärt",
       title: "Häufige Fragen",
-      intro: "Antworten zum Datenumfang, zur Aktualisierung, zu Interactive und Classic sowie zur Unabhängigkeit von Punktespiegel.",
+      intro: "Antworten zum Datenumfang, zur Aktualisierung und zur Unabhängigkeit von Punktespiegel.",
     },
   };
   const page = copy[view];
@@ -856,11 +820,11 @@ function InfoPage({ view, filters, onView }: { view: InfoView; filters: Filters;
 
     {view === "about" && <>
       <div className="info-grid">
-        <section className="info-card info-card-wide"><h2>Ein Überblick, der Details nicht versteckt</h2><p>Ranglisten führen direkt zu Spieler- und Mannschaftsprofilen. Saison- und Spieltagsfilter machen Entwicklungen sichtbar; die Tabelle zeigt Platzierungsverlauf, Formkurve und Kreuztabelle jeder Liga, auch für vergangene Saisons. Die Fantasy-Ansicht ergänzt datenbasierte Beispielkader für kicker Manager Interactive und Classic.</p></section>
+        <section className="info-card info-card-wide"><h2>Ein Überblick, der Details nicht versteckt</h2><p>Ranglisten führen direkt zu Spieler- und Mannschaftsprofilen. Saison- und Spieltagsfilter machen Entwicklungen sichtbar; die Tabelle zeigt Platzierungsverlauf, Formkurve und Kreuztabelle jeder Liga, auch für vergangene Saisons.</p></section>
         <section className="info-card"><h2>Drei Ligen, mehrere Saisons</h2><p>Bundesliga, 2. Bundesliga und 3. Liga verwenden dieselben Tabellen und Metriken. So lassen sich Positionen, Vereine und Spieltage konsistent vergleichen.</p></section>
-        <section className="info-card"><h2>Unabhängig und transparent</h2><p>Punktespiegel ist ein unabhängiges Analyseprojekt und nicht mit kicker verbunden. Quellen, Modellgrenzen und Aktualisierungswege werden offen beschrieben.</p></section>
+        <section className="info-card"><h2>Unabhängig und transparent</h2><p>Punktespiegel ist ein unabhängiges Analyseprojekt und nicht mit kicker verbunden. Quellen, Datengrenzen und Aktualisierungswege werden offen beschrieben.</p></section>
       </div>
-      <nav className="info-actions" aria-label="Punktespiegel entdecken">{link("players", "Spielerdaten durchsuchen →")}{link("table", "Tabelle öffnen →")}{link("manager", "Fantasy-Teams ansehen →")}</nav>
+      <nav className="info-actions" aria-label="Punktespiegel entdecken">{link("players", "Spielerdaten durchsuchen →")}{link("table", "Tabelle öffnen →")}{link("teams", "Mannschaften ansehen →")}</nav>
     </>}
 
     {view === "methodology" && <>
@@ -868,24 +832,24 @@ function InfoPage({ view, filters, onView }: { view: InfoView; filters: Filters;
         <li><span>01</span><div><h2>Öffentliche Daten importieren</h2><p>Der Build-Generator lädt die laufende Saison aus öffentlichen kicker-Quelldaten. Abgeschlossene Saisons bleiben unverändert, bis ein vollständiger Neuaufbau ausdrücklich gestartet wird.</p></div></li>
         <li><span>02</span><div><h2>Datenvertrag prüfen</h2><p>Ligen, Saisons, Spieltage, Spieler, Vereine und Wertungen werden normalisiert und vor jeder Veröffentlichung auf Vollständigkeit und Konsistenz geprüft.</p></div></li>
         <li><span>03</span><div><h2>Statische Saisonartefakte bauen</h2><p>Je Liga und Saison entsteht ein kompaktes JSON-Artefakt. Der Browser lädt nur die ausgewählte Saison; es gibt keinen Laufzeitserver, keine Datenbank und kein Benutzerkonto.</p></div></li>
-        <li><span>04</span><div><h2>Beispielteams offline berechnen</h2><p>Interactive- und Classic-Kader werden vorab berechnet. Marktwerte, Positionen, Vereinslimits, Rollen und Verfügbarkeit fließen in die Auswahl ein; die Ergebnisse sind Beispiele und keine Garantie.</p></div></li>
+        <li><span>04</span><div><h2>Profil- und Verfügbarkeitssignale ergänzen</h2><p>Externe Snapshots von LigaInsider und Transfermarkt ergänzen die Wertungen um Rollen-, Verfügbarkeits- und Vereinskontext. Jedes Signal bleibt mit Quelle und Stand ausgewiesen.</p></div></li>
       </ol>
       <div className="info-grid">
         <section className="info-card"><h2>Aktualisierung</h2><p>Die laufende Saison wird täglich um 12:15 Uhr deutscher Zeit neu gebaut. Ein manueller Lauf kann zusätzlich alle abgeschlossenen Saisons aktualisieren.</p></section>
-        <section className="info-card"><h2>Modellgrenzen</h2><p>Prognosen bleiben Erwartungswerte. Die historische Classic-Prüfung ist ohne vollständig archivierte damalige Marktsnapshots ausdrücklich experimentell.</p></section>
+        <section className="info-card"><h2>Datengrenzen</h2><p>Externe Signale sind datierte Snapshots und können der Realität hinterherlaufen. Jede Angabe bleibt mit ihrer Originalquelle verlinkt.</p></section>
       </div>
     </>}
 
     {view === "sources" && <>
       <div className="info-grid">
         <section className="info-card"><h2>Noten, Punkte und Medien</h2><p>Spiel- und Wertungsdaten sowie Spielerfotos und Vereinslogos stammen aus öffentlichen kicker-Quellen. Spielerprofile verlinken zusätzlich auf die jeweiligen kicker-Seiten.</p></section>
-        <section className="info-card"><h2>Rollen und Verfügbarkeit</h2><p>LigaInsider liefert Bundesliga-Rollen- und Topelf-Signale. Medizinische Verfügbarkeit wird für die Bundesliga über LigaInsider und für 2. Bundesliga sowie 3. Liga über Transfermarkt eingeordnet.</p></section>
+        <section className="info-card"><h2>Profile und Verfügbarkeit</h2><p>Transfermarkt-Snapshots liefern Trainer, Kapitän, Transfers, Kaderbiografien und Karrierewerte. LigaInsider ergänzt Bundesliga-Rollen- und Topelf-Signale; medizinische Verfügbarkeit kommt je Liga aus LigaInsider oder Transfermarkt.</p></section>
         <section className="info-card info-card-wide"><h2>Fußball-News</h2><p>Spielerbezogene Überschriften werden über NewsAPI oder öffentliche RSS-Feeds gesammelt. Jede Meldung öffnet die Originalquelle; Punktespiegel übernimmt keine redaktionelle Verantwortung für externe Inhalte.</p></section>
       </div>
       <nav className="source-directory" aria-label="Externe Quellen">
-        <a href="https://www.kicker.de/games/startseite" target="_blank" rel="noreferrer external"><strong>kicker Games</strong><span>Interactive, Classic und Regeln ↗</span></a>
+        <a href="https://www.kicker.de/games/startseite" target="_blank" rel="noreferrer external"><strong>kicker Games</strong><span>Punkteregeln der kicker Manager-Liga ↗</span></a>
         <a href="https://www.ligainsider.de/" target="_blank" rel="noreferrer external"><strong>LigaInsider</strong><span>Rollen, Topelf und Verfügbarkeit ↗</span></a>
-        <a href="https://www.transfermarkt.de/" target="_blank" rel="noreferrer external"><strong>Transfermarkt</strong><span>Vereinsprofile und Ausfalllisten ↗</span></a>
+        <a href="https://www.transfermarkt.de/" target="_blank" rel="noreferrer external"><strong>Transfermarkt</strong><span>Kader, Transfers, Marktwerte, Karriere und Ausfalllisten ↗</span></a>
         <a href="https://www.sportschau.de/fussball/" target="_blank" rel="noreferrer external"><strong>Sportschau</strong><span>Fußball-News und RSS ↗</span></a>
         <a href="https://www.bundesliga.com/de/bundesliga" target="_blank" rel="noreferrer external"><strong>Bundesliga.com</strong><span>Offizielle Liga-News ↗</span></a>
         <a href="https://www.skysports.com/football" target="_blank" rel="noreferrer external"><strong>Sky Sports</strong><span>Internationaler Fußball-Newsfeed ↗</span></a>
@@ -908,7 +872,7 @@ function SiteFooter({ currentView, filters, onView }: { currentView: View; filte
     { view: "faq", label: "FAQ" },
     { view: "table", label: "Tabelle" },
     { view: "players", label: "Spieler" },
-    { view: "manager", label: "Fantasy Team" },
+    { view: "teams", label: "Mannschaften" },
   ];
   const openView = (event: ReactMouseEvent<HTMLAnchorElement>, target: NavView) => {
     event.preventDefault();
@@ -1114,28 +1078,6 @@ function TabelleView({ filters, leagues, seasons, onFilter, onTeam, onPlayer }: 
     return () => controller.abort();
   }, [filters.league, filters.season, round]);
 
-  // Squad membership marks scorers from the fantasy teams; recommendations
-  // only exist for the current season, so missing artifacts leave the map empty.
-  const [squad, setSquad] = useState<Map<string, string[]>>(new Map());
-  useEffect(() => {
-    const controller = new AbortController();
-    const params = new URLSearchParams({ league: filters.league, season: filters.season });
-    Promise.allSettled([
-      api.managerPicks(params, "classic", controller.signal),
-      api.managerPicks(params, "interactive", controller.signal),
-    ]).then((results) => {
-      if (controller.signal.aborted) return;
-      const membership = new Map<string, string[]>();
-      results.forEach((result, index) => {
-        if (result.status !== "fulfilled") return;
-        const mode = index === 0 ? "Classic" : "Interactive";
-        for (const player of result.value.players) membership.set(player.id, [...(membership.get(player.id) ?? []), mode]);
-      });
-      setSquad(membership);
-    });
-    return () => controller.abort();
-  }, [filters.league, filters.season]);
-
   return (
     <div className="tabelle-view">
       <PageHeader title="Tabelle" description={`${selectedSeason?.displayName ?? "Gewählte Saison"} · Stand nach Spieltag ${round}`} controls={<div className="selectors">
@@ -1147,7 +1089,7 @@ function TabelleView({ filters, leagues, seasons, onFilter, onTeam, onPlayer }: 
         : loading || !standings ? <LoadingState />
           : standings.context.playedMatchCount < 1 ? <section className="detail-section"><Empty message="Für diese Auswahl liegen noch keine gespielten Partien vor." /></section>
             : <>
-              <MatchdayFixturesCard standings={standings} squad={squad} onTeam={onTeam} onPlayer={onPlayer} />
+              <MatchdayFixturesCard standings={standings} onTeam={onTeam} onPlayer={onPlayer} />
               <FormTableCard standings={standings} league={filters.league} onTeam={onTeam} />
               <BumpChartCard standings={standings} zones={leagueZones[filters.league] ?? []} />
               <CrossTableCard standings={standings} onTeam={onTeam} />
@@ -1156,7 +1098,7 @@ function TabelleView({ filters, leagues, seasons, onFilter, onTeam, onPlayer }: 
   );
 }
 
-function MatchdayFixturesCard({ standings, squad, onTeam, onPlayer }: { standings: LeagueStandings; squad: Map<string, string[]>; onTeam: (id: string) => void; onPlayer: (id: string) => void }) {
+function MatchdayFixturesCard({ standings, onTeam, onPlayer }: { standings: LeagueStandings; onTeam: (id: string) => void; onPlayer: (id: string) => void }) {
   if (!standings.fixtures.length) return null;
   const groups: { slot: string | null; fixtures: MatchdayFixture[] }[] = [];
   for (const fixture of standings.fixtures) {
@@ -1171,7 +1113,7 @@ function MatchdayFixturesCard({ standings, squad, onTeam, onPlayer }: { standing
         {groups.map((group) => (
           <div className="fixture-slot" key={group.slot ?? "offen"}>
             <h4>{formatFixtureSlot(group.slot)}</h4>
-            {group.fixtures.map((fixture) => <TabelleFixture key={fixture.id} fixture={fixture} squad={squad} onTeam={onTeam} onPlayer={onPlayer} />)}
+            {group.fixtures.map((fixture) => <TabelleFixture key={fixture.id} fixture={fixture} onTeam={onTeam} onPlayer={onPlayer} />)}
           </div>
         ))}
       </div>
@@ -1179,7 +1121,7 @@ function MatchdayFixturesCard({ standings, squad, onTeam, onPlayer }: { standing
   );
 }
 
-function TabelleFixture({ fixture, squad, onTeam, onPlayer }: { fixture: MatchdayFixture; squad: Map<string, string[]>; onTeam: (id: string) => void; onPlayer: (id: string) => void }) {
+function TabelleFixture({ fixture, onTeam, onPlayer }: { fixture: MatchdayFixture; onTeam: (id: string) => void; onPlayer: (id: string) => void }) {
   const played = fixture.homeScore != null && fixture.awayScore != null;
   const contributorCount = fixture.home.goals.length + fixture.home.assists.length + fixture.away.goals.length + fixture.away.assists.length;
   const teamButton = (side: MatchdayFixtureSide, align: "home" | "away") => (
@@ -1203,23 +1145,22 @@ function TabelleFixture({ fixture, squad, onTeam, onPlayer }: { fixture: Matchda
     <details className="fixture-card">
       <summary>{head}<span className="fixture-toggle" aria-hidden="true">⌄</span></summary>
       <div className="fixture-detail">
-        <FixtureSideDetail side={fixture.home} align="home" squad={squad} onPlayer={onPlayer} />
-        <FixtureSideDetail side={fixture.away} align="away" squad={squad} onPlayer={onPlayer} />
+        <FixtureSideDetail side={fixture.home} align="home" onPlayer={onPlayer} />
+        <FixtureSideDetail side={fixture.away} align="away" onPlayer={onPlayer} />
       </div>
     </details>
   );
 }
 
-function FixtureSideDetail({ side, align, squad, onPlayer }: { side: MatchdayFixtureSide; align: "home" | "away"; squad: Map<string, string[]>; onPlayer: (id: string) => void }) {
+function FixtureSideDetail({ side, align, onPlayer }: { side: MatchdayFixtureSide; align: "home" | "away"; onPlayer: (id: string) => void }) {
   const group = (label: string, contributors: MatchdayContributor[]) => contributors.length > 0 && (
     <div className="fixture-people">
       <span className="fixture-detail-label">{label}</span>
       <div className="fixture-people-row">
         {contributors.map((contributor) => {
-          const modes = squad.get(contributor.id);
-          const title = `${contributor.name}${contributor.count > 1 ? ` · ${contributor.count}×` : ""}${modes ? ` · im Fantasy-Team (${modes.join(" & ")})` : ""}`;
+          const title = `${contributor.name}${contributor.count > 1 ? ` · ${contributor.count}×` : ""}`;
           return (
-            <button key={contributor.id} className={`fixture-person${modes ? " in-squad" : ""}`} title={title} onClick={() => onPlayer(contributor.id)}>
+            <button key={contributor.id} className="fixture-person" title={title} onClick={() => onPlayer(contributor.id)}>
               <span className="fixture-person-portrait">
                 <PlayerPortrait name={contributor.name} url={contributor.photoUrl} teamCode={side.team.code} teamLogoUrl={side.team.logoUrl} />
                 {contributor.count > 1 && <b>{contributor.count}×</b>}
@@ -1609,10 +1550,13 @@ function PlayerDetailView({ filters, playerId, backLabel, onBack, onTeam, onSeas
         <div className="profile-copy"><p className="kicker">{positionName[detail.position]}</p><h2>{detail.name}</h2><div className="profile-context"><button className="profile-team-link" onClick={() => onTeam(detail.teamId)}>{detail.team}</button><span>{detail.league} · {detail.season}</span></div><div className="profile-links"><a href={detail.kickerUrl} target="_blank" rel="noreferrer">kicker-Profil ↗</a>{detail.ligaInsiderUrl && <a href={detail.ligaInsiderUrl} target="_blank" rel="noreferrer">LigaInsider ↗</a>}<a href={detail.transfermarktUrl} target="_blank" rel="noreferrer">Transfermarkt ↗</a></div></div>
         <div className="profile-stats">
           <span><strong>{detail.seasonPoints}</strong><small>Saisonpunkte</small></span>
-          <span><strong>{formatMarketValue(detail.priceM)}</strong><small>Marktwert</small></span>
+          {detail.bio?.marketValue?.eur != null
+            ? <span><strong>{formatEur(detail.bio.marketValue.eur)}</strong><small>Marktwert · Transfermarkt</small></span>
+            : <span><strong>{formatMarketValue(detail.priceM)}</strong><small>Marktwert · kicker</small></span>}
           <span><strong>{formatPlayerValue(detail.value)}</strong><small>Wert · Pkt. / Mio. €</small></span>
         </div>
       </header>
+      {detail.bio && <PlayerBioSection bio={detail.bio} />}
       {detail.availability && (
         <aside className={`availability-alert ${detail.availability.status}`}>
           <div><p className="kicker">Aktueller Verfügbarkeitsstatus</p><strong>{availabilityStatusName[detail.availability.status]}{detail.availability.reason ? ` · ${detail.availability.reason}` : ""}</strong><small>{detail.availability.absentSince ? `Fehlt seit ${detail.availability.absentSince}. ` : ""}{detail.availability.expectedReturn ? `Erwartete Rückkehr: ${formatDate(detail.availability.expectedReturn)}.` : "Kein bestätigtes Rückkehrdatum."}</small></div>
@@ -1621,9 +1565,9 @@ function PlayerDetailView({ filters, playerId, backLabel, onBack, onTeam, onSeas
       )}
       <PlayerNewsSection news={detail.news} kickerNewsUrl={detail.kickerNewsUrl} kickerNewsDirect={detail.kickerNewsDirect} />
       <section className="player-seasons">
-        <div className="section-copy"><h3>Punkte nach Saison</h3><p>Verein, Einsätze und benotete Spiele je Saison.</p></div>
+        <div className="section-copy"><h3>Punkte nach Saison</h3><p>Verein, Einsätze, Tore und benotete Spiele je Saison im Archiv.</p></div>
         <div className="table-shell player-season-table">
-          <table><thead><tr><th>Jahr</th><th>Verein</th><th>Liga</th><th className="num">Einsätze</th><th className="num">Benotet</th><th className="num">Gesamtpunkte</th></tr></thead>
+          <table><thead><tr><th>Jahr</th><th>Verein</th><th>Liga</th><th className="num">Einsätze</th><th className="num">Benotet</th><th className="num">Tore</th><th className="num">Vorlagen</th><th className="num">Gesamtpunkte</th></tr></thead>
             <tbody>{detail.seasons.map((season) => (
               <tr key={season.startYear} className={`clickable-row ${season.startYear === detail.startYear ? "selected" : ""}`} tabIndex={0} onClick={() => onSeason(season.startYear)} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") onSeason(season.startYear); }}>
                 <td><strong>{season.season}</strong></td>
@@ -1631,16 +1575,74 @@ function PlayerDetailView({ filters, playerId, backLabel, onBack, onTeam, onSeas
                 <td>{season.league}</td>
                 <td className="num">{season.appearances}</td>
                 <td className="num">{season.gradedAppearances}</td>
+                <td className="num">{season.goals}</td>
+                <td className="num">{season.assists}</td>
                 <td className="num primary-num">{season.points}</td>
               </tr>
             ))}</tbody>
+            {detail.seasons.length > 1 && <tfoot><tr>
+              <td colSpan={3}><strong>Gesamt im Archiv</strong></td>
+              <td className="num">{detail.seasons.reduce((sum, season) => sum + season.appearances, 0)}</td>
+              <td className="num">{detail.seasons.reduce((sum, season) => sum + season.gradedAppearances, 0)}</td>
+              <td className="num">{detail.seasons.reduce((sum, season) => sum + season.goals, 0)}</td>
+              <td className="num">{detail.seasons.reduce((sum, season) => sum + season.assists, 0)}</td>
+              <td className="num primary-num">{detail.seasons.reduce((sum, season) => sum + season.points, 0)}</td>
+            </tr></tfoot>}
           </table>
         </div>
       </section>
+      {detail.career && detail.career.clubs.length > 0 && <PlayerCareerSection career={detail.career} />}
       <div className="section-copy"><p className="kicker">Saisonverlauf</p><h3>Jeder Einsatz und jede Punkteaktion</h3></div>
       <div className="table-shell game-table">
         <table><thead><tr><th>Spieltag</th><th>Datum</th><th>Gegner</th><th>Ergebnis</th><th className="num">Punkte</th><th className="num">Note</th><th className="num">Tore</th><th className="num">Vorlagen</th><th className="num">Zu null</th><th className="num">Startelf</th><th className="num">Karten</th><th className="num">SdS</th><th className="num">Joker</th></tr></thead>
           <tbody>{detail.games.map((game) => <GameRow key={game.matchday} game={game} onTeam={onTeam} />)}</tbody>
+        </table>
+      </div>
+    </section>
+  );
+}
+
+function PlayerBioSection({ bio }: { bio: NonNullable<PlayerDetail["bio"]> }) {
+  const facts: { label: string; value: string; detail?: string }[] = [
+    { label: "Geboren", value: bio.birthDate ? formatDateWithYear(bio.birthDate) : "—", detail: bio.age != null ? `${bio.age} Jahre` : undefined },
+    { label: "Nationalität", value: bio.nationalities.join(", ") || "—" },
+    { label: "Größe", value: formatHeight(bio.heightCm), detail: bio.foot ? `${bio.foot === "beidfüßig" ? "beidfüßig" : `${bio.foot}er Fuß`}` : undefined },
+    { label: "Im Verein seit", value: bio.joinedAt ? formatJoined(bio.joinedAt) : "—", detail: bio.previousClub ? `zuvor ${bio.previousClub}` : undefined },
+    { label: "Vertrag bis", value: bio.contractUntil ? formatDateWithYear(bio.contractUntil) : "—" },
+    { label: "Rückennummer", value: bio.shirtNumber ?? "—", detail: bio.positionDetail ?? undefined },
+  ];
+  return (
+    <section className="player-bio" aria-label="Spielerdaten">
+      {facts.map((fact) => <span key={fact.label}><small>{fact.label}</small><strong>{fact.value}</strong>{fact.detail && <em>{fact.detail}</em>}</span>)}
+    </section>
+  );
+}
+
+function PlayerCareerSection({ career }: { career: NonNullable<PlayerDetail["career"]> }) {
+  const clubs = [...career.clubs].sort((left, right) => right.appearances - left.appearances || left.name.localeCompare(right.name, "de"));
+  const totals = clubs.reduce((result, club) => ({
+    appearances: result.appearances + club.appearances,
+    goals: result.goals + club.goals,
+    assists: result.assists + club.assists,
+  }), { appearances: 0, goals: 0, assists: 0 });
+  return (
+    <section className="player-career" aria-label="Karrierestationen">
+      <div className="section-copy news-heading">
+        <div><h3>Leistungsdaten nach Verein</h3><p>Karriereeinsätze, Tore und Vorlagen je Verein.</p></div>
+        <div className="news-actions"><span>{career.provider} · Stand {formatDate(career.generatedAt)}</span><a href={career.tmUrl} target="_blank" rel="noreferrer">Profil öffnen ↗</a></div>
+      </div>
+      <div className="table-shell career-table">
+        <table>
+          <thead><tr><th>Verein</th><th className="num">Einsätze</th><th className="num">Tore</th><th className="num">Vorlagen</th></tr></thead>
+          <tbody>{clubs.map((club) => (
+            <tr key={club.clubId}>
+              <td><strong>{club.tmUrl ? <a href={club.tmUrl} target="_blank" rel="noreferrer">{club.name} ↗</a> : club.name}</strong></td>
+              <td className="num">{club.appearances}</td>
+              <td className="num">{club.goals}</td>
+              <td className="num">{club.assists}</td>
+            </tr>
+          ))}</tbody>
+          <tfoot><tr><td><strong>Gesamt</strong></td><td className="num">{totals.appearances}</td><td className="num">{totals.goals}</td><td className="num">{totals.assists}</td></tr></tfoot>
         </table>
       </div>
     </section>
@@ -1728,325 +1730,6 @@ function NewsList<Article extends NewsArticle>({ articles, context }: {
   );
 }
 
-function ManagerPicksView({ filters, section, selectedMatchday, onSection, onMatchday, onPlayer }: {
-  filters: Filters;
-  section: ManagerSection;
-  selectedMatchday: number | null;
-  onSection: (section: ManagerSection) => void;
-  onMatchday: (matchday: number) => void;
-  onPlayer: (id: string) => void;
-}) {
-  const [mode, setMode] = useState<ManagerMode>("classic");
-  const [recommendation, setRecommendation] = useState<ManagerRecommendation | null>(null);
-  const [schedule, setSchedule] = useState<ManagerScheduleRound[]>([]);
-  const [scheduleLoading, setScheduleLoading] = useState(false);
-  const [scheduleError, setScheduleError] = useState<string | null>(null);
-  const [squadNews, setSquadNews] = useState<SquadNews | null>(null);
-  const [squadNewsLoading, setSquadNewsLoading] = useState(false);
-  const [squadNewsError, setSquadNewsError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    const controller = new AbortController();
-    let active = true;
-    setLoading(true);
-    setError(null);
-    setSchedule([]);
-    setScheduleLoading(false);
-    setScheduleError(null);
-    setSquadNews(null);
-    setSquadNewsLoading(false);
-    setSquadNewsError(null);
-    void (async () => {
-      try {
-        const nextRecommendation = await api.managerPicks(scopeQuery(filters, false), mode, controller.signal);
-        if (!active) return;
-        setRecommendation(nextRecommendation);
-        setLoading(false);
-        setScheduleLoading(true);
-        void api.managerSchedule(scopeQuery(filters, false), nextRecommendation.players, controller.signal)
-          .then((nextSchedule) => {
-            if (!active) return;
-            setSchedule(nextSchedule);
-          })
-          .catch((reason: Error) => {
-            if (active && !isAbort(reason)) setScheduleError(reason.message);
-          })
-          .finally(() => { if (active) setScheduleLoading(false); });
-        setSquadNewsLoading(true);
-        try {
-          const news = await api.managerNews(nextRecommendation.players, controller.signal);
-          if (active) setSquadNews(news);
-        } catch (reason) {
-          if (active && !isAbort(reason)) setSquadNewsError(reason instanceof Error ? reason.message : "Kadernachrichten konnten nicht geladen werden.");
-        } finally {
-          if (active) setSquadNewsLoading(false);
-        }
-      } catch (reason) {
-        if (active && !isAbort(reason)) setError(reason instanceof Error ? reason.message : "Kaderempfehlung konnte nicht geladen werden.");
-      } finally {
-        if (active) setLoading(false);
-      }
-    })();
-    return () => {
-      active = false;
-      controller.abort();
-    };
-  }, [filters.league, filters.season, mode]);
-
-  useEffect(() => {
-    if (!schedule.length || (selectedMatchday !== null && schedule.some((round) => round.matchday === selectedMatchday))) return;
-    const nextMatchday = (recommendation?.currentSeasonEvidence?.throughMatchday ?? 0) + 1;
-    const availableMatchday = schedule.find((round) => round.matchday >= nextMatchday)?.matchday ?? schedule.at(-1)!.matchday;
-    onMatchday(availableMatchday);
-  }, [recommendation?.currentSeasonEvidence?.throughMatchday, schedule, selectedMatchday]);
-
-  if (error) return <ErrorState message={error} />;
-  const starters = recommendation?.players.filter((player) => player.role === "start") ?? [];
-  const reserves = recommendation?.players.filter((player) => player.role === "reserve") ?? [];
-  const remainingProjection = Boolean(
-    recommendation?.currentSeasonEvidence?.realizedPointsExcludedFromSelectionObjective
-    && recommendation.currentSeasonEvidence.throughMatchday > 0,
-  );
-  const optimizationStartsAt = recommendation?.currentSeasonEvidence?.optimizationStartsAtMatchday
-    ?? ((recommendation?.currentSeasonEvidence?.throughMatchday ?? 0) + 1);
-  const methodology = recommendation ? (recommendation.modelVersion === 2
-    ? recommendation.mode === "classic"
-      ? remainingProjection
-        ? `Der Kader maximiert die verfügbarkeitsbereinigten Punkte ab Spieltag ${optimizationStartsAt} mit festen Starter- und Reserveslots; bereits erzielte Punkte beeinflussen die Auswahl nicht.`
-        : "Der September-Kader maximiert verfügbarkeitsbereinigte Saisonpunkte mit festen Starter- und Reserveslots; die drei möglichen Winterwechsel werden erst am echten Stichtag mit den dann bekannten Informationen festgelegt."
-      : remainingProjection
-        ? `Punkte- und Rollenprognosen wählen den Kader ab Spieltag ${optimizationStartsAt} gemeinsam mit der besten zulässigen Elf je Spieltag. Bereits erzielte Punkte beeinflussen die Auswahl nicht.`
-        : "Punkte- und Rollenprognosen wählen den Kader gemeinsam mit der besten zulässigen Elf je Spieltag. Alle drei Torhüter kommen als Ausfallversicherung vom selben Verein."
-    : "Optimiert nach Punkteprognose sowie Positions-, Formations- und Vereinsregeln.") : "";
-  return (
-    <div className="manager-view">
-      <div className="manager-toolbar">
-        <div className="scope-switch" aria-label="Spielmodus">
-          <button className={mode === "classic" ? "active" : ""} onClick={() => setMode("classic")}>Classic</button>
-          <button className={mode === "interactive" ? "active" : ""} onClick={() => setMode("interactive")}>Interactive</button>
-        </div>
-        <p>{mode === "classic" ? "15 Spieler · feste 4-4-2-Aufstellung" : "22 Spieler · beste Elf und Formation für jeden Spieltag"}</p>
-      </div>
-      <div className="scope-switch manager-section-tabs" aria-label="Fantasy-Team-Ansicht">
-        <button className={section === "overview" ? "active" : ""} aria-pressed={section === "overview"} onClick={() => onSection("overview")}>Übersicht</button>
-        <button className={section === "matchdays" ? "active" : ""} aria-pressed={section === "matchdays"} onClick={() => onSection("matchdays")}>Spieltage</button>
-      </div>
-      {loading || !recommendation ? <LoadingState /> : (
-        <>
-          {section === "overview" ? <>
-            <div className="manager-content-grid">
-              <div className="manager-squad-grid">
-                <section className="detail-section manager-lineup">
-                <div className="section-copy"><p className="kicker">Startelf</p><h3>Formation {recommendation.formation}</h3></div>
-                <div className="manager-position-groups">
-                  {(["GK", "DEF", "MID", "FWD"] as Position[]).map((position) => (
-                    <section key={position}><h4>{positionName[position]}</h4><div>{starters.filter((player) => player.position === position).map((player) => <ManagerPlayerCard key={player.id} player={player} onClick={() => onPlayer(player.id)} />)}</div></section>
-                  ))}
-                </div>
-                <section className="manager-reserves manager-reserves-inline">
-                  <div className="section-copy"><p className="kicker">Reserve</p><h3>Ersatzbank</h3></div>
-                  <ol>{reserves.map((player) => <li key={player.id}><ManagerPlayerRow player={player} onClick={() => onPlayer(player.id)} /></li>)}</ol>
-                </section>
-                </section>
-              </div>
-              <section className="detail-section fantasy-matchdays">
-                <div className="section-copy"><p className="kicker">Saisonverlauf</p><h3>Punkte je Spieltag</h3><p>Gesamt- und Positionspunkte auf einen Blick. Aufklappen zeigt die Einzelwerte der Startelf.</p></div>
-                {recommendation.matchdays.length ? (
-                  <div className="fantasy-matchday-list">
-                    {recommendation.matchdays.map((matchday) => <FantasyMatchdayCard key={matchday.matchday} matchday={matchday} onPlayer={onPlayer} />)}
-                  </div>
-                ) : <p className="fantasy-matchdays-empty">Für diese Saison sind noch keine Spieltagspunkte verfügbar.</p>}
-              </section>
-            </div>
-            {squadNews
-              ? <SquadNewsSection news={squadNews} />
-              : squadNewsLoading
-                ? <SquadNewsLoadingSection />
-                : squadNewsError && <SquadNewsErrorSection message={squadNewsError} />}
-          </> : <ManagerScheduleView
-            rounds={schedule}
-            selectedMatchday={selectedMatchday}
-            onMatchday={onMatchday}
-            onPlayer={onPlayer}
-            loading={scheduleLoading}
-            error={scheduleError}
-          />}
-          <details className="manager-methodology">
-            <summary>Methodik &amp; Datenstand</summary>
-            <div><p>{methodology} Prognosen sind Erwartungswerte, keine Garantie.</p>
-              {recommendation.availabilityAudit && <p>
-                {recommendation.currentSeasonEvidence && recommendation.currentSeasonEvidence.throughMatchday > 0 && <><strong>Aktuelle Saison berücksichtigt:</strong> {recommendation.currentSeasonEvidence.completedMatches} Spiele und {recommendation.currentSeasonEvidence.roleObservations} Rollenbeobachtungen bis Spieltag {recommendation.currentSeasonEvidence.throughMatchday}; Kaderauswahl ab Spieltag {optimizationStartsAt}. </>}
-                <strong>Verfügbarkeit geprüft:</strong> {recommendation.availabilityAudit.excludedPlayerCount} aktuell verletzte, im Aufbautraining befindliche oder nicht berücksichtigte Kandidaten wurden ausgeschlossen. <a href={recommendation.availabilityAudit.sourceUrl} target="_blank" rel="noreferrer">{recommendation.availabilityAudit.provider} · Stand {formatDate(recommendation.availabilityAudit.generatedAt)} ↗</a>
-              </p>}
-            </div>
-          </details>
-        </>
-      )}
-    </div>
-  );
-}
-
-function SquadNewsLoadingSection() {
-  return (
-    <section className="detail-section manager-squad-news" aria-labelledby="manager-squad-news-loading-title" aria-busy="true">
-      <div className="section-copy"><p className="kicker">Kaderbeobachtung</p><h3 id="manager-squad-news-loading-title">Neueste Entwicklungen im Kader</h3></div>
-      <p className="news-empty">Kadernachrichten werden unabhängig von der bereits geladenen Empfehlung ergänzt …</p>
-    </section>
-  );
-}
-
-function SquadNewsErrorSection({ message }: { message: string }) {
-  return (
-    <section className="detail-section manager-squad-news" aria-labelledby="manager-squad-news-error-title">
-      <div className="section-copy"><p className="kicker">Kaderbeobachtung</p><h3 id="manager-squad-news-error-title">Neueste Entwicklungen im Kader</h3></div>
-      <p className="news-health news-health--failed" role="alert">Die optionale Nachrichtenansicht konnte nicht geladen werden: {message}</p>
-    </section>
-  );
-}
-
-function SquadNewsSection({ news }: { news: SquadNews }) {
-  const emptyMessage = news.status === "failed"
-    ? "Die Kadernachrichten konnten beim letzten Lauf nicht geladen werden."
-    : news.status === "stale"
-      ? "Der letzte verfügbare Nachrichtenstand ist veraltet und enthält keine Meldung zu diesem Kader."
-      : "Die Quellen wurden erfolgreich geprüft; aktuell gibt es keine Meldung zu den ausgewählten Spielern oder ihren Vereinen.";
-  const context = (article: SquadNewsArticle) => article.relatedPlayers.length
-    ? `Spieler: ${article.relatedPlayers.join(", ")}`
-    : `Verein: ${article.relatedTeams.join(", ")}`;
-  return (
-    <section className="detail-section manager-squad-news" aria-labelledby="manager-squad-news-title">
-      <div className="section-copy news-heading">
-        <div><p className="kicker">Kaderbeobachtung</p><h3 id="manager-squad-news-title">Neueste Entwicklungen im Kader</h3><p>Spielerzuordnungen und Meldungen aus dem Vereinsumfeld, URL-genau zusammengeführt.</p></div>
-        <div className="news-actions">{news.generatedAt && <span>Stand {formatNewsDate(news.generatedAt)}</span>}</div>
-      </div>
-      <NewsHealthNotice status={news.status} feedSummary={news.feedSummary} includeUnmapped />
-      {news.articles.length
-        ? <NewsList articles={news.articles} context={context} />
-        : <p className={`news-empty news-empty--${news.status}`}>{emptyMessage}</p>}
-    </section>
-  );
-}
-
-function ManagerPlayerCard({ player, onClick }: { player: ManagerRecommendation["players"][number]; onClick: () => void }) {
-  return <button className="manager-player-card" onClick={onClick} title={`${player.name} · ${player.team}`}><PlayerPortrait name={player.name} url={player.photoUrl} teamCode={player.teamCode} teamLogoUrl={player.logoUrl} /><span><strong>{lastName(player.name)}</strong><small>{player.team}</small></span><b>{player.currentPoints} Pkt.<small>aktuell</small></b>{player.promotionAdjusted && <em>Ligastufe korrigiert</em>}</button>;
-}
-
-function ManagerPlayerRow({ player, onClick }: { player: ManagerRecommendation["players"][number]; onClick: () => void }) {
-  const confidence = ({ high: "hoch", medium: "mittel", low: "gering" } as const)[player.confidence];
-  return <button onClick={onClick}><PlayerPortrait name={player.name} url={player.photoUrl} teamCode={player.teamCode} teamLogoUrl={player.logoUrl} /><span><strong>{player.name}</strong><small>{positionName[player.position]} · {player.team}{player.promotionAdjusted ? " · Ligastufe korrigiert" : ""}</small></span><span><b>{player.currentPoints} Pkt.</b><small>Aktuell</small></span><em className={`confidence ${player.confidence}`}>{confidence}</em></button>;
-}
-
-function FantasyMatchdayCard({ matchday, onPlayer }: { matchday: ManagerRecommendation["matchdays"][number]; onPlayer: (id: string) => void }) {
-  const positions = [
-    { label: "TW", value: matchday.positionPoints.GK },
-    { label: "ABW", value: matchday.positionPoints.DEF },
-    { label: "MIT", value: matchday.positionPoints.MID },
-    { label: "Sturm", value: matchday.positionPoints.FWD },
-  ];
-  return (
-    <details className="fantasy-matchday-card">
-      <summary>
-        <span className="matchday-badge">Spieltag {matchday.matchday}</span>
-        <span className="fantasy-summary-positions">{positions.map((position) => <span key={position.label}><small>{position.label}</small><strong>{position.value}</strong></span>)}</span>
-        <span className="fantasy-matchday-total"><strong>{matchday.totalPoints}</strong><small>Punkte</small></span>
-        <span className="fantasy-matchday-toggle" aria-hidden="true">⌄</span>
-      </summary>
-      <ol className="fantasy-player-points">
-        {matchday.players.map((player) => (
-          <li key={player.id}><button onClick={() => onPlayer(player.id)}><PlayerPortrait name={player.name} url={player.photoUrl} teamCode={player.teamCode} teamLogoUrl={player.logoUrl} /><span><strong>{player.name}</strong><small>{positionName[player.position]} · {player.team}</small></span><b className={player.points < 0 ? "negative" : ""}>{player.points > 0 ? `+${player.points}` : player.points}</b></button></li>
-        ))}
-      </ol>
-    </details>
-  );
-}
-
-function ManagerScheduleView({ rounds, selectedMatchday, onMatchday, onPlayer, loading, error }: {
-  rounds: ManagerScheduleRound[];
-  selectedMatchday: number | null;
-  onMatchday: (matchday: number) => void;
-  onPlayer: (id: string) => void;
-  loading: boolean;
-  error: string | null;
-}) {
-  if (loading && !rounds.length) return <LoadingState />;
-  if (error) return <ErrorState message={error} />;
-  const round = rounds.find((item) => item.matchday === selectedMatchday) ?? rounds[0];
-  if (!round) return <section className="detail-section"><Empty message="Für diese Saison ist noch kein Spielplan verfügbar." /></section>;
-  const slots = new Map<string, ManagerFixture[]>();
-  for (const fixture of round.fixtures) {
-    const slot = fixture.scheduledAt ?? "unknown";
-    slots.set(slot, [...(slots.get(slot) ?? []), fixture]);
-  }
-  return (
-    <section className="detail-section manager-fixtures" aria-labelledby="manager-fixtures-title">
-      <header className="manager-fixtures-header">
-        <div className="section-copy">
-          <p className="kicker">Dein Kader im Spielplan</p>
-          <h3 id="manager-fixtures-title">Spieltagswertung</h3>
-          <p>Alle Partien und die zugehörigen Spieler deines Fantasy Teams. Bereits verfügbare Punkte stehen direkt am Spieler.</p>
-        </div>
-        <StepperSelect
-          label="Spieltag"
-          value={String(round.matchday)}
-          options={rounds.map((item) => ({ value: String(item.matchday), label: `${item.matchday}. Spieltag` }))}
-          onChange={(value) => onMatchday(Number(value))}
-        />
-      </header>
-      <div className="manager-fixtures-round" aria-live="polite">
-        <strong>{round.name}</strong>
-        <span>{formatMatchdayRange(round.startAt, round.endAt)}</span>
-        <em>{formatRoundPhase(round.phase)}</em>
-      </div>
-      <div className="manager-fixture-slots">
-        {[...slots.entries()].map(([slot, fixtures]) => (
-          <section className="manager-fixture-slot" key={slot}>
-            <h4>{formatFixtureSlot(slot === "unknown" ? null : slot)}</h4>
-            <div>{fixtures.map((fixture) => <ManagerFixtureCard key={fixture.id} fixture={fixture} onPlayer={onPlayer} />)}</div>
-          </section>
-        ))}
-      </div>
-    </section>
-  );
-}
-
-function ManagerFixtureCard({ fixture, onPlayer }: { fixture: ManagerFixture; onPlayer: (id: string) => void }) {
-  const result = fixture.homeScore == null || fixture.awayScore == null ? "– : –" : `${fixture.homeScore} : ${fixture.awayScore}`;
-  return (
-    <article className="manager-fixture-card">
-      <div className="manager-fixture-matchup">
-        <span className="manager-fixture-team home"><strong>{fixture.home.name}</strong><TeamLogo code={fixture.home.code} url={fixture.home.logoUrl} /></span>
-        <span className={`manager-fixture-score ${fixture.state.toLocaleLowerCase()}`}>{result}</span>
-        <span className="manager-fixture-team away"><TeamLogo code={fixture.away.code} url={fixture.away.logoUrl} /><strong>{fixture.away.name}</strong></span>
-      </div>
-      <div className="manager-fixture-squads">
-        <FixturePlayers players={fixture.home.players} side="home" onPlayer={onPlayer} />
-        <FixturePlayers players={fixture.away.players} side="away" onPlayer={onPlayer} />
-      </div>
-    </article>
-  );
-}
-
-function FixturePlayers({ players, side, onPlayer }: {
-  players: ManagerFixture["home"]["players"];
-  side: "home" | "away";
-  onPlayer: (id: string) => void;
-}) {
-  return (
-    <ol className={`manager-fixture-players ${side}`} aria-label={`${side === "home" ? "Heimteam" : "Auswärtsteam"}: Spieler aus deinem Kader`}>
-      {players.map((player) => (
-        <li key={player.id}>
-          <button className={player.role === "reserve" ? "reserve" : ""} onClick={() => onPlayer(player.id)} title={`${player.name} · ${positionName[player.position]} · ${player.role === "start" ? "Startelf" : "Reserve"}`}>
-            <span className="manager-fixture-portrait"><PlayerPortrait name={player.name} url={player.photoUrl} teamCode={player.teamCode} teamLogoUrl={player.logoUrl} />{player.points != null && <b className={player.points < 0 ? "negative" : ""}>{formatSignedPoints(player.points)}</b>}</span>
-            <small>{lastName(player.name)}</small>
-          </button>
-        </li>
-      ))}
-    </ol>
-  );
-}
-
 function GameRow({ game, onTeam }: { game: PlayerGame; onTeam: (id: string) => void }) {
   const result = game.homeScore == null || game.awayScore == null ? "—" : `${game.homeScore}–${game.awayScore}`;
   return (
@@ -2104,26 +1787,12 @@ function TeamDetailView({ filters, teamId, backLabel, onBack, onPlayer, onTeam }
     { label: "Sturm", value: detail.matches.reduce((sum, match) => sum + match.forwardPoints, 0) },
   ];
   const strongestPart = [...positionTotals].sort((left, right) => right.value - left.value)[0];
-  const rosterColumns: DataTableColumn<TeamDetail["players"][number]>[] = [
-    {
-      id: "player",
-      label: "Spieler",
-      width: "78%",
-      render: (player, index) => <div className="table-player">
-        <span className="rank">{index + 1}</span>
-        <PlayerPortrait name={player.name} url={player.photoUrl} teamCode={detail.code} teamLogoUrl={detail.logoUrl} />
-        <span><PlayerName name={player.name} /><small>{positionName[player.position]}</small></span>
-      </div>,
-    },
-    {
-      id: "points",
-      label: "Punkte",
-      numeric: true,
-      className: "point-value",
-      width: "22%",
-      render: (player) => <>{player.points}<small>Pkt.</small></>,
-    },
-  ];
+  const profile = detail.profile;
+  const squadValues = profile ? Object.values(profile.squad).map((member) => member.marketValue?.eur).filter((value): value is number => value != null) : [];
+  const squadTotalValue = squadValues.length ? squadValues.reduce((sum, value) => sum + value, 0) : null;
+  const squadAges = profile ? Object.values(profile.squad).map((member) => member.age).filter((value): value is number => value != null) : [];
+  const averageAge = squadAges.length ? squadAges.reduce((sum, value) => sum + value, 0) / squadAges.length : null;
+  const captain = profile?.captainPlayerId ? detail.players.find((player) => player.id === profile.captainPlayerId) : null;
   return (
     <div className="team-detail-view">
       <section className="detail-section team-detail-section">
@@ -2131,31 +1800,26 @@ function TeamDetailView({ filters, teamId, backLabel, onBack, onPlayer, onTeam }
         <header className="team-profile">
           <TeamLogo code={detail.code} url={detail.logoUrl} large />
           <div><p className="kicker">Mannschaftsprofil</p><h2>{detail.name}</h2><span>Alle Wertungen der ausgewählten Saison</span></div>
-          <div className="team-profile-stats"><span><strong>{totalPoints}</strong><small>Gesamtpunkte</small></span><span><strong>{detail.players.length}</strong><small>Spieler</small></span><span><strong>{strongestPart.label}</strong><small>Stärkster Mannschaftsteil</small></span></div>
+          <div className="team-profile-stats"><span><strong>{totalPoints}</strong><small>Gesamtpunkte</small></span><span><strong>{detail.players.length}</strong><small>Kaderspieler</small></span><span><strong>{strongestPart.label}</strong><small>Stärkster Mannschaftsteil</small></span></div>
         </header>
-        <div className="team-detail-grid">
-          <article className="team-roster-card">
-            <CardHead eyebrow="Kader" title="Spieler und Punkte" subtitle="Klicken für das Spielerprofil" />
-            <div className="team-roster-table">
-              <DataTable
-                ariaLabel={`${detail.name}: Spieler und Punkte`}
-                rows={detail.players}
-                columns={rosterColumns}
-                getRowKey={(player) => player.id}
-                emptyMessage="Keine Spieler für diese Saison verfügbar."
-                minWidth="100%"
-                maxVisibleRows={11}
-                onRowClick={(player) => onPlayer(player.id)}
-              />
-            </div>
-          </article>
-          <article className="team-season-summary">
-            <CardHead eyebrow="Saisonverlauf" title="Jedes Spiel im Detail" subtitle="Punkte nach Mannschaftsteil und Aktion" />
-            <div className="team-match-list">
-              {detail.matches.map((match) => <TeamMatchCard key={match.matchday} match={match} onTeam={onTeam} onPlayer={onPlayer} />)}
-            </div>
-          </article>
-        </div>
+        {profile && (
+          <div className="club-facts" aria-label="Vereinsdaten">
+            {profile.coach && <span><small>Trainer</small><strong><a href={profile.coach.tmUrl} target="_blank" rel="noreferrer">{profile.coach.name}</a></strong><em>{profile.coach.appointedAt ? `seit ${formatDateWithYear(profile.coach.appointedAt)}` : profile.coach.nationalities[0] ?? ""}</em></span>}
+            {captain && <span><small>Kapitän</small><strong><button className="club-fact-link" onClick={() => onPlayer(captain.id)}>{captain.name}</button></strong><em>{positionName[captain.position]}</em></span>}
+            {squadTotalValue != null && <span><small>Marktwert Kader</small><strong>{formatEur(squadTotalValue)}</strong><em>{squadValues.length} Spieler bewertet</em></span>}
+            {averageAge != null && <span><small>Ø Alter</small><strong>{averageAge.toLocaleString("de-DE", { maximumFractionDigits: 1 })}</strong><em>Jahre</em></span>}
+            <span className="club-facts-source"><small>Quelle</small><strong><a href={profile.transfermarktUrl} target="_blank" rel="noreferrer">Transfermarkt ↗</a></strong><em>Stand {formatDate(profile.generatedAt)}</em></span>
+          </div>
+        )}
+        <TeamSquadByPosition detail={detail} onPlayer={onPlayer} />
+        {detail.likelyEleven && <TeamLikelyEleven eleven={detail.likelyEleven} teamCode={detail.code} teamLogoUrl={detail.logoUrl} onPlayer={onPlayer} />}
+        {profile && (profile.arrivals.length > 0 || profile.departures.length > 0) && <TeamTransferLedger profile={profile} onPlayer={onPlayer} />}
+        <section className="team-season-summary">
+          <CardHead eyebrow="Saisonverlauf" title="Jedes Spiel im Detail" subtitle="Punkte nach Mannschaftsteil und Aktion" />
+          <div className="team-match-list">
+            {detail.matches.map((match) => <TeamMatchCard key={match.matchday} match={match} onTeam={onTeam} onPlayer={onPlayer} />)}
+          </div>
+        </section>
         {detail.externalSources && (
           <section className="player-news team-source-news" aria-labelledby="team-news-title">
             <div className="section-copy news-heading">
@@ -2167,6 +1831,112 @@ function TeamDetailView({ filters, teamId, backLabel, onBack, onPlayer, onTeam }
         )}
       </section>
     </div>
+  );
+}
+
+const positionSectionOrder: Position[] = ["GK", "DEF", "MID", "FWD"];
+
+function TeamSquadByPosition({ detail, onPlayer }: { detail: TeamDetail; onPlayer: (id: string) => void }) {
+  const squad = detail.profile?.squad ?? {};
+  const hasBio = Object.keys(squad).length > 0;
+  return (
+    <section className="team-squad-groups" aria-label="Kader nach Position">
+      <CardHead eyebrow="Kader" title="Spieler nach Position" subtitle={hasBio ? "Punkte aus kicker-Wertungen, Profildaten von Transfermarkt" : "Punkte aus kicker-Wertungen"} />
+      {positionSectionOrder.map((position) => {
+        const players = detail.players.filter((player) => player.position === position);
+        if (!players.length) return null;
+        return (
+          <div className="squad-group" key={position}>
+            <h4>{positionName[position]}</h4>
+            <div className="table-shell squad-table">
+              <table>
+                <thead><tr><th>Spieler</th><th className="num">Alter</th><th>Nationalität</th><th className="num">Größe</th><th>Im Verein seit</th><th>Vertrag bis</th><th className="num">Marktwert</th><th className="num">Punkte</th></tr></thead>
+                <tbody>
+                  {players.map((player) => {
+                    const bio = squad[player.id];
+                    const isCaptain = detail.profile?.captainPlayerId === player.id;
+                    return (
+                      <tr key={player.id} className="clickable-row" tabIndex={0} onClick={() => onPlayer(player.id)} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") onPlayer(player.id); }}>
+                        <td><span className="squad-player">{bio?.shirtNumber && <b className="squad-number">{bio.shirtNumber}</b>}<PlayerPortrait name={player.name} url={player.photoUrl} teamCode={detail.code} teamLogoUrl={detail.logoUrl} /><span><PlayerName name={player.name} />{isCaptain && <em className="captain-badge" title="Mannschaftskapitän">Kapitän</em>}<small>{bio?.positionDetail ?? positionName[player.position]}</small></span></span></td>
+                        <td className="num">{bio?.age ?? "—"}</td>
+                        <td><span title={bio?.nationalities.join(", ")}>{bio?.nationalities[0] ?? "—"}{bio && bio.nationalities.length > 1 ? ` +${bio.nationalities.length - 1}` : ""}</span></td>
+                        <td className="num">{formatHeight(bio?.heightCm ?? null)}</td>
+                        <td>{bio?.joinedAt ? formatJoined(bio.joinedAt) : "—"}</td>
+                        <td>{bio?.contractUntil ? formatDateWithYear(bio.contractUntil) : "—"}</td>
+                        <td className="num">{formatMoney(bio?.marketValue ?? null)}</td>
+                        <td className="num primary-num">{player.points}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        );
+      })}
+    </section>
+  );
+}
+
+function TeamLikelyEleven({ eleven, teamCode, teamLogoUrl, onPlayer }: { eleven: NonNullable<TeamDetail["likelyEleven"]>; teamCode: string; teamLogoUrl: string | null; onPlayer: (id: string) => void }) {
+  const groups = eleven.players.reduce<Record<Position, typeof eleven.players>>((accumulator, player) => {
+    accumulator[player.position].push(player);
+    return accumulator;
+  }, { GK: [], DEF: [], MID: [], FWD: [] });
+  return (
+    <section className="team-likely-eleven" aria-label="Mögliche Startelf">
+      <CardHead eyebrow="Mögliche Startelf" title={`Formation ${eleven.formation}`} subtitle={eleven.source === "roleSnapshot" ? "Aktuelle Rollenprognose von LigaInsider vor dem Saisonstart" : `Meiste Startelfeinsätze in ${eleven.evaluatedMatches} gewerteten ${eleven.evaluatedMatches === 1 ? "Spiel" : "Spielen"} dieser Saison`} />
+      <div className="likely-eleven-rows">
+        {positionSectionOrder.map((position) => groups[position].length > 0 && (
+          <div className="likely-eleven-row" key={position}>
+            <h4>{positionName[position]}</h4>
+            <div>
+              {groups[position].map((player) => (
+                <button key={player.id} className="likely-player" onClick={() => onPlayer(player.id)} title={eleven.source === "roleSnapshot" ? `${player.name} · ${player.role === "starter" ? "Startelf-Tipp" : player.role === "alternative" ? "Alternative" : "Kader"}` : `${player.name} · ${player.starts}× Startelf`}>
+                  <PlayerPortrait name={player.name} url={player.photoUrl} teamCode={teamCode} teamLogoUrl={teamLogoUrl} />
+                  <strong>{lastName(player.name)}</strong>
+                  <small>{eleven.source === "roleSnapshot" ? (player.role === "starter" ? "Startelf-Tipp" : player.role === "alternative" ? "Alternative" : "Kader") : `${player.starts}× Startelf`}</small>
+                </button>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function TeamTransferLedger({ profile, onPlayer }: { profile: NonNullable<TeamDetail["profile"]>; onPlayer: (id: string) => void }) {
+  const list = (label: string, transfers: ClubTransfer[], direction: "in" | "out") => (
+    <div className="transfer-column">
+      <h4>{label}</h4>
+      {transfers.length ? (
+        <ol className="transfer-list">
+          {transfers.map((transfer, index) => {
+            const inner = <>
+              <span className="transfer-player"><strong>{transfer.name}</strong><small>{transfer.club ? (direction === "in" ? `von ${transfer.club}` : `zu ${transfer.club}`) : "Verein unbekannt"}{transfer.age != null ? ` · ${transfer.age} Jahre` : ""}</small></span>
+              <b className={`transfer-fee ${transfer.fee?.kind ?? "unknown"}`}>{formatMoney(transfer.fee)}</b>
+            </>;
+            return (
+              <li key={`${transfer.tmId}-${transfer.club ?? ""}-${index}`}>
+                {transfer.playerId
+                  ? <button className="transfer-row" onClick={() => onPlayer(transfer.playerId!)}>{inner}</button>
+                  : <span className="transfer-row static">{inner}</span>}
+              </li>
+            );
+          })}
+        </ol>
+      ) : <p className="transfer-empty">Keine Bewegungen registriert.</p>}
+    </div>
+  );
+  return (
+    <section className="team-transfers" aria-label="Transfers der Saison">
+      <CardHead eyebrow="Transfers" title="Zugänge und Abgänge" subtitle={`${profile.provider} · Stand ${formatDate(profile.generatedAt)}`} />
+      <div className="transfer-grid">
+        {list("Zugänge", profile.arrivals, "in")}
+        {list("Abgänge", profile.departures, "out")}
+      </div>
+    </section>
   );
 }
 
@@ -2477,6 +2247,29 @@ function PositionTag({ position }: { position: Position }) {
 
 function formatPlayerValue(value: number | null) { return value == null ? "—" : value.toFixed(1); }
 function formatMarketValue(valueInMillions: number) { return valueInMillions >= 999 ? "–" : `€${valueInMillions.toFixed(1)}m`; }
+function formatEur(eur: number | null) {
+  if (eur == null) return "—";
+  if (eur >= 1_000_000) return `${(eur / 1_000_000).toLocaleString("de-DE", { maximumFractionDigits: 2 })} Mio. €`;
+  if (eur >= 1_000) return `${Math.round(eur / 1_000)} Tsd. €`;
+  return `${eur} €`;
+}
+function formatMoney(value: MoneyValue | null | undefined) {
+  if (!value) return "—";
+  if (value.kind === "free") return "ablösefrei";
+  if (value.kind === "loanEnd") return "Leih-Ende";
+  if (value.kind === "loan") return value.eur != null && value.eur > 0 ? `Leihe · ${formatEur(value.eur)}` : "Leihe";
+  return value.eur != null ? formatEur(value.eur) : value.raw;
+}
+function formatHeight(heightCm: number | null) {
+  return heightCm == null ? "—" : `${(heightCm / 100).toLocaleString("de-DE", { minimumFractionDigits: 2 })} m`;
+}
+function formatJoined(joinedAt: string) {
+  const joined = new Date(joinedAt);
+  if (Number.isNaN(joined.getTime())) return joinedAt;
+  const years = Math.floor((Date.now() - joined.getTime()) / (365.25 * 24 * 60 * 60 * 1000));
+  const date = new Intl.DateTimeFormat("de-DE", { month: "2-digit", year: "numeric" }).format(joined);
+  return years >= 1 ? `${date} · ${years} ${years === 1 ? "Jahr" : "Jahre"}` : date;
+}
 function formatPenalty(value: number) { return value < 0 ? `−${Math.abs(value)}` : String(value); }
 function formatSignedPoints(value: number) { return value > 0 ? `+${value}` : value < 0 ? `−${Math.abs(value)}` : "0"; }
 function formatCardCounts(redCards: number, yellowRedCards: number) {
@@ -2485,19 +2278,9 @@ function formatCardCounts(redCards: number, yellowRedCards: number) {
 }
 function formatDate(value: string | null) { return value ? new Intl.DateTimeFormat("de-DE", { day: "2-digit", month: "short" }).format(new Date(value)) : "—"; }
 function formatDateWithYear(value: string | null) { return value ? new Intl.DateTimeFormat("de-DE", { day: "2-digit", month: "short", year: "numeric" }).format(new Date(value)) : "—"; }
-function formatMatchdayRange(startAt: string | null, endAt: string | null) {
-  if (!startAt && !endAt) return "Termin noch offen";
-  const formatter = new Intl.DateTimeFormat("de-DE", { day: "2-digit", month: "long" });
-  if (!startAt) return formatter.format(new Date(endAt!));
-  if (!endAt) return formatter.format(new Date(startAt));
-  return `${formatter.format(new Date(startAt))} – ${formatter.format(new Date(endAt))}`;
-}
 function formatFixtureSlot(value: string | null) {
   if (!value) return "Termin noch offen";
   return new Intl.DateTimeFormat("de-DE", { weekday: "long", day: "2-digit", month: "long", hour: "2-digit", minute: "2-digit" }).format(new Date(value));
-}
-function formatRoundPhase(phase: string) {
-  return ({ COMPLETED: "Abgeschlossen", LIVE: "Live", SCHEDULED: "Anstehend" } as Record<string, string>)[phase] ?? phase;
 }
 function formatNewsDate(value: string | null) {
   if (!value) return "—";

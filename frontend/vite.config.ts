@@ -3,7 +3,8 @@ import react from "@vitejs/plugin-react";
 import { copyFile, mkdir } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 
-// "historie" stays so old links keep resolving; the app routes it to /tabelle.
+// "historie" and "fantasy-team" stay so old links keep resolving; the app
+// routes them to /tabelle beziehungsweise /mannschaften.
 const staticRoutes = ["tabelle", "spieler", "mannschaften", "historie", "topspieler", "fantasy-team", "ueber", "daten-methodik", "quellen", "faq"];
 
 function staticRouteEntrypoints() {

@@ -13,7 +13,7 @@ Im Vorsaisonmodus werden mehrere reproduzierbare, latente Winterzustände für R
 - unveränderte Spieler dürfen ihren Slot nicht kostenlos tauschen;
 - Budget, Positionsquoten und Vereinslimit gelten auch im Winter.
 
-Veröffentlicht wird deshalb keine verbindliche Transferliste. Das Artefakt enthält nur Verkaufskandidaten, Zielspieler und ihre Häufigkeit über die Szenarien. Die auf der Website gezeigte Empfehlung bleibt der Septemberkader.
+Das Artefakt enthält deshalb keine verbindliche Transferliste, sondern nur Verkaufskandidaten, Zielspieler und ihre Häufigkeit über die Szenarien. Die lokal erzeugte Empfehlung bleibt der Septemberkader.
 
 ## Echter Winterlauf
 
@@ -55,4 +55,4 @@ Jedes Artefakt enthält unter `recommendation.availabilityAudit` Quelle, Zeitpun
 npm run generate:recommendations
 ```
 
-Der Befehl schreibt Classic und Interactive für alle drei Ligen nach `frontend/public/data/recommendations/`.
+Der Befehl schreibt Classic und Interactive für alle drei Ligen nach `recommendations/`. Diese Ergebnisse sind lokale Werkzeugeingaben und werden nicht von der Website ausgeliefert.

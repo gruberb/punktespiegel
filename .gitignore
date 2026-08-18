@@ -10,3 +10,6 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 __pycache__/
+
+# Transfermarkt HTTP cache of scripts/fetch-club-profiles.py
+.cache/

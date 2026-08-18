@@ -1,9 +1,15 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import test from "node:test";
 import { leagueProjectionFactor, recommendManagerSquad } from "./manager-model.ts";
 import type { ManagerSeason } from "./manager-model.ts";
-import type { Catalog, ManagerMode, ManagerRecommendation, Position } from "./types.ts";
+import type { Catalog, Position } from "../frontend/src/types.ts";
+import type { ManagerMode, ManagerRecommendation } from "./manager-types.ts";
+
+// Recommendation artifacts are generated locally and no longer ship with the
+// website; the artifact-consistency tests only run when a local run exists.
+const recommendationsUrl = (file: string) => new URL(`../recommendations/${file}`, import.meta.url);
+const hasRecommendationArtifacts = existsSync(recommendationsUrl("se-k00012026-classic.json"));
 
 const positions: Position[] = ["GK", "DEF", "MID", "FWD"];
 const teams = Array.from({ length: 10 }, (_, index) => ({ id: `team-${index}`, name: `Team ${index}`, code: `T${index}`, logoUrl: null }));
@@ -104,8 +110,8 @@ test("tracks actual points for the recommended starting eleven by matchday", () 
   assert.ok(result.players.every((player) => player.currentPoints === 5));
 });
 
-const publishedCatalog = JSON.parse(readFileSync(new URL("../public/data/catalog.json", import.meta.url), "utf8")) as Catalog;
-const availabilitySignals = JSON.parse(readFileSync(new URL("../public/data/current-availability-signals.json", import.meta.url), "utf8")) as {
+const publishedCatalog = JSON.parse(readFileSync(new URL("../frontend/public/data/catalog.json", import.meta.url), "utf8")) as Catalog;
+const availabilitySignals = JSON.parse(readFileSync(new URL("../frontend/public/data/current-availability-signals.json", import.meta.url), "utf8")) as {
   season: number;
   leagues: Record<string, {
     players: Record<string, { status: string; reason: string | null }>;
@@ -113,14 +119,14 @@ const availabilitySignals = JSON.parse(readFileSync(new URL("../public/data/curr
 };
 for (const league of ["0001", "0002", "0003"]) {
   for (const mode of ["classic", "interactive"] as ManagerMode[]) {
-    test(`published ${league} ${mode} recommendation is valid and stable`, () => {
-      const publishedSeason = JSON.parse(readFileSync(new URL(`../public/data/seasons/se-k${league}2026.json`, import.meta.url), "utf8")) as {
+    test(`published ${league} ${mode} recommendation is valid and stable`, { skip: !hasRecommendationArtifacts }, () => {
+      const publishedSeason = JSON.parse(readFileSync(new URL(`../frontend/public/data/seasons/se-k${league}2026.json`, import.meta.url), "utf8")) as {
         latestRound: number;
         matches: { id: string; round: number; state: string; homeTeamId: string; awayTeamId: string }[];
         players: { id: string; teamId: string }[];
         scores: { matchId: string; playerId: string; totalPoints: number; pointsStarter: number; pointsJoker: number }[];
       };
-      const artifact = JSON.parse(readFileSync(new URL(`../public/data/recommendations/se-k${league}2026-${mode}.json`, import.meta.url), "utf8")) as {
+      const artifact = JSON.parse(readFileSync(recommendationsUrl(`se-k${league}2026-${mode}.json`), "utf8")) as {
         schemaVersion: number;
         modelVersion: number;
         source: { seasonId: string };
@@ -197,7 +203,7 @@ for (const league of ["0001", "0002", "0003"]) {
 }
 
 test("LigaInsider prior-season performance index remains a strong independent Bundesliga benchmark", () => {
-  const benchmark = JSON.parse(readFileSync(new URL("../public/data/external-performance-benchmark.json", import.meta.url), "utf8")) as {
+  const benchmark = JSON.parse(readFileSync(new URL("../frontend/public/data/external-performance-benchmark.json", import.meta.url), "utf8")) as {
     schemaVersion: number;
     league: string;
     sourceRows: number;
@@ -217,26 +223,26 @@ test("LigaInsider prior-season performance index remains a strong independent Bu
   assert.match(benchmark.method, /independent rank benchmark/);
 });
 
-test("published Bundesliga recommendations do not start the externally identified backup goalkeeper", () => {
-  const roleSignals = JSON.parse(readFileSync(new URL("../public/data/current-role-signals.json", import.meta.url), "utf8")) as {
+test("published Bundesliga recommendations do not start the externally identified backup goalkeeper", { skip: !hasRecommendationArtifacts }, () => {
+  const roleSignals = JSON.parse(readFileSync(new URL("../frontend/public/data/current-role-signals.json", import.meta.url), "utf8")) as {
     players: Record<string, { role: string }>;
   };
   assert.equal(roleSignals.players["pl-k00051437"]?.role, "starter");
   assert.equal(roleSignals.players["pl-k00064802"]?.role, "squad");
   for (const mode of ["classic", "interactive"] as ManagerMode[]) {
-    const artifact = JSON.parse(readFileSync(new URL(`../public/data/recommendations/se-k00012026-${mode}.json`, import.meta.url), "utf8")) as {
+    const artifact = JSON.parse(readFileSync(recommendationsUrl(`se-k00012026-${mode}.json`), "utf8")) as {
       recommendation: ManagerRecommendation;
     };
     assert.notEqual(artifact.recommendation.players.find((player) => player.id === "pl-k00064802")?.role, "start");
   }
 });
 
-test("published recommendations reject Mitchell Weiser while his ACL rehabilitation has no return date", () => {
+test("published recommendations reject Mitchell Weiser while his ACL rehabilitation has no return date", { skip: !hasRecommendationArtifacts }, () => {
   const weiser = availabilitySignals.leagues["0001"].players["pl-k00058003"];
   assert.equal(weiser.status, "rehab");
   assert.equal(weiser.reason, "Kreuzbandriss");
   for (const mode of ["classic", "interactive"] as ManagerMode[]) {
-    const artifact = JSON.parse(readFileSync(new URL(`../public/data/recommendations/se-k00012026-${mode}.json`, import.meta.url), "utf8")) as {
+    const artifact = JSON.parse(readFileSync(recommendationsUrl(`se-k00012026-${mode}.json`), "utf8")) as {
       recommendation: ManagerRecommendation;
     };
     assert.ok(artifact.recommendation.availabilityAudit?.excludedPlayers.some((player) => player.id === "pl-k00058003"));
@@ -245,8 +251,8 @@ test("published recommendations reject Mitchell Weiser while his ACL rehabilitat
 });
 
 for (const league of ["0001", "0002", "0003"]) {
-  test(`published ${league} Classic-v2 recommendation has exact roster roles and winter constraints`, () => {
-    const artifact = JSON.parse(readFileSync(new URL(`../public/data/recommendations/se-k${league}2026-classic.json`, import.meta.url), "utf8")) as {
+  test(`published ${league} Classic-v2 recommendation has exact roster roles and winter constraints`, { skip: !hasRecommendationArtifacts }, () => {
+    const artifact = JSON.parse(readFileSync(recommendationsUrl(`se-k${league}2026-classic.json`), "utf8")) as {
       schemaVersion: number;
       modelVersion: number;
       recommendation: ManagerRecommendation;
@@ -269,8 +275,8 @@ for (const league of ["0001", "0002", "0003"]) {
 }
 
 for (const league of ["0001", "0002", "0003"]) {
-  test(`published ${league} Interactive-v2 recommendation uses valid round-specific lineups`, () => {
-    const artifact = JSON.parse(readFileSync(new URL(`../public/data/recommendations/se-k${league}2026-interactive.json`, import.meta.url), "utf8")) as {
+  test(`published ${league} Interactive-v2 recommendation uses valid round-specific lineups`, { skip: !hasRecommendationArtifacts }, () => {
+    const artifact = JSON.parse(readFileSync(recommendationsUrl(`se-k${league}2026-interactive.json`), "utf8")) as {
       schemaVersion: number;
       modelVersion: number;
       recommendation: ManagerRecommendation;

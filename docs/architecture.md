@@ -27,7 +27,7 @@ flowchart LR
 | React/Vite | Filter, Navigation, Tabellen, Detailseiten und sämtliche Aggregationen |
 | GitHub Pages/Nginx | Unveränderte statische Dateien ausliefern |
 
-Die Hauptansichten besitzen feste Pfade wie `/tabelle`, `/spieler`, `/mannschaften` und `/fantasy-team`. Der Produktionsbuild schreibt für jeden dieser Pfade einen statischen HTML-Einstiegspunkt, damit direkte Aufrufe auch auf GitHub Pages ohne Laufzeit-Router funktionieren. Liga, Saison, Spieltag und Unteransichten bleiben als Query-Parameter erhalten. Frühere Links mit `?view=...` sowie der frühere Pfad `/historie` werden beim Öffnen automatisch auf den entsprechenden festen Pfad normalisiert.
+Die Hauptansichten besitzen feste Pfade wie `/tabelle`, `/spieler`, `/mannschaften` und `/topspieler`. Der Produktionsbuild schreibt für jeden dieser Pfade einen statischen HTML-Einstiegspunkt, damit direkte Aufrufe auch auf GitHub Pages ohne Laufzeit-Router funktionieren. Liga, Saison, Spieltag und Unteransichten bleiben als Query-Parameter erhalten. Frühere Links mit `?view=...` sowie die eingestellten Pfade `/historie` und `/fantasy-team` werden beim Öffnen automatisch auf Tabelle beziehungsweise Mannschaften umgeleitet.
 
 ## Datenvertrag
 
@@ -50,7 +50,7 @@ Die Darstellung berechnet daraus deterministisch:
 - historische Toplisten,
 - Spieler- und Mannschaftsdetailseiten,
 - die punktstärkste reguläre Elf für Saison oder Spieltag,
-- regelkonforme Classic- und Interactive-Kaderempfehlungen für die aktuelle Saison.
+- nach Position gruppierte Vereinskader und eine mögliche Elf, die vor Saisonbeginn aus dem Bundesliga-Rollensnapshot und danach aus den häufigsten tatsächlichen Startelfeinsätzen abgeleitet wird.
 
 ## Kaderprognose
 
@@ -60,7 +60,7 @@ Interactive-v2 nutzt die vollständigen Spieler-Spiel-Daten. Ein chronologisch t
 
 Vor dem finalen Interactive-Training wird das Mischgewicht auf einer früheren Vorsaison festgelegt. Eine zeitlich spätere Saison dient als Champion-/Challenger-Gate. Classic verwendet mehrere Rolling-Origin-Folds und gibt dem v1-Vergleich dieselbe legale Winteraktion. Die historischen Saisonartefakte enthalten jedoch noch keine nachweislichen Entscheidungszeit-Snapshots für Preis, Vereinszuordnung, `active` und `selectable`. Beide Validierungen werden deshalb als experimentell gekennzeichnet und nicht als leakage-sicher ausgegeben. Danach wird das Produktionsmodell mit allen abgeschlossenen Saisons neu trainiert.
 
-Beide Verfahren erzeugen statische JSON-Dateien für Bundesliga, 2. Bundesliga und 3. Liga. Der Browser lädt nur das zur Auswahl passende Ergebnis und führt weder Modelltraining noch Kaderoptimierung aus. Details stehen unter [Classic-v2](classic-v2.md) und [Interactive-v2](interactive-v2.md).
+Beide Verfahren erzeugen lokale JSON-Dateien für Bundesliga, 2. Bundesliga und 3. Liga unter `recommendations/`. Die Website lädt diese Dateien nicht und führt weder Modelltraining noch Kaderoptimierung aus. Details stehen unter [Classic-v2](classic-v2.md) und [Interactive-v2](interactive-v2.md).
 
 In der Produktion wird der Zustand aller abgeschlossenen Spiele der laufenden Saison vor der Prognose wiederhergestellt. Die tatsächlichen Rollen aktualisieren die künftige Einsatzverteilung mit abklingendem Gewicht; bekannte Punkte und Rollen ersetzen die Darstellung bereits gespielter Runden exakt. Für die Optimierung erhalten diese Runden jedoch den Wert null, sodass die Empfehlung nur verbleibende Punkte maximiert. `recommendation.currentSeasonEvidence` dokumentiert Cutoff, Beobachtungsumfang und Beginn des Optimierungsfensters.
 
@@ -76,9 +76,15 @@ Spielertreffer erfordern den vollständigen Namen oder einen durch den aktuellen
 
 Bei kicker werden nur die im offiziellen RSS-Angebot vorgesehenen Felder dargestellt: Überschrift, Datum und direkter Link mit sichtbarer Quellenangabe. Punktespiegel speichert kein dauerhaftes Artikelarchiv. Eine weitergehende oder kommerzielle Syndizierung setzt eine separate Freigabe des Anbieters voraus.
 
-Für die aktuelle Bundesliga ergänzt `current-role-signals.json` einen lokal erzeugten LigaInsider-Snapshot: Topelf/Alternativen, direkte Spieler- und Vereinslinks sowie aktuelle Vereinsthemen. `current-availability-signals.json` trennt davon den aktuellen medizinischen Status. LigaInsider liefert Verletzungen, Aufbautraining, Sperren und Nichtberücksichtigung für die Bundesliga; die öffentlichen Transfermarkt-Ausfalllisten decken die 2. Bundesliga und 3. Liga ab. Der medizinische Status hat in der Produktionsoptimierung Vorrang vor der Saisonhierarchie. Beide Stände und die daraus erzeugten Empfehlungen werden lokal erstellt, gemeinsam eingecheckt und vom Browser ausschließlich als statische Dateien geladen.
+Für die aktuelle Bundesliga ergänzt `current-role-signals.json` einen lokal erzeugten LigaInsider-Snapshot: Topelf/Alternativen, direkte Spieler- und Vereinslinks sowie aktuelle Vereinsthemen. `current-availability-signals.json` trennt davon den aktuellen medizinischen Status. LigaInsider liefert Verletzungen, Aufbautraining, Sperren und Nichtberücksichtigung für die Bundesliga; die öffentlichen Transfermarkt-Ausfalllisten decken die 2. Bundesliga und 3. Liga ab. Beide Stände werden als statische Dateien geladen; der medizinische Status dient zusätzlich dem lokalen Empfehlungsgenerator.
 
 `external-performance-benchmark.json` enthält zusätzlich den LigaInsider-Leistungsindex 2025/26 als unabhängigen Bundesliga-Rangbenchmark gegen die kicker-Historie. Wegen der unterschiedlichen Punktesysteme fließt er nicht als weiteres Punktemerkmal in den Optimierer ein; er dient als überprüfbarer Plausibilitäts- und Abdeckungstest.
+
+## Vereins- und Spielerprofile
+
+`club-profiles/{liga}.json` ergänzt die aktuelle Saison um Transfermarkt-Kaderdaten, Trainer, Kapitän sowie Zu- und Abgänge samt veröffentlichter Ablöse. `player-careers/{liga}.json` enthält je zugeordnetem Spieler die Karriereeinsätze, Tore und Vorlagen nach Verein. Die Zuordnung verbindet stabile kicker-IDs mit Transfermarkt-IDs über normalisierte Namen innerhalb desselben Vereins; mehrdeutige Fälle bleiben sichtbar und können über `config/transfermarkt-overrides.json` korrigiert werden.
+
+Der Import läuft nicht im täglichen Pages-Build. Er ist ein bewusst rate-limitierter, lokal gestarteter Snapshot mit Dateicache, weil die Profilwerte langsamer wechseln und Transfermarkt keine öffentliche API garantiert. Fehlt ein Snapshot oder wird eine ältere Saison geöffnet, bleiben die kicker-basierten Punkte- und Saisonprofile vollständig nutzbar; die externen Profilblöcke werden dann nicht angezeigt.
 
 ## Sharding und Übertragung
 

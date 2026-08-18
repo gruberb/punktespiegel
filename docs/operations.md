@@ -43,23 +43,35 @@ Nützliche Optionen:
 
 Ein vollständiger Lauf ist für Erstaufbau oder historische Korrekturen gedacht. Der tägliche Lauf ruft nur die aktuelle und gegebenenfalls eine noch unvollständige Vorsaison ab.
 
-Anschließend werden die sechs aktuellen Kaderempfehlungen aus genau diesem Datenstand erzeugt:
+Die sechs aktuellen Kaderempfehlungen können anschließend als rein lokales Werkzeug aus genau diesem Datenstand erzeugt werden:
 
 ```bash
 uv sync --frozen
 npm run generate:recommendations
 ```
 
-Der Befehl aktualisiert zuerst den statischen Bundesliga-Rollensnapshot, den medizinischen Snapshot aller drei Ligen von LigaInsider/Transfermarkt und `external-performance-benchmark.json` aus dem LigaInsider-Leistungsindex. Danach schreibt er je Liga und Modus ein versioniertes v2-JSON nach `frontend/public/data/recommendations`. Die Pipeline trainiert CatBoost offline, spielt abgeschlossene aktuelle Saisonspiele in den Produktionszustand ein, führt zeitlich getrennte Interactive- sowie Rolling-Origin-Classic-Prüfungen aus und löst die Kader mit HiGHS ab dem nächsten ungespielten Spieltag; dieser Schritt kann mehrere Minuten dauern. Die erzeugten JSON-Dateien werden geprüft und eingecheckt. CI, `npm run dev`, `npm run build` und das Pages-Deployment verwenden ausschließlich diese vorhandenen Artefakte und trainieren nicht erneut.
+Der Befehl aktualisiert zuerst den statischen Bundesliga-Rollensnapshot, den medizinischen Snapshot aller drei Ligen von LigaInsider/Transfermarkt und `external-performance-benchmark.json` aus dem LigaInsider-Leistungsindex. Danach schreibt er je Liga und Modus ein versioniertes v2-JSON nach `recommendations/`. Die Pipeline trainiert CatBoost offline, spielt abgeschlossene aktuelle Saisonspiele in den Produktionszustand ein, führt zeitlich getrennte Interactive- sowie Rolling-Origin-Classic-Prüfungen aus und löst die Kader mit HiGHS ab dem nächsten ungespielten Spieltag; dieser Schritt kann mehrere Minuten dauern. Die Website, CI und das Pages-Deployment laden diese Empfehlungen nicht.
 
 Der reale Classic-Winterlauf ist ein eigener Befehl. Er benötigt den tatsächlich gekauften Kader und schreibt standardmäßig nicht in das Produktionsverzeichnis; ein vollständiges Beispiel steht in [Classic-v2](classic-v2.md).
+
+## Vereins- und Spielerprofile
+
+Die Transfermarkt-Profile werden separat und deutlich seltener als die kicker-Wertungen aktualisiert:
+
+```bash
+npm run generate:club-profiles
+```
+
+Der Lauf erzeugt `frontend/public/data/club-profiles/{liga}.json` und `frontend/public/data/player-careers/{liga}.json` für die neueste Saison. Er verwendet einen identifizierbaren User-Agent, wartet standardmäßig 0,8 Sekunden zwischen gestarteten Netzwerkanfragen und legt Antworten in `.cache/transfermarkt/` ab. Abgebrochene Läufe können deshalb ohne erneutes Laden der bereits vorhandenen Seiten fortgesetzt werden. Mit `--leagues 0001`, `--skip-careers`, `--career-workers 4` oder `--delay 1.2` lässt sich der Umfang steuern.
+
+Nicht zugeordnete Vereine und Spieler werden auf stderr ausgegeben und bleiben als `unmatchedSquad` im Vereinsartefakt nachvollziehbar. Eindeutige manuelle Korrekturen gehören nach `config/transfermarkt-overrides.json`; die Website rät keine Zuordnung. Wegen der Last und der nicht garantierten privaten Endpunkte läuft dieser Import nicht im täglichen GitHub-Pages-Workflow. Die erzeugten, geprüften Snapshots werden gemeinsam mit einer Release-Änderung eingecheckt.
 
 ## CI
 
 `.github/workflows/ci.yml` prüft bei Push, Pull Request und manuellem Start:
 
 - Rust-Formatierung, Clippy und Tests,
-- TypeScript-Typen und den Vite-Produktionsbuild,
+- TypeScript-Typen, Parser-Tests und den Vite-Produktionsbuild,
 - Compose-Konfiguration und den statischen Nginx-Build.
 
 Lokal entsprechen dem:
@@ -71,6 +83,8 @@ cargo test --workspace --all-targets --locked
 cargo run --locked -p punktespiegel-data -- --validate-only
 npm ci
 npm run typecheck
+npm run test:club-profiles
+npm run test:recommender-baseline
 npm run build
 docker compose config --quiet
 docker compose build web
@@ -84,8 +98,8 @@ Der Workflow:
 
 1. checkt das Repository aus,
 2. aktualisiert die laufenden Saisondateien,
-3. validiert die eingecheckten Classic- und Interactive-Empfehlungen,
-4. baut React mit genau diesen statischen Empfehlungen,
+3. validiert den statischen Datenvertrag,
+4. baut React mit den eingecheckten Profil-Snapshots,
 5. lädt `frontend/dist` als Pages-Artefakt hoch,
 6. ersetzt die Website nur nach einem vollständig erfolgreichen Build.
 
@@ -93,7 +107,7 @@ Es gibt kein `DATABASE_URL`-Secret. Der Workflow schreibt auch nicht zurück in 
 
 ### Nachrichtenabgleich
 
-Der gleiche tägliche Lauf aktualisiert `data/news.json`. Ohne weitere Einrichtung liest er ausschließlich die offiziellen Liga- und Team-RSS-Feeds von kicker und ordnet den kicker-Feedkatalog den Vereinen der aktuellen drei Ligen zu. Sportschau, Bundesliga.com, Sky Sports, ESPN, BBC Sport und The Guardian bleiben als mögliche Quellen konfiguriert, werden aber nicht öffentlich ausgegeben, solange keine anbieterspezifische Wiederverwendungsfreigabe dokumentiert ist. Der eingecheckte Rollensnapshot liefert unabhängig davon direkte LigaInsider-Links und aktuelle Mannschaftsthemen; er wird bewusst zusammen mit einer lokalen Neuberechnung der Empfehlungen aktualisiert.
+Der gleiche tägliche Lauf aktualisiert `data/news.json`. Ohne weitere Einrichtung liest er ausschließlich die offiziellen Liga- und Team-RSS-Feeds von kicker und ordnet den kicker-Feedkatalog den Vereinen der aktuellen drei Ligen zu. Sportschau, Bundesliga.com, Sky Sports, ESPN, BBC Sport und The Guardian bleiben als mögliche Quellen konfiguriert, werden aber nicht öffentlich ausgegeben, solange keine anbieterspezifische Wiederverwendungsfreigabe dokumentiert ist. Der eingecheckte Rollensnapshot liefert unabhängig davon direkte LigaInsider-Links und aktuelle Mannschaftsthemen; er wird bei Bedarf zusammen mit dem lokalen Empfehlungslauf aktualisiert.
 
 Freigegebene zusätzliche RSS-Anbieter werden kommasepariert über `NEWS_APPROVED_RSS_SOURCES` aktiviert; akzeptiert werden die dokumentierten Feed-IDs, Quellnamen oder Domains. `NEWS_API_KEY` allein aktiviert keine öffentliche Ausgabe. Dafür muss zusätzlich `NEWS_API_PUBLISHING_APPROVED=true` gesetzt und jeder zugelassene Publisher in `NEWS_APPROVED_RSS_SOURCES` aufgeführt sein. Diese Schalter sind keine Rechteerteilung, sondern setzen eine zuvor dokumentierte Freigabe und einen produktionsgeeigneten NewsAPI-Tarif voraus.
 
@@ -110,7 +124,7 @@ Die kicker-Spielerarchive und internen APIs werden nicht gescrapt. Der Browser v
 3. Den Workflow einmal manuell starten.
 4. Die in der `github-pages`-Umgebung angezeigte URL prüfen.
 
-Vite erzeugt Asset- und Datenpfade relativ zur Domainwurzel. Das unterstützt die festen Einstiegspfade wie `/fantasy-team` auf `punktespiegel.org` und im lokalen Nginx-Container. Eine Veröffentlichung unter einem Unterpfad wie `/punktespiegel/` benötigt dagegen einen entsprechend angepassten Vite-`base` und passende Routeneinstiegspunkte.
+Vite erzeugt Asset- und Datenpfade relativ zur Domainwurzel. Das unterstützt feste Einstiegspfade wie `/spieler` und `/mannschaften` auf `punktespiegel.org` und im lokalen Nginx-Container. Eine Veröffentlichung unter einem Unterpfad wie `/punktespiegel/` benötigt dagegen einen entsprechend angepassten Vite-`base` und passende Routeneinstiegspunkte.
 
 ## Saisonwechsel
 
@@ -123,6 +137,7 @@ Typische Fehler stehen direkt im Actions-Schritt **Statische Daten aktualisieren
 - HTTP-Fehler: Quelle vorübergehend nicht erreichbar; Workflow später erneut starten.
 - Vertragsfehler: Quellformat hat sich geändert; Rust-Struktur und `schemaVersion` anpassen.
 - unvollständige beste Elf: Für den ausgewählten Spieltag gibt es noch nicht genug gewertete Spieler; kein Pipelinefehler.
+- unvollständiger Profil-Snapshot: Zuordnungsausgabe des lokalen Transfermarkt-Laufs prüfen, eindeutige Fälle als Override festlegen und den gecachten Lauf wiederholen.
 - fehlende Bilder: externer Mediendienst oder einzelne Bild-ID; Wertungsdaten bleiben intakt.
 
 Ein fehlgeschlagener Lauf verändert die veröffentlichte Website nicht. Für ein Rollback genügt es, einen früheren Commit erneut über den Pages-Workflow zu bauen.

@@ -1,8 +1,8 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { buildPlayerNews, buildSquadNews, canonicalNewsUrl, clubFeedStatus, newsAttribution, newsHealthStatus, newsSourceLabel } from "./news.ts";
+import { buildPlayerNews, canonicalNewsUrl, clubFeedStatus, newsAttribution, newsHealthStatus, newsSourceLabel } from "./news.ts";
 import type { NewsArtifact, NewsFeedHealth } from "./news.ts";
-import type { ManagerPickPlayer, NewsArticle } from "./types.ts";
+import type { NewsArticle } from "./types.ts";
 
 function article(url: string, publishedAt: string, title = url): NewsArticle {
   return { source: "kicker", domain: "kicker.de", title, url, publishedAt };
@@ -24,14 +24,6 @@ function feed(status: NewsFeedHealth["status"], teamId: string | null = null): N
     url: "https://www.kicker.de/news/fussball/rssfeed", teamId, status, httpStatus: status === "ok" ? 200 : null,
     fetchedAt: "2026-08-14T12:00:00Z", itemCount: 1, acceptedItemCount: status === "ok" ? 1 : 0,
     error: status === "error" ? "request failed" : null,
-  };
-}
-
-function pick(id: string, name: string, teamId: string, team: string): ManagerPickPlayer {
-  return {
-    id, name, teamId, team, teamCode: "TST", logoUrl: null, photoUrl: null, position: "MID",
-    priceM: 1, projectedPoints: 1, currentPoints: 0, confidence: "medium", seasonsUsed: 1,
-    appearancesUsed: 1, promotionAdjusted: false, role: "start",
   };
 }
 
@@ -75,7 +67,7 @@ test("derives per-club feed availability only from schema-v2 feed health", () =>
   assert.equal(clubFeedStatus(artifact({ schemaVersion: 2, feeds: [feed("ok", "other")] }), "club"), "unavailable");
 });
 
-test("uses club news as player fallback and deduplicates the squad feed by URL", () => {
+test("uses club news as player fallback", () => {
   const sharedPlayerArticle = article("https://www.kicker.de/shared/artikel#omrss", "2026-08-14T11:00:00Z", "Shared");
   const sharedTeamArticle = { ...article("https://www.kicker.de/shared/artikel", "2026-08-14T11:00:00Z", "Shared"), relation: "team" as const };
   const clubOnlyArticle = { ...article("https://www.kicker.de/club/artikel", "2026-08-14T10:00:00Z", "Club"), relation: "team" as const };
@@ -90,12 +82,6 @@ test("uses club news as player fallback and deduplicates the squad feed by URL",
   assert.deepEqual(fallback.articles, []);
   assert.equal(fallback.clubArticles.length, 2);
   assert.equal(fallback.clubFeedStatus, "ok");
-
-  const squad = buildSquadNews(source, [pick("one", "Ada Eins", "club", "Testverein"), pick("two", "Berta Zwei", "club", "Testverein")], new Date("2026-08-14T13:00:00Z"));
-  assert.equal(squad.articles.length, 2);
-  assert.equal(squad.articles[0].relation, "player");
-  assert.deepEqual(squad.articles[0].relatedPlayers, ["Ada Eins"]);
-  assert.deepEqual(squad.articles[0].relatedTeams, ["Testverein"]);
 });
 
 test("fills remaining player-news slots with labelled club context", () => {
@@ -108,17 +94,6 @@ test("fills remaining player-news slots with labelled club context", () => {
   assert.equal(news.clubArticles.length, 1);
   assert.equal(news.clubArticles[0].relation, "team");
   assert.match(news.clubArticles[0].url, /club-/);
-});
-
-test("reserves squad slots for direct mentions despite newer team-feed volume", () => {
-  const direct = article("https://example.test/direct", "2026-08-01T10:00:00Z", "Direct mention");
-  const teamArticles = Array.from({ length: 30 }, (_, index) => article(`https://example.test/team-${index}`, `2026-08-14T${String(index % 24).padStart(2, "0")}:00:00Z`));
-  const source = artifact({ schemaVersion: 2, players: { one: [direct] }, teams: { club: teamArticles } });
-  const squad = buildSquadNews(source, [pick("one", "Ada Eins", "club", "Testverein")], new Date("2026-08-14T13:00:00Z"));
-
-  assert.equal(squad.articles.length, 15);
-  assert.ok(squad.articles.some((item) => item.url === direct.url && item.relation === "player"));
-  assert.equal(squad.articles.filter((item) => item.relation === "team").length, 14);
 });
 
 test("uses the exact visible kicker attribution", () => {

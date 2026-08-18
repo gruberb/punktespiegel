@@ -1,9 +1,10 @@
 import { readFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { managerCandidateProjections, recommendManagerSquad } from "../frontend/src/manager-model.ts";
-import type { ManagerSeason } from "../frontend/src/manager-model.ts";
-import type { Catalog, ManagerMode } from "../frontend/src/types.ts";
+import { managerCandidateProjections, recommendManagerSquad } from "./manager-model.ts";
+import type { ManagerSeason } from "./manager-model.ts";
+import type { Catalog } from "../frontend/src/types.ts";
+import type { ManagerMode } from "./manager-types.ts";
 
 const projectRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const dataDirectory = resolve(projectRoot, "frontend/public/data");

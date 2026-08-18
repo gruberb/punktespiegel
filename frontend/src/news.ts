@@ -1,13 +1,10 @@
 import type {
   ClubFeedStatus,
-  ManagerPickPlayer,
   NewsArticle,
   NewsFeedSummary,
   NewsHealthStatus,
   NewsRelation,
   PlayerNews,
-  SquadNews,
-  SquadNewsArticle,
 } from "./types";
 
 export type NewsFeedHealth = {
@@ -116,59 +113,6 @@ export function buildPlayerNews(artifact: NewsArtifact, playerId: string, teamId
     articles,
     clubArticles,
   };
-}
-
-type MutableSquadNewsArticle = SquadNewsArticle & {
-  relatedPlayers: string[];
-  relatedTeams: string[];
-};
-
-export function buildSquadNews(artifact: NewsArtifact, players: ManagerPickPlayer[], now = new Date(), limit = 15): SquadNews {
-  const byUrl = new Map<string, MutableSquadNewsArticle>();
-  const teams = new Map(players.map((player) => [player.teamId, player.team]));
-  const playerRelation: NewsRelation = artifact.schemaVersion >= 2 ? "player" : "automatic";
-
-  const addArticle = (article: NewsArticle, relation: NewsRelation, playerName?: string, teamName?: string) => {
-    const key = canonicalNewsUrl(article.url);
-    const current = byUrl.get(key);
-    if (current) {
-      if (relationPriority(relation) > relationPriority(current.relation)) current.relation = relation;
-      if (playerName && !current.relatedPlayers.includes(playerName)) current.relatedPlayers.push(playerName);
-      if (teamName && !current.relatedTeams.includes(teamName)) current.relatedTeams.push(teamName);
-      return;
-    }
-    byUrl.set(key, {
-      ...article,
-      relation,
-      relatedPlayers: playerName ? [playerName] : [],
-      relatedTeams: teamName ? [teamName] : [],
-    });
-  };
-
-  for (const player of players) {
-    for (const article of artifact.players[player.id] ?? []) addArticle(article, playerRelation, player.name, player.team);
-  }
-  for (const [teamId, teamName] of teams) {
-    for (const article of artifact.teams?.[teamId] ?? []) addArticle(article, "team", undefined, teamName);
-  }
-
-  const newestFirst = (left: SquadNewsArticle, right: SquadNewsArticle) => articleTimestamp(right) - articleTimestamp(left)
-    || relationPriority(right.relation) - relationPriority(left.relation);
-  const articlesByRelation = [...byUrl.values()].sort(newestFirst);
-  const directArticles = articlesByRelation.filter((article) => article.relation !== "team").slice(0, limit);
-  const teamArticles = articlesByRelation.filter((article) => article.relation === "team").slice(0, Math.max(0, limit - directArticles.length));
-  const articles = [...directArticles, ...teamArticles].sort(newestFirst);
-  return {
-    generatedAt: artifact.generatedAt || null,
-    provider: artifact.provider || null,
-    status: newsHealthStatus(artifact, now),
-    feedSummary: summarizeNewsFeeds(artifact.feeds),
-    articles,
-  };
-}
-
-function relationPriority(relation: NewsRelation) {
-  return relation === "player" ? 2 : relation === "automatic" ? 1 : 0;
 }
 
 function isKickerArticle(article: NewsArticle) {

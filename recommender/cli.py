@@ -40,6 +40,8 @@ from .winter import run_classic_winter
 
 DEFAULT_CONFIG_DIR = config.REPO_ROOT / "config" / "recommender"
 DEFAULT_DATA_DIR = config.REPO_ROOT / "frontend" / "public" / "data"
+# Recommendations are local tooling output; the website does not ship them.
+DEFAULT_RECOMMENDATION_OUTPUT_DIR = config.REPO_ROOT / "recommendations"
 
 
 def parse_args() -> argparse.Namespace:
@@ -77,6 +79,7 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument(
         "--recommendation-output-dir",
+        default=str(DEFAULT_RECOMMENDATION_OUTPUT_DIR),
         help="Preseason artifact directory; use a temporary path for evaluation runs",
     )
     return parser.parse_args()

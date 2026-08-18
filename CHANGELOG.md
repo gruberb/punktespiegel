@@ -2,6 +2,25 @@
 
 Alle wesentlichen Änderungen an Punktespiegel werden in dieser Datei dokumentiert.
 
+## [1.17.0] – 2026-08-18
+
+### Hinzugefügt
+
+- Mannschaftsprofile sind zum digitalen Saisonheft ausgebaut: Trainer, Kapitän, gesamter Kader nach Position, Alter, Nationalität, Größe, Vereinszugehörigkeit, Vertragslaufzeit und Transfermarkt-Marktwert stehen neben den kicker-Punkten. Eine mögliche Startelf nutzt vor Saisonbeginn den LigaInsider-Rollensnapshot und wird nach dem Anpfiff aus den häufigsten tatsächlichen Startelfeinsätzen abgeleitet.
+- Zu- und Abgänge der aktuellen Saison erscheinen je Verein mit abgebendem beziehungsweise aufnehmendem Club und der veröffentlichten Ablöse, Leihe oder Ablösefreiheit.
+- Spielerprofile zeigen Geburtsdatum, Alter, Nationalität, Größe, Fuß, Rückennummer, Vertragslaufzeit, Zeit im Verein und Transfermarkt-Marktwert. Karrierewerte listen alle erfassten Vereine mit Einsätzen, Toren und Vorlagen sowie einer Gesamtsumme.
+- `scripts/fetch-club-profiles.py` erzeugt die statischen Vereins- und Spieler-Snapshots für alle drei Ligen. Der Import ist rate-limitiert, wiederaufnehmbar gecacht, meldet offene kicker-/Transfermarkt-Zuordnungen und unterstützt feste Korrekturen über `config/transfermarkt-overrides.json`.
+
+### Geändert
+
+- Texte, Metadaten, Manifest und Social Preview richten Punktespiegel als Statistik- und Profilangebot statt als Fantasy-Kaderprodukt aus. Die Topspieler-Seite bleibt als Form- und Marktwertanalyse erhalten.
+- Der Empfehlungsgenerator bleibt vollständig als lokales Werkzeug unter `recommender/` erhalten. Seine Artefakte liegen jetzt unter `recommendations/`; das v1-Vergleichsmodell und seine Tests sind aus dem Frontend nach `scripts/` verschoben.
+
+### Entfernt
+
+- Die Seite „Fantasy Team“ samt Navigation, Kader-/Spieltagansichten, Mannschaftsmeldungen und URL-Zustand wurde aus der Website entfernt. Der alte Pfad `/fantasy-team` führt kompatibel zu den Mannschaften.
+- Torschützen und Vorlagengeber werden in der Spieltagsübersicht nicht mehr anhand lokaler Empfehlungskader hervorgehoben. Empfehlungstypen, Loader, CSS und ausgelieferte Empfehlungssnapshots sind aus dem Frontend entfernt.
+
 ## [1.16.0] – 2026-08-17
 
 ### Geändert

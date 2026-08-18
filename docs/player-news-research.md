@@ -49,8 +49,7 @@ The first two phases described below were implemented after the baseline audit:
   known common-word surnames are rejected unless additional context resolves
   them.
 - Player profiles combine direct mentions with clearly labelled club context up
-  to 15 links. The Fantasy Team view shows a URL-deduplicated 15-link squad
-  feed, reserving space for direct mentions.
+  to 15 links.
 - Every source records `ok`, `error`, or `unmapped` health. Player pages report
   their own club-feed availability, and a failed refresh writes a fresh empty
   artifact rather than retaining vanished kicker items.

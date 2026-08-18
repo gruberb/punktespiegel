@@ -1,11 +1,10 @@
+import type { Catalog, Position } from "../frontend/src/types.ts";
 import type {
-  Catalog,
   ManagerMode,
   ManagerPickPlayer,
   ManagerRecommendation,
-  Position,
   ProjectionConfidence,
-} from "./types";
+} from "./manager-types.ts";
 
 export type ManagerSeason = {
   generatedAt: string;

@@ -6,7 +6,6 @@ export type RouteView =
   | "teams"
   | "team"
   | "top"
-  | "manager"
   | "about"
   | "methodology"
   | "sources"
@@ -20,7 +19,6 @@ const routePaths: Record<RouteView, string> = {
   teams: "/mannschaften",
   team: "/mannschaften",
   top: "/topspieler",
-  manager: "/fantasy-team",
   about: "/ueber",
   methodology: "/daten-methodik",
   sources: "/quellen",
@@ -29,8 +27,11 @@ const routePaths: Record<RouteView, string> = {
 
 // The Historie page was folded into the Tabelle, Spieler and Überblick views;
 // old links and the crawled /historie path keep resolving to the Tabelle.
+// The Fantasy-Team page was removed with the shift to a stats-first product;
+// its crawled path resolves to the Mannschaften overview.
 const legacyPaths: Record<string, RouteView> = {
   "/historie": "table",
+  "/fantasy-team": "teams",
 };
 
 function normalizedPathname(pathname: string) {

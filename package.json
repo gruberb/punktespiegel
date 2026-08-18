@@ -1,6 +1,6 @@
 {
-  "name": "punktespiegel-fantasy-dashboard",
-  "version": "1.16.0",
+  "name": "punktespiegel-dashboard",
+  "version": "1.17.0",
   "type": "module",
   "workspaces": [
     "frontend"
@@ -12,7 +12,10 @@
     "generate:recommendations:v2": "uv run --frozen python -m recommender",
     "generate:recommendations:interactive": "npm run generate:recommendations:v2",
     "generate:role-signals": "uv run --frozen python scripts/fetch-current-role-signals.py",
+    "generate:club-profiles": "python3 scripts/fetch-club-profiles.py",
     "generate:recommendations": "npm run generate:role-signals && npm run generate:recommendations:v2",
+    "test:club-profiles": "python3 -m unittest scripts/fetch_club_profiles_test.py",
+    "test:recommender-baseline": "node --experimental-strip-types --test scripts/manager-model.test.ts",
     "dev": "npm run dev --workspace frontend",
     "build": "npm run build --workspace frontend",
     "typecheck": "npm run typecheck --workspace frontend"

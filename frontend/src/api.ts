@@ -1,19 +1,16 @@
 import type {
   BestEleven,
   Catalog,
+  ClubProfile,
+  ClubSquadMember,
   Dashboard,
-  ManagerFixturePlayer,
-  ManagerMatchday,
-  ManagerMatchdayPlayer,
-  ManagerMode,
-  ManagerRecommendation,
-  ManagerScheduleRound,
+  LikelyEleven,
   Player,
+  PlayerCareer,
   PlayerDetail,
   PlayerGame,
   PlayerSeasonSummary,
   Position,
-  SquadNews,
   TeamDetail,
   TeamDetailMatch,
   TeamDetailPlayer,
@@ -23,26 +20,34 @@ import type {
   TopPlayerAnalysis,
   TopPlayers,
 } from "./types";
-import { buildPlayerNews, buildSquadNews } from "./news";
+import { buildPlayerNews } from "./news";
 import type { NewsArtifact } from "./news";
 import { kickerPlayerNewsLink } from "./kicker-links";
 import { computeTable, crossTable, formLastN, formPoints, positionsByRound, trendVsRound } from "./standings";
 import type { LeagueStandings, LeagueTableRow, LeagueTableTeam, MatchdayContributor, MatchdayFixture } from "./types";
 type StaticCatalog = Catalog & { schemaVersion: number; generatedAt: string };
 
-type StaticManagerRecommendation = {
+type StaticClubProfiles = {
   schemaVersion: number;
-  modelVersion: number;
   generatedAt: string;
-  source: {
-    catalogGeneratedAt: string;
-    seasonGeneratedAt: string;
-    seasonId: string;
-  };
-  model?: {
-    deploymentModel?: "two-stage-v2" | "scenario-recourse-v2" | "fixed-v1-champion" | "availability-aware-stable-v2";
-  };
-  recommendation: ManagerRecommendation;
+  leagueCode: string;
+  season: number;
+  provider: string;
+  teams: Record<string, ClubProfile & {
+    name: string;
+    transfermarktClubId: number;
+    unmatchedSquad: { tmName: string; tmId: number }[];
+    unmatchedKicker: { playerId: string; name: string }[];
+  }>;
+};
+
+type StaticPlayerCareers = {
+  schemaVersion: number;
+  generatedAt: string;
+  leagueCode: string;
+  season: number;
+  provider: string;
+  players: Record<string, { tmId: number; tmUrl: string; clubs: PlayerCareer["clubs"] }>;
 };
 
 type StaticRoleSignals = {
@@ -50,7 +55,11 @@ type StaticRoleSignals = {
   generatedAt: string;
   league: string;
   season: number;
-  players: Record<string, { sourceUrl: string }>;
+  players: Record<string, {
+    role: "starter" | "alternative" | "squad";
+    sourceUrl: string;
+    sourceUpdatedAt: string;
+  }>;
   teams: Record<string, {
     ligaInsiderUrl: string;
     transfermarktUrl: string;
@@ -179,7 +188,8 @@ const newsCache = loadJson<NewsArtifact>(asset("data/news.json")).catch((): News
 const roleSignalsCache = loadJson<StaticRoleSignals>(asset("data/current-role-signals.json")).catch(() => null);
 const availabilitySignalsCache = loadJson<StaticAvailabilitySignals>(asset("data/current-availability-signals.json")).catch(() => null);
 const seasonCache = new Map<string, Promise<SeasonIndex>>();
-const managerRecommendationCache = new Map<string, Promise<ManagerRecommendation>>();
+const clubProfilesCache = new Map<string, Promise<StaticClubProfiles | null>>();
+const playerCareersCache = new Map<string, Promise<StaticPlayerCareers | null>>();
 
 function asset(path: string) {
   return `${import.meta.env.BASE_URL}${path}`;
@@ -221,21 +231,23 @@ function loadSeason(params: URLSearchParams): Promise<SeasonIndex> {
   return pending;
 }
 
-function loadManagerRecommendation(params: URLSearchParams, mode: ManagerMode) {
-  const league = params.get("league") ?? "0001";
-  const year = params.get("season") ?? String(currentSeasonStartYear());
-  const id = `se-k${league}${year}`;
-  const cacheKey = `${id}:${mode}`;
-  let pending = managerRecommendationCache.get(cacheKey);
+// Club and career snapshots exist only for the current season; both loaders
+// resolve to null when the artifact is missing so older seasons render
+// without the profile sections.
+function loadClubProfiles(league: string): Promise<StaticClubProfiles | null> {
+  let pending = clubProfilesCache.get(league);
   if (!pending) {
-    pending = loadJson<StaticManagerRecommendation>(asset(`data/recommendations/${id}-${mode}.json`)).then((artifact) => {
-      const expectedVersion = 2;
-      if (artifact.schemaVersion !== expectedVersion || artifact.modelVersion !== expectedVersion || artifact.source.seasonId !== id) {
-        throw new Error("Die Kaderempfehlung verwendet einen unbekannten Vertrag.");
-      }
-      return { ...artifact.recommendation, deploymentModel: artifact.model?.deploymentModel };
-    });
-    managerRecommendationCache.set(cacheKey, pending);
+    pending = loadJson<StaticClubProfiles>(asset(`data/club-profiles/${league}.json`)).catch(() => null);
+    clubProfilesCache.set(league, pending);
+  }
+  return pending;
+}
+
+function loadPlayerCareers(league: string): Promise<StaticPlayerCareers | null> {
+  let pending = playerCareersCache.get(league);
+  if (!pending) {
+    pending = loadJson<StaticPlayerCareers>(asset(`data/player-careers/${league}.json`)).catch(() => null);
+    playerCareersCache.set(league, pending);
   }
   return pending;
 }
@@ -592,6 +604,8 @@ async function playerDetail(
   news: NewsArtifact,
   roleSignals: StaticRoleSignals | null,
   availabilitySignals: StaticAvailabilitySignals | null,
+  clubProfiles: StaticClubProfiles | null,
+  playerCareers: StaticPlayerCareers | null,
 ): Promise<PlayerDetail> {
   const player = index.players.get(playerId);
   if (!player) throw new Error("Spieler wurde in dieser Saison nicht gefunden.");
@@ -633,6 +647,11 @@ async function playerDetail(
   const availability = availabilitySignals?.season === index.season.startYear
     ? availabilitySignals.leagues[index.season.leagueCode]?.players[playerId]
     : null;
+  const currentSnapshot = clubProfiles?.leagueCode === index.season.leagueCode && clubProfiles.season === index.season.startYear ? clubProfiles : null;
+  const bio = currentSnapshot?.teams[player.teamId]?.squad[playerId] ?? null;
+  const careerEntry = playerCareers?.leagueCode === index.season.leagueCode && playerCareers.season === index.season.startYear
+    ? playerCareers.players[playerId] ?? null
+    : null;
   return {
     id: player.id,
     name: player.name,
@@ -647,7 +666,7 @@ async function playerDetail(
     kickerUrl: kickerProfileUrl(index.season, player.name, team.name),
     kickerNewsUrl: kickerNews.url,
     kickerNewsDirect: kickerNews.direct,
-    transfermarktUrl: `https://www.transfermarkt.de/schnellsuche/ergebnis/schnellsuche?query=${encodeURIComponent(player.name)}`,
+    transfermarktUrl: bio?.tmUrl ?? `https://www.transfermarkt.de/schnellsuche/ergebnis/schnellsuche?query=${encodeURIComponent(player.name)}`,
     ligaInsiderUrl: roleSignals?.league === index.season.leagueCode && roleSignals.season === index.season.startYear
       ? roleSignals.players[player.id]?.sourceUrl ?? null
       : null,
@@ -655,6 +674,14 @@ async function playerDetail(
     priceM: player.priceM,
     seasonPoints,
     value: player.priceM > 0 && player.priceM < 999 ? seasonPoints / player.priceM : null,
+    bio,
+    career: careerEntry ? {
+      generatedAt: playerCareers!.generatedAt,
+      provider: playerCareers!.provider,
+      tmId: careerEntry.tmId,
+      tmUrl: careerEntry.tmUrl,
+      clubs: careerEntry.clubs,
+    } : null,
     seasons,
     games,
     news: buildPlayerNews(news, player.id, team.id),
@@ -729,6 +756,8 @@ async function playerSeasonHistory(catalog: StaticCatalog, playerId: string): Pr
       appearances: appearanceScores.length,
       gradedAppearances: index.season.scores.filter((score) => score.playerId === playerId && score.grade != null && score.grade > 0).length,
       points: season.points,
+      goals: appearanceScores.reduce((sum, score) => sum + score.goals, 0),
+      assists: appearanceScores.reduce((sum, score) => sum + score.assists, 0),
     };
   }));
 }
@@ -752,14 +781,68 @@ function profileSlug(value: string) {
     .replace(/^-|-$/g, "");
 }
 
-function teamDetail(index: SeasonIndex, teamId: string, roleSignals: StaticRoleSignals | null): TeamDetail {
+// Once matches have been played, the likely starting eleven is derived from
+// actual lineups. Before kickoff, Bundesliga role signals provide a preseason
+// fallback so a possible eleven remains useful on the current-season page.
+function likelyEleven(index: SeasonIndex, teamId: string, roleSignals: StaticRoleSignals | null, eligiblePlayers: Set<string> | null = null): LikelyEleven | null {
+  const starts = new Map<string, number>();
+  const points = new Map<string, number>();
+  const evaluatedMatches = new Set<string>();
+  for (const score of index.season.scores) {
+    if (score.teamId !== teamId) continue;
+    evaluatedMatches.add(score.matchId);
+    points.set(score.playerId, (points.get(score.playerId) ?? 0) + score.totalPoints);
+    if (score.pointsStarter > 0) starts.set(score.playerId, (starts.get(score.playerId) ?? 0) + 1);
+  }
+  const useRoleSnapshot = !starts.size
+    && roleSignals?.league === index.season.leagueCode
+    && roleSignals.season === index.season.startYear;
+  if (!starts.size && !useRoleSnapshot) return null;
+  const candidates: LikelyEleven["players"] = useRoleSnapshot
+    ? [...index.players.values()].flatMap((player) => {
+        const signal = roleSignals.players[player.id];
+        if (player.teamId !== teamId || !signal || (eligiblePlayers && !eligiblePlayers.has(player.id))) return [];
+        return [{ id: player.id, name: player.name, position: player.position, photoUrl: player.photoUrl, starts: signal.role === "starter" ? 1 : 0, points: 0, role: signal.role }];
+      })
+    : [...starts].flatMap(([id, count]) => {
+        if (eligiblePlayers && !eligiblePlayers.has(id)) return [];
+        const player = index.players.get(id);
+        return player ? [{ id, name: player.name, position: player.position, photoUrl: player.photoUrl, starts: count, points: points.get(id) ?? 0, role: null }] : [];
+      });
+  const formations = [[3, 4, 3], [4, 3, 3], [3, 5, 2], [4, 4, 2], [4, 5, 1], [5, 3, 2], [5, 4, 1]] as const;
+  let best: { starts: number; formation: string; players: LikelyEleven["players"] } | null = null;
+  for (const [defenders, midfielders, forwards] of formations) {
+    const counts: [Position, number][] = [["GK", 1], ["DEF", defenders], ["MID", midfielders], ["FWD", forwards]];
+    const eleven = counts.flatMap(([position, count]) => candidates.filter((player) => player.position === position)
+      .sort((left, right) => {
+        const roleWeight = (role: LikelyEleven["players"][number]["role"]) => role === "starter" ? 2 : role === "alternative" ? 1 : 0;
+        return right.starts - left.starts || roleWeight(right.role) - roleWeight(left.role) || right.points - left.points || left.name.localeCompare(right.name, "de");
+      })
+      .slice(0, count));
+    if (eleven.length !== 11) continue;
+    const total = eleven.reduce((sum, player) => sum + player.starts, 0);
+    if (!best || total > best.starts) best = { starts: total, formation: `${defenders}–${midfielders}–${forwards}`, players: eleven };
+  }
+  if (!best) return null;
+  return { formation: best.formation, evaluatedMatches: evaluatedMatches.size, source: useRoleSnapshot ? "roleSnapshot" : "seasonStarts", players: best.players };
+}
+
+function teamDetail(index: SeasonIndex, teamId: string, roleSignals: StaticRoleSignals | null, clubProfiles: StaticClubProfiles | null): TeamDetail {
   const team = index.teams.get(teamId);
   if (!team) throw new Error("Mannschaft wurde in dieser Saison nicht gefunden.");
+  const snapshot = clubProfiles?.leagueCode === index.season.leagueCode && clubProfiles.season === index.season.startYear
+    ? clubProfiles.teams[teamId] ?? null
+    : null;
   const points = new Map<string, number>();
   for (const score of index.season.scores) {
     if (score.teamId === teamId) points.set(score.playerId, (points.get(score.playerId) ?? 0) + score.totalPoints);
   }
-  const rosterIds = new Set([...index.season.players.filter((player) => player.teamId === teamId).map((player) => player.id), ...points.keys()]);
+  const rosterIds = snapshot
+    ? new Set([
+        ...Object.keys(snapshot.squad),
+        ...index.season.players.filter((player) => player.teamId === teamId && player.active).map((player) => player.id),
+      ])
+    : new Set([...index.season.players.filter((player) => player.teamId === teamId).map((player) => player.id), ...points.keys()]);
   const players = [...rosterIds].flatMap((id): TeamDetailPlayer[] => {
     const player = index.players.get(id);
     return player ? [{ id, name: player.name, position: player.position, points: points.get(id) ?? 0, photoUrl: player.photoUrl }] : [];
@@ -813,6 +896,17 @@ function teamDetail(index: SeasonIndex, teamId: string, roleSignals: StaticRoleS
     logoUrl: team.logoUrl,
     players,
     matches,
+    profile: snapshot ? {
+      generatedAt: clubProfiles!.generatedAt,
+      provider: clubProfiles!.provider,
+      transfermarktUrl: snapshot.transfermarktUrl,
+      coach: snapshot.coach,
+      captainPlayerId: snapshot.captainPlayerId,
+      squad: snapshot.squad,
+      arrivals: snapshot.arrivals,
+      departures: snapshot.departures,
+    } : null,
+    likelyEleven: likelyEleven(index, teamId, roleSignals, snapshot ? rosterIds : null),
     externalSources: source ? { generatedAt: roleSignals!.generatedAt, ...source } : null,
   };
 }
@@ -956,114 +1050,6 @@ function topPlayers(index: SeasonIndex, catalog: StaticCatalog): TopPlayers {
   };
 }
 
-// The recommendation artifacts are only regenerated when the squads change,
-// while the season file refreshes daily. Realized points therefore get
-// recomputed here from the season scores so the Fantasy view never lags a
-// data run behind: matchday lineups come from the artifact's projected
-// lineups, their points from the freshly imported score rows.
-function refreshRecommendation(recommendation: ManagerRecommendation, index: SeasonIndex): ManagerRecommendation {
-  const pointsByPlayerRound = new Map<string, number>();
-  const seasonPointsByPlayer = new Map<string, number>();
-  for (const score of index.season.scores) {
-    const match = index.matches.get(score.matchId);
-    if (!match) continue;
-    const key = `${score.playerId}:${match.round}`;
-    pointsByPlayerRound.set(key, (pointsByPlayerRound.get(key) ?? 0) + score.totalPoints);
-    seasonPointsByPlayer.set(score.playerId, (seasonPointsByPlayer.get(score.playerId) ?? 0) + score.totalPoints);
-  }
-  const players = recommendation.players.map((player) => ({ ...player, currentPoints: seasonPointsByPlayer.get(player.id) ?? 0 }));
-  if (!recommendation.projectedMatchdays?.length) return { ...recommendation, players };
-  const matchdays = recommendation.projectedMatchdays
-    .filter((projected) => projected.matchday <= index.season.latestRound)
-    .map((projected): ManagerMatchday => {
-      const lineup = projected.players.map((player): ManagerMatchdayPlayer => ({
-        id: player.id,
-        name: player.name,
-        team: player.team,
-        teamCode: player.teamCode,
-        logoUrl: player.logoUrl,
-        photoUrl: player.photoUrl,
-        position: player.position,
-        points: Math.round(pointsByPlayerRound.get(`${player.id}:${projected.matchday}`) ?? 0),
-      }));
-      const positionPoints = Object.fromEntries((["GK", "DEF", "MID", "FWD"] as Position[]).map((position) => [
-        position,
-        lineup.filter((player) => player.position === position).reduce((sum, player) => sum + player.points, 0),
-      ])) as Record<Position, number>;
-      return {
-        matchday: projected.matchday,
-        totalPoints: lineup.reduce((sum, player) => sum + player.points, 0),
-        positionPoints,
-        players: lineup,
-      };
-    });
-  return {
-    ...recommendation,
-    players,
-    matchdays,
-    currentStartingPoints: matchdays.reduce((sum, matchday) => sum + matchday.totalPoints, 0),
-  };
-}
-
-function managerSchedule(index: SeasonIndex, squad: ManagerRecommendation["players"]): ManagerScheduleRound[] {
-  const squadByTeam = new Map<string, ManagerRecommendation["players"]>();
-  for (const player of squad) {
-    const teamPlayers = squadByTeam.get(player.teamId) ?? [];
-    teamPlayers.push(player);
-    squadByTeam.set(player.teamId, teamPlayers);
-  }
-  const scoreByMatchAndPlayer = new Map(index.season.scores.map((score) => [`${score.matchId}:${score.playerId}`, score.totalPoints]));
-  // kicker publishes score rows before grading; until at least one row of a match
-  // carries a grade or points, the match counts as ungraded and shows no badges.
-  const gradedMatches = new Set<string>();
-  for (const score of index.season.scores) {
-    if ((score.grade != null && score.grade > 0) || score.totalPoints !== 0) gradedMatches.add(score.matchId);
-  }
-  const positionOrder: Record<Position, number> = { GK: 0, DEF: 1, MID: 2, FWD: 3 };
-
-  function fixturePlayers(teamId: string, matchId: string): ManagerFixturePlayer[] {
-    return [...(squadByTeam.get(teamId) ?? [])]
-      .sort((left, right) => Number(right.role === "start") - Number(left.role === "start")
-        || positionOrder[left.position] - positionOrder[right.position]
-        || left.name.localeCompare(right.name, "de"))
-      .map((player) => ({
-        id: player.id,
-        name: player.name,
-        teamCode: player.teamCode,
-        logoUrl: player.logoUrl,
-        photoUrl: player.photoUrl,
-        position: player.position,
-        role: player.role,
-        points: gradedMatches.has(matchId) ? scoreByMatchAndPlayer.get(`${matchId}:${player.id}`) ?? null : null,
-      }));
-  }
-
-  return index.season.rounds.map((round) => ({
-    matchday: round.number,
-    name: round.name,
-    startAt: round.startAt,
-    endAt: round.endAt,
-    phase: round.phase,
-    fixtures: index.season.matches
-      .filter((match) => match.round === round.number)
-      .sort((left, right) => (left.scheduledAt ?? "").localeCompare(right.scheduledAt ?? "") || left.id.localeCompare(right.id))
-      .map((match) => {
-        const home = index.teams.get(match.homeTeamId);
-        const away = index.teams.get(match.awayTeamId);
-        if (!home || !away) throw new Error("Mannschaft wurde im Spielplan nicht gefunden.");
-        return {
-          id: match.id,
-          scheduledAt: match.scheduledAt,
-          state: match.state,
-          homeScore: match.homeScore,
-          awayScore: match.awayScore,
-          home: { ...home, players: fixturePlayers(home.id, match.id) },
-          away: { ...away, players: fixturePlayers(away.id, match.id) },
-        };
-      }),
-  }));
-}
-
 export const api = {
   catalog: (signal?: AbortSignal) => abortable(catalogCache.then(({ leagues, seasons }) => ({ leagues, seasons })), signal),
   dashboard: (params: URLSearchParams, signal?: AbortSignal) => abortable(loadSeason(params).then((index): Dashboard => {
@@ -1091,12 +1077,9 @@ export const api = {
       .filter((player) => !query || player.name.toLocaleLowerCase("de").includes(query) || player.team.toLocaleLowerCase("de").includes(query)), params.get("sort") ?? "points", direction);
     return { items: filtered.slice(offset, offset + limit), nextOffset: offset + limit < filtered.length ? offset + limit : null };
   }), signal),
-  player: (playerId: string, params: URLSearchParams, signal?: AbortSignal) => abortable(Promise.all([loadSeason(params), catalogCache, newsCache, roleSignalsCache, availabilitySignalsCache]).then(([index, catalog, news, roleSignals, availabilitySignals]) => playerDetail(index, playerId, catalog, news, roleSignals, availabilitySignals)), signal),
+  player: (playerId: string, params: URLSearchParams, signal?: AbortSignal) => abortable(Promise.all([loadSeason(params), catalogCache, newsCache, roleSignalsCache, availabilitySignalsCache, loadClubProfiles(params.get("league") ?? "0001"), loadPlayerCareers(params.get("league") ?? "0001")]).then(([index, catalog, news, roleSignals, availabilitySignals, clubProfiles, playerCareers]) => playerDetail(index, playerId, catalog, news, roleSignals, availabilitySignals, clubProfiles, playerCareers)), signal),
   teams: (params: URLSearchParams, signal?: AbortSignal) => abortable(loadSeason(params).then((index) => buildTeamScores(index, { kind: "all" })), signal),
-  team: (teamId: string, params: URLSearchParams, signal?: AbortSignal) => abortable(Promise.all([loadSeason(params), roleSignalsCache]).then(([index, roleSignals]) => teamDetail(index, teamId, roleSignals)), signal),
+  team: (teamId: string, params: URLSearchParams, signal?: AbortSignal) => abortable(Promise.all([loadSeason(params), roleSignalsCache, loadClubProfiles(params.get("league") ?? "0001")]).then(([index, roleSignals, clubProfiles]) => teamDetail(index, teamId, roleSignals, clubProfiles)), signal),
   bestEleven: (params: URLSearchParams, signal?: AbortSignal) => abortable(loadSeason(params).then((index) => bestEleven(index, params.get("scope") === "season" ? "season" : "matchday", selectedRound(params, index.season))), signal),
   topPlayers: (params: URLSearchParams, signal?: AbortSignal): Promise<TopPlayers> => abortable(Promise.all([loadSeason(params), catalogCache]).then(([index, catalog]) => topPlayers(index, catalog)), signal),
-  managerPicks: (params: URLSearchParams, mode: ManagerMode, signal?: AbortSignal): Promise<ManagerRecommendation> => abortable(Promise.all([loadManagerRecommendation(params, mode), loadSeason(params)]).then(([recommendation, index]) => refreshRecommendation(recommendation, index)), signal),
-  managerSchedule: (params: URLSearchParams, players: ManagerRecommendation["players"], signal?: AbortSignal): Promise<ManagerScheduleRound[]> => abortable(loadSeason(params).then((index) => managerSchedule(index, players)), signal),
-  managerNews: (players: ManagerRecommendation["players"], signal?: AbortSignal): Promise<SquadNews> => abortable(newsCache.then((news) => buildSquadNews(news, players)), signal),
 };

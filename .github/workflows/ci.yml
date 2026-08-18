@@ -65,6 +65,9 @@ jobs:
       - name: Offline-Modellcode prüfen
         run: python3 -m compileall -q recommender
 
+      - name: Profil-Scraper prüfen
+        run: npm run test:club-profiles
+
       - name: Frontend-Tests ausführen
         run: npm test --workspace frontend
 
