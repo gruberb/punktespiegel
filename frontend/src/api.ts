@@ -23,6 +23,7 @@ import type {
 import { buildPlayerNews } from "./news";
 import type { NewsArtifact } from "./news";
 import { kickerPlayerNewsLink } from "./kicker-links";
+import { comparePlayerPositions, previousSeasonPointsByPlayer } from "./player-table";
 import { latestImportedRound } from "./rounds";
 import { computeTable, crossTable, formLastN, formPoints, positionsByRound, trendVsRound } from "./standings";
 import type { LeagueStandings, LeagueTableRow, LeagueTableTeam, MatchdayContributor, MatchdayFixture } from "./types";
@@ -354,6 +355,7 @@ function summarizePlayers(index: SeasonIndex, round: number): { players: Player[
       priceM: player.priceM,
       roundPoints: value.roundPoints,
       observedPoints: value.points,
+      previousSeasonPoints: null,
       averageGrade: value.gradedMatches ? value.gradeTotal / value.gradedMatches / 100 : null,
       roundGrade: value.roundGradedMatches ? value.roundGradeTotal / value.roundGradedMatches / 100 : null,
       gradedMatches: value.gradedMatches,
@@ -584,9 +586,10 @@ function sortPlayers(players: Player[], sort: string, direction: "asc" | "desc")
   const text = (left: string, right: string) => direction === "asc" ? left.localeCompare(right, "de") : right.localeCompare(left, "de");
   return players.sort((left, right) => {
     if (sort === "name") return text(left.name, right.name);
-    if (sort === "position") return text(left.position, right.position) || left.name.localeCompare(right.name, "de");
+    if (sort === "position") return comparePlayerPositions(left.position, right.position, direction) || left.name.localeCompare(right.name, "de");
     const value = (player: Player): number | null => {
       if (sort === "price") return player.priceM;
+      if (sort === "previousPoints") return player.previousSeasonPoints;
       if (sort === "round") return player.roundPoints;
       if (sort === "grade") return player.averageGrade;
       if (sort === "goals") return player.goals;
@@ -1070,7 +1073,7 @@ export const api = {
     };
   }), signal),
   standings: (params: URLSearchParams, signal?: AbortSignal): Promise<LeagueStandings> => abortable(loadSeason(params).then((index) => leagueStandings(index, selectedRound(params, index.season))), signal),
-  players: (params: URLSearchParams, signal?: AbortSignal) => abortable(loadSeason(params).then((index) => {
+  players: (params: URLSearchParams, signal?: AbortSignal) => abortable(Promise.all([loadSeason(params), catalogCache]).then(([index, catalog]) => {
     const round = latestImportedRound(index.season);
     const query = (params.get("q") ?? "").trim().toLocaleLowerCase("de");
     const position = params.get("position") as Position | null;
@@ -1078,7 +1081,12 @@ export const api = {
     const limit = Math.max(1, Math.min(100, Number(params.get("limit") ?? 50)));
     const offset = Math.max(0, Number(params.get("offset") ?? 0));
     const { players } = summarizePlayers(index, round);
-    const filtered = sortPlayers(players.filter((player) => !position || player.position === position)
+    const previousSeason = previousSeasonPointsByPlayer(catalog, index.season.startYear);
+    const playersWithHistory = players.map((player): Player => ({
+      ...player,
+      previousSeasonPoints: previousSeason.points.get(player.id) ?? null,
+    }));
+    const filtered = sortPlayers(playersWithHistory.filter((player) => !position || player.position === position)
       .filter((player) => !query || player.name.toLocaleLowerCase("de").includes(query) || player.team.toLocaleLowerCase("de").includes(query)), params.get("sort") ?? "points", direction);
     return { items: filtered.slice(offset, offset + limit), nextOffset: offset + limit < filtered.length ? offset + limit : null };
   }), signal),

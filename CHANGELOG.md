@@ -2,6 +2,17 @@
 
 Alle wesentlichen Änderungen an Punktespiegel werden in dieser Datei dokumentiert.
 
+## [1.21.0] – 2026-08-19
+
+### Hinzugefügt
+
+- Die Spielerübersicht zeigt eine sortierbare Spalte „Punkte Vorsaison“. Sie folgt Spielern auch über einen Ligawechsel hinweg und entfällt vollständig, wenn für die gewählte Saison noch kein Vorjahresarchiv existiert.
+
+### Geändert
+
+- Saisonpunkte tragen jetzt die kompakte Saison im Spaltentitel, etwa „Punkte 25/26“, statt eines Spieltag-Zwischenstands.
+- Saisons mit Wertungen sortieren Spieler standardmäßig nach Punkten. Vor dem ersten Spieltag gilt die Fußballreihenfolge Torwart, Abwehr, Mittelfeld und Sturm; innerhalb einer Position sowie bei gleichen Punktzahlen wird alphabetisch sortiert. Mannschaftsprofile verwenden dieselben Regeln innerhalb ihrer Positionsgruppen.
+
 ## [1.20.0] – 2026-08-19
 
 ### Geändert

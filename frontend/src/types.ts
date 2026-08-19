@@ -26,6 +26,7 @@ export type Player = {
   priceM: number;
   roundPoints: number;
   observedPoints: number;
+  previousSeasonPoints: number | null;
   averageGrade: number | null;
   roundGrade: number | null;
   gradedMatches: number;
