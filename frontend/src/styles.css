@@ -235,7 +235,7 @@ tbody tr:hover { background: #fbfcf9; }
 .player-bio strong { display: block; margin-top: 5px; font-size: 14px; font-weight: 640; }
 .player-bio em { display: block; margin-top: 3px; color: var(--soft-ink); font-size: 10px; font-style: normal; }
 .player-career { margin-bottom: 30px; }
-.career-table table { min-width: 560px; }
+.career-table table { min-width: 820px; }
 .career-table th, .career-table td { padding: 11px 16px; }
 
 /* Club facts, squad groups, likely eleven, transfers --------------------- */

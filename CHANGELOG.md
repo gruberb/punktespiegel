@@ -2,6 +2,20 @@
 
 Alle wesentlichen Änderungen an Punktespiegel werden in dieser Datei dokumentiert.
 
+## [1.19.0] – 2026-08-19
+
+### Hinzugefügt
+
+- „Leistungsdaten nach Verein“ schlüsselt die Transfermarkt-Karriere jetzt nach Verein, Saison und Wettbewerb auf; Einsätze, Tore und Vorlagen bleiben mit einer verlässlichen Gesamtsumme vergleichbar.
+
+### Geändert
+
+- Die bisherige Tabellen-, Form- und Spieltagsansicht ist jetzt der „Überblick“. Die bisherigen Ranglisten und Wertungskarten stehen unter dem eindeutiger benannten Navigationsziel „Tabellen“.
+
+### Behoben
+
+- „Im Verein seit“ bleibt in historischen Spieler- und Mannschaftsprofilen sichtbar, wenn der Spieler damals bereits beim selben Verein war. Die angezeigte Dauer wird am Ende der gewählten Saison statt immer am heutigen Datum berechnet.
+
 ## [1.18.0] – 2026-08-18
 
 ### Hinzugefügt

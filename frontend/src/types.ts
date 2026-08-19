@@ -381,12 +381,26 @@ export type PlayerCareerClub = {
   assists: number;
 };
 
+export type PlayerCareerSeason = {
+  clubId: number;
+  name: string;
+  tmUrl: string | null;
+  seasonStartYear: number;
+  competitionId: string;
+  competition: string;
+  competitionUrl: string | null;
+  appearances: number;
+  goals: number;
+  assists: number;
+};
+
 export type PlayerCareer = {
   generatedAt: string;
   provider: string;
   tmId: number;
   tmUrl: string;
   clubs: PlayerCareerClub[];
+  seasons: PlayerCareerSeason[];
 };
 
 export type LikelyElevenPlayer = {
@@ -454,6 +468,7 @@ export type TeamDetail = {
   id: string;
   name: string;
   code: string;
+  startYear: number;
   logoUrl: string | null;
   players: TeamDetailPlayer[];
   matches: TeamDetailMatch[];

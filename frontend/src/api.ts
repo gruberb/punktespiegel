@@ -47,7 +47,7 @@ type StaticPlayerCareers = {
   leagueCode: string;
   season: number;
   provider: string;
-  players: Record<string, { tmId: number; tmUrl: string; clubs: PlayerCareer["clubs"] }>;
+  players: Record<string, { tmId: number; tmUrl: string; clubs: PlayerCareer["clubs"]; seasons?: PlayerCareer["seasons"] }>;
 };
 
 type StaticRoleSignals = {
@@ -684,6 +684,7 @@ async function playerDetail(
       tmId: careerEntry.tmId,
       tmUrl: careerEntry.tmUrl,
       clubs: careerEntry.clubs,
+      seasons: careerEntry.seasons ?? [],
     } : null,
     seasons,
     games,
@@ -896,6 +897,7 @@ function teamDetail(index: SeasonIndex, teamId: string, roleSignals: StaticRoleS
     id: team.id,
     name: team.name,
     code: team.code,
+    startYear: index.season.startYear,
     logoUrl: team.logoUrl,
     players,
     matches,

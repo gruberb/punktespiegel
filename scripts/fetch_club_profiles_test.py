@@ -23,9 +23,15 @@ class ProfileParserTests(unittest.TestCase):
 
     def test_aggregates_only_club_appearances(self) -> None:
         def performance(club_id: int, state: str = "played", goals: int | None = 0, assists: int | None = 0,
-                        national: bool = False, competition_type: int = 1) -> dict:
+                        national: bool = False, competition_type: int = 1, season: int = 2025,
+                        competition: str = "L1") -> dict:
             return {
-                "gameInformation": {"isNationalGame": national, "competitionTypeId": competition_type},
+                "gameInformation": {
+                    "isNationalGame": national,
+                    "competitionTypeId": competition_type,
+                    "seasonId": season,
+                    "competitionId": competition,
+                },
                 "clubsInformation": {"club": {"clubId": str(club_id)}},
                 "statistics": {
                     "generalStatistics": {"participationState": state},
@@ -38,13 +44,19 @@ class ProfileParserTests(unittest.TestCase):
             performance(27, goals=None, assists=None),
             performance(27, state="in squad"),
             performance(3299, goals=1, national=True, competition_type=11),
-            performance(148, goals=1),
+            performance(148, goals=1, season=2024, competition="GB1"),
         ]}}
 
-        self.assertEqual(MODULE.parse_player_performance(payload), [
-            {"clubId": 27, "appearances": 2, "goals": 2, "assists": 1},
-            {"clubId": 148, "appearances": 1, "goals": 1, "assists": 0},
-        ])
+        self.assertEqual(MODULE.parse_player_performance(payload), {
+            "clubs": [
+                {"clubId": 27, "appearances": 2, "goals": 2, "assists": 1},
+                {"clubId": 148, "appearances": 1, "goals": 1, "assists": 0},
+            ],
+            "seasons": [
+                {"clubId": 27, "seasonStartYear": 2025, "competitionId": "L1", "appearances": 2, "goals": 2, "assists": 1},
+                {"clubId": 148, "seasonStartYear": 2024, "competitionId": "GB1", "appearances": 1, "goals": 1, "assists": 0},
+            ],
+        })
 
     def test_matches_unique_short_name(self) -> None:
         self.assertEqual(MODULE.match_by_name("grimaldo", {"1": "alejandro grimaldo", "2": "manuel neuer"}), "1")
@@ -70,7 +82,7 @@ class ProfileArtifactTests(unittest.TestCase):
                 careers = json.loads((DATA_ROOT / "player-careers" / f"{league}-{year}.json").read_text())
 
                 self.assertEqual(profiles["schemaVersion"], 1)
-                self.assertEqual(careers["schemaVersion"], 1)
+                self.assertEqual(careers["schemaVersion"], 2)
                 self.assertEqual(profiles["leagueCode"], league)
                 self.assertEqual(careers["leagueCode"], league)
                 self.assertEqual(profiles["season"], year)
@@ -92,6 +104,13 @@ class ProfileArtifactTests(unittest.TestCase):
                         self.assertGreaterEqual(club["appearances"], 0)
                         self.assertGreaterEqual(club["goals"], 0)
                         self.assertGreaterEqual(club["assists"], 0)
+                    for season in player["seasons"]:
+                        self.assertTrue(season["name"])
+                        self.assertTrue(season["competition"])
+                        self.assertGreater(season["seasonStartYear"], 1900)
+                        self.assertGreaterEqual(season["appearances"], 0)
+                        self.assertGreaterEqual(season["goals"], 0)
+                        self.assertGreaterEqual(season["assists"], 0)
 
             current_profiles = (DATA_ROOT / "club-profiles" / f"{league}.json").read_text()
             current_careers = (DATA_ROOT / "player-careers" / f"{league}.json").read_text()

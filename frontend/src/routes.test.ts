@@ -15,7 +15,7 @@ test("reads clean paths with or without a trailing slash", () => {
   assert.equal(viewFromPathname("/unknown", null, null), null);
 });
 
-test("keeps resolving the retired Historie path to the Tabelle", () => {
+test("keeps resolving the retired Historie path to Tabellen", () => {
   assert.equal(viewFromPathname("/historie", null, null), "table");
   assert.equal(viewFromPathname("/historie/", null, null), "table");
   assert.equal(pathForView("table"), "/tabelle");

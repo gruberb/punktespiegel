@@ -25,8 +25,8 @@ const routePaths: Record<RouteView, string> = {
   faq: "/faq",
 };
 
-// The Historie page was folded into the Tabelle, Spieler and Überblick views;
-// old links and the crawled /historie path keep resolving to the Tabelle.
+// The Historie page was folded into the Tabellen, Spieler and Überblick views;
+// old links and the crawled /historie path keep resolving to the Tabellen page.
 // The Fantasy-Team page was removed with the shift to a stats-first product;
 // its crawled path resolves to the Mannschaften overview.
 const legacyPaths: Record<string, RouteView> = {

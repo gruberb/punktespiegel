@@ -84,7 +84,7 @@ docker compose build web
 - `frontend/public/data/catalog.json`: unterstützte Ligen und Saisons.
 - `frontend/public/data/seasons/`: ein normalisierter Snapshot je Liga-Saison.
 - `frontend/public/data/club-profiles/`: saisonierte Kader-, Kapitäns- und Transferdaten je Liga; Trainerdaten werden nur für den aktuellen Stand veröffentlicht.
-- `frontend/public/data/player-careers/`: saisonierte Karriereeinsätze, Tore und Vorlagen je Spieler und Verein.
+- `frontend/public/data/player-careers/`: saisonierte Karriereeinsätze, Tore und Vorlagen je Spieler, Verein, Saison und Wettbewerb.
 - `frontend/public/data/current-role-signals.json`: statischer Bundesliga-Snapshot für aktuelle Topelf-, Spieler- und Vereinsquellen.
 - `frontend/public/data/current-availability-signals.json`: datierter Ausfallsnapshot für Bundesliga, 2. Bundesliga und 3. Liga.
 - `frontend/public/data/external-performance-benchmark.json`: unabhängiger Vergleich der LigaInsider-Leistungsrangfolge 2025/26 mit den historischen kicker-Punkten.

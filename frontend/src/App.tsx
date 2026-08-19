@@ -8,6 +8,7 @@ import { hrefForView, pathForView, viewFromPathname } from "./routes";
 import type { DataTableColumn } from "./DataTable";
 import type { RouteView } from "./routes";
 import { initialAvailableRound, latestAvailableRound } from "./rounds";
+import { formatJoined } from "./profile-format";
 import type {
   BestEleven,
   BestElevenPlayer,
@@ -65,7 +66,7 @@ const availabilityStatusName: Record<NonNullable<PlayerDetail["availability"]>["
 };
 const nav = [
   { id: "overview", label: "Überblick" },
-  { id: "table", label: "Tabelle" },
+  { id: "table", label: "Tabellen" },
   { id: "players", label: "Spieler" },
   { id: "teams", label: "Mannschaften" },
   { id: "top", label: "Topspieler" },
@@ -76,7 +77,7 @@ const navMobile: Record<(typeof nav)[number]["id"], { label: string; icon: React
     icon: <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3.7 10.9 8.3-7 8.3 7" /><path d="M6 9.7V20h12V9.7" /></svg>,
   },
   table: {
-    label: "Tabelle",
+    label: "Tabellen",
     icon: <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 20V9.5h6V20" /><path d="M3.5 20v-6.7H9" /><path d="M20.5 20v-5.2H15" /><path d="M2.5 20h19" /></svg>,
   },
   players: {
@@ -229,7 +230,7 @@ function viewBackLabel(view: View) {
     player: "zum Spielerprofil",
     teams: "zu den Mannschaften",
     team: "zur Mannschaft",
-    table: "zur Tabelle",
+    table: "zu den Tabellen",
     top: "zu den Topspielern",
     about: "zu Über Punktespiegel",
     methodology: "zu Daten & Methodik",
@@ -292,7 +293,7 @@ export default function App() {
   const selectedPlayerSeason = playerSeasonCandidates.find((season) => season.leagueCode === filters.league && String(season.startYear) === filters.season)
     ?? playerSeasons.find((season) => String(season.startYear) === filters.season)
     ?? playerSeasons[0];
-  const selectedSeason = view === "overview" ? latestPublishedSeason : view === "top" ? newestSeason : view === "team" ? selectedTeamSeason : view === "player" ? selectedPlayerSeason : requestedSeason;
+  const selectedSeason = view === "table" ? latestPublishedSeason : view === "top" ? newestSeason : view === "team" ? selectedTeamSeason : view === "player" ? selectedPlayerSeason : requestedSeason;
   const roundCount = selectedSeason?.roundCount ?? (filters.league === "0003" ? 38 : 34);
   const latestRound = selectedSeason?.latestRound ?? 0;
   const overviewRound = Math.min(Math.max(1, Number(filters.round) || 1), Math.max(1, latestRound));
@@ -306,8 +307,8 @@ export default function App() {
     const seasonName = selectedSeason?.displayName ?? filters.season;
     const seo = ({
       overview: {
-        title: `kicker Manager Punkte ${leagueName} ${seasonName}`,
-        description: `Aktuelle kicker-Noten und Managerpunkte der ${leagueName} ${seasonName}: Ranglisten nach Spielern, Positionen und Mannschaften.`,
+        title: `Tabelle & Formkurve ${leagueName} ${seasonName}`,
+        description: `Tabelle der ${leagueName} ${seasonName} nach Spieltag: Platzierungsverlauf, Form der letzten fünf Spiele und Kreuztabelle aller Paarungen.`,
       },
       players: {
         title: `kicker Noten & Managerpunkte ${leagueName}`,
@@ -326,8 +327,8 @@ export default function App() {
         description: `Trainer, Kapitän, Kader nach Position, mögliche Startelf, Transfers, Spielerpunkte und Saisonverlauf für Mannschaften der ${leagueName}.`,
       },
       table: {
-        title: `Tabelle & Formkurve ${leagueName} ${seasonName}`,
-        description: `Tabelle der ${leagueName} ${seasonName} nach Spieltag: Platzierungsverlauf, Form der letzten fünf Spiele und Kreuztabelle aller Paarungen.`,
+        title: `kicker Manager Tabellen ${leagueName} ${seasonName}`,
+        description: `Aktuelle kicker-Noten und Managerpunkte der ${leagueName} ${seasonName}: Ranglisten nach Spielern, Positionen und Mannschaften.`,
       },
       top: {
         title: `Topspieler ${leagueName}: Form & Marktwert`,
@@ -403,10 +404,10 @@ export default function App() {
   }, [selectedSeason?.id]);
 
   useEffect(() => {
-    if (view !== "overview" || !latestPublishedSeason || filters.season === String(latestPublishedSeason.startYear)) return;
+    if (view !== "table" || !latestPublishedSeason || filters.season === String(latestPublishedSeason.startYear)) return;
     const next = { ...filters, season: String(latestPublishedSeason.startYear), round: String(Math.max(1, latestPublishedSeason.latestRound)) };
     setFilters(next);
-    syncUrl(next, "overview", null, null);
+    syncUrl(next, "table", null, null);
   }, [view, filters.league, filters.season, latestPublishedSeason?.startYear, latestPublishedSeason?.latestRound]);
 
   useEffect(() => {
@@ -445,7 +446,7 @@ export default function App() {
   }, [view, playerId, filters.league, filters.season, selectedPlayerSeason?.id, selectedPlayerSeason?.latestRound]);
 
   useEffect(() => {
-    if (view !== "overview" || !selectedSeason) return;
+    if (view !== "table" || !selectedSeason) return;
     if (latestRound < 1) {
       setDashboard(null);
       setDashboardError(null);
@@ -498,7 +499,7 @@ export default function App() {
     const next = { ...filters, [key]: value };
     if (key === "league") {
       const available = seasonsForLeague(catalog, value);
-      const defaultSeason = view === "overview"
+      const defaultSeason = view === "table"
         ? available.find((season) => season.latestRound > 0) ?? available[0]
         : available[0];
       if (defaultSeason) next.season = String(defaultSeason.startYear);
@@ -538,11 +539,11 @@ export default function App() {
   }
 
   function setView(next: NavView) {
-    const nextFilters = next === "overview" && latestPublishedSeason
+    const nextFilters = next === "table" && latestPublishedSeason
       ? { ...filters, season: String(latestPublishedSeason.startYear), round: String(Math.max(1, latestPublishedSeason.latestRound)) }
       : next === "top" && newestSeason
         ? { ...filters, season: String(newestSeason.startYear), round: String(Math.max(1, newestSeason.latestRound)) }
-      : next === "table" && requestedSeason
+      : next === "overview" && requestedSeason
         ? { ...filters, round: String(Math.max(1, requestedSeason.latestRound)) }
         : filters;
     if (nextFilters !== filters) setFilters(nextFilters);
@@ -594,7 +595,7 @@ export default function App() {
     faq: "Häufige Fragen",
   };
   const title = isInfoView(view) ? infoTitle[view] : view === "overview" ? "Überblick" : view === "player" ? "Spielerprofil" : view === "team" ? "Mannschaftsprofil" : nav.find((item) => item.id === view)?.label;
-  const description = view === "overview"
+  const description = view === "table"
     ? latestRound > 0
       ? `${selectedSeason?.displayName ?? "Gewählte Saison"} · ${overviewScope === "matchday" ? `nur Spieltag ${overviewRound}` : `kumuliert bis Spieltag ${overviewRound}`}`
       : `${selectedSeason?.displayName ?? "Gewählte Saison"} · noch ohne abgeschlossenen Spieltag`
@@ -602,7 +603,7 @@ export default function App() {
       ? `${selectedSeason?.displayName ?? "Gewählte Saison"} · gesamte Saison`
       : view === "team"
         ? "Kader und Saisonverlauf"
-      : view === "table"
+      : view === "overview"
         ? "Tabellenstand, Verlauf und Form"
         : view === "top"
           ? `${newestSeason?.displayName ?? "Aktuelle Saison"} · Form- und Marktwertvergleich`
@@ -637,17 +638,17 @@ export default function App() {
       </header>
 
       <main>
-        {!isInfoView(view) && view !== "table" && view !== "top" && <PageHeader title={title ?? ""} description={description} controls={<div className="selectors">
+        {!isInfoView(view) && view !== "overview" && view !== "top" && <PageHeader title={title ?? ""} description={description} controls={<div className="selectors">
             {view !== "team" && view !== "player" && <StepperSelect label="Liga" value={filters.league} options={(catalog?.leagues ?? []).map((league) => ({ value: league.code, label: league.name }))} onChange={(value) => updateFilter("league", value)} />}
             {view === "team"
               ? <StepperSelect label="Saison" value={String(selectedTeamSeason?.startYear ?? filters.season)} options={[...teamSeasons].reverse().map((season) => ({ value: String(season.startYear), label: season.displayName }))} onChange={updateTeamSeason} />
               : view === "player"
                 ? <StepperSelect label="Saison" value={String(selectedPlayerSeason?.startYear ?? filters.season)} options={[...playerSeasons].reverse().map((season) => ({ value: String(season.startYear), label: season.displayName }))} onChange={updatePlayerSeason} />
-                : view !== "overview" && <StepperSelect label="Saison" value={filters.season} options={[...seasons].reverse().map((season) => ({ value: String(season.startYear), label: season.displayName }))} onChange={(value) => updateFilter("season", value)} />}
+                : view !== "table" && <StepperSelect label="Saison" value={filters.season} options={[...seasons].reverse().map((season) => ({ value: String(season.startYear), label: season.displayName }))} onChange={(value) => updateFilter("season", value)} />}
             {showMatchday && (
               <StepperSelect label="Spieltag" value={filters.round} options={Array.from({ length: roundCount }, (_, index) => ({ value: String(index + 1), label: `Spieltag ${index + 1}` }))} onChange={(value) => updateFilter("round", value)} />
             )}
-            {view === "overview" && latestRound > 0 && <>
+            {view === "table" && latestRound > 0 && <>
               <div className="scope-switch acorn-segmented-control header-scope-switch" aria-label="Zeitraum">
                 <button className={`acorn-segment ${overviewScope === "through" ? "active is-selected" : ""}`} onClick={() => setOverviewScope("through")}>Gesamt</button>
                 <button className={`acorn-segment ${overviewScope === "matchday" ? "active is-selected" : ""}`} onClick={() => setOverviewScope("matchday")}>Nur Spieltag</button>
@@ -658,7 +659,7 @@ export default function App() {
 
         {isInfoView(view) ? <InfoPage view={view} filters={filters} onView={setView} /> : catalogError ? <ErrorState message={catalogError} /> : !catalog ? <LoadingState /> : (
           <>
-            {view === "overview" && (
+            {view === "table" && (
               latestRound < 1 ? <section className="detail-section"><Empty message="Für diese Saison liegen noch keine Daten eines abgeschlossenen Spieltags vor." /></section>
                 : dashboardError ? <ErrorState message={dashboardError} />
                 : dashboardLoading || !dashboard ? <LoadingState />
@@ -668,7 +669,7 @@ export default function App() {
             {view === "player" && playerId && (playerSelectionPending ? <LoadingState /> : <PlayerDetailView filters={filters} playerId={playerId} backLabel={backLabel} onBack={() => goBack("players")} onTeam={openTeam} onSeason={(year) => updatePlayerSeason(String(year))} />)}
             {view === "teams" && <TeamsView filters={filters} onTeam={openTeam} />}
             {view === "team" && teamId && (teamSelectionPending ? <LoadingState /> : <TeamDetailView filters={filters} teamId={teamId} backLabel={backLabel} onBack={() => goBack("teams")} onPlayer={openPlayer} onTeam={openTeam} />)}
-            {view === "table" && <TabelleView filters={filters} leagues={catalog.leagues} seasons={seasons} onFilter={updateFilter} onTeam={openTeam} onPlayer={openPlayer} />}
+            {view === "overview" && <TabelleView filters={filters} leagues={catalog.leagues} seasons={seasons} onFilter={updateFilter} onTeam={openTeam} onPlayer={openPlayer} />}
             {view === "top" && <TopPlayersView filters={filters} leagues={catalog.leagues} onFilter={updateFilter} onPlayer={openPlayer} />}
           </>
         )}
@@ -824,7 +825,7 @@ function InfoPage({ view, filters, onView }: { view: InfoView; filters: Filters;
         <section className="info-card"><h2>Drei Ligen, mehrere Saisons</h2><p>Bundesliga, 2. Bundesliga und 3. Liga verwenden dieselben Tabellen und Metriken. So lassen sich Positionen, Vereine und Spieltage konsistent vergleichen.</p></section>
         <section className="info-card"><h2>Unabhängig und transparent</h2><p>Punktespiegel ist ein unabhängiges Analyseprojekt und nicht mit kicker verbunden. Quellen, Datengrenzen und Aktualisierungswege werden offen beschrieben.</p></section>
       </div>
-      <nav className="info-actions" aria-label="Punktespiegel entdecken">{link("players", "Spielerdaten durchsuchen →")}{link("table", "Tabelle öffnen →")}{link("teams", "Mannschaften ansehen →")}</nav>
+      <nav className="info-actions" aria-label="Punktespiegel entdecken">{link("players", "Spielerdaten durchsuchen →")}{link("table", "Tabellen öffnen →")}{link("teams", "Mannschaften ansehen →")}</nav>
     </>}
 
     {view === "methodology" && <>
@@ -870,7 +871,7 @@ function SiteFooter({ currentView, filters, onView }: { currentView: View; filte
     { view: "methodology", label: "Daten & Methodik" },
     { view: "sources", label: "Quellen" },
     { view: "faq", label: "FAQ" },
-    { view: "table", label: "Tabelle" },
+    { view: "table", label: "Tabellen" },
     { view: "players", label: "Spieler" },
     { view: "teams", label: "Mannschaften" },
   ];
@@ -1080,7 +1081,7 @@ function TabelleView({ filters, leagues, seasons, onFilter, onTeam, onPlayer }: 
 
   return (
     <div className="tabelle-view">
-      <PageHeader title="Tabelle" description={`${selectedSeason?.displayName ?? "Gewählte Saison"} · Stand nach Spieltag ${round}`} controls={<div className="selectors">
+      <PageHeader title="Überblick" description={`${selectedSeason?.displayName ?? "Gewählte Saison"} · Stand nach Spieltag ${round}`} controls={<div className="selectors">
         <StepperSelect label="Liga" value={filters.league} options={leagues.map((league) => ({ value: league.code, label: league.name }))} onChange={(value) => onFilter("league", value)} />
         <StepperSelect label="Saison" value={filters.season} options={[...seasons].reverse().map((season) => ({ value: String(season.startYear), label: season.displayName }))} onChange={(value) => onFilter("season", value)} />
         <StepperSelect label="Spieltag" value={String(round)} options={Array.from({ length: maximumRound }, (_, index) => ({ value: String(index + 1), label: `Spieltag ${index + 1}` }))} onChange={(value) => onFilter("round", value)} />
@@ -1564,7 +1565,7 @@ function PlayerDetailView({ filters, playerId, backLabel, onBack, onTeam, onSeas
       </nav>
       {activeTab === "profile" && (
         <div className="player-tab-panel" id="player-profile-panel" role="tabpanel" aria-labelledby="player-profile-tab">
-          {detail.bio && <PlayerBioSection bio={detail.bio} />}
+          {detail.bio && <PlayerBioSection bio={detail.bio} seasonStartYear={detail.startYear} />}
           {detail.availability && (
             <aside className={`availability-alert ${detail.availability.status}`}>
               <div><p className="kicker">Aktueller Verfügbarkeitsstatus</p><strong>{availabilityStatusName[detail.availability.status]}{detail.availability.reason ? ` · ${detail.availability.reason}` : ""}</strong><small>{detail.availability.absentSince ? `Fehlt seit ${detail.availability.absentSince}. ` : ""}{detail.availability.expectedReturn ? `Erwartete Rückkehr: ${formatDate(detail.availability.expectedReturn)}.` : "Kein bestätigtes Rückkehrdatum."}</small></div>
@@ -1572,7 +1573,7 @@ function PlayerDetailView({ filters, playerId, backLabel, onBack, onTeam, onSeas
             </aside>
           )}
           <PlayerNewsSection news={detail.news} kickerNewsUrl={detail.kickerNewsUrl} kickerNewsDirect={detail.kickerNewsDirect} />
-          {detail.career && detail.career.clubs.length > 0 && <PlayerCareerSection career={detail.career} />}
+          {detail.career && (detail.career.clubs.length > 0 || detail.career.seasons.length > 0) && <PlayerCareerSection career={detail.career} />}
         </div>
       )}
       {activeTab === "points" && (
@@ -1616,12 +1617,12 @@ function PlayerDetailView({ filters, playerId, backLabel, onBack, onTeam, onSeas
   );
 }
 
-function PlayerBioSection({ bio }: { bio: NonNullable<PlayerDetail["bio"]> }) {
+function PlayerBioSection({ bio, seasonStartYear }: { bio: NonNullable<PlayerDetail["bio"]>; seasonStartYear: number }) {
   const facts: { label: string; value: string; detail?: string }[] = [
     { label: "Geboren", value: bio.birthDate ? formatDateWithYear(bio.birthDate) : "—", detail: bio.age != null ? `${bio.age} Jahre` : undefined },
     { label: "Nationalität", value: bio.nationalities.join(", ") || "—" },
     { label: "Größe", value: formatHeight(bio.heightCm), detail: bio.foot ? `${bio.foot === "beidfüßig" ? "beidfüßig" : `${bio.foot}er Fuß`}` : undefined },
-    { label: "Im Verein seit", value: bio.joinedAt ? formatJoined(bio.joinedAt) : "—", detail: bio.previousClub ? `zuvor ${bio.previousClub}` : undefined },
+    { label: "Im Verein seit", value: bio.joinedAt ? formatJoined(bio.joinedAt, seasonStartYear) : "—", detail: bio.previousClub ? `zuvor ${bio.previousClub}` : undefined },
     { label: "Vertrag bis", value: bio.contractUntil ? formatDateWithYear(bio.contractUntil) : "—" },
     { label: "Rückennummer", value: bio.shirtNumber ?? "—", detail: bio.positionDetail ?? undefined },
   ];
@@ -1634,29 +1635,41 @@ function PlayerBioSection({ bio }: { bio: NonNullable<PlayerDetail["bio"]> }) {
 
 function PlayerCareerSection({ career }: { career: NonNullable<PlayerDetail["career"]> }) {
   const clubs = [...career.clubs].sort((left, right) => right.appearances - left.appearances || left.name.localeCompare(right.name, "de"));
+  const seasons = [...career.seasons].sort((left, right) => right.seasonStartYear - left.seasonStartYear
+    || left.name.localeCompare(right.name, "de")
+    || left.competition.localeCompare(right.competition, "de"));
   const totals = clubs.reduce((result, club) => ({
     appearances: result.appearances + club.appearances,
     goals: result.goals + club.goals,
     assists: result.assists + club.assists,
   }), { appearances: 0, goals: 0, assists: 0 });
+  const rows = seasons.length > 0 ? seasons : clubs.map((club) => ({
+    ...club,
+    seasonStartYear: null,
+    competitionId: "",
+    competition: "Alle Wettbewerbe",
+    competitionUrl: null,
+  }));
   return (
     <section className="player-career" aria-label="Karrierestationen">
       <div className="section-copy news-heading">
-        <div><h3>Leistungsdaten nach Verein</h3><p>Karriereeinsätze, Tore und Vorlagen je Verein.</p></div>
+        <div><h3>Leistungsdaten nach Verein</h3><p>Einsätze, Tore und Vorlagen je Verein, Saison und Wettbewerb.</p></div>
         <div className="news-actions"><span>{career.provider} · Stand {formatDate(career.generatedAt)}</span><a href={career.tmUrl} target="_blank" rel="noreferrer">Profil öffnen ↗</a></div>
       </div>
       <div className="table-shell career-table">
         <table>
-          <thead><tr><th>Verein</th><th className="num">Einsätze</th><th className="num">Tore</th><th className="num">Vorlagen</th></tr></thead>
-          <tbody>{clubs.map((club) => (
-            <tr key={club.clubId}>
-              <td><strong>{club.tmUrl ? <a href={club.tmUrl} target="_blank" rel="noreferrer">{club.name} ↗</a> : club.name}</strong></td>
-              <td className="num">{club.appearances}</td>
-              <td className="num">{club.goals}</td>
-              <td className="num">{club.assists}</td>
+          <thead><tr><th>Verein</th><th>Saison</th><th>Wettbewerb</th><th className="num">Einsätze</th><th className="num">Tore</th><th className="num">Vorlagen</th></tr></thead>
+          <tbody>{rows.map((row) => (
+            <tr key={`${row.clubId}-${row.seasonStartYear ?? "all"}-${row.competitionId}`}>
+              <td><strong>{row.tmUrl ? <a href={row.tmUrl} target="_blank" rel="noreferrer">{row.name} ↗</a> : row.name}</strong></td>
+              <td>{row.seasonStartYear == null ? "Gesamt" : formatSeason(row.seasonStartYear)}</td>
+              <td>{row.competitionUrl ? <a href={row.competitionUrl} target="_blank" rel="noreferrer">{row.competition} ↗</a> : row.competition}</td>
+              <td className="num">{row.appearances}</td>
+              <td className="num">{row.goals}</td>
+              <td className="num">{row.assists}</td>
             </tr>
           ))}</tbody>
-          <tfoot><tr><td><strong>Gesamt</strong></td><td className="num">{totals.appearances}</td><td className="num">{totals.goals}</td><td className="num">{totals.assists}</td></tr></tfoot>
+          <tfoot><tr><td colSpan={3}><strong>Gesamt</strong></td><td className="num">{totals.appearances}</td><td className="num">{totals.goals}</td><td className="num">{totals.assists}</td></tr></tfoot>
         </table>
       </div>
     </section>
@@ -1875,7 +1888,7 @@ function TeamSquadByPosition({ detail, onPlayer }: { detail: TeamDetail; onPlaye
                         <td className="num">{bio?.age ?? "—"}</td>
                         <td><span title={bio?.nationalities.join(", ")}>{bio?.nationalities[0] ?? "—"}{bio && bio.nationalities.length > 1 ? ` +${bio.nationalities.length - 1}` : ""}</span></td>
                         <td className="num">{formatHeight(bio?.heightCm ?? null)}</td>
-                        <td>{bio?.joinedAt ? formatJoined(bio.joinedAt) : "—"}</td>
+                        <td>{bio?.joinedAt ? formatJoined(bio.joinedAt, detail.startYear) : "—"}</td>
                         <td>{bio?.contractUntil ? formatDateWithYear(bio.contractUntil) : "—"}</td>
                         <td className="num">{formatMoney(bio?.marketValue ?? null)}</td>
                         <td className="num primary-num">{player.points}</td>
@@ -2277,13 +2290,7 @@ function formatMoney(value: MoneyValue | null | undefined) {
 function formatHeight(heightCm: number | null) {
   return heightCm == null ? "—" : `${(heightCm / 100).toLocaleString("de-DE", { minimumFractionDigits: 2 })} m`;
 }
-function formatJoined(joinedAt: string) {
-  const joined = new Date(joinedAt);
-  if (Number.isNaN(joined.getTime())) return joinedAt;
-  const years = Math.floor((Date.now() - joined.getTime()) / (365.25 * 24 * 60 * 60 * 1000));
-  const date = new Intl.DateTimeFormat("de-DE", { month: "2-digit", year: "numeric" }).format(joined);
-  return years >= 1 ? `${date} · ${years} ${years === 1 ? "Jahr" : "Jahre"}` : date;
-}
+function formatSeason(startYear: number) { return `${startYear}/${String(startYear + 1).slice(-2)}`; }
 function formatPenalty(value: number) { return value < 0 ? `−${Math.abs(value)}` : String(value); }
 function formatSignedPoints(value: number) { return value > 0 ? `+${value}` : value < 0 ? `−${Math.abs(value)}` : "0"; }
 function formatCardCounts(redCards: number, yellowRedCards: number) {

@@ -328,8 +328,8 @@ def parse_league_clubs(page: str) -> dict[str, dict[str, Any]]:
     return clubs
 
 
-def parse_player_performance(payload: dict[str, Any]) -> list[dict[str, Any]]:
-    """Aggregate Transfermarkt's game-level career data by club.
+def parse_player_performance(payload: dict[str, Any]) -> dict[str, list[dict[str, Any]]]:
+    """Aggregate Transfermarkt's game-level career data by club and season.
 
     The profile component excludes national-team competition types and counts
     only rows in which the player actually appeared. Mirroring those rules
@@ -338,6 +338,7 @@ def parse_player_performance(payload: dict[str, Any]) -> list[dict[str, Any]]:
     """
     data = payload.get("data") or {}
     totals: dict[str, dict[str, Any]] = {}
+    seasons: dict[tuple[str, int, str], dict[str, Any]] = {}
     national_team_types = {11, 17, 19, 20}
     for item in data.get("performance", []):
         game = item.get("gameInformation") or {}
@@ -362,7 +363,30 @@ def parse_player_performance(payload: dict[str, Any]) -> list[dict[str, Any]]:
         aggregate["appearances"] += 1
         aggregate["goals"] += int(goals.get("goalsScoredTotal") or 0)
         aggregate["assists"] += int(goals.get("assists") or 0)
-    return sorted(totals.values(), key=lambda entry: (-entry["appearances"], entry["clubId"]))
+
+        season_year = game.get("seasonId")
+        competition_id = str(game.get("competitionId") or "")
+        if season_year is None or not competition_id:
+            continue
+        season_key = (club_id, int(season_year), competition_id)
+        season = seasons.setdefault(season_key, {
+            "clubId": int(club_id),
+            "seasonStartYear": int(season_year),
+            "competitionId": competition_id,
+            "appearances": 0,
+            "goals": 0,
+            "assists": 0,
+        })
+        season["appearances"] += 1
+        season["goals"] += int(goals.get("goalsScoredTotal") or 0)
+        season["assists"] += int(goals.get("assists") or 0)
+    return {
+        "clubs": sorted(totals.values(), key=lambda entry: (-entry["appearances"], entry["clubId"])),
+        "seasons": sorted(
+            seasons.values(),
+            key=lambda entry: (-entry["seasonStartYear"], entry["clubId"], entry["competitionId"]),
+        ),
+    }
 
 
 def resolve_career_clubs(fetcher: Fetcher, club_ids: set[int]) -> dict[int, dict[str, Any]]:
@@ -378,6 +402,24 @@ def resolve_career_clubs(fetcher: Fetcher, club_ids: set[int]) -> dict[int, dict
             relative_url = club.get("relativeUrl")
             resolved[club_id] = {
                 "name": club.get("name") or f"Verein {club_id}",
+                "tmUrl": f"{BASE_URL}{relative_url}" if relative_url else None,
+            }
+    return resolved
+
+
+def resolve_career_competitions(fetcher: Fetcher, competition_ids: set[str]) -> dict[str, dict[str, Any]]:
+    """Resolve Transfermarkt competition ids in batches through the entity API."""
+    resolved: dict[str, dict[str, Any]] = {}
+    ordered = sorted(competition_ids)
+    for offset in range(0, len(ordered), 200):
+        batch = ordered[offset:offset + 200]
+        query = urlencode({"ids[]": batch}, doseq=True)
+        payload = json.loads(fetcher.fetch(f"{API_URL}/competitions?{query}"))
+        for competition in payload.get("data", []):
+            competition_id = str(competition["id"])
+            relative_url = competition.get("relativeUrl")
+            resolved[competition_id] = {
+                "name": competition.get("shortName") or competition.get("name") or competition_id,
                 "tmUrl": f"{BASE_URL}{relative_url}" if relative_url else None,
             }
     return resolved
@@ -479,7 +521,10 @@ def build_league_snapshot(
         current_profiles = load_json(current_profile_path)
         for current_team in current_profiles.get("teams", {}).values():
             for current_member in current_team.get("squad", {}).values():
-                stable_bios[int(current_member["tmId"])] = current_member
+                stable_bios[int(current_member["tmId"])] = {
+                    "clubId": int(current_team["transfermarktClubId"]),
+                    "member": current_member,
+                }
     teams = [team for team in season_file["teams"]]
     players_by_team: dict[str, dict[str, str]] = {}
     player_names: dict[str, str] = {}
@@ -516,9 +561,10 @@ def build_league_snapshot(
 
         squad = parse_squad_page(squad_page)
         for member in squad:
-            stable = stable_bios.get(member["tmId"])
+            stable_entry = stable_bios.get(member["tmId"])
+            stable = stable_entry["member"] if stable_entry and stable_entry["clubId"] == int(club["id"]) else None
             if stable:
-                for field in ("birthDate", "nationalities", "heightCm", "foot"):
+                for field in ("birthDate", "nationalities", "heightCm", "foot", "joinedAt", "previousClub"):
                     if not member.get(field):
                         member[field] = stable.get(field)
             historical_age = age_at_season_end(member.get("birthDate"), season_year)
@@ -562,10 +608,10 @@ def build_league_snapshot(
         }
 
         if include_careers:
-            performances: dict[str, list[dict[str, Any]]] = {}
+            performances: dict[str, dict[str, list[dict[str, Any]]]] = {}
             failures: list[str] = []
 
-            def load_performance(kicker_id: str, member: dict[str, Any]) -> tuple[str, list[dict[str, Any]]]:
+            def load_performance(kicker_id: str, member: dict[str, Any]) -> tuple[str, dict[str, list[dict[str, Any]]]]:
                 payload = fetch_player_performance(fetcher, member["tmId"])
                 return kicker_id, parse_player_performance(payload)
 
@@ -587,7 +633,8 @@ def build_league_snapshot(
                 careers[kicker_id] = {
                     "tmId": member["tmId"],
                     "tmUrl": member["tmUrl"],
-                    "clubs": performances[kicker_id],
+                    "clubs": performances[kicker_id]["clubs"],
+                    "seasons": performances[kicker_id]["seasons"],
                 }
             if failures:
                 print(f"[{league}] Karrierewerte fehlgeschlagen: {', '.join(sorted(failures))}", file=sys.stderr)
@@ -607,11 +654,24 @@ def build_league_snapshot(
             for club in career["clubs"]
         }
         career_clubs = resolve_career_clubs(fetcher, club_ids)
+        competition_ids = {
+            season["competitionId"]
+            for career in careers.values()
+            for season in career["seasons"]
+        }
+        career_competitions = resolve_career_competitions(fetcher, competition_ids)
         for career in careers.values():
             for club in career["clubs"]:
                 entity = career_clubs.get(club["clubId"], {})
                 club["name"] = entity.get("name") or f"Verein {club['clubId']}"
                 club["tmUrl"] = entity.get("tmUrl")
+            for season in career["seasons"]:
+                club = career_clubs.get(season["clubId"], {})
+                competition = career_competitions.get(season["competitionId"], {})
+                season["name"] = club.get("name") or f"Verein {season['clubId']}"
+                season["tmUrl"] = club.get("tmUrl")
+                season["competition"] = competition.get("name") or season["competitionId"]
+                season["competitionUrl"] = competition.get("tmUrl")
 
     club_snapshot = {
         "schemaVersion": 1,
@@ -622,7 +682,7 @@ def build_league_snapshot(
         "teams": club_teams,
     }
     career_snapshot = {
-        "schemaVersion": 1,
+        "schemaVersion": 2,
         "generatedAt": generated_at,
         "leagueCode": league,
         "season": season_year,
