@@ -7,7 +7,7 @@ import { newsAttribution, newsSourceLabel } from "./news";
 import { hrefForView, pathForView, viewFromPathname } from "./routes";
 import type { DataTableColumn } from "./DataTable";
 import type { RouteView } from "./routes";
-import { initialAvailableRound, latestAvailableRound } from "./rounds";
+import { initialAvailableRound, latestAvailableRound, latestImportedRound } from "./rounds";
 import { formatJoined } from "./profile-format";
 import type {
   BestEleven,
@@ -43,8 +43,7 @@ type NavView = Exclude<View, "player" | "team">;
 type Filters = { league: string; season: string; round: string };
 type ViewLocation = { view: View; filters: Filters; playerId: string | null; teamId: string | null; scrollY: number };
 type TeamMetric = "overall" | "goalkeeper" | "defence" | "midfield" | "forward";
-type PlayerSort = "name" | "position" | "price" | "round" | "points" | "grade" | "goals" | "assists" | "value" | "roundGrade" | "roundGoals" | "roundAssists";
-type PlayerScope = "season" | "round";
+type PlayerSort = "name" | "position" | "price" | "points" | "grade" | "goals" | "assists" | "value";
 type TopPlayerSort = "current" | "previous" | "average" | "value" | "trend" | "price";
 type Theme = "light" | "dark";
 
@@ -180,7 +179,7 @@ function scopeQuery(filters: Filters, includeRound = true) {
 }
 
 function viewHref(view: NavView, filters: Filters) {
-  const params = isInfoView(view) ? new URLSearchParams() : scopeQuery(filters, view === "players");
+  const params = isInfoView(view) ? new URLSearchParams() : scopeQuery(filters, view === "table");
   return hrefForView(view, params);
 }
 
@@ -268,9 +267,11 @@ export default function App() {
   }, [theme]);
 
   useEffect(() => {
-    const hasLegacyViewParam = new URLSearchParams(window.location.search).has("view");
+    const currentParams = new URLSearchParams(window.location.search);
+    const hasLegacyViewParam = currentParams.has("view");
+    const hasIrrelevantRound = view !== "table" && currentParams.has("round");
     const currentPath = window.location.pathname.replace(/\/+$/, "") || "/";
-    if (!hasLegacyViewParam && currentPath === pathForView(view)) return;
+    if (!hasLegacyViewParam && !hasIrrelevantRound && currentPath === pathForView(view)) return;
     syncUrl(filters, view, playerId, teamId);
   }, []);
 
@@ -294,8 +295,7 @@ export default function App() {
     ?? playerSeasons.find((season) => String(season.startYear) === filters.season)
     ?? playerSeasons[0];
   const selectedSeason = view === "table" ? latestPublishedSeason : view === "top" ? newestSeason : view === "team" ? selectedTeamSeason : view === "player" ? selectedPlayerSeason : requestedSeason;
-  const roundCount = selectedSeason?.roundCount ?? (filters.league === "0003" ? 38 : 34);
-  const latestRound = selectedSeason?.latestRound ?? 0;
+  const latestRound = selectedSeason ? latestImportedRound(selectedSeason) : 0;
   const overviewRound = Math.min(Math.max(1, Number(filters.round) || 1), Math.max(1, latestRound));
   const teamSelectionPending = Boolean(selectedTeamSeason)
     && (filters.league !== selectedTeamSeason?.leagueCode || filters.season !== String(selectedTeamSeason?.startYear));
@@ -312,7 +312,7 @@ export default function App() {
       },
       players: {
         title: `kicker Noten & Managerpunkte ${leagueName}`,
-        description: `Spieler, kicker-Noten, Managerpunkte, Tore, Vorlagen und Marktwerte der ${leagueName} ${seasonName} nach Spieltag durchsuchen.`,
+        description: `Spieler, kicker-Noten, Managerpunkte, Tore, Vorlagen und Marktwerte der ${leagueName} ${seasonName} für die gesamte Saison durchsuchen.`,
       },
       player: {
         title: `Spielerprofil: Daten, Noten & Punkte ${leagueName}`,
@@ -356,7 +356,7 @@ export default function App() {
     if (!isInfoView(view)) {
       canonical.searchParams.set("league", filters.league);
       canonical.searchParams.set("season", filters.season);
-      if (view === "players") canonical.searchParams.set("round", filters.round);
+      if (view === "table") canonical.searchParams.set("round", filters.round);
       if (view === "player" && playerId) canonical.searchParams.set("player", playerId);
       if (view === "team" && teamId) canonical.searchParams.set("team", teamId);
     }
@@ -463,10 +463,8 @@ export default function App() {
     return () => controller.abort();
   }, [filters.league, filters.season, overviewRound, latestRound, selectedSeason, view]);
 
-  const showMatchday = view === "players";
-
   function syncUrl(nextFilters: Filters, nextView: View, nextPlayer: string | null, nextTeam: string | null) {
-    const params = isInfoView(nextView) ? new URLSearchParams() : scopeQuery(nextFilters);
+    const params = isInfoView(nextView) ? new URLSearchParams() : scopeQuery(nextFilters, nextView === "table");
     if (nextView === "player" && nextPlayer) params.set("player", nextPlayer);
     if (nextView === "team" && nextTeam) params.set("team", nextTeam);
     window.history.replaceState({}, "", hrefForView(nextView, params));
@@ -601,6 +599,10 @@ export default function App() {
       : `${selectedSeason?.displayName ?? "Gewählte Saison"} · noch ohne abgeschlossenen Spieltag`
     : view === "teams"
       ? `${selectedSeason?.displayName ?? "Gewählte Saison"} · gesamte Saison`
+      : view === "players"
+        ? latestRound > 0
+          ? `${selectedSeason?.displayName ?? "Gewählte Saison"} · kumuliert bis Spieltag ${latestRound}`
+          : `${selectedSeason?.displayName ?? "Gewählte Saison"} · Saisonkader vor dem ersten Spieltag`
       : view === "team"
         ? "Kader und Saisonverlauf"
       : view === "overview"
@@ -645,9 +647,6 @@ export default function App() {
               : view === "player"
                 ? <StepperSelect label="Saison" value={String(selectedPlayerSeason?.startYear ?? filters.season)} options={[...playerSeasons].reverse().map((season) => ({ value: String(season.startYear), label: season.displayName }))} onChange={updatePlayerSeason} />
                 : view !== "table" && <StepperSelect label="Saison" value={filters.season} options={[...seasons].reverse().map((season) => ({ value: String(season.startYear), label: season.displayName }))} onChange={(value) => updateFilter("season", value)} />}
-            {showMatchday && (
-              <StepperSelect label="Spieltag" value={filters.round} options={Array.from({ length: roundCount }, (_, index) => ({ value: String(index + 1), label: `Spieltag ${index + 1}` }))} onChange={(value) => updateFilter("round", value)} />
-            )}
             {view === "table" && latestRound > 0 && <>
               <div className="scope-switch acorn-segmented-control header-scope-switch" aria-label="Zeitraum">
                 <button className={`acorn-segment ${overviewScope === "through" ? "active is-selected" : ""}`} onClick={() => setOverviewScope("through")}>Gesamt</button>
@@ -665,7 +664,7 @@ export default function App() {
                 : dashboardLoading || !dashboard ? <LoadingState />
                   : <Overview data={dashboard} scope={overviewScope} eleven={{ league: filters.league, season: String(selectedSeason?.startYear ?? filters.season), round: overviewRound }} onView={setView} onPlayer={openPlayer} onTeam={openTeam} />
             )}
-            {view === "players" && <PlayersView filters={filters} onPlayer={openPlayer} />}
+            {view === "players" && <PlayersView filters={filters} latestRound={latestRound} onPlayer={openPlayer} />}
             {view === "player" && playerId && (playerSelectionPending ? <LoadingState /> : <PlayerDetailView filters={filters} playerId={playerId} backLabel={backLabel} onBack={() => goBack("players")} onTeam={openTeam} onSeason={(year) => updatePlayerSeason(String(year))} />)}
             {view === "teams" && <TeamsView filters={filters} onTeam={openTeam} />}
             {view === "team" && teamId && (teamSelectionPending ? <LoadingState /> : <TeamDetailView filters={filters} teamId={teamId} backLabel={backLabel} onBack={() => goBack("teams")} onPlayer={openPlayer} onTeam={openTeam} />)}
@@ -1408,11 +1407,10 @@ function CrossTableCard({ standings, onTeam }: { standings: LeagueStandings; onT
   );
 }
 
-function PlayersView({ filters, onPlayer }: { filters: Filters; onPlayer: (id: string) => void }) {
+function PlayersView({ filters, latestRound, onPlayer }: { filters: Filters; latestRound: number; onPlayer: (id: string) => void }) {
   const [query, setQuery] = useState("");
   const [position, setPosition] = useState("");
   const [team, setTeam] = useState("");
-  const [scope, setScope] = useState<PlayerScope>("season");
   const [sort, setSort] = useState<PlayerSort>("points");
   const [direction, setDirection] = useState<"asc" | "desc">("desc");
   const [players, setPlayers] = useState<Player[]>([]);
@@ -1421,7 +1419,7 @@ function PlayersView({ filters, onPlayer }: { filters: Filters; onPlayer: (id: s
 
   useEffect(() => {
     const controller = new AbortController();
-    const params = scopeQuery(filters);
+    const params = scopeQuery(filters, false);
     params.set("limit", "100");
     params.set("sort", sort);
     params.set("direction", direction);
@@ -1446,53 +1444,27 @@ function PlayersView({ filters, onPlayer }: { filters: Filters; onPlayer: (id: s
       .catch((reason: Error) => { if (!isAbort(reason)) setError(reason.message); })
       .finally(() => setLoading(false));
     return () => controller.abort();
-  }, [filters, query, position, sort, direction]);
+  }, [filters.league, filters.season, query, position, sort, direction]);
 
   function sortBy(column: PlayerSort) {
     if (column === sort) setDirection((value) => value === "asc" ? "desc" : "asc");
     else {
       setSort(column);
-      setDirection(column === "name" || column === "position" || column === "grade" || column === "roundGrade" ? "asc" : "desc");
-    }
-  }
-
-  function switchScope(next: PlayerScope) {
-    if (next === scope) return;
-    setScope(next);
-    const mapping: Partial<Record<PlayerSort, PlayerSort>> = next === "round"
-      ? { points: "round", grade: "roundGrade", goals: "roundGoals", assists: "roundAssists", value: "round" }
-      : { round: "points", roundGrade: "grade", roundGoals: "goals", roundAssists: "assists" };
-    const mapped = mapping[sort];
-    if (mapped) {
-      setSort(mapped);
-      setDirection(mapped === "grade" || mapped === "roundGrade" ? "asc" : "desc");
+      setDirection(column === "name" || column === "position" || column === "grade" ? "asc" : "desc");
     }
   }
 
   const teamOptions = useMemo(() => [...new Set(players.map((player) => player.team))].sort((left, right) => left.localeCompare(right, "de")), [players]);
-  const visiblePlayers = (team ? players.filter((player) => player.team === team) : players)
-    .filter((player) => scope === "season"
-      || player.roundGrade != null
-      || player.roundPoints !== 0
-      || player.roundGoals > 0
-      || player.roundAssists > 0
-      || player.roundStarterPoints > 0);
+  const visiblePlayers = team ? players.filter((player) => player.team === team) : players;
   const sortProps = (column: PlayerSort) => ({ active: sort === column, direction, onSort: () => sortBy(column) });
   const identityColumns: DataTableColumn<Player>[] = [
     { id: "player", label: "Spieler", width: "29%", sort: sortProps("name"), render: (player, index) => <div className="table-player"><span className="rank">{index + 1}</span><PlayerPortrait name={player.name} url={player.photoUrl} teamCode={player.teamCode} teamLogoUrl={player.logoUrl} /><span><PlayerName name={player.name} /><small>{player.team}</small></span></div> },
     { id: "position", label: "Position", shortLabel: "Pos.", sort: sortProps("position"), render: (player) => <PositionTag position={player.position} /> },
     { id: "price", label: "Marktwert", shortLabel: "Wert", numeric: true, sort: sortProps("price"), render: (player) => formatMarketValue(player.priceM) },
   ];
-  const columns: DataTableColumn<Player>[] = scope === "round" ? [
+  const columns: DataTableColumn<Player>[] = [
     ...identityColumns,
-    { id: "round", label: `Punkte · Spieltag ${filters.round}`, shortLabel: "Punkte", numeric: true, className: "primary-num", sort: sortProps("round"), render: (player) => player.roundPoints },
-    { id: "roundGrade", label: "Note", numeric: true, sort: sortProps("roundGrade"), render: (player) => player.roundGrade?.toFixed(2) ?? "—" },
-    { id: "roundGoals", label: "Tore", numeric: true, sort: sortProps("roundGoals"), render: (player) => player.roundGoals },
-    { id: "roundAssists", label: "Vorlagen", shortLabel: "Vorl.", numeric: true, sort: sortProps("roundAssists"), render: (player) => player.roundAssists },
-  ] : [
-    ...identityColumns,
-    { id: "round", label: `Spieltag ${filters.round}`, shortLabel: `ST ${filters.round}`, numeric: true, className: "matchday-score", sort: sortProps("round"), render: (player) => player.roundPoints },
-    { id: "points", label: `Gesamt bis Spieltag ${filters.round}`, shortLabel: "Gesamt", numeric: true, className: "primary-num", sort: sortProps("points"), render: (player) => player.observedPoints },
+    { id: "points", label: latestRound > 0 ? `Gesamt bis Spieltag ${latestRound}` : "Gesamtpunkte", shortLabel: "Gesamt", numeric: true, className: "primary-num", sort: sortProps("points"), render: (player) => player.observedPoints },
     { id: "goals", label: "Tore", numeric: true, sort: sortProps("goals"), render: (player) => player.goals },
     { id: "assists", label: "Vorlagen", shortLabel: "Vorl.", numeric: true, sort: sortProps("assists"), render: (player) => player.assists },
     { id: "grade", label: "Ø-Note", shortLabel: "Note", numeric: true, sort: sortProps("grade"), render: (player) => player.averageGrade?.toFixed(2) ?? "—" },
@@ -1506,20 +1478,16 @@ function PlayersView({ filters, onPlayer }: { filters: Filters; onPlayer: (id: s
         rows={visiblePlayers}
         columns={columns}
         getRowKey={(player) => player.id}
-        leading={<div className="scope-switch acorn-segmented-control players-scope-switch" aria-label="Zeitraum">
-          <button className={`acorn-segment ${scope === "season" ? "active is-selected" : ""}`} onClick={() => switchScope("season")}>Bis Spieltag {filters.round}</button>
-          <button className={`acorn-segment ${scope === "round" ? "active is-selected" : ""}`} onClick={() => switchScope("round")}>Nur Spieltag {filters.round}</button>
-        </div>}
         search={{ value: query, onChange: setQuery, placeholder: "Spieler oder Mannschaft" }}
         filters={[
           { id: "position", label: "Position", value: position, onChange: setPosition, options: [{ value: "", label: "Alle Positionen" }, ...(["GK", "DEF", "MID", "FWD"] as Position[]).map((item) => ({ value: item, label: positionName[item] }))] },
           { id: "team", label: "Mannschaft", value: team, onChange: setTeam, options: [{ value: "", label: "Alle Mannschaften" }, ...teamOptions.map((item) => ({ value: item, label: item }))] },
         ]}
         countLabel={`${visiblePlayers.length} Spieler`}
-        emptyMessage={scope === "round" ? "Für diesen Spieltag liegen keine Wertungen vor." : "Keine Spieler entsprechen diesen Filtern."}
+        emptyMessage="Keine Spieler entsprechen diesen Filtern."
         loading={loading}
-        minWidth={scope === "round" ? "880px" : "1120px"}
-        mobileMinWidth={scope === "round" ? "560px" : "700px"}
+        minWidth="1020px"
+        mobileMinWidth="640px"
         variant="compact"
         onRowClick={(player) => onPlayer(player.id)}
       />}

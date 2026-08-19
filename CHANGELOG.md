@@ -2,6 +2,17 @@
 
 Alle wesentlichen Änderungen an Punktespiegel werden in dieser Datei dokumentiert.
 
+## [1.20.0] – 2026-08-19
+
+### Geändert
+
+- Die Spielerübersicht ist jetzt saisonbasiert wie die Mannschaftsübersicht: Sie zeigt immer die kumulierten Punkte bis zum letzten importierten Spieltag und verzichtet auf den separaten Spieltagfilter sowie den Umschalter „Bis/Nur Spieltag“.
+- Spieler-URLs enthalten keinen wirkungslosen Spieltagparameter mehr. Der kompaktere Tabellenaufbau schafft besonders auf kleineren Bildschirmen mehr Platz für Namen und Saisonwerte.
+
+### Behoben
+
+- Vor dem ersten Spieltag zeigt die Spielerübersicht den vollständigen Saisonkader mit Nullwerten, statt alle Spieler ohne vorhandene Wertung auszublenden.
+
 ## [1.19.0] – 2026-08-19
 
 ### Hinzugefügt

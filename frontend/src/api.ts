@@ -23,6 +23,7 @@ import type {
 import { buildPlayerNews } from "./news";
 import type { NewsArtifact } from "./news";
 import { kickerPlayerNewsLink } from "./kicker-links";
+import { latestImportedRound } from "./rounds";
 import { computeTable, crossTable, formLastN, formPoints, positionsByRound, trendVsRound } from "./standings";
 import type { LeagueStandings, LeagueTableRow, LeagueTableTeam, MatchdayContributor, MatchdayFixture } from "./types";
 type StaticCatalog = Catalog & { schemaVersion: number; generatedAt: string };
@@ -1070,15 +1071,14 @@ export const api = {
   }), signal),
   standings: (params: URLSearchParams, signal?: AbortSignal): Promise<LeagueStandings> => abortable(loadSeason(params).then((index) => leagueStandings(index, selectedRound(params, index.season))), signal),
   players: (params: URLSearchParams, signal?: AbortSignal) => abortable(loadSeason(params).then((index) => {
-    const round = selectedRound(params, index.season);
+    const round = latestImportedRound(index.season);
     const query = (params.get("q") ?? "").trim().toLocaleLowerCase("de");
     const position = params.get("position") as Position | null;
     const direction = params.get("direction") === "asc" ? "asc" : "desc";
     const limit = Math.max(1, Math.min(100, Number(params.get("limit") ?? 50)));
     const offset = Math.max(0, Number(params.get("offset") ?? 0));
     const { players } = summarizePlayers(index, round);
-    const filtered = sortPlayers(players.filter((player) => player.observedPoints !== 0)
-      .filter((player) => !position || player.position === position)
+    const filtered = sortPlayers(players.filter((player) => !position || player.position === position)
       .filter((player) => !query || player.name.toLocaleLowerCase("de").includes(query) || player.team.toLocaleLowerCase("de").includes(query)), params.get("sort") ?? "points", direction);
     return { items: filtered.slice(offset, offset + limit), nextOffset: offset + limit < filtered.length ? offset + limit : null };
   }), signal),

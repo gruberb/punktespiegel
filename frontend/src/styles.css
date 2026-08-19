@@ -1905,8 +1905,6 @@ circle.bump-line { fill: light-dark(#ded9ea, #4a4460); stroke: none; }
 .overview-eleven-summary { margin: 0 0 12px; color: var(--text-color-deemphasized); font-size: 11px; }
 .overview-eleven-summary strong { color: var(--color-accent-primary); font-size: var(--point-value-size); font-weight: 800; }
 
-.players-scope-switch { height: 48px; flex: 0 0 auto; align-items: center; }
-.players-scope-switch .acorn-segment { white-space: nowrap; }
 .header-scope-switch { height: 48px; flex: 0 0 auto; align-items: center; }
 .header-scope-switch .acorn-segment { white-space: nowrap; }
 
@@ -1914,8 +1912,6 @@ circle.bump-line { fill: light-dark(#ded9ea, #4a4460); stroke: none; }
   .tabelle-view { gap: 16px; }
   .bump-card { padding: 14px; }
   .tabelle-block .data-table .table-team { min-width: 150px; }
-  .players-scope-switch { flex: 1 0 100%; height: 42px; }
-  .players-scope-switch .acorn-segment { flex: 1; }
   .cross-copy { align-items: start; flex-direction: column; }
 }
 
