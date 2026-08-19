@@ -60,9 +60,12 @@ Die Transfermarkt-Profile werden separat und deutlich seltener als die kicker-We
 
 ```bash
 npm run generate:club-profiles
+npm run generate:club-profiles:backfill
 ```
 
-Der Lauf erzeugt `frontend/public/data/club-profiles/{liga}.json` und `frontend/public/data/player-careers/{liga}.json` für die neueste Saison. Er verwendet einen identifizierbaren User-Agent, wartet standardmäßig 0,8 Sekunden zwischen gestarteten Netzwerkanfragen und legt Antworten in `.cache/transfermarkt/` ab. Abgebrochene Läufe können deshalb ohne erneutes Laden der bereits vorhandenen Seiten fortgesetzt werden. Mit `--leagues 0001`, `--skip-careers`, `--career-workers 4` oder `--delay 1.2` lässt sich der Umfang steuern.
+Der normale Lauf erzeugt `frontend/public/data/club-profiles/{liga}-{jahr}.json` und `frontend/public/data/player-careers/{liga}-{jahr}.json` für die neueste Saison und hält die bisherigen `{liga}.json`-Aliasdateien kompatibel. Der Backfill erzeugt alle im Katalog geführten Saisons. Er verwendet einen identifizierbaren User-Agent, wartet standardmäßig 0,8 Sekunden zwischen gestarteten Netzwerkanfragen und legt Antworten in `.cache/transfermarkt/` ab. Abgebrochene Läufe können deshalb ohne erneutes Laden der bereits vorhandenen Seiten fortgesetzt werden. Mit `--season 2025`, `--all-seasons`, `--leagues 0001`, `--skip-careers`, `--career-workers 4` oder `--delay 1.2` lässt sich der Umfang steuern.
+
+Historische Transfermarkt-Kaderseiten liefern einzelne stabile Biografiefelder nicht immer erneut aus. Der Backfill übernimmt dann Geburtsdatum, Nationalität, Größe und Fuß aus dem aktuellen Snapshot desselben Transfermarkt-Spielers und berechnet das Alter am Ende der gewählten Saison. Aktuelle Trainer werden bewusst nicht rückwirkend als historische Trainer ausgegeben.
 
 Nicht zugeordnete Vereine und Spieler werden auf stderr ausgegeben und bleiben als `unmatchedSquad` im Vereinsartefakt nachvollziehbar. Eindeutige manuelle Korrekturen gehören nach `config/transfermarkt-overrides.json`; die Website rät keine Zuordnung. Wegen der Last und der nicht garantierten privaten Endpunkte läuft dieser Import nicht im täglichen GitHub-Pages-Workflow. Die erzeugten, geprüften Snapshots werden gemeinsam mit einer Release-Änderung eingecheckt.
 

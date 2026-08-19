@@ -231,23 +231,26 @@ function loadSeason(params: URLSearchParams): Promise<SeasonIndex> {
   return pending;
 }
 
-// Club and career snapshots exist only for the current season; both loaders
-// resolve to null when the artifact is missing so older seasons render
-// without the profile sections.
-function loadClubProfiles(league: string): Promise<StaticClubProfiles | null> {
-  let pending = clubProfilesCache.get(league);
+// Profile snapshots are versioned by league and season. The legacy current-
+// season filename remains a fallback while older deployments are cached.
+function loadClubProfiles(league: string, season: number): Promise<StaticClubProfiles | null> {
+  const key = `${league}-${season}`;
+  let pending = clubProfilesCache.get(key);
   if (!pending) {
-    pending = loadJson<StaticClubProfiles>(asset(`data/club-profiles/${league}.json`)).catch(() => null);
-    clubProfilesCache.set(league, pending);
+    pending = loadJson<StaticClubProfiles>(asset(`data/club-profiles/${key}.json`))
+      .catch(() => loadJson<StaticClubProfiles>(asset(`data/club-profiles/${league}.json`)).catch(() => null));
+    clubProfilesCache.set(key, pending);
   }
   return pending;
 }
 
-function loadPlayerCareers(league: string): Promise<StaticPlayerCareers | null> {
-  let pending = playerCareersCache.get(league);
+function loadPlayerCareers(league: string, season: number): Promise<StaticPlayerCareers | null> {
+  const key = `${league}-${season}`;
+  let pending = playerCareersCache.get(key);
   if (!pending) {
-    pending = loadJson<StaticPlayerCareers>(asset(`data/player-careers/${league}.json`)).catch(() => null);
-    playerCareersCache.set(league, pending);
+    pending = loadJson<StaticPlayerCareers>(asset(`data/player-careers/${key}.json`))
+      .catch(() => loadJson<StaticPlayerCareers>(asset(`data/player-careers/${league}.json`)).catch(() => null));
+    playerCareersCache.set(key, pending);
   }
   return pending;
 }
@@ -1077,9 +1080,17 @@ export const api = {
       .filter((player) => !query || player.name.toLocaleLowerCase("de").includes(query) || player.team.toLocaleLowerCase("de").includes(query)), params.get("sort") ?? "points", direction);
     return { items: filtered.slice(offset, offset + limit), nextOffset: offset + limit < filtered.length ? offset + limit : null };
   }), signal),
-  player: (playerId: string, params: URLSearchParams, signal?: AbortSignal) => abortable(Promise.all([loadSeason(params), catalogCache, newsCache, roleSignalsCache, availabilitySignalsCache, loadClubProfiles(params.get("league") ?? "0001"), loadPlayerCareers(params.get("league") ?? "0001")]).then(([index, catalog, news, roleSignals, availabilitySignals, clubProfiles, playerCareers]) => playerDetail(index, playerId, catalog, news, roleSignals, availabilitySignals, clubProfiles, playerCareers)), signal),
+  player: (playerId: string, params: URLSearchParams, signal?: AbortSignal) => {
+    const league = params.get("league") ?? "0001";
+    const season = Number(params.get("season") ?? currentSeasonStartYear());
+    return abortable(Promise.all([loadSeason(params), catalogCache, newsCache, roleSignalsCache, availabilitySignalsCache, loadClubProfiles(league, season), loadPlayerCareers(league, season)]).then(([index, catalog, news, roleSignals, availabilitySignals, clubProfiles, playerCareers]) => playerDetail(index, playerId, catalog, news, roleSignals, availabilitySignals, clubProfiles, playerCareers)), signal);
+  },
   teams: (params: URLSearchParams, signal?: AbortSignal) => abortable(loadSeason(params).then((index) => buildTeamScores(index, { kind: "all" })), signal),
-  team: (teamId: string, params: URLSearchParams, signal?: AbortSignal) => abortable(Promise.all([loadSeason(params), roleSignalsCache, loadClubProfiles(params.get("league") ?? "0001")]).then(([index, roleSignals, clubProfiles]) => teamDetail(index, teamId, roleSignals, clubProfiles)), signal),
+  team: (teamId: string, params: URLSearchParams, signal?: AbortSignal) => {
+    const league = params.get("league") ?? "0001";
+    const season = Number(params.get("season") ?? currentSeasonStartYear());
+    return abortable(Promise.all([loadSeason(params), roleSignalsCache, loadClubProfiles(league, season)]).then(([index, roleSignals, clubProfiles]) => teamDetail(index, teamId, roleSignals, clubProfiles)), signal);
+  },
   bestEleven: (params: URLSearchParams, signal?: AbortSignal) => abortable(loadSeason(params).then((index) => bestEleven(index, params.get("scope") === "season" ? "season" : "matchday", selectedRound(params, index.season))), signal),
   topPlayers: (params: URLSearchParams, signal?: AbortSignal): Promise<TopPlayers> => abortable(Promise.all([loadSeason(params), catalogCache]).then(([index, catalog]) => topPlayers(index, catalog)), signal),
 };

@@ -1528,8 +1528,10 @@ function PlayersView({ filters, onPlayer }: { filters: Filters; onPlayer: (id: s
 
 function PlayerDetailView({ filters, playerId, backLabel, onBack, onTeam, onSeason }: { filters: Filters; playerId: string; backLabel: string; onBack: () => void; onTeam: (id: string) => void; onSeason: (year: number) => void }) {
   const [detail, setDetail] = useState<PlayerDetail | null>(null);
+  const [activeTab, setActiveTab] = useState<"profile" | "points">("profile");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  useEffect(() => setActiveTab("profile"), [playerId]);
   useEffect(() => {
     const controller = new AbortController();
     setLoading(true);
@@ -1556,48 +1558,60 @@ function PlayerDetailView({ filters, playerId, backLabel, onBack, onTeam, onSeas
           <span><strong>{formatPlayerValue(detail.value)}</strong><small>Wert · Pkt. / Mio. €</small></span>
         </div>
       </header>
-      {detail.bio && <PlayerBioSection bio={detail.bio} />}
-      {detail.availability && (
-        <aside className={`availability-alert ${detail.availability.status}`}>
-          <div><p className="kicker">Aktueller Verfügbarkeitsstatus</p><strong>{availabilityStatusName[detail.availability.status]}{detail.availability.reason ? ` · ${detail.availability.reason}` : ""}</strong><small>{detail.availability.absentSince ? `Fehlt seit ${detail.availability.absentSince}. ` : ""}{detail.availability.expectedReturn ? `Erwartete Rückkehr: ${formatDate(detail.availability.expectedReturn)}.` : "Kein bestätigtes Rückkehrdatum."}</small></div>
-          <a href={detail.availability.sourceUrl} target="_blank" rel="noreferrer">{detail.availability.source} · Stand {formatDate(detail.availability.generatedAt)} ↗</a>
-        </aside>
-      )}
-      <PlayerNewsSection news={detail.news} kickerNewsUrl={detail.kickerNewsUrl} kickerNewsDirect={detail.kickerNewsDirect} />
-      <section className="player-seasons">
-        <div className="section-copy"><h3>Punkte nach Saison</h3><p>Verein, Einsätze, Tore und benotete Spiele je Saison im Archiv.</p></div>
-        <div className="table-shell player-season-table">
-          <table><thead><tr><th>Jahr</th><th>Verein</th><th>Liga</th><th className="num">Einsätze</th><th className="num">Benotet</th><th className="num">Tore</th><th className="num">Vorlagen</th><th className="num">Gesamtpunkte</th></tr></thead>
-            <tbody>{detail.seasons.map((season) => (
-              <tr key={season.startYear} className={`clickable-row ${season.startYear === detail.startYear ? "selected" : ""}`} tabIndex={0} onClick={() => onSeason(season.startYear)} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") onSeason(season.startYear); }}>
-                <td><strong>{season.season}</strong></td>
-                <td><span className="season-team-list">{season.teams.map((team) => <span key={team.id}><TeamLogo code={team.code} url={team.logoUrl} /><strong>{team.name}</strong></span>)}</span></td>
-                <td>{season.league}</td>
-                <td className="num">{season.appearances}</td>
-                <td className="num">{season.gradedAppearances}</td>
-                <td className="num">{season.goals}</td>
-                <td className="num">{season.assists}</td>
-                <td className="num primary-num">{season.points}</td>
-              </tr>
-            ))}</tbody>
-            {detail.seasons.length > 1 && <tfoot><tr>
-              <td colSpan={3}><strong>Gesamt im Archiv</strong></td>
-              <td className="num">{detail.seasons.reduce((sum, season) => sum + season.appearances, 0)}</td>
-              <td className="num">{detail.seasons.reduce((sum, season) => sum + season.gradedAppearances, 0)}</td>
-              <td className="num">{detail.seasons.reduce((sum, season) => sum + season.goals, 0)}</td>
-              <td className="num">{detail.seasons.reduce((sum, season) => sum + season.assists, 0)}</td>
-              <td className="num primary-num">{detail.seasons.reduce((sum, season) => sum + season.points, 0)}</td>
-            </tr></tfoot>}
-          </table>
+      <nav className="player-detail-tabs scope-switch acorn-segmented-control" role="tablist" aria-label="Spielerprofil-Bereiche">
+        <button id="player-profile-tab" role="tab" aria-controls="player-profile-panel" aria-selected={activeTab === "profile"} className={`acorn-segment ${activeTab === "profile" ? "active is-selected" : ""}`} onClick={() => setActiveTab("profile")}>Profil &amp; Karriere</button>
+        <button id="player-points-tab" role="tab" aria-controls="player-points-panel" aria-selected={activeTab === "points"} className={`acorn-segment ${activeTab === "points" ? "active is-selected" : ""}`} onClick={() => setActiveTab("points")}>Punkte &amp; Spiele</button>
+      </nav>
+      {activeTab === "profile" && (
+        <div className="player-tab-panel" id="player-profile-panel" role="tabpanel" aria-labelledby="player-profile-tab">
+          {detail.bio && <PlayerBioSection bio={detail.bio} />}
+          {detail.availability && (
+            <aside className={`availability-alert ${detail.availability.status}`}>
+              <div><p className="kicker">Aktueller Verfügbarkeitsstatus</p><strong>{availabilityStatusName[detail.availability.status]}{detail.availability.reason ? ` · ${detail.availability.reason}` : ""}</strong><small>{detail.availability.absentSince ? `Fehlt seit ${detail.availability.absentSince}. ` : ""}{detail.availability.expectedReturn ? `Erwartete Rückkehr: ${formatDate(detail.availability.expectedReturn)}.` : "Kein bestätigtes Rückkehrdatum."}</small></div>
+              <a href={detail.availability.sourceUrl} target="_blank" rel="noreferrer">{detail.availability.source} · Stand {formatDate(detail.availability.generatedAt)} ↗</a>
+            </aside>
+          )}
+          <PlayerNewsSection news={detail.news} kickerNewsUrl={detail.kickerNewsUrl} kickerNewsDirect={detail.kickerNewsDirect} />
+          {detail.career && detail.career.clubs.length > 0 && <PlayerCareerSection career={detail.career} />}
         </div>
-      </section>
-      {detail.career && detail.career.clubs.length > 0 && <PlayerCareerSection career={detail.career} />}
-      <div className="section-copy"><p className="kicker">Saisonverlauf</p><h3>Jeder Einsatz und jede Punkteaktion</h3></div>
-      <div className="table-shell game-table">
-        <table><thead><tr><th>Spieltag</th><th>Datum</th><th>Gegner</th><th>Ergebnis</th><th className="num">Punkte</th><th className="num">Note</th><th className="num">Tore</th><th className="num">Vorlagen</th><th className="num">Zu null</th><th className="num">Startelf</th><th className="num">Karten</th><th className="num">SdS</th><th className="num">Joker</th></tr></thead>
-          <tbody>{detail.games.map((game) => <GameRow key={game.matchday} game={game} onTeam={onTeam} />)}</tbody>
-        </table>
-      </div>
+      )}
+      {activeTab === "points" && (
+        <div className="player-tab-panel" id="player-points-panel" role="tabpanel" aria-labelledby="player-points-tab">
+          <section className="player-seasons">
+            <div className="section-copy"><h3>Punkte nach Saison</h3><p>Verein, Einsätze, Tore und benotete Spiele je Saison im Archiv.</p></div>
+            <div className="table-shell player-season-table">
+              <table><thead><tr><th>Jahr</th><th>Verein</th><th>Liga</th><th className="num">Einsätze</th><th className="num">Benotet</th><th className="num">Tore</th><th className="num">Vorlagen</th><th className="num">Gesamtpunkte</th></tr></thead>
+                <tbody>{detail.seasons.map((season) => (
+                  <tr key={season.startYear} className={`clickable-row ${season.startYear === detail.startYear ? "selected" : ""}`} tabIndex={0} onClick={() => onSeason(season.startYear)} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") onSeason(season.startYear); }}>
+                    <td><strong>{season.season}</strong></td>
+                    <td><span className="season-team-list">{season.teams.map((team) => <span key={team.id}><TeamLogo code={team.code} url={team.logoUrl} /><strong>{team.name}</strong></span>)}</span></td>
+                    <td>{season.league}</td>
+                    <td className="num">{season.appearances}</td>
+                    <td className="num">{season.gradedAppearances}</td>
+                    <td className="num">{season.goals}</td>
+                    <td className="num">{season.assists}</td>
+                    <td className="num primary-num">{season.points}</td>
+                  </tr>
+                ))}</tbody>
+                {detail.seasons.length > 1 && <tfoot><tr>
+                  <td colSpan={3}><strong>Gesamt im Archiv</strong></td>
+                  <td className="num">{detail.seasons.reduce((sum, season) => sum + season.appearances, 0)}</td>
+                  <td className="num">{detail.seasons.reduce((sum, season) => sum + season.gradedAppearances, 0)}</td>
+                  <td className="num">{detail.seasons.reduce((sum, season) => sum + season.goals, 0)}</td>
+                  <td className="num">{detail.seasons.reduce((sum, season) => sum + season.assists, 0)}</td>
+                  <td className="num primary-num">{detail.seasons.reduce((sum, season) => sum + season.points, 0)}</td>
+                </tr></tfoot>}
+              </table>
+            </div>
+          </section>
+          <div className="section-copy"><p className="kicker">Saisonverlauf</p><h3>Jeder Einsatz und jede Punkteaktion</h3></div>
+          <div className="table-shell game-table">
+            <table><thead><tr><th>Spieltag</th><th>Datum</th><th>Gegner</th><th>Ergebnis</th><th className="num">Punkte</th><th className="num">Note</th><th className="num">Tore</th><th className="num">Vorlagen</th><th className="num">Zu null</th><th className="num">Startelf</th><th className="num">Karten</th><th className="num">SdS</th><th className="num">Joker</th></tr></thead>
+              <tbody>{detail.games.map((game) => <GameRow key={game.matchday} game={game} onTeam={onTeam} />)}</tbody>
+            </table>
+          </div>
+        </div>
+      )}
     </section>
   );
 }
@@ -1857,7 +1871,7 @@ function TeamSquadByPosition({ detail, onPlayer }: { detail: TeamDetail; onPlaye
                     const isCaptain = detail.profile?.captainPlayerId === player.id;
                     return (
                       <tr key={player.id} className="clickable-row" tabIndex={0} onClick={() => onPlayer(player.id)} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") onPlayer(player.id); }}>
-                        <td><span className="squad-player">{bio?.shirtNumber && <b className="squad-number">{bio.shirtNumber}</b>}<PlayerPortrait name={player.name} url={player.photoUrl} teamCode={detail.code} teamLogoUrl={detail.logoUrl} /><span><PlayerName name={player.name} />{isCaptain && <em className="captain-badge" title="Mannschaftskapitän">Kapitän</em>}<small>{bio?.positionDetail ?? positionName[player.position]}</small></span></span></td>
+                        <td><span className="squad-player"><b className="squad-number">{bio?.shirtNumber ?? ""}</b><PlayerPortrait name={player.name} url={player.photoUrl} teamCode={detail.code} teamLogoUrl={detail.logoUrl} /><span><PlayerName name={player.name} />{isCaptain && <em className="captain-badge" title="Mannschaftskapitän">Kapitän</em>}<small>{bio?.positionDetail ?? positionName[player.position]}</small></span></span></td>
                         <td className="num">{bio?.age ?? "—"}</td>
                         <td><span title={bio?.nationalities.join(", ")}>{bio?.nationalities[0] ?? "—"}{bio && bio.nationalities.length > 1 ? ` +${bio.nationalities.length - 1}` : ""}</span></td>
                         <td className="num">{formatHeight(bio?.heightCm ?? null)}</td>

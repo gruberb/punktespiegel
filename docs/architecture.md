@@ -82,9 +82,9 @@ Für die aktuelle Bundesliga ergänzt `current-role-signals.json` einen lokal er
 
 ## Vereins- und Spielerprofile
 
-`club-profiles/{liga}.json` ergänzt die aktuelle Saison um Transfermarkt-Kaderdaten, Trainer, Kapitän sowie Zu- und Abgänge samt veröffentlichter Ablöse. `player-careers/{liga}.json` enthält je zugeordnetem Spieler die Karriereeinsätze, Tore und Vorlagen nach Verein. Die Zuordnung verbindet stabile kicker-IDs mit Transfermarkt-IDs über normalisierte Namen innerhalb desselben Vereins; mehrdeutige Fälle bleiben sichtbar und können über `config/transfermarkt-overrides.json` korrigiert werden.
+`club-profiles/{liga}-{jahr}.json` ergänzt jede archivierte Saison um Transfermarkt-Kaderdaten, Kapitän sowie Zu- und Abgänge samt veröffentlichter Ablöse; der aktuelle Snapshot enthält zusätzlich den heutigen Trainer. `player-careers/{liga}-{jahr}.json` enthält je zugeordnetem Spieler die Karriereeinsätze, Tore und Vorlagen nach Verein. Die Zuordnung verbindet stabile kicker-IDs mit Transfermarkt-IDs über normalisierte Namen innerhalb desselben Vereins; mehrdeutige Fälle bleiben sichtbar und können über `config/transfermarkt-overrides.json` korrigiert werden. Die bisherigen `{liga}.json`-Dateien bleiben als Alias für die aktuelle Saison bestehen.
 
-Der Import läuft nicht im täglichen Pages-Build. Er ist ein bewusst rate-limitierter, lokal gestarteter Snapshot mit Dateicache, weil die Profilwerte langsamer wechseln und Transfermarkt keine öffentliche API garantiert. Fehlt ein Snapshot oder wird eine ältere Saison geöffnet, bleiben die kicker-basierten Punkte- und Saisonprofile vollständig nutzbar; die externen Profilblöcke werden dann nicht angezeigt.
+Der Import läuft nicht im täglichen Pages-Build. Er ist ein bewusst rate-limitierter, lokal gestarteter Snapshot mit Dateicache, weil die Profilwerte langsamer wechseln und Transfermarkt keine öffentliche API garantiert. Fehlt eine einzelne Liga-Saison, bleiben die kicker-basierten Punkte- und Saisonprofile vollständig nutzbar; nur die externen Profilblöcke werden dann nicht angezeigt.
 
 ## Sharding und Übertragung
 

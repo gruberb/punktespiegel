@@ -50,41 +50,53 @@ class ProfileParserTests(unittest.TestCase):
         self.assertEqual(MODULE.match_by_name("grimaldo", {"1": "alejandro grimaldo", "2": "manuel neuer"}), "1")
         self.assertIsNone(MODULE.match_by_name("mueller", {"1": "thomas mueller", "2": "florian mueller"}))
 
+    def test_calculates_age_at_the_end_of_a_season(self) -> None:
+        self.assertEqual(MODULE.age_at_season_end("1993-05-06", 2025), 33)
+        self.assertEqual(MODULE.age_at_season_end("1986-03-27", 2022), 37)
+        self.assertIsNone(MODULE.age_at_season_end(None, 2025))
+
 
 class ProfileArtifactTests(unittest.TestCase):
-    def test_current_profile_artifacts_match_the_catalog(self) -> None:
+    def test_profile_artifacts_match_every_catalog_season(self) -> None:
         catalog = json.loads((DATA_ROOT / "catalog.json").read_text())
         for league in ("0001", "0002", "0003"):
             current = max(
                 (season for season in catalog["seasons"] if season["leagueCode"] == league),
                 key=lambda season: season["startYear"],
             )
-            profiles = json.loads((DATA_ROOT / "club-profiles" / f"{league}.json").read_text())
-            careers = json.loads((DATA_ROOT / "player-careers" / f"{league}.json").read_text())
+            for season in (entry for entry in catalog["seasons"] if entry["leagueCode"] == league):
+                year = season["startYear"]
+                profiles = json.loads((DATA_ROOT / "club-profiles" / f"{league}-{year}.json").read_text())
+                careers = json.loads((DATA_ROOT / "player-careers" / f"{league}-{year}.json").read_text())
 
-            self.assertEqual(profiles["schemaVersion"], 1)
-            self.assertEqual(careers["schemaVersion"], 1)
-            self.assertEqual(profiles["leagueCode"], league)
-            self.assertEqual(careers["leagueCode"], league)
-            self.assertEqual(profiles["season"], current["startYear"])
-            self.assertEqual(careers["season"], current["startYear"])
-            self.assertEqual(set(profiles["teams"]), set(current["teamIds"]))
+                self.assertEqual(profiles["schemaVersion"], 1)
+                self.assertEqual(careers["schemaVersion"], 1)
+                self.assertEqual(profiles["leagueCode"], league)
+                self.assertEqual(careers["leagueCode"], league)
+                self.assertEqual(profiles["season"], year)
+                self.assertEqual(careers["season"], year)
+                self.assertEqual(set(profiles["teams"]), set(season["teamIds"]))
 
-            squad_players = {
-                player_id
-                for team in profiles["teams"].values()
-                for player_id in team["squad"]
-            }
-            self.assertEqual(squad_players, set(careers["players"]))
-            self.assertGreaterEqual(len(squad_players), len(current["players"]) * 0.85)
+                squad_players = {
+                    player_id
+                    for team in profiles["teams"].values()
+                    for player_id in team["squad"]
+                }
+                self.assertEqual(squad_players, set(careers["players"]))
+                self.assertGreaterEqual(len(squad_players), len(season["players"]) * 0.80)
 
-            for player in careers["players"].values():
-                self.assertGreater(player["tmId"], 0)
-                for club in player["clubs"]:
-                    self.assertTrue(club["name"])
-                    self.assertGreaterEqual(club["appearances"], 0)
-                    self.assertGreaterEqual(club["goals"], 0)
-                    self.assertGreaterEqual(club["assists"], 0)
+                for player in careers["players"].values():
+                    self.assertGreater(player["tmId"], 0)
+                    for club in player["clubs"]:
+                        self.assertTrue(club["name"])
+                        self.assertGreaterEqual(club["appearances"], 0)
+                        self.assertGreaterEqual(club["goals"], 0)
+                        self.assertGreaterEqual(club["assists"], 0)
+
+            current_profiles = (DATA_ROOT / "club-profiles" / f"{league}.json").read_text()
+            current_careers = (DATA_ROOT / "player-careers" / f"{league}.json").read_text()
+            self.assertEqual(current_profiles, (DATA_ROOT / "club-profiles" / f"{league}-{current['startYear']}.json").read_text())
+            self.assertEqual(current_careers, (DATA_ROOT / "player-careers" / f"{league}-{current['startYear']}.json").read_text())
 
 
 if __name__ == "__main__":

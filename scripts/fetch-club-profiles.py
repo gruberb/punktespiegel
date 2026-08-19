@@ -27,7 +27,7 @@ import sys
 import threading
 import time
 import unicodedata
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 from difflib import SequenceMatcher
 from pathlib import Path
 from typing import Any
@@ -154,6 +154,14 @@ def parse_german_date(value: str) -> str | None:
     return f"{year}-{month}-{day}"
 
 
+def age_at_season_end(birth_date: str | None, season_year: int) -> int | None:
+    if not birth_date:
+        return None
+    born = date.fromisoformat(birth_date)
+    reference = date(season_year + 1, 6, 30)
+    return reference.year - born.year - ((reference.month, reference.day) < (born.month, born.day))
+
+
 def split_top_level_cells(row: str) -> list[str]:
     """Split a <tr> body into top-level <td> contents, ignoring nested tables."""
     cells: list[str] = []
@@ -218,12 +226,13 @@ def parse_squad_page(page: str) -> list[dict[str, Any]]:
         signing_fee = re.search(r'title="[^":]+:\s*Ablöse\s*([^"]+)"', previous_cell)
         shirt_number = re.search(r"rn_nummer>([^<]*)<", row)
         position_detail = re.search(r"<tr>\s*<td>\s*([^<]+?)\s*</td>\s*</tr>\s*</table>", row, flags=re.DOTALL)
+        shirt_number_value = clean_text(shirt_number.group(1)) if shirt_number else ""
         players.append({
             "tmId": int(profile.group(2)),
             "tmUrl": f"{BASE_URL}{profile.group(1)}",
             "tmName": name,
             "captain": "kapitaenicon" in row,
-            "shirtNumber": (clean_text(shirt_number.group(1)) or None) if shirt_number else None,
+            "shirtNumber": shirt_number_value if shirt_number_value not in {"", "-"} else None,
             "positionDetail": clean_text(position_detail.group(1)) if position_detail else None,
             "birthDate": parse_german_date(birth_cell),
             "age": int(age_match.group(1)) if age_match else None,
@@ -415,6 +424,7 @@ def newest_season(catalog: dict[str, Any], league: str) -> dict[str, Any]:
 def resolve_club_ids(
     fetcher: Fetcher,
     league: str,
+    season_year: int,
     kicker_teams: list[dict[str, Any]],
     config: dict[str, Any],
     overrides: dict[str, Any],
@@ -427,7 +437,7 @@ def resolve_club_ids(
     }
     override_clubs = {str(key): value for key, value in overrides.get("clubs", {}).get(league, {}).items()}
     slug, competition = LEAGUE_COMPETITIONS[league]
-    league_page = fetcher.fetch(f"{BASE_URL}/{slug}/startseite/wettbewerb/{competition}")
+    league_page = fetcher.fetch(f"{BASE_URL}/{slug}/startseite/wettbewerb/{competition}/saison_id/{season_year}")
     tm_clubs = parse_league_clubs(league_page)
     tm_by_name = {club_id: normalize(club["name"]) for club_id, club in tm_clubs.items()}
 
@@ -461,6 +471,15 @@ def build_league_snapshot(
     career_workers: int,
 ) -> tuple[dict[str, Any], dict[str, Any]]:
     season_file = load_json(DATA_DIR / "seasons" / f"se-k{league}{season_year}.json")
+    catalog = load_json(DATA_DIR / "catalog.json")
+    is_current_season = season_year == newest_season(catalog, league)["startYear"]
+    stable_bios: dict[int, dict[str, Any]] = {}
+    current_profile_path = CLUB_OUTPUT_DIR / f"{league}.json"
+    if not is_current_season and current_profile_path.exists():
+        current_profiles = load_json(current_profile_path)
+        for current_team in current_profiles.get("teams", {}).values():
+            for current_member in current_team.get("squad", {}).values():
+                stable_bios[int(current_member["tmId"])] = current_member
     teams = [team for team in season_file["teams"]]
     players_by_team: dict[str, dict[str, str]] = {}
     player_names: dict[str, str] = {}
@@ -470,7 +489,7 @@ def build_league_snapshot(
         player_names[player["id"]] = player["name"]
         players_by_team.setdefault(player["teamId"], {})[player["id"]] = normalize(player["name"])
 
-    clubs, unmatched_clubs = resolve_club_ids(fetcher, league, teams, config, overrides)
+    clubs, unmatched_clubs = resolve_club_ids(fetcher, league, season_year, teams, config, overrides)
     if unmatched_clubs:
         print(f"[{league}] Ohne Transfermarkt-Zuordnung: {', '.join(unmatched_clubs)}", file=sys.stderr)
 
@@ -490,11 +509,23 @@ def build_league_snapshot(
         club_url = f"{BASE_URL}/{slug}/startseite/verein/{club['id']}"
         squad_page = fetcher.fetch(f"{BASE_URL}/{slug}/kader/verein/{club['id']}/saison_id/{season_year}/plus/1")
         transfers_page = fetcher.fetch(f"{BASE_URL}/{slug}/transfers/verein/{club['id']}/saison_id/{season_year}")
-        staff_page = fetcher.fetch(f"{BASE_URL}/{slug}/mitarbeiter/verein/{club['id']}")
+        # The public staff page is current-state only. Do not stamp today's
+        # coach onto a historical season; captain data remains season-specific
+        # because it comes from the archived squad page.
+        staff_page = fetcher.fetch(f"{BASE_URL}/{slug}/mitarbeiter/verein/{club['id']}") if is_current_season else None
 
         squad = parse_squad_page(squad_page)
+        for member in squad:
+            stable = stable_bios.get(member["tmId"])
+            if stable:
+                for field in ("birthDate", "nationalities", "heightCm", "foot"):
+                    if not member.get(field):
+                        member[field] = stable.get(field)
+            historical_age = age_at_season_end(member.get("birthDate"), season_year)
+            if historical_age is not None and not is_current_season:
+                member["age"] = historical_age
         arrivals, departures = parse_transfers_page(transfers_page)
-        coach = parse_coach(staff_page)
+        coach = parse_coach(staff_page) if staff_page else None
 
         kicker_candidates = dict(players_by_team.get(team_id, {}))
         matched: dict[str, Any] = {}
@@ -605,11 +636,14 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--leagues", default="0001,0002,0003", help="Comma-separated kicker league codes")
     parser.add_argument("--season", type=int, help="Season start year; defaults to the newest season in the catalog")
+    parser.add_argument("--all-seasons", action="store_true", help="Generate every archived season in the catalog")
     parser.add_argument("--skip-careers", action="store_true", help="Skip the per-player career performance requests")
     parser.add_argument("--delay", type=float, default=0.8, help="Seconds between requests")
     parser.add_argument("--career-workers", type=int, default=4, help="Concurrent career downloads; request starts remain rate-limited")
     parser.add_argument("--no-cache", action="store_true", help="Bypass the on-disk HTTP cache")
     args = parser.parse_args()
+    if args.season and args.all_seasons:
+        parser.error("--season and --all-seasons cannot be used together")
 
     catalog = load_json(DATA_DIR / "catalog.json")
     config = load_json(CONFIG_PATH)
@@ -619,22 +653,37 @@ def main() -> int:
     for league in [code.strip() for code in args.leagues.split(",") if code.strip()]:
         if league not in LEAGUE_COMPETITIONS:
             raise RuntimeError(f"Unbekannter Liga-Code: {league}")
-        season_year = args.season or newest_season(catalog, league)["startYear"]
-        club_snapshot, career_snapshot = build_league_snapshot(
-            fetcher,
-            league,
-            season_year,
-            config,
-            overrides,
-            not args.skip_careers,
-            max(1, args.career_workers),
+        newest_year = newest_season(catalog, league)["startYear"]
+        archived_years = sorted(
+            season["startYear"]
+            for season in catalog["seasons"]
+            if season["leagueCode"] == league and season["startYear"] != newest_year
         )
-        CLUB_OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-        (CLUB_OUTPUT_DIR / f"{league}.json").write_text(json.dumps(club_snapshot, ensure_ascii=False, separators=(",", ":")) + "\n")
-        if not args.skip_careers:
-            CAREER_OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-            (CAREER_OUTPUT_DIR / f"{league}.json").write_text(json.dumps(career_snapshot, ensure_ascii=False, separators=(",", ":")) + "\n")
-        print(f"[{league}] Snapshot geschrieben ({fetcher.request_count} Anfragen bisher)", file=sys.stderr)
+        # Generate the current snapshot first so its stable biographical
+        # fields can enrich sparse archive tables in the same backfill run.
+        season_years = [newest_year, *archived_years] if args.all_seasons else [args.season or newest_year]
+        for season_year in season_years:
+            club_snapshot, career_snapshot = build_league_snapshot(
+                fetcher,
+                league,
+                season_year,
+                config,
+                overrides,
+                not args.skip_careers,
+                max(1, args.career_workers),
+            )
+            CLUB_OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+            club_payload = json.dumps(club_snapshot, ensure_ascii=False, separators=(",", ":")) + "\n"
+            (CLUB_OUTPUT_DIR / f"{league}-{season_year}.json").write_text(club_payload)
+            if season_year == newest_year:
+                (CLUB_OUTPUT_DIR / f"{league}.json").write_text(club_payload)
+            if not args.skip_careers:
+                CAREER_OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+                career_payload = json.dumps(career_snapshot, ensure_ascii=False, separators=(",", ":")) + "\n"
+                (CAREER_OUTPUT_DIR / f"{league}-{season_year}.json").write_text(career_payload)
+                if season_year == newest_year:
+                    (CAREER_OUTPUT_DIR / f"{league}.json").write_text(career_payload)
+            print(f"[{league}/{season_year}] Snapshot geschrieben ({fetcher.request_count} Anfragen bisher)", file=sys.stderr)
     return 0
 
 

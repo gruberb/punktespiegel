@@ -217,13 +217,16 @@ tbody tr:hover { background: #fbfcf9; }
 .availability-alert.rehab { border-color: #dbc792; background: #fffbef; }
 .availability-alert.rehab strong, .availability-alert.rehab a { color: #79611d; }
 .player-seasons { width: 100%; margin-bottom: 30px; }
+.player-detail-tabs { width: min(100%, 440px); display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); margin: 0 0 24px; }
+.player-detail-tabs button { min-width: 0; flex: 1 1 0; white-space: nowrap; }
+.player-tab-panel { min-width: 0; }
 .player-seasons h3 { margin: 0 0 12px; font-size: 17px; font-weight: 620; }
 .player-seasons .section-copy > p { margin: -5px 0 0; color: var(--muted); font-size: 10px; }
 .player-season-table table { min-width: 860px; }
 .player-season-table th, .player-season-table td { padding: 12px 16px; }
 .player-season-table tr.selected { background: var(--sage-soft); }
 .player-season-table tr.selected td:first-child { box-shadow: inset 3px 0 var(--green); }
-.player-season-table tfoot td { border-top: 2px solid var(--line); background: #fbfcf8; font-size: 12px; }
+.player-season-table tfoot td { border-top: 2px solid var(--line); background: var(--background-color-box); color: var(--text-color); font-size: 12px; }
 
 /* Player bio and career (Transfermarkt snapshot) ------------------------ */
 .player-bio { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1px; margin-bottom: 30px; overflow: hidden; border: 1px solid var(--line); border-radius: 12px; background: var(--line); }
@@ -253,7 +256,7 @@ tbody tr:hover { background: #fbfcf9; }
 .squad-player { display: flex; align-items: center; gap: 10px; }
 .squad-player > span:last-child { min-width: 0; }
 .squad-player small { display: block; margin-top: 3px; color: var(--muted); font-size: 10px; }
-.squad-number { min-width: 24px; color: var(--muted); font-size: 11px; font-weight: 680; font-variant-numeric: tabular-nums; text-align: right; }
+.squad-number { flex: 0 0 24px; color: var(--muted); font-size: 11px; font-weight: 680; font-variant-numeric: tabular-nums; text-align: right; }
 .captain-badge { display: inline-block; margin-left: 7px; padding: 2px 6px; border-radius: 6px; background: var(--sage-soft); color: var(--green-deep); font-size: 8px; font-style: normal; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; vertical-align: middle; }
 .likely-eleven-rows { display: grid; gap: 14px; }
 .likely-eleven-row h4 { margin: 0 0 8px; color: var(--soft-ink); font-size: 10px; font-weight: 660; letter-spacing: .08em; text-transform: uppercase; }
@@ -1567,22 +1570,26 @@ tbody tr:hover, .clickable-row:hover { background: var(--button-background-color
   }
   .main-nav { scrollbar-width: none; }
   .main-nav::-webkit-scrollbar { display: none; }
+  .profile-stats,
   .team-profile-stats {
     width: 100%;
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     overflow: hidden;
   }
+  .profile-stats > span,
   .team-profile-stats > span {
     min-width: 0;
     padding: 12px 10px;
   }
+  .profile-stats strong,
   .team-profile-stats strong {
     overflow: hidden;
     font-size: 17px;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
+  .profile-stats small,
   .team-profile-stats small { font-size: 7px; }
   .team-roster-card > .card-head { padding: 18px 16px 14px; }
   .team-roster-table .data-table th:first-child,
@@ -1759,9 +1766,9 @@ html[data-theme="dark"] select optgroup {
     left: 0;
     z-index: 40;
     display: grid;
-    grid-template-columns: repeat(6, minmax(0, 1fr));
-    gap: 2px;
-    padding: 6px max(8px, env(safe-area-inset-right)) max(6px, env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left));
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 4px;
+    padding: 6px max(10px, env(safe-area-inset-right)) max(6px, env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left));
     border-top: 1px solid var(--line);
     background: color-mix(in srgb, var(--background-color-box) 94%, transparent);
     backdrop-filter: blur(20px);
@@ -1784,6 +1791,8 @@ html[data-theme="dark"] select optgroup {
   .mobile-nav-icon svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
   .mobile-nav a.active { color: var(--color-accent-primary); font-weight: 750; }
   .mobile-nav a.active .mobile-nav-icon { background: var(--color-accent-primary-deemphasized); }
+  .player-detail-tabs { width: 100%; margin-bottom: 20px; }
+  .player-detail-tabs button { padding-inline: 9px; font-size: 11px; }
   main { padding-bottom: calc(84px + env(safe-area-inset-bottom)); }
 }
 

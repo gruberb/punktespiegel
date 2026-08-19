@@ -2,6 +2,22 @@
 
 Alle wesentlichen Änderungen an Punktespiegel werden in dieser Datei dokumentiert.
 
+## [1.18.0] – 2026-08-18
+
+### Hinzugefügt
+
+- Vereins- und Spielerprofile sind für alle Liga-Saisons von 2022/23 bis 2026/27 saisoniert hinterlegt. Der wiederaufnehmbare Backfill behält die bisherigen Dateinamen als Alias der aktuellen Saison bei.
+- Spielerprofile trennen Profil, Nachrichten und Vereinslaufbahn in einem eigenen Tab von den archivierten Saisonpunkten und einzelnen Spieleinsätzen.
+
+### Geändert
+
+- Die mobile Navigation nutzt nach dem Wegfall des Fantasy-Bereichs die verfügbare Breite wieder gleichmäßig für ihre fünf Ziele.
+
+### Behoben
+
+- Historische Saisonwechsel laden jetzt die zugehörigen Kader-, Transfer-, Bio- und Karriere-Snapshots statt nur die kicker-Wertungen. Archivierte Altersangaben werden auf das Saisonende bezogen; fehlende stabile Biografiefelder können aus dem aktuellen Spielerprofil ergänzt werden.
+- Fehlende Rückennummern verschieben Portrait und Spielernamen in Kadertabellen nicht mehr. Die Archiv-Gesamtsumme bleibt im dunklen Design dunkel, und Profilkennzahlen passen auf Mobilgeräten ohne horizontale Bildlaufleiste in drei gleich breite Spalten.
+
 ## [1.17.0] – 2026-08-18
 
 ### Hinzugefügt

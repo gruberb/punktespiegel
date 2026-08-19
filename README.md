@@ -54,7 +54,7 @@ Aktuelle Vereins- und Spielerprofile werden bewusst als langsamer, zwischengespe
 npm run generate:club-profiles
 ```
 
-Der Import fragt Transfermarkt mit eindeutigem User-Agent, lokalem HTTP-Cache und höchstens ungefähr einer Anfrage pro Sekunde ab. Er schreibt `club-profiles/` und `player-careers/` für die aktuelle Saison. Nicht eindeutig zuordenbare Namen werden im Lauf ausgegeben und können in `config/transfermarkt-overrides.json` fest verdrahtet werden.
+Der Import fragt Transfermarkt mit eindeutigem User-Agent, lokalem HTTP-Cache und höchstens ungefähr einer Anfrage pro Sekunde ab. Er schreibt saisonierte Dateien nach `club-profiles/` und `player-careers/`; `npm run generate:club-profiles:backfill` erzeugt alle im Katalog geführten Liga-Saisons. Nicht eindeutig zuordenbare Namen werden im Lauf ausgegeben und können in `config/transfermarkt-overrides.json` fest verdrahtet werden.
 
 ## GitHub Pages
 
@@ -83,8 +83,8 @@ docker compose build web
 - `frontend/`: React-Anwendung und statischer Datenadapter.
 - `frontend/public/data/catalog.json`: unterstützte Ligen und Saisons.
 - `frontend/public/data/seasons/`: ein normalisierter Snapshot je Liga-Saison.
-- `frontend/public/data/club-profiles/`: aktuelle Kader-, Trainer-, Kapitäns- und Transferdaten je Liga.
-- `frontend/public/data/player-careers/`: aktuelle Karriereeinsätze, Tore und Vorlagen je Spieler und Verein.
+- `frontend/public/data/club-profiles/`: saisonierte Kader-, Kapitäns- und Transferdaten je Liga; Trainerdaten werden nur für den aktuellen Stand veröffentlicht.
+- `frontend/public/data/player-careers/`: saisonierte Karriereeinsätze, Tore und Vorlagen je Spieler und Verein.
 - `frontend/public/data/current-role-signals.json`: statischer Bundesliga-Snapshot für aktuelle Topelf-, Spieler- und Vereinsquellen.
 - `frontend/public/data/current-availability-signals.json`: datierter Ausfallsnapshot für Bundesliga, 2. Bundesliga und 3. Liga.
 - `frontend/public/data/external-performance-benchmark.json`: unabhängiger Vergleich der LigaInsider-Leistungsrangfolge 2025/26 mit den historischen kicker-Punkten.
