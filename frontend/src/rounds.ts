@@ -3,6 +3,10 @@ type RoundAvailability = {
   latestRound: number;
 };
 
+type SeasonAvailability = RoundAvailability & {
+  startYear: number;
+};
+
 export function latestAvailableRound(season: RoundAvailability) {
   const roundCount = Math.max(1, Math.trunc(season.roundCount));
   const latestRound = Number.isFinite(season.latestRound) ? Math.trunc(season.latestRound) : 0;
@@ -20,4 +24,9 @@ export function initialAvailableRound(season: RoundAvailability, requestedRound:
   return requestedRound !== null && Number.isInteger(requestedRound) && requestedRound >= 1 && requestedRound <= latestRound
     ? requestedRound
     : latestRound;
+}
+
+export function latestPlayedSeason<T extends SeasonAvailability>(seasons: readonly T[]) {
+  const newestFirst = [...seasons].sort((left, right) => right.startYear - left.startYear);
+  return newestFirst.find((season) => latestImportedRound(season) > 0) ?? newestFirst[0];
 }

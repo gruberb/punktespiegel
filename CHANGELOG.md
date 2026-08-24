@@ -2,6 +2,12 @@
 
 Alle wesentlichen Änderungen an Punktespiegel werden in dieser Datei dokumentiert.
 
+## [1.21.1] – 2026-08-24
+
+### Behoben
+
+- Die App startet mit der Bundesliga und zeigt beim Öffnen sowie nach einem Ligawechsel automatisch den neuesten bereits gespielten Spieltag. Hat die aktuelle Bundesliga- oder Zweitligasaison noch nicht begonnen, wird stattdessen der letzte Spieltag der Vorsaison angezeigt.
+
 ## [1.21.0] – 2026-08-19
 
 ### Hinzugefügt

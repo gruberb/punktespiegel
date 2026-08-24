@@ -8,7 +8,7 @@ import { hrefForView, pathForView, viewFromPathname } from "./routes";
 import type { DataTableColumn } from "./DataTable";
 import type { RouteView } from "./routes";
 import { shortSeasonLabel } from "./player-table";
-import { initialAvailableRound, latestAvailableRound, latestImportedRound } from "./rounds";
+import { initialAvailableRound, latestAvailableRound, latestImportedRound, latestPlayedSeason } from "./rounds";
 import { formatJoined } from "./profile-format";
 import type {
   BestEleven,
@@ -253,8 +253,9 @@ export default function App() {
   const [dashboardLoading, setDashboardLoading] = useState(false);
   const [overviewScope, setOverviewScope] = useState<"through" | "matchday">("through");
   const navigationToken = useRef(0);
+  const initialSeasonRequest = useRef(new URLSearchParams(window.location.search).get("season"));
   const initialRoundRequest = useRef(requestedInitialRound());
-  const initialRoundResolved = useRef(false);
+  const initialSelectionResolved = useRef(false);
 
   useLayoutEffect(() => {
     document.documentElement.dataset.theme = theme;
@@ -289,7 +290,7 @@ export default function App() {
   const playerSeasons = seasonsForPlayer(catalog, playerId);
   const playerSeasonCandidates = catalog?.seasons.filter((season) => playerId && playerSeasonMembership(season, playerId)) ?? [];
   const newestSeason = seasons[0];
-  const latestPublishedSeason = seasons.find((season) => season.latestRound > 0) ?? newestSeason;
+  const latestPublishedSeason = latestPlayedSeason(seasons);
   const requestedSeason = seasons.find((season) => String(season.startYear) === filters.season);
   const selectedTeamSeason = teamSeasons.find((season) => String(season.startYear) === filters.season) ?? teamSeasons[0];
   const selectedPlayerSeason = playerSeasonCandidates.find((season) => season.leagueCode === filters.league && String(season.startYear) === filters.season)
@@ -397,14 +398,22 @@ export default function App() {
   }, [catalog, filters.league, filters.round, filters.season, playerId, selectedSeason?.displayName, teamId, view]);
 
   useEffect(() => {
-    if (initialRoundResolved.current || !selectedSeason) return;
-    initialRoundResolved.current = true;
-    const round = String(initialAvailableRound(selectedSeason, initialRoundRequest.current));
-    if (round === filters.round) return;
-    const next = { ...filters, round };
+    if (initialSelectionResolved.current) return;
+    const useLatestPlayedSeason = initialSeasonRequest.current === null
+      && view !== "top"
+      && view !== "team"
+      && view !== "player"
+      && !isInfoView(view);
+    const initialSeason = useLatestPlayedSeason ? latestPublishedSeason : selectedSeason;
+    if (!initialSeason) return;
+    initialSelectionResolved.current = true;
+    const season = String(initialSeason.startYear);
+    const round = String(initialAvailableRound(initialSeason, initialRoundRequest.current));
+    if (season === filters.season && round === filters.round) return;
+    const next = { ...filters, season, round };
     setFilters(next);
     syncUrl(next, view, playerId, teamId);
-  }, [selectedSeason?.id]);
+  }, [latestPublishedSeason?.id, selectedSeason?.id]);
 
   useEffect(() => {
     if (view !== "table" || !latestPublishedSeason || filters.season === String(latestPublishedSeason.startYear)) return;
@@ -500,9 +509,7 @@ export default function App() {
     const next = { ...filters, [key]: value };
     if (key === "league") {
       const available = seasonsForLeague(catalog, value);
-      const defaultSeason = view === "table"
-        ? available.find((season) => season.latestRound > 0) ?? available[0]
-        : available[0];
+      const defaultSeason = view === "top" ? available[0] : latestPlayedSeason(available);
       if (defaultSeason) next.season = String(defaultSeason.startYear);
     }
     const season = catalog?.seasons.find((item) => item.leagueCode === next.league && String(item.startYear) === next.season);
@@ -540,12 +547,15 @@ export default function App() {
   }
 
   function setView(next: NavView) {
+    const overviewSeason = requestedSeason && latestImportedRound(requestedSeason) > 0
+      ? requestedSeason
+      : latestPublishedSeason;
     const nextFilters = next === "table" && latestPublishedSeason
       ? { ...filters, season: String(latestPublishedSeason.startYear), round: String(Math.max(1, latestPublishedSeason.latestRound)) }
       : next === "top" && newestSeason
         ? { ...filters, season: String(newestSeason.startYear), round: String(Math.max(1, newestSeason.latestRound)) }
-      : next === "overview" && requestedSeason
-        ? { ...filters, round: String(Math.max(1, requestedSeason.latestRound)) }
+      : next === "overview" && overviewSeason
+        ? { ...filters, season: String(overviewSeason.startYear), round: String(latestAvailableRound(overviewSeason)) }
         : filters;
     if (nextFilters !== filters) setFilters(nextFilters);
     setViewState(next);
