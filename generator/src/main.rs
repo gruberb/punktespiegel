@@ -172,6 +172,20 @@ fn score_counts_as_appearance(score: &StaticScore) -> bool {
         || score.points_joker != 0
 }
 
+fn latest_scored_round(matches: &[StaticMatch], scores: &[StaticScore]) -> i32 {
+    let scored_match_ids = scores
+        .iter()
+        .filter(|score| score_counts_as_appearance(score))
+        .map(|score| score.match_id.as_str())
+        .collect::<std::collections::HashSet<_>>();
+    matches
+        .iter()
+        .filter(|fixture| scored_match_ids.contains(fixture.id.as_str()))
+        .map(|fixture| fixture.round)
+        .max()
+        .unwrap_or(0)
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 struct StaticRound {
@@ -844,12 +858,7 @@ fn build_static_season(
             code: team.short_name,
         })
         .collect::<Vec<_>>();
-    let latest_round = matches
-        .iter()
-        .filter(|fixture| scores.iter().any(|score| score.match_id == fixture.id))
-        .map(|fixture| fixture.round)
-        .max()
-        .unwrap_or(0);
+    let latest_round = latest_scored_round(&matches, &scores);
     let round_count = rounds.iter().map(|round| round.number).max().unwrap_or(0);
     Ok(StaticSeason {
         schema_version: SCHEMA_VERSION,
@@ -1109,5 +1118,43 @@ mod tests {
         assert!(!score_counts_as_appearance(&score));
         score.points_starter = 4;
         assert!(score_counts_as_appearance(&score));
+    }
+
+    #[test]
+    fn latest_round_ignores_empty_upstream_score_rows() {
+        let fixture = StaticMatch {
+            id: "match".to_owned(),
+            round: 3,
+            home_team_id: "home".to_owned(),
+            away_team_id: "away".to_owned(),
+            scheduled_at: None,
+            state: "FINISHED".to_owned(),
+            home_score: Some(2),
+            away_score: Some(1),
+        };
+        let mut score = StaticScore {
+            match_id: fixture.id.clone(),
+            player_id: "player".to_owned(),
+            team_id: "home".to_owned(),
+            total_points: 0,
+            grade: None,
+            goals: 0,
+            assists: 0,
+            points_clean_sheet: 0,
+            points_grade: 0,
+            points_goals: 0,
+            points_cards: 0,
+            points_assists: 0,
+            points_starter: 0,
+            points_mvp: 0,
+            points_joker: 0,
+        };
+
+        assert_eq!(
+            latest_scored_round(std::slice::from_ref(&fixture), std::slice::from_ref(&score)),
+            0
+        );
+        score.points_starter = 4;
+        assert_eq!(latest_scored_round(&[fixture], &[score]), 3);
     }
 }

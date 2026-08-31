@@ -6,6 +6,8 @@ on:
   schedule:
     - cron: "15 12 * * *"
       timezone: Europe/Berlin
+    - cron: "45 14 * * *"
+      timezone: Europe/Berlin
   workflow_dispatch:
     inputs:
       refresh_all:

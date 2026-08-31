@@ -2,6 +2,13 @@
 
 Alle wesentlichen Änderungen an Punktespiegel werden in dieser Datei dokumentiert.
 
+## [1.21.2] – 2026-08-31
+
+### Behoben
+
+- Leere, vom Anbieter vorab angelegte Spielerwertungen markieren einen Spieltag nicht mehr als bereits importiert. Ergebnisse ohne veröffentlichte Noten und Managerpunkte bleiben dadurch als noch ausstehend erkennbar.
+- Der tägliche Pages-Datenlauf verwendet dokumentiert die deutsche Zeitzone und erhält um 14:45 Uhr deutscher Zeit einen zweiten Ausführungszeitpunkt als Absicherung gegen stark verspätete oder ausgelassene GitHub-Zeitpläne.
+
 ## [1.21.1] – 2026-08-24
 
 ### Behoben
