@@ -2,6 +2,13 @@
 
 Alle wesentlichen Änderungen an Punktespiegel werden in dieser Datei dokumentiert.
 
+## [1.23.0] – 2026-09-14
+
+### Entfernt
+
+- Das gesamte lokale Empfehlungssystem: Classic-/Interactive-Prognosen, Kaderoptimierung, Winterläufe, Baseline, Audits, generierte Empfehlungen, Modellkonfiguration und Python-Modellabhängigkeiten. Der eigenständige Rollen- und Ausfallimport für die Website bleibt erhalten und benötigt nur die Python-Standardbibliothek.
+- Der ungenutzte LigaInsider-Leistungsbenchmark samt Import und statischer Datei.
+
 ## [1.22.0] – 2026-09-14
 
 ### Geändert

@@ -39,14 +39,11 @@ cargo run --locked -p punktespiegel-data -- --refresh-all
 
 Der Datenbestand ist nach Liga und Saison getrennt. Der Browser lädt nicht alle Jahre auf einmal. Die 15 enthaltenen Saisons benötigen zusammen ungefähr 54 MB im Repository; eine vollständige Saison wird mit üblicher HTTP-Kompression auf ungefähr 180–250 KB übertragen.
 
-Der lokale Empfehlungsgenerator bleibt als separates Werkzeug erhalten, seine Ergebnisse werden jedoch nicht mehr von der Website ausgeliefert. Dafür werden [uv](https://docs.astral.sh/uv/) und Python 3.13 benötigt; `uv` installiert die exakt gesperrten CatBoost- und HiGHS-Abhängigkeiten selbst:
+Aktuelle Bundesliga-Rollen und Ausfälle aller drei Ligen werden separat mit Python 3 (ohne zusätzliche Pakete) aktualisiert:
 
 ```bash
-uv sync --frozen
-npm run generate:recommendations
+npm run generate:role-signals
 ```
-
-Vor der Berechnung werden aktuelle Rollen- und Ausfallsignale von LigaInsider beziehungsweise Transfermarkt sowie ein unabhängiger LigaInsider-Vorsaisonbenchmark aktualisiert. Die v2-Pipeline schreibt Classic- und Interactive-Ergebnisse nach `recommendations/`; das verschobene v1-Modell unter `scripts/` bleibt nur als Ensemble-Baseline erhalten. `npm run dev`, CI und `npm run build` laden diese lokalen Empfehlungsergebnisse nicht.
 
 Aktuelle Vereins- und Spielerprofile werden bewusst als langsamer, zwischengespeicherter Snapshot erzeugt:
 
@@ -71,7 +68,6 @@ cargo test --workspace --all-targets --locked
 cargo run --locked -p punktespiegel-data -- --validate-only
 npm run typecheck
 npm run test:club-profiles
-npm run test:recommender-baseline
 npm run build
 docker compose config --quiet
 docker compose build web
@@ -87,21 +83,13 @@ docker compose build web
 - `frontend/public/data/player-careers/`: saisonierte Karriereeinsätze, Tore und Vorlagen je Spieler, Verein, Saison und Wettbewerb.
 - `frontend/public/data/current-role-signals.json`: statischer Bundesliga-Snapshot für aktuelle Topelf-, Spieler- und Vereinsquellen.
 - `frontend/public/data/current-availability-signals.json`: datierter Ausfallsnapshot für Bundesliga, 2. Bundesliga und 3. Liga.
-- `frontend/public/data/external-performance-benchmark.json`: unabhängiger Vergleich der LigaInsider-Leistungsrangfolge 2025/26 mit den historischen kicker-Punkten.
-- `recommendations/`: lokale Classic- und Interactive-Ergebnisse; nicht Teil des Website-Artefakts.
-- `recommender/`: der lokale Empfehlungsgenerator als Python-Paket mit rollenabhängiger Prognose, regelgenauer Classic-Reservewertung, optionalem Winterlauf, Mehrspieltags-MILPs und exaktem historischem Interactive-Optimierungs-Audit; das deterministische v1-Vergleichsmodell (`scripts/manager-model.ts` über `scripts/backtest-manager-baseline.ts`) bleibt als Ensemble-Baseline eingebunden.
-- `config/recommender/`: Liga-Konfigurationen (Bundesliga, 2. Bundesliga, 3. Liga) und Modell-Voreinstellungen, dort dokumentiert.
 - `scripts/fetch-current-role-signals.py`: lokal ausgeführter, fail-closed Import der LigaInsider-Topelf, Vereinsthemen und medizinischen Verfügbarkeit aus LigaInsider/Transfermarkt.
 - `scripts/fetch-club-profiles.py`: rate-limitierter Transfermarkt-Import für Vereinsprofile und Karrierewerte mit lokalem HTTP-Cache.
-- `pyproject.toml` und `uv.lock`: reproduzierbare Offline-Modellumgebung.
 - `.github/workflows/`: CI sowie täglicher Pages-Datenbuild.
 - `docs/`: Architektur, Betrieb und Architekturentscheidung.
 
 Weitere Details:
 
 - [Architektur](docs/architecture.md)
-- [Classic-v2](docs/classic-v2.md)
-- [Interactive-v2](docs/interactive-v2.md)
-- [Bundesliga-Recommender-Audit 2026/27](docs/bundesliga-recommender-audit.md)
 - [Betrieb und Datenpflege](docs/operations.md)
 - [ADR: statische Saisonartefakte](docs/adr/0001-static-season-artifacts.md)

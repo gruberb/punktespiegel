@@ -52,20 +52,6 @@ Die Darstellung berechnet daraus deterministisch:
 - die punktstärkste reguläre Elf für Saison oder Spieltag,
 - nach Position gruppierte Vereinskader und eine mögliche Elf, die vor Saisonbeginn aus dem Bundesliga-Rollensnapshot und danach aus den häufigsten tatsächlichen Startelfeinsätzen abgeleitet wird.
 
-## Kaderprognose
-
-Classic-v1 bleibt das deterministische Vergleichsmodell. Classic-v2 kombiniert dessen stabile Saisonprognose mit CatBoost-Spieltagresiduen und bewertet die positionsgebundene Reserve mit der vollständigen negativen wie positiven Punkteverteilung. Der Vorsaisonoptimierer teilt einen 15er-Septemberkader über mehrere latente Winterzustände und erlaubt je Zustand eine eigene regelkonforme Antwort mit höchstens drei positions- und slotgleichen Wechseln. Im echten Winterlauf werden der gekaufte Kader gesperrt, aktuelle Saisonzustände bis zum Cutoff eingespielt und nur die verbleibenden Spieltage optimiert.
-
-Interactive-v2 nutzt die vollständigen Spieler-Spiel-Daten. Ein chronologisch trainierter CatBoost-Klassifikator schätzt DNP, Einwechslung und Startelf; nach Position und Rolle getrennte Regressoren schätzen bedingten Mittelwert sowie P10, Median und P90. Spieler mit wenig Historie werden zu einem aus Position, Liga und Preisstufe gelernten empirischen Prior zurückgezogen. Das nachgelagerte HiGHS-Modell wählt standardmäßig einen festen Saisonkader sowie eigene Aufstellungs- und Formationsentscheide für jeden Spieltag; Winterwechsel sind nur ein Opt-in-Experiment. Es bildet eine Torwartversicherung aus drei Spielern desselben Vereins, begrenzt Feldspieler eines Vereins strategisch und versieht Bankoptionen mit einem historisch gewählten Teilwert. Seine Hauptzielfunktion verbindet damit die erwarteten Punkte der jeweils besten gültigen Elf mit dem Optionswert der Kaderbreite.
-
-Vor dem finalen Interactive-Training wird das Mischgewicht auf einer früheren Vorsaison festgelegt. Eine zeitlich spätere Saison dient als Champion-/Challenger-Gate. Classic verwendet mehrere Rolling-Origin-Folds und gibt dem v1-Vergleich dieselbe legale Winteraktion. Die historischen Saisonartefakte enthalten jedoch noch keine nachweislichen Entscheidungszeit-Snapshots für Preis, Vereinszuordnung, `active` und `selectable`. Beide Validierungen werden deshalb als experimentell gekennzeichnet und nicht als leakage-sicher ausgegeben. Danach wird das Produktionsmodell mit allen abgeschlossenen Saisons neu trainiert.
-
-Beide Verfahren erzeugen lokale JSON-Dateien für Bundesliga, 2. Bundesliga und 3. Liga unter `recommendations/`. Die Website lädt diese Dateien nicht und führt weder Modelltraining noch Kaderoptimierung aus. Details stehen unter [Classic-v2](classic-v2.md) und [Interactive-v2](interactive-v2.md).
-
-In der Produktion wird der Zustand aller abgeschlossenen Spiele der laufenden Saison vor der Prognose wiederhergestellt. Die tatsächlichen Rollen aktualisieren die künftige Einsatzverteilung mit abklingendem Gewicht; bekannte Punkte und Rollen ersetzen die Darstellung bereits gespielter Runden exakt. Für die Optimierung erhalten diese Runden jedoch den Wert null, sodass die Empfehlung nur verbleibende Punkte maximiert. `recommendation.currentSeasonEvidence` dokumentiert Cutoff, Beobachtungsumfang und Beginn des Optimierungsfensters.
-
-Die ausgegebenen Punkte sind Erwartungswerte und werden im UI ausdrücklich als Prognose gekennzeichnet. Das Verfahren nutzt keine privaten Managerdaten und behauptet nicht, den späteren Siegerkader sicher vorherzusagen.
-
 ## Nachrichten
 
 Der Datencompiler liest serverseitig im täglichen Build die offiziellen kicker-RSS-Feeds und den kicker-Feedkatalog. Weitere konfigurierte RSS-Anbieter sind standardmäßig deaktiviert und werden erst nach einer expliziten, anbieterspezifischen Rechtefreigabe berücksichtigt. Eine statische `news.json` enthält höchstens 15 aktuelle Links je Spieler und Verein, jeweils mit Datum, Quelle, Überschrift, direkter Ziel-URL und der Art des Bezugs. Ein exakter Spielerfund wird als `player`, ein Artikel aus dem offiziellen Vereinsfeed nur als `team` gespeichert. So kann die Oberfläche Vereinsnachrichten als Kontext anbieten, ohne zu behaupten, der Spieler werde im Artikel erwähnt.
@@ -76,9 +62,7 @@ Spielertreffer erfordern den vollständigen Namen oder einen durch den aktuellen
 
 Bei kicker werden nur die im offiziellen RSS-Angebot vorgesehenen Felder dargestellt: Überschrift, Datum und direkter Link mit sichtbarer Quellenangabe. Punktespiegel speichert kein dauerhaftes Artikelarchiv. Eine weitergehende oder kommerzielle Syndizierung setzt eine separate Freigabe des Anbieters voraus.
 
-Für die aktuelle Bundesliga ergänzt `current-role-signals.json` einen lokal erzeugten LigaInsider-Snapshot: Topelf/Alternativen, direkte Spieler- und Vereinslinks sowie aktuelle Vereinsthemen. `current-availability-signals.json` trennt davon den aktuellen medizinischen Status. LigaInsider liefert Verletzungen, Aufbautraining, Sperren und Nichtberücksichtigung für die Bundesliga; die öffentlichen Transfermarkt-Ausfalllisten decken die 2. Bundesliga und 3. Liga ab. Beide Stände werden als statische Dateien geladen; der medizinische Status dient zusätzlich dem lokalen Empfehlungsgenerator.
-
-`external-performance-benchmark.json` enthält zusätzlich den LigaInsider-Leistungsindex 2025/26 als unabhängigen Bundesliga-Rangbenchmark gegen die kicker-Historie. Wegen der unterschiedlichen Punktesysteme fließt er nicht als weiteres Punktemerkmal in den Optimierer ein; er dient als überprüfbarer Plausibilitäts- und Abdeckungstest.
+Für die aktuelle Bundesliga ergänzt `current-role-signals.json` einen lokal erzeugten LigaInsider-Snapshot: Topelf/Alternativen, direkte Spieler- und Vereinslinks sowie aktuelle Vereinsthemen. `current-availability-signals.json` trennt davon den aktuellen medizinischen Status. LigaInsider liefert Verletzungen, Aufbautraining, Sperren und Nichtberücksichtigung für die Bundesliga; die öffentlichen Transfermarkt-Ausfalllisten decken die 2. Bundesliga und 3. Liga ab. Beide Stände werden als statische Dateien geladen und mit `npm run generate:role-signals` aktualisiert.
 
 ## Vereins- und Spielerprofile
 

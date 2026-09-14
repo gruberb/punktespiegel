@@ -1,6 +1,6 @@
 {
   "name": "punktespiegel-dashboard",
-  "version": "1.22.0",
+  "version": "1.23.0",
   "type": "module",
   "workspaces": [
     "frontend"
@@ -9,15 +9,10 @@
     "node": ">=22"
   },
   "scripts": {
-    "generate:recommendations:v2": "uv run --frozen python -m recommender",
-    "generate:recommendations:interactive": "npm run generate:recommendations:v2",
-    "generate:role-signals": "uv run --frozen python scripts/fetch-current-role-signals.py",
+    "generate:role-signals": "python3 scripts/fetch-current-role-signals.py",
     "generate:club-profiles": "python3 scripts/fetch-club-profiles.py",
     "generate:club-profiles:backfill": "python3 scripts/fetch-club-profiles.py --all-seasons",
-    "generate:recommendations": "npm run generate:role-signals && npm run generate:recommendations:v2",
     "test:club-profiles": "python3 -m unittest scripts/fetch_club_profiles_test.py",
-    "test:recommender-baseline": "node --experimental-strip-types --test scripts/manager-model.test.ts",
-    "test:recommender-oracle": "uv run --frozen python -m unittest scripts/recommender_oracle_test.py",
     "dev": "npm run dev --workspace frontend",
     "build": "npm run build --workspace frontend",
     "typecheck": "npm run typecheck --workspace frontend"
