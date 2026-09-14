@@ -2,6 +2,24 @@
 
 Alle wesentlichen Änderungen an Punktespiegel werden in dieser Datei dokumentiert.
 
+## [1.22.0] – 2026-09-14
+
+### Geändert
+
+- Spieler und Topspieler sind in einer gemeinsamen Spieleransicht zusammengeführt. „Saison“ und „Historie“ wechseln die Statistikspalten und behalten Suche sowie Positions- und Vereinsfilter bei; frühere Topspieler-Links öffnen die historischen Spalten.
+- Sobald eine Saison Wertungen enthält, sortiert die Spieleransicht standardmäßig nach Saisonpunkten; davor nach Vorsaisonpunkten. Historische Durchschnittswerte und Preis-Leistung bleiben getrennt von aktuellen Saisonwerten erkennbar.
+- Spielerprofile öffnen zuerst „Punkte & Spiele“; „Profil & Karriere“ steht an zweiter Stelle.
+- Der primäre tägliche Datenimport startet um 11:00 UTC. Der zusätzliche Lauf um 14:45 Uhr deutscher Zeit bleibt bestehen.
+- Der lokale Empfehlungsgenerator berücksichtigt historische Classic-Kaderregeln, realisierte Spieltage und die Stärke der Interactive-Bank; Wintertransfers sind optional. Ein historischer Interactive-Optimierungs-Audit ergänzt die Bundesliga-Auswertung.
+
+### Entfernt
+
+- Veraltete Layout-Styles, ungenutzte Typen und Funktionen sowie doppelte Modell-Voreinstellungen. Die Konfiguration verwendet die mitgelieferte `defaults.json` mit optionalen lokalen Überschreibungen.
+
+### Bekannte Einschränkungen
+
+- Die gespeicherten Empfehlungen für die 2. Bundesliga und 3. Liga reichen noch bis Spieltag 1, während die Saisondateien bereits Spieltag 2 enthalten. Vier lokale Aktualitätsprüfungen schlagen deshalb fehl; Empfehlungen werden nicht mit der Website ausgeliefert.
+
 ## [1.21.2] – 2026-08-31
 
 ### Behoben

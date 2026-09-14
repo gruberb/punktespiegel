@@ -1,0 +1,1865 @@
+{
+  "schemaVersion": 1,
+  "kind": "historical-hindsight-optimizer-audit",
+  "leagues": [
+    "0001"
+  ],
+  "winterTransfersModeled": false,
+  "interactiveRules": "fixed 22-player roster, exact 3/7/7/5 quotas, budget ceiling, no club limit, one legal formation and eleven players per matchday",
+  "classicRules": "fixed 15-player roster and slots, season-correct 3-5-2/4-4-2 quotas, budget ceiling, three-player club limit, exact automatic reserve activation",
+  "interpretation": "Realized points are supplied to the solver as a hindsight upper bound. This proves optimization and constraint handling, not forecast skill. Historical price/selectability fields are not proven kickoff snapshots.",
+  "seasons": [
+    {
+      "seasonId": "se-k00012022",
+      "league": "0001",
+      "season": "2022/23",
+      "artifactMetadataAtDecisionTime": false,
+      "classicHistoricalScoringComparable": false,
+      "interactiveWinnerPoints": null,
+      "interactiveOracle": {
+        "mode": "interactive",
+        "formations": {
+          "1": "4-3-3",
+          "2": "3-4-3",
+          "3": "4-4-2",
+          "4": "4-3-3",
+          "5": "4-3-3",
+          "6": "3-4-3",
+          "7": "3-4-3",
+          "8": "3-4-3",
+          "9": "5-4-1",
+          "10": "3-4-3",
+          "11": "3-5-2",
+          "12": "5-3-2",
+          "13": "4-4-2",
+          "14": "3-5-2",
+          "15": "3-4-3",
+          "16": "5-4-1",
+          "17": "4-3-3",
+          "18": "4-3-3",
+          "19": "4-4-2",
+          "20": "5-4-1",
+          "21": "4-4-2",
+          "22": "4-4-2",
+          "23": "4-3-3",
+          "24": "5-3-2",
+          "25": "4-3-3",
+          "26": "5-3-2",
+          "27": "5-3-2",
+          "28": "4-4-2",
+          "29": "5-3-2",
+          "30": "5-3-2",
+          "31": "3-5-2",
+          "32": "3-5-2",
+          "33": "4-5-1",
+          "34": "5-4-1"
+        },
+        "realized_points": 3597,
+        "spent_m": 42.5,
+        "solver_status": "Optimal",
+        "mip_gap": 0.0,
+        "optimal_proven": true,
+        "goalkeepers_from_same_team": false,
+        "max_field_players_from_team": null,
+        "players": [
+          {
+            "id": "pl-k00043520",
+            "name": "Janis Blaswich",
+            "position": "GK",
+            "team": "RB Leipzig",
+            "priceM": 0.7,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00058003",
+            "name": "Mitchell Weiser",
+            "position": "DEF",
+            "team": "Werder Bremen",
+            "priceM": 1.2,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00063799",
+            "name": "Michael Gregoritsch",
+            "position": "FWD",
+            "team": "SC Freiburg",
+            "priceM": 2.2,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00066523",
+            "name": "Florian Kainz",
+            "position": "MID",
+            "team": "1. FC Köln",
+            "priceM": 2.4,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00066530",
+            "name": "Niclas Füllkrug",
+            "position": "FWD",
+            "team": "Werder Bremen",
+            "priceM": 2.2,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00067514",
+            "name": "Kevin Stöger",
+            "position": "MID",
+            "team": "VfL Bochum",
+            "priceM": 1.6,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00070990",
+            "name": "Matthias Ginter",
+            "position": "DEF",
+            "team": "SC Freiburg",
+            "priceM": 2.8,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00075651",
+            "name": "Frederik Rönnow",
+            "position": "GK",
+            "team": "1. FC Union Berlin",
+            "priceM": 2.3,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00083988",
+            "name": "Marius Bülter",
+            "position": "FWD",
+            "team": "FC Schalke 04",
+            "priceM": 1.7,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00085382",
+            "name": "Jeff Chabot",
+            "position": "DEF",
+            "team": "1. FC Köln",
+            "priceM": 1.2,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00085871",
+            "name": "Lennart Grill",
+            "position": "GK",
+            "team": "1. FC Union Berlin",
+            "priceM": 0.7,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00087260",
+            "name": "Sheraldo Becker",
+            "position": "FWD",
+            "team": "1. FC Union Berlin",
+            "priceM": 2.4,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00087694",
+            "name": "Benjamin Pavard",
+            "position": "DEF",
+            "team": "Bayern München",
+            "priceM": 2.6,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00087823",
+            "name": "Jae-Sung Lee",
+            "position": "MID",
+            "team": "1. FSV Mainz 05",
+            "priceM": 2.0,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00089441",
+            "name": "Lucas Tousart",
+            "position": "MID",
+            "team": "Hertha BSC",
+            "priceM": 1.6,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00089655",
+            "name": "Ellyes Skhiri",
+            "position": "MID",
+            "team": "1. FC Köln",
+            "priceM": 2.6,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00092237",
+            "name": "Danilho Doekhi",
+            "position": "DEF",
+            "team": "1. FC Union Berlin",
+            "priceM": 1.8,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00094443",
+            "name": "Christopher Antwi-Adjei",
+            "position": "MID",
+            "team": "VfL Bochum",
+            "priceM": 1.4,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00098698",
+            "name": "Randal Kolo Muani",
+            "position": "FWD",
+            "team": "Eintracht Frankfurt",
+            "priceM": 2.6,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00103754",
+            "name": "Dominik Szoboszlai",
+            "position": "MID",
+            "team": "RB Leipzig",
+            "priceM": 2.8,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00121927",
+            "name": "Jeremie Frimpong",
+            "position": "DEF",
+            "team": "Bayer 04 Leverkusen",
+            "priceM": 2.5,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00139304",
+            "name": "Micky van de Ven",
+            "position": "DEF",
+            "team": "VfL Wolfsburg",
+            "priceM": 1.2,
+            "role": "roster"
+          }
+        ]
+      },
+      "interactiveInsuredDiversifiedOracle": {
+        "mode": "interactive",
+        "formations": {
+          "1": "3-4-3",
+          "2": "3-4-3",
+          "3": "3-4-3",
+          "4": "4-3-3",
+          "5": "4-3-3",
+          "6": "3-5-2",
+          "7": "3-4-3",
+          "8": "3-4-3",
+          "9": "5-3-2",
+          "10": "3-5-2",
+          "11": "3-5-2",
+          "12": "5-3-2",
+          "13": "5-3-2",
+          "14": "3-5-2",
+          "15": "4-5-1",
+          "16": "5-4-1",
+          "17": "3-4-3",
+          "18": "3-4-3",
+          "19": "3-4-3",
+          "20": "5-4-1",
+          "21": "4-5-1",
+          "22": "3-4-3",
+          "23": "4-3-3",
+          "24": "4-3-3",
+          "25": "4-3-3",
+          "26": "5-3-2",
+          "27": "5-3-2",
+          "28": "4-4-2",
+          "29": "5-3-2",
+          "30": "5-3-2",
+          "31": "3-5-2",
+          "32": "3-5-2",
+          "33": "4-4-2",
+          "34": "4-5-1"
+        },
+        "realized_points": 3558,
+        "spent_m": 42.5,
+        "solver_status": "Optimal",
+        "mip_gap": 0.0,
+        "optimal_proven": true,
+        "goalkeepers_from_same_team": true,
+        "max_field_players_from_team": 3,
+        "players": [
+          {
+            "id": "pl-k00057247",
+            "name": "Marvin Ducksch",
+            "position": "FWD",
+            "team": "Werder Bremen",
+            "priceM": 2.4,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00058003",
+            "name": "Mitchell Weiser",
+            "position": "DEF",
+            "team": "Werder Bremen",
+            "priceM": 1.2,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00066523",
+            "name": "Florian Kainz",
+            "position": "MID",
+            "team": "1. FC Köln",
+            "priceM": 2.4,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00066530",
+            "name": "Niclas Füllkrug",
+            "position": "FWD",
+            "team": "Werder Bremen",
+            "priceM": 2.2,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00067514",
+            "name": "Kevin Stöger",
+            "position": "MID",
+            "team": "VfL Bochum",
+            "priceM": 1.6,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00070990",
+            "name": "Matthias Ginter",
+            "position": "DEF",
+            "team": "SC Freiburg",
+            "priceM": 2.8,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00074868",
+            "name": "Jakob Busk",
+            "position": "GK",
+            "team": "1. FC Union Berlin",
+            "priceM": 0.5,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00075651",
+            "name": "Frederik Rönnow",
+            "position": "GK",
+            "team": "1. FC Union Berlin",
+            "priceM": 2.3,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00083988",
+            "name": "Marius Bülter",
+            "position": "FWD",
+            "team": "FC Schalke 04",
+            "priceM": 1.7,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00085382",
+            "name": "Jeff Chabot",
+            "position": "DEF",
+            "team": "1. FC Köln",
+            "priceM": 1.2,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00085871",
+            "name": "Lennart Grill",
+            "position": "GK",
+            "team": "1. FC Union Berlin",
+            "priceM": 0.7,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00087260",
+            "name": "Sheraldo Becker",
+            "position": "FWD",
+            "team": "1. FC Union Berlin",
+            "priceM": 2.4,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00087694",
+            "name": "Benjamin Pavard",
+            "position": "DEF",
+            "team": "Bayern München",
+            "priceM": 2.6,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00087823",
+            "name": "Jae-Sung Lee",
+            "position": "MID",
+            "team": "1. FSV Mainz 05",
+            "priceM": 2.0,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00089441",
+            "name": "Lucas Tousart",
+            "position": "MID",
+            "team": "Hertha BSC",
+            "priceM": 1.6,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00089655",
+            "name": "Ellyes Skhiri",
+            "position": "MID",
+            "team": "1. FC Köln",
+            "priceM": 2.6,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00092237",
+            "name": "Danilho Doekhi",
+            "position": "DEF",
+            "team": "1. FC Union Berlin",
+            "priceM": 1.8,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00094443",
+            "name": "Christopher Antwi-Adjei",
+            "position": "MID",
+            "team": "VfL Bochum",
+            "priceM": 1.4,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00098698",
+            "name": "Randal Kolo Muani",
+            "position": "FWD",
+            "team": "Eintracht Frankfurt",
+            "priceM": 2.6,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00103754",
+            "name": "Dominik Szoboszlai",
+            "position": "MID",
+            "team": "RB Leipzig",
+            "priceM": 2.8,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00121927",
+            "name": "Jeremie Frimpong",
+            "position": "DEF",
+            "team": "Bayer 04 Leverkusen",
+            "priceM": 2.5,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00139304",
+            "name": "Micky van de Ven",
+            "position": "DEF",
+            "team": "VfL Wolfsburg",
+            "priceM": 1.2,
+            "role": "roster"
+          }
+        ]
+      },
+      "interactiveOracleMinusWinner": null,
+      "interactiveInsuredDiversifiedOracleMinusWinner": null,
+      "insuranceOpportunityCost": 39,
+      "classicOracle": {
+        "status": "not-run-on-full-pool",
+        "reason": "exact automatic-reserve interactions leave a wide MIP bound on the full historical player pool; Classic is constraint-checked and exactly rescored, but is not mislabeled as a proven global hindsight optimum"
+      }
+    },
+    {
+      "seasonId": "se-k00012023",
+      "league": "0001",
+      "season": "2023/24",
+      "artifactMetadataAtDecisionTime": false,
+      "classicHistoricalScoringComparable": false,
+      "interactiveWinnerPoints": null,
+      "interactiveOracle": {
+        "mode": "interactive",
+        "formations": {
+          "1": "4-4-2",
+          "2": "4-3-3",
+          "3": "3-5-2",
+          "4": "3-4-3",
+          "5": "3-5-2",
+          "6": "3-4-3",
+          "7": "4-4-2",
+          "8": "4-3-3",
+          "9": "3-4-3",
+          "10": "4-4-2",
+          "11": "3-4-3",
+          "12": "4-4-2",
+          "13": "4-3-3",
+          "14": "3-4-3",
+          "15": "5-4-1",
+          "16": "4-3-3",
+          "17": "3-5-2",
+          "18": "4-4-2",
+          "19": "3-4-3",
+          "20": "4-3-3",
+          "21": "4-4-2",
+          "22": "4-3-3",
+          "23": "3-5-2",
+          "24": "3-4-3",
+          "25": "3-5-2",
+          "26": "3-4-3",
+          "27": "4-3-3",
+          "28": "5-3-2",
+          "29": "4-3-3",
+          "30": "4-3-3",
+          "31": "5-3-2",
+          "32": "4-4-2",
+          "33": "4-3-3",
+          "34": "4-3-3"
+        },
+        "realized_points": 3862,
+        "spent_m": 42.3,
+        "solver_status": "Optimal",
+        "mip_gap": 0.0,
+        "optimal_proven": true,
+        "goalkeepers_from_same_team": false,
+        "max_field_players_from_team": null,
+        "players": [
+          {
+            "id": "pl-k00070592",
+            "name": "Jonathan Tah",
+            "position": "DEF",
+            "team": "Bayer 04 Leverkusen",
+            "priceM": 3.0,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00076053",
+            "name": "Michael Zetterer",
+            "position": "GK",
+            "team": "Werder Bremen",
+            "priceM": 0.8,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00079199",
+            "name": "Moritz Nicolas",
+            "position": "GK",
+            "team": "Bor. Mönchengladbach",
+            "priceM": 0.5,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00079813",
+            "name": "Maximilian Mittelstädt",
+            "position": "DEF",
+            "team": "VfB Stuttgart",
+            "priceM": 1.3,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00080351",
+            "name": "Chris Führich",
+            "position": "MID",
+            "team": "VfB Stuttgart",
+            "priceM": 2.2,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00081465",
+            "name": "Alejandro Grimaldo",
+            "position": "DEF",
+            "team": "Bayer 04 Leverkusen",
+            "priceM": 3.0,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00082727",
+            "name": "Robin Hack",
+            "position": "MID",
+            "team": "Bor. Mönchengladbach",
+            "priceM": 1.8,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00086138",
+            "name": "Niklas Beste",
+            "position": "MID",
+            "team": "1. FC Heidenheim",
+            "priceM": 2.2,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00087885",
+            "name": "Deniz Undav",
+            "position": "FWD",
+            "team": "VfB Stuttgart",
+            "priceM": 2.2,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00089442",
+            "name": "Serhou Guirassy",
+            "position": "FWD",
+            "team": "VfB Stuttgart",
+            "priceM": 3.0,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00094959",
+            "name": "Romano Schmid",
+            "position": "MID",
+            "team": "Werder Bremen",
+            "priceM": 1.6,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00101460",
+            "name": "Keven Schlotterbeck",
+            "position": "DEF",
+            "team": "VfL Bochum",
+            "priceM": 1.2,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00103878",
+            "name": "Omar Marmoush",
+            "position": "FWD",
+            "team": "Eintracht Frankfurt",
+            "priceM": 1.8,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00104317",
+            "name": "Angelo Stiller",
+            "position": "MID",
+            "team": "VfB Stuttgart",
+            "priceM": 1.6,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00104895",
+            "name": "Rocco Reitz",
+            "position": "MID",
+            "team": "Bor. Mönchengladbach",
+            "priceM": 0.7,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00105787",
+            "name": "Sepp van den Berg",
+            "position": "DEF",
+            "team": "1. FSV Mainz 05",
+            "priceM": 1.6,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00107693",
+            "name": "Florian Wirtz",
+            "position": "MID",
+            "team": "Bayer 04 Leverkusen",
+            "priceM": 5.5,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00110717",
+            "name": "Lois Openda",
+            "position": "FWD",
+            "team": "RB Leipzig",
+            "priceM": 4.3,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00114736",
+            "name": "Maximilian Beier",
+            "position": "FWD",
+            "team": "TSG Hoffenheim",
+            "priceM": 1.5,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00120081",
+            "name": "Odilon Kossounou",
+            "position": "DEF",
+            "team": "Bayer 04 Leverkusen",
+            "priceM": 1.9,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00140563",
+            "name": "Max Finkgräfe",
+            "position": "DEF",
+            "team": "1. FC Köln",
+            "priceM": 0.5,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00149738",
+            "name": "Hugo Rölleke",
+            "position": "GK",
+            "team": "VfL Bochum",
+            "priceM": 0.1,
+            "role": "roster"
+          }
+        ]
+      },
+      "interactiveInsuredDiversifiedOracle": {
+        "mode": "interactive",
+        "formations": {
+          "1": "4-4-2",
+          "2": "4-3-3",
+          "3": "3-4-3",
+          "4": "3-5-2",
+          "5": "3-4-3",
+          "6": "4-3-3",
+          "7": "4-3-3",
+          "8": "4-3-3",
+          "9": "3-4-3",
+          "10": "5-3-2",
+          "11": "4-3-3",
+          "12": "4-4-2",
+          "13": "4-3-3",
+          "14": "3-4-3",
+          "15": "5-4-1",
+          "16": "5-3-2",
+          "17": "4-4-2",
+          "18": "5-3-2",
+          "19": "4-3-3",
+          "20": "4-3-3",
+          "21": "4-3-3",
+          "22": "5-3-2",
+          "23": "3-4-3",
+          "24": "4-3-3",
+          "25": "3-4-3",
+          "26": "4-4-2",
+          "27": "4-3-3",
+          "28": "5-3-2",
+          "29": "5-3-2",
+          "30": "3-4-3",
+          "31": "4-5-1",
+          "32": "5-4-1",
+          "33": "4-3-3",
+          "34": "4-3-3"
+        },
+        "realized_points": 3757,
+        "spent_m": 42.5,
+        "solver_status": "Optimal",
+        "mip_gap": 0.0,
+        "optimal_proven": true,
+        "goalkeepers_from_same_team": true,
+        "max_field_players_from_team": 3,
+        "players": [
+          {
+            "id": "pl-k00064802",
+            "name": "Kevin Müller",
+            "position": "GK",
+            "team": "1. FC Heidenheim",
+            "priceM": 2.3,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00067514",
+            "name": "Kevin Stöger",
+            "position": "MID",
+            "team": "VfL Bochum",
+            "priceM": 2.6,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00070592",
+            "name": "Jonathan Tah",
+            "position": "DEF",
+            "team": "Bayer 04 Leverkusen",
+            "priceM": 3.0,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00073704",
+            "name": "Patrick Mainka",
+            "position": "DEF",
+            "team": "1. FC Heidenheim",
+            "priceM": 1.8,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00080351",
+            "name": "Chris Führich",
+            "position": "MID",
+            "team": "VfB Stuttgart",
+            "priceM": 2.2,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00081465",
+            "name": "Alejandro Grimaldo",
+            "position": "DEF",
+            "team": "Bayer 04 Leverkusen",
+            "priceM": 3.0,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00082727",
+            "name": "Robin Hack",
+            "position": "MID",
+            "team": "Bor. Mönchengladbach",
+            "priceM": 1.8,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00086138",
+            "name": "Niklas Beste",
+            "position": "MID",
+            "team": "1. FC Heidenheim",
+            "priceM": 2.2,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00087705",
+            "name": "Ermedin Demirovic",
+            "position": "FWD",
+            "team": "FC Augsburg",
+            "priceM": 2.8,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00087885",
+            "name": "Deniz Undav",
+            "position": "FWD",
+            "team": "VfB Stuttgart",
+            "priceM": 2.2,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00088061",
+            "name": "Tim Skarke",
+            "position": "MID",
+            "team": "SV Darmstadt 98",
+            "priceM": 1.4,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00089442",
+            "name": "Serhou Guirassy",
+            "position": "FWD",
+            "team": "VfB Stuttgart",
+            "priceM": 3.0,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00101460",
+            "name": "Keven Schlotterbeck",
+            "position": "DEF",
+            "team": "VfL Bochum",
+            "priceM": 1.2,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00103878",
+            "name": "Omar Marmoush",
+            "position": "FWD",
+            "team": "Eintracht Frankfurt",
+            "priceM": 1.8,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00104895",
+            "name": "Rocco Reitz",
+            "position": "MID",
+            "team": "Bor. Mönchengladbach",
+            "priceM": 0.7,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00105787",
+            "name": "Sepp van den Berg",
+            "position": "DEF",
+            "team": "1. FSV Mainz 05",
+            "priceM": 1.6,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00114736",
+            "name": "Maximilian Beier",
+            "position": "FWD",
+            "team": "TSG Hoffenheim",
+            "priceM": 1.5,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00116548",
+            "name": "Paul Tschernuth",
+            "position": "GK",
+            "team": "1. FC Heidenheim",
+            "priceM": 0.5,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00120081",
+            "name": "Odilon Kossounou",
+            "position": "DEF",
+            "team": "Bayer 04 Leverkusen",
+            "priceM": 1.9,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00131111",
+            "name": "Xavi",
+            "position": "MID",
+            "team": "RB Leipzig",
+            "priceM": 4.0,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00132204",
+            "name": "Frank Feller",
+            "position": "GK",
+            "team": "1. FC Heidenheim",
+            "priceM": 0.5,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00140563",
+            "name": "Max Finkgräfe",
+            "position": "DEF",
+            "team": "1. FC Köln",
+            "priceM": 0.5,
+            "role": "roster"
+          }
+        ]
+      },
+      "interactiveOracleMinusWinner": null,
+      "interactiveInsuredDiversifiedOracleMinusWinner": null,
+      "insuranceOpportunityCost": 105,
+      "classicOracle": {
+        "status": "not-run-on-full-pool",
+        "reason": "exact automatic-reserve interactions leave a wide MIP bound on the full historical player pool; Classic is constraint-checked and exactly rescored, but is not mislabeled as a proven global hindsight optimum"
+      }
+    },
+    {
+      "seasonId": "se-k00012024",
+      "league": "0001",
+      "season": "2024/25",
+      "artifactMetadataAtDecisionTime": false,
+      "classicHistoricalScoringComparable": true,
+      "interactiveWinnerPoints": 2511,
+      "interactiveOracle": {
+        "mode": "interactive",
+        "formations": {
+          "1": "4-4-2",
+          "2": "4-4-2",
+          "3": "3-5-2",
+          "4": "3-4-3",
+          "5": "3-4-3",
+          "6": "3-4-3",
+          "7": "4-3-3",
+          "8": "3-5-2",
+          "9": "3-4-3",
+          "10": "3-5-2",
+          "11": "4-5-1",
+          "12": "3-4-3",
+          "13": "3-5-2",
+          "14": "4-4-2",
+          "15": "4-5-1",
+          "16": "5-3-2",
+          "17": "5-3-2",
+          "18": "3-4-3",
+          "19": "3-4-3",
+          "20": "3-4-3",
+          "21": "3-5-2",
+          "22": "4-3-3",
+          "23": "3-5-2",
+          "24": "3-5-2",
+          "25": "3-4-3",
+          "26": "4-4-2",
+          "27": "5-3-2",
+          "28": "3-4-3",
+          "29": "4-5-1",
+          "30": "4-4-2",
+          "31": "4-3-3",
+          "32": "3-5-2",
+          "33": "3-4-3",
+          "34": "3-4-3"
+        },
+        "realized_points": 3644,
+        "spent_m": 42.5,
+        "solver_status": "Optimal",
+        "mip_gap": 0.0,
+        "optimal_proven": true,
+        "goalkeepers_from_same_team": false,
+        "max_field_players_from_team": null,
+        "players": [
+          {
+            "id": "pl-k00058003",
+            "name": "Mitchell Weiser",
+            "position": "DEF",
+            "team": "Werder Bremen",
+            "priceM": 3.0,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00065503",
+            "name": "Steven Skrzybski",
+            "position": "FWD",
+            "team": "Holstein Kiel",
+            "priceM": 0.8,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00075608",
+            "name": "Finn Dahmen",
+            "position": "GK",
+            "team": "FC Augsburg",
+            "priceM": 1.2,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00079078",
+            "name": "Nikola Vasilj",
+            "position": "GK",
+            "team": "FC St. Pauli",
+            "priceM": 2.2,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00080083",
+            "name": "Nadiem Amiri",
+            "position": "MID",
+            "team": "1. FSV Mainz 05",
+            "priceM": 3.5,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00082966",
+            "name": "Matus Bero",
+            "position": "MID",
+            "team": "VfL Bochum",
+            "priceM": 0.8,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00096680",
+            "name": "Rasmus Kristensen",
+            "position": "DEF",
+            "team": "Eintracht Frankfurt",
+            "priceM": 2.0,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00097452",
+            "name": "Alexis Claude-Maurice",
+            "position": "MID",
+            "team": "FC Augsburg",
+            "priceM": 1.6,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00100591",
+            "name": "Paul Nebel",
+            "position": "MID",
+            "team": "1. FSV Mainz 05",
+            "priceM": 1.8,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00101451",
+            "name": "Benedict Hollerbach",
+            "position": "FWD",
+            "team": "1. FC Union Berlin",
+            "priceM": 1.8,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00103878",
+            "name": "Omar Marmoush",
+            "position": "FWD",
+            "team": "Eintracht Frankfurt",
+            "priceM": 1.8,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00106087",
+            "name": "Ko Itakura",
+            "position": "DEF",
+            "team": "Bor. Mönchengladbach",
+            "priceM": 2.0,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00106698",
+            "name": "Nick Woltemade",
+            "position": "FWD",
+            "team": "VfB Stuttgart",
+            "priceM": 1.8,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00107693",
+            "name": "Florian Wirtz",
+            "position": "MID",
+            "team": "Bayer 04 Leverkusen",
+            "priceM": 5.5,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00111919",
+            "name": "Max Rosenfelder",
+            "position": "DEF",
+            "team": "SC Freiburg",
+            "priceM": 0.5,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00117298",
+            "name": "Jens Stage",
+            "position": "MID",
+            "team": "Werder Bremen",
+            "priceM": 2.0,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00125181",
+            "name": "Michael Olise",
+            "position": "MID",
+            "team": "Bayern München",
+            "priceM": 5.0,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00129671",
+            "name": "Nathaniel Brown",
+            "position": "DEF",
+            "team": "Eintracht Frankfurt",
+            "priceM": 1.4,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00130566",
+            "name": "Frans Krätzig",
+            "position": "DEF",
+            "team": "1. FC Heidenheim",
+            "priceM": 0.5,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00132205",
+            "name": "Lukas Ullrich",
+            "position": "DEF",
+            "team": "Bor. Mönchengladbach",
+            "priceM": 0.6,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00139302",
+            "name": "Mohammed Amoura",
+            "position": "FWD",
+            "team": "VfL Wolfsburg",
+            "priceM": 2.2,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00155136",
+            "name": "Kaua Santos",
+            "position": "GK",
+            "team": "Eintracht Frankfurt",
+            "priceM": 0.5,
+            "role": "roster"
+          }
+        ]
+      },
+      "interactiveInsuredDiversifiedOracle": {
+        "mode": "interactive",
+        "formations": {
+          "1": "4-5-1",
+          "2": "4-5-1",
+          "3": "3-5-2",
+          "4": "4-3-3",
+          "5": "3-4-3",
+          "6": "3-5-2",
+          "7": "4-3-3",
+          "8": "4-5-1",
+          "9": "3-4-3",
+          "10": "3-5-2",
+          "11": "4-5-1",
+          "12": "3-5-2",
+          "13": "3-5-2",
+          "14": "4-4-2",
+          "15": "3-5-2",
+          "16": "5-3-2",
+          "17": "4-3-3",
+          "18": "3-5-2",
+          "19": "4-4-2",
+          "20": "3-4-3",
+          "21": "4-5-1",
+          "22": "4-4-2",
+          "23": "3-5-2",
+          "24": "3-5-2",
+          "25": "3-4-3",
+          "26": "5-4-1",
+          "27": "5-4-1",
+          "28": "3-4-3",
+          "29": "4-5-1",
+          "30": "5-4-1",
+          "31": "4-3-3",
+          "32": "3-4-3",
+          "33": "3-4-3",
+          "34": "4-4-2"
+        },
+        "realized_points": 3617,
+        "spent_m": 42.5,
+        "solver_status": "Optimal",
+        "mip_gap": 0.0,
+        "optimal_proven": true,
+        "goalkeepers_from_same_team": true,
+        "max_field_players_from_team": 3,
+        "players": [
+          {
+            "id": "pl-k00039186",
+            "name": "Sascha Burchert",
+            "position": "GK",
+            "team": "FC St. Pauli",
+            "priceM": 0.3,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00058003",
+            "name": "Mitchell Weiser",
+            "position": "DEF",
+            "team": "Werder Bremen",
+            "priceM": 3.0,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00063777",
+            "name": "Lukas Kübler",
+            "position": "DEF",
+            "team": "SC Freiburg",
+            "priceM": 1.7,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00065503",
+            "name": "Steven Skrzybski",
+            "position": "FWD",
+            "team": "Holstein Kiel",
+            "priceM": 0.8,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00079078",
+            "name": "Nikola Vasilj",
+            "position": "GK",
+            "team": "FC St. Pauli",
+            "priceM": 2.2,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00080083",
+            "name": "Nadiem Amiri",
+            "position": "MID",
+            "team": "1. FSV Mainz 05",
+            "priceM": 3.5,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00082966",
+            "name": "Matus Bero",
+            "position": "MID",
+            "team": "VfL Bochum",
+            "priceM": 0.8,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00089775",
+            "name": "Sören Ahlers",
+            "position": "GK",
+            "team": "FC St. Pauli",
+            "priceM": 0.1,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00096680",
+            "name": "Rasmus Kristensen",
+            "position": "DEF",
+            "team": "Eintracht Frankfurt",
+            "priceM": 2.0,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00097452",
+            "name": "Alexis Claude-Maurice",
+            "position": "MID",
+            "team": "FC Augsburg",
+            "priceM": 1.6,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00100591",
+            "name": "Paul Nebel",
+            "position": "MID",
+            "team": "1. FSV Mainz 05",
+            "priceM": 1.8,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00103878",
+            "name": "Omar Marmoush",
+            "position": "FWD",
+            "team": "Eintracht Frankfurt",
+            "priceM": 1.8,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00106087",
+            "name": "Ko Itakura",
+            "position": "DEF",
+            "team": "Bor. Mönchengladbach",
+            "priceM": 2.0,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00106698",
+            "name": "Nick Woltemade",
+            "position": "FWD",
+            "team": "VfB Stuttgart",
+            "priceM": 1.8,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00107693",
+            "name": "Florian Wirtz",
+            "position": "MID",
+            "team": "Bayer 04 Leverkusen",
+            "priceM": 5.5,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00116706",
+            "name": "Chrislain Matsima",
+            "position": "DEF",
+            "team": "FC Augsburg",
+            "priceM": 1.7,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00117298",
+            "name": "Jens Stage",
+            "position": "MID",
+            "team": "Werder Bremen",
+            "priceM": 2.0,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00125181",
+            "name": "Michael Olise",
+            "position": "MID",
+            "team": "Bayern München",
+            "priceM": 5.0,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00129671",
+            "name": "Nathaniel Brown",
+            "position": "DEF",
+            "team": "Eintracht Frankfurt",
+            "priceM": 1.4,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00130566",
+            "name": "Frans Krätzig",
+            "position": "DEF",
+            "team": "1. FC Heidenheim",
+            "priceM": 0.5,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00139302",
+            "name": "Mohammed Amoura",
+            "position": "FWD",
+            "team": "VfL Wolfsburg",
+            "priceM": 2.2,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00141224",
+            "name": "Alexander Bernhardsson",
+            "position": "FWD",
+            "team": "Holstein Kiel",
+            "priceM": 0.8,
+            "role": "roster"
+          }
+        ]
+      },
+      "interactiveOracleMinusWinner": 1133,
+      "interactiveInsuredDiversifiedOracleMinusWinner": 1106,
+      "insuranceOpportunityCost": 27,
+      "classicOracle": {
+        "status": "not-run-on-full-pool",
+        "reason": "exact automatic-reserve interactions leave a wide MIP bound on the full historical player pool; Classic is constraint-checked and exactly rescored, but is not mislabeled as a proven global hindsight optimum"
+      }
+    },
+    {
+      "seasonId": "se-k00012025",
+      "league": "0001",
+      "season": "2025/26",
+      "artifactMetadataAtDecisionTime": false,
+      "classicHistoricalScoringComparable": true,
+      "interactiveWinnerPoints": 2914,
+      "interactiveOracle": {
+        "mode": "interactive",
+        "formations": {
+          "1": "3-4-3",
+          "2": "3-5-2",
+          "3": "3-4-3",
+          "4": "5-3-2",
+          "5": "5-4-1",
+          "6": "4-4-2",
+          "7": "4-5-1",
+          "8": "3-4-3",
+          "9": "4-4-2",
+          "10": "5-3-2",
+          "11": "3-5-2",
+          "12": "5-3-2",
+          "13": "5-3-2",
+          "14": "4-3-3",
+          "15": "5-4-1",
+          "16": "5-3-2",
+          "17": "3-5-2",
+          "18": "5-3-2",
+          "19": "4-3-3",
+          "20": "4-3-3",
+          "21": "4-3-3",
+          "22": "4-3-3",
+          "23": "3-4-3",
+          "24": "4-3-3",
+          "25": "4-3-3",
+          "26": "4-4-2",
+          "27": "3-4-3",
+          "28": "5-3-2",
+          "29": "5-3-2",
+          "30": "5-4-1",
+          "31": "3-4-3",
+          "32": "3-5-2",
+          "33": "4-4-2",
+          "34": "5-3-2"
+        },
+        "realized_points": 3792,
+        "spent_m": 42.5,
+        "solver_status": "Optimal",
+        "mip_gap": 0.0,
+        "optimal_proven": true,
+        "goalkeepers_from_same_team": false,
+        "max_field_players_from_team": null,
+        "players": [
+          {
+            "id": "pl-k00054360",
+            "name": "Daniel Batz",
+            "position": "GK",
+            "team": "1. FSV Mainz 05",
+            "priceM": 0.5,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00059041",
+            "name": "Andrej Kramaric",
+            "position": "MID",
+            "team": "TSG Hoffenheim",
+            "priceM": 3.8,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00070990",
+            "name": "Matthias Ginter",
+            "position": "DEF",
+            "team": "SC Freiburg",
+            "priceM": 3.6,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00073704",
+            "name": "Patrick Mainka",
+            "position": "DEF",
+            "team": "1. FC Heidenheim",
+            "priceM": 1.0,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00077817",
+            "name": "Hauke Wahl",
+            "position": "DEF",
+            "team": "FC St. Pauli",
+            "priceM": 0.9,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00081053",
+            "name": "Vladimir Coufal",
+            "position": "DEF",
+            "team": "TSG Hoffenheim",
+            "priceM": 1.8,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00081465",
+            "name": "Alejandro Grimaldo",
+            "position": "DEF",
+            "team": "Bayer 04 Leverkusen",
+            "priceM": 3.8,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00087292",
+            "name": "Kevin Diks",
+            "position": "DEF",
+            "team": "Bor. Mönchengladbach",
+            "priceM": 1.8,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00087885",
+            "name": "Deniz Undav",
+            "position": "FWD",
+            "team": "VfB Stuttgart",
+            "priceM": 4.0,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00088240",
+            "name": "Aleix Garcia",
+            "position": "MID",
+            "team": "Bayer 04 Leverkusen",
+            "priceM": 2.3,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00097893",
+            "name": "Diant Ramaj",
+            "position": "GK",
+            "team": "1. FC Heidenheim",
+            "priceM": 1.0,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00102800",
+            "name": "Christoph Baumgartner",
+            "position": "MID",
+            "team": "RB Leipzig",
+            "priceM": 2.3,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00102956",
+            "name": "Kamil Grabara",
+            "position": "GK",
+            "team": "VfL Wolfsburg",
+            "priceM": 1.0,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00103527",
+            "name": "Danel Sinani",
+            "position": "FWD",
+            "team": "FC St. Pauli",
+            "priceM": 0.8,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00107842",
+            "name": "Wouter Burger",
+            "position": "MID",
+            "team": "TSG Hoffenheim",
+            "priceM": 2.0,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00119669",
+            "name": "Fisnik Asllani",
+            "position": "FWD",
+            "team": "TSG Hoffenheim",
+            "priceM": 2.4,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00125604",
+            "name": "Jakub Kaminski",
+            "position": "MID",
+            "team": "1. FC Köln",
+            "priceM": 1.6,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00139302",
+            "name": "Mohammed Amoura",
+            "position": "FWD",
+            "team": "VfL Wolfsburg",
+            "priceM": 1.0,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00146292",
+            "name": "Can Uzun",
+            "position": "MID",
+            "team": "Eintracht Frankfurt",
+            "priceM": 2.0,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00155823",
+            "name": "Luka Vuskovic",
+            "position": "DEF",
+            "team": "Hamburger SV",
+            "priceM": 1.6,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00159629",
+            "name": "Said El Mala",
+            "position": "MID",
+            "team": "1. FC Köln",
+            "priceM": 1.7,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00176299",
+            "name": "Yan Diomande",
+            "position": "FWD",
+            "team": "RB Leipzig",
+            "priceM": 1.6,
+            "role": "roster"
+          }
+        ]
+      },
+      "interactiveInsuredDiversifiedOracle": {
+        "mode": "interactive",
+        "formations": {
+          "1": "4-3-3",
+          "2": "3-5-2",
+          "3": "3-4-3",
+          "4": "5-3-2",
+          "5": "5-4-1",
+          "6": "4-4-2",
+          "7": "4-5-1",
+          "8": "3-4-3",
+          "9": "5-3-2",
+          "10": "5-3-2",
+          "11": "4-4-2",
+          "12": "5-3-2",
+          "13": "5-3-2",
+          "14": "3-4-3",
+          "15": "5-4-1",
+          "16": "5-3-2",
+          "17": "3-5-2",
+          "18": "5-3-2",
+          "19": "4-3-3",
+          "20": "5-3-2",
+          "21": "4-3-3",
+          "22": "4-3-3",
+          "23": "3-4-3",
+          "24": "3-4-3",
+          "25": "3-4-3",
+          "26": "5-3-2",
+          "27": "3-4-3",
+          "28": "5-3-2",
+          "29": "4-4-2",
+          "30": "5-4-1",
+          "31": "3-4-3",
+          "32": "3-5-2",
+          "33": "4-4-2",
+          "34": "5-3-2"
+        },
+        "realized_points": 3721,
+        "spent_m": 42.5,
+        "solver_status": "Optimal",
+        "mip_gap": 0.0,
+        "optimal_proven": true,
+        "goalkeepers_from_same_team": true,
+        "max_field_players_from_team": 3,
+        "players": [
+          {
+            "id": "pl-k00059041",
+            "name": "Andrej Kramaric",
+            "position": "MID",
+            "team": "TSG Hoffenheim",
+            "priceM": 3.8,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00070990",
+            "name": "Matthias Ginter",
+            "position": "DEF",
+            "team": "SC Freiburg",
+            "priceM": 3.6,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00073704",
+            "name": "Patrick Mainka",
+            "position": "DEF",
+            "team": "1. FC Heidenheim",
+            "priceM": 1.0,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00081053",
+            "name": "Vladimir Coufal",
+            "position": "DEF",
+            "team": "TSG Hoffenheim",
+            "priceM": 1.8,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00081465",
+            "name": "Alejandro Grimaldo",
+            "position": "DEF",
+            "team": "Bayer 04 Leverkusen",
+            "priceM": 3.8,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00084365",
+            "name": "Nico Elvedi",
+            "position": "DEF",
+            "team": "Bor. Mönchengladbach",
+            "priceM": 1.9,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00087292",
+            "name": "Kevin Diks",
+            "position": "DEF",
+            "team": "Bor. Mönchengladbach",
+            "priceM": 1.8,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00087885",
+            "name": "Deniz Undav",
+            "position": "FWD",
+            "team": "VfB Stuttgart",
+            "priceM": 4.0,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00088240",
+            "name": "Aleix Garcia",
+            "position": "MID",
+            "team": "Bayer 04 Leverkusen",
+            "priceM": 2.3,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00093610",
+            "name": "Pavao Pervan",
+            "position": "GK",
+            "team": "VfL Wolfsburg",
+            "priceM": 0.3,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00102800",
+            "name": "Christoph Baumgartner",
+            "position": "MID",
+            "team": "RB Leipzig",
+            "priceM": 2.3,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00102956",
+            "name": "Kamil Grabara",
+            "position": "GK",
+            "team": "VfL Wolfsburg",
+            "priceM": 1.0,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00103527",
+            "name": "Danel Sinani",
+            "position": "FWD",
+            "team": "FC St. Pauli",
+            "priceM": 0.8,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00119669",
+            "name": "Fisnik Asllani",
+            "position": "FWD",
+            "team": "TSG Hoffenheim",
+            "priceM": 2.4,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00125604",
+            "name": "Jakub Kaminski",
+            "position": "MID",
+            "team": "1. FC Köln",
+            "priceM": 1.6,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00139302",
+            "name": "Mohammed Amoura",
+            "position": "FWD",
+            "team": "VfL Wolfsburg",
+            "priceM": 1.0,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00146292",
+            "name": "Can Uzun",
+            "position": "MID",
+            "team": "Eintracht Frankfurt",
+            "priceM": 2.0,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00149146",
+            "name": "Ibrahim Maza",
+            "position": "MID",
+            "team": "Bayer 04 Leverkusen",
+            "priceM": 2.0,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00155823",
+            "name": "Luka Vuskovic",
+            "position": "DEF",
+            "team": "Hamburger SV",
+            "priceM": 1.6,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00159629",
+            "name": "Said El Mala",
+            "position": "MID",
+            "team": "1. FC Köln",
+            "priceM": 1.7,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00168971",
+            "name": "Jakub Zielinski",
+            "position": "GK",
+            "team": "VfL Wolfsburg",
+            "priceM": 0.2,
+            "role": "roster"
+          },
+          {
+            "id": "pl-k00176299",
+            "name": "Yan Diomande",
+            "position": "FWD",
+            "team": "RB Leipzig",
+            "priceM": 1.6,
+            "role": "roster"
+          }
+        ]
+      },
+      "interactiveOracleMinusWinner": 878,
+      "interactiveInsuredDiversifiedOracleMinusWinner": 807,
+      "insuranceOpportunityCost": 71,
+      "classicOracle": {
+        "status": "not-run-on-full-pool",
+        "reason": "exact automatic-reserve interactions leave a wide MIP bound on the full historical player pool; Classic is constraint-checked and exactly rescored, but is not mislabeled as a proven global hindsight optimum"
+      }
+    }
+  ]
+}

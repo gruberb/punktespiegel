@@ -184,31 +184,6 @@ export type Dashboard = {
   matchdayTeams: TeamScore[];
 };
 
-export type HistoricalPlayer = {
-  id: string;
-  name: string;
-  team: string;
-  teamCode: string;
-  logoUrl: string | null;
-  photoUrl: string | null;
-  position: Position;
-  points: number;
-  averageGrade: number | null;
-  gradedMatches: number;
-  goals: number;
-  assists: number;
-};
-
-export type History = {
-  leaderboards: {
-    overall: HistoricalPlayer[];
-    positions: Record<Position, HistoricalPlayer[]>;
-    grades: HistoricalPlayer[];
-    goals: HistoricalPlayer[];
-    assists: HistoricalPlayer[];
-  };
-};
-
 export type PlayerGame = {
   matchday: number;
   scheduledAt: string | null;
@@ -501,40 +476,18 @@ export type BestEleven = {
   players: BestElevenPlayer[];
 };
 
-export type TopPlayerSeason = {
+export type PlayerHistorySeason = {
   season: string;
   league: string;
   points: number;
 };
 
-export type TopPlayerAnalysis = {
-  id: string;
-  name: string;
-  team: string;
-  teamCode: string;
-  logoUrl: string | null;
-  photoUrl: string | null;
-  position: Position;
-  priceM: number;
-  currentPoints: number | null;
-  previousSeason: string | null;
-  previousLeague: string | null;
-  previousPoints: number | null;
+export type PlayerHistory = {
   averagePoints: number | null;
   value: number | null;
-  seasons: number;
-  trend: "up" | "steady" | "down" | "new";
   trendDelta: number | null;
   signal: string;
-  history: TopPlayerSeason[];
+  history: PlayerHistorySeason[];
 };
 
-export type TopPlayers = {
-  context: {
-    season: string;
-    cutoffSeason: string | null;
-    playerCount: number;
-    currentRound: number;
-  };
-  positions: Record<Position, TopPlayerAnalysis[]>;
-};
+export type PlayerTableRow = Player & { analysis: PlayerHistory };

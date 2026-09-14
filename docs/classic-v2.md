@@ -1,19 +1,21 @@
 # Classic-v2
 
-Classic-v2 optimiert die eine verbindliche Septemberentscheidung und bewertet dabei, dass im Winter auf neue Informationen reagiert werden kann. Das Ergebnis ist ein 15er-Kader mit fester 4-4-2-Startelf, genau einer Reserve je Position und höchstens drei Spielern desselben Vereins.
+Classic-v2 optimiert eine verbindliche Entscheidung für die ganze Saison. Das Ergebnis ist nach aktuellen Regeln ein 15er-Kader mit fester 4-4-2-Startelf, genau einer Reserve je Position und höchstens drei Spielern desselben Vereins. Das Budget ist eine Obergrenze und muss nicht ausgeschöpft werden.
 
 ## Wertung und Winterfenster
 
 Eine Reserve punktet nur, wenn mindestens ein Starter ihrer Position nicht eingesetzt wird. Auch bei mehreren Ausfällen derselben Position wird nur diese eine Reserve aktiviert; eine Einwechslung des Starters zählt als Einsatz und blockiert die Reserve. Historische Wertungen wenden diese Regel exakt an. Kandidaten werden in einer Best-Response-Schleife mit `1 - product(1 - pDNP)` neu bewertet; bei einem Zyklus gewinnt der exakt nachbewertete Kandidat mit den meisten Erwartungspunkten und der Solverstatus weist den Zyklus aus. Die DNP-Ereignisse werden dabei vorläufig als bedingt unabhängig angenommen. Negative erwartete Reservepunkte werden nicht abgeschnitten. Eine gemeinsame Rollen- und Punktesimulation bleibt die nächste Genauigkeitsstufe.
 
-Im Vorsaisonmodus werden mehrere reproduzierbare, latente Winterzustände für Rollen, Verfügbarkeit und Leistungsniveau erzeugt. Alle Zustände teilen denselben Septemberkader, dürfen aber jeweils eine eigene regelkonforme Winterantwort wählen:
+Verletzungsanfälligkeit und Rotation wirken über historische Starts, Einwechslungen und DNPs sowie den aktuellen medizinischen Status. Ein separater, belastbarer historischer Europapokal-Spielplan fehlt. Internationale Teilnehmer erhalten deshalb keinen unkalibrierten Pauschalabzug; ein explizites Belastungsfeature bleibt offene Datenarbeit.
+
+Im Standardlauf bleibt dieser Kader für die gesamte Saison unverändert. Winterwechsel sind absichtlich nicht Teil der Empfehlung. Mit `--with-winter-transfers` kann die frühere Rekursvariante weiterhin als Experiment aktiviert werden. Dann werden mehrere reproduzierbare, latente Winterzustände für Rollen, Verfügbarkeit und Leistungsniveau erzeugt. Alle Zustände teilen denselben Septemberkader und dürfen jeweils eine eigene regelkonforme Winterantwort wählen:
 
 - höchstens drei positionsgleiche Verkäufe und Käufe;
 - jeder Zugang übernimmt den Starter- oder Reserveslot des verkauften Spielers;
 - unveränderte Spieler dürfen ihren Slot nicht kostenlos tauschen;
 - Budget, Positionsquoten und Vereinslimit gelten auch im Winter.
 
-Das Artefakt enthält deshalb keine verbindliche Transferliste, sondern nur Verkaufskandidaten, Zielspieler und ihre Häufigkeit über die Szenarien. Die lokal erzeugte Empfehlung bleibt der Septemberkader.
+Auch im Opt-in-Fall enthält das Artefakt keine verbindliche Transferliste, sondern nur Verkaufskandidaten, Zielspieler und ihre Häufigkeit über die Szenarien. Die normale lokal erzeugte Empfehlung bleibt ein fester Saisonkader.
 
 ## Echter Winterlauf
 
@@ -33,15 +35,17 @@ Der Standard-Ausgabepfad liegt absichtlich nicht im Produktionsverzeichnis. Das 
 
 ## Champion-/Challenger-Schutz
 
-Die Classic-Prüfung verwendet Rolling-Origin-Folds. In jedem Fold wird der Septemberkader ausschließlich aus älteren Saisons erzeugt. Am echten Wintercutoff werden die bis dahin bekannten Zustände wiederhergestellt und die drei Wechsel neu optimiert. Der v1-Vergleich erhält dasselbe Winterfenster und dieselbe exakte Reservewertung. Der Challenger wird nur eingesetzt, wenn er aggregiert gewinnt und mindestens die Hälfte der Folds gewinnt.
+Die Classic-Prüfung verwendet Rolling-Origin-Folds. In jedem Fold wird der Saisonkader ausschließlich aus älteren Saisons erzeugt und anschließend mit der exakten Reserveaktivierung über die gesamte Saison gewertet. Bis einschließlich 2023/24 verwendet der Backtest den damaligen 2/4/6/3-Kader mit festem 3-5-2; ab 2024/25 gelten 2/5/5/3 und 4-4-2. Der v1-Vergleich erhält denselben historischen Regelstand. Der Challenger wird nur eingesetzt, wenn er aggregiert gewinnt und mindestens die Hälfte der Folds gewinnt.
 
 Historische Preis-, Aktiv- und Auswahlfelder liegen derzeit nicht als echte Entscheidungszeit-Snapshots vor. Die Rolling-Ergebnisse sind deshalb ausdrücklich `experimental` und dürfen noch nicht als leakage-sicher bezeichnet werden. Der Generator vermerkt diese Einschränkung im Artefakt. Für eine belastbare Freigabe müssen Vorsaison- und Wintersnapshots archiviert werden.
+
+Der historische Audit prüft die Classic-Kader und ihre Reservewertung regelgenau. Ein global exakter Hindsight-Upper-Bound wird für den vollständigen Spielerpool nicht behauptet, weil die positionsweise Reserveaktivierung eine zusätzliche nichtlineare Auswahlkomponente erzeugt. Der exakte MILP-Nachweis im Audit gilt für Interactive.
 
 Die Entscheidung ist im Artefakt unter `model.deploymentModel` sichtbar. `scenario-recourse-v2` bezeichnet den Szenariooptimierer. Verfehlt er das Validierungstor, verwendet `availability-aware-stable-v2` dessen stabile bedingte Punktestärke, optimiert den Kader aber immer neu mit den aktuellen Einsatzwahrscheinlichkeiten. Ein historischer v1-Kader wird nie unverändert in die Produktion kopiert.
 
 Saisonpunkte werden nicht unabhängig von der Rolle gemischt. Der stabile Prior wird zunächst in Punkte je tatsächlichem Einsatz zurückgerechnet; erst danach entstehen unbedingte Erwartungspunkte als `pStart × Punkte|Start + pEinwechslung × Punkte|Einwechslung`. Dadurch kann ein aktueller Ersatzspieler nicht gleichzeitig fast sicher ausfallen und dennoch eine volle Saisonprojektion erhalten.
 
-Für die Bundesliga wird die Rollenprognose vor der Produktionsoptimierung mit einem eingecheckten, datierten LigaInsider-Topelf-Snapshot verankert. Unabhängig davon wird für alle drei Ligen ein medizinischer Snapshot geladen: aktuell verletzte, im Aufbautraining befindliche oder ausdrücklich nicht berücksichtigte Spieler sind für den Septemberkader und die vorab simulierte Winterphase nicht wählbar; eine Sperre wirkt nur auf den betroffenen ersten Spieltag. LigaInsider liefert diesen Status für die Bundesliga, Transfermarkt für die 2. Bundesliga und 3. Liga. Der medizinische Status hat immer Vorrang vor der saisonalen Kaderhierarchie. Diese aktuellen Produktionssignale werden nicht rückwirkend in historische Folds eingebaut.
+Für die Bundesliga wird die Rollenprognose vor der Produktionsoptimierung mit einem eingecheckten, datierten LigaInsider-Topelf-Snapshot verankert. Unabhängig davon wird für alle drei Ligen ein medizinischer Snapshot geladen: aktuell verletzte, im Aufbautraining befindliche oder ausdrücklich nicht berücksichtigte Spieler sind für den empfohlenen Saisonkader nicht wählbar; eine Sperre wirkt nur auf den betroffenen ersten Spieltag. LigaInsider liefert diesen Status für die Bundesliga, Transfermarkt für die 2. Bundesliga und 3. Liga. Der medizinische Status hat immer Vorrang vor der saisonalen Kaderhierarchie. Diese aktuellen Produktionssignale werden nicht rückwirkend in historische Folds eingebaut.
 
 Abgeschlossene Spiele der aktuellen Saison werden für alle drei Ligen in die Spieler- und Mannschaftszustände eingespielt. Beobachtete Start-, Joker- und DNP-Rollen verankern die verbleibende Saison vorsichtig; fehlt ein Spieler trotz abgeschlossenem Vereinsspiel in der kicker-Punktetabelle, wird dies als DNP mit null Punkten erfasst. Ein einzelner Spieltag ersetzt die langfristige Historie nicht. Die bereits erzielten Punkte bleiben im Ist-Verlauf sichtbar, sind aber aus der neuen Kaderzielfunktion ausgeschlossen. So nutzt eine nach Spieltag 1 erzeugte Empfehlung die neue Information, ohne die Spielerauswahl nachträglich auf die höchsten bekannten Spieltagspunkte zu optimieren.
 

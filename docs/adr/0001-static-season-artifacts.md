@@ -21,7 +21,7 @@ Punktespiegel verwendet stattdessen:
 - React-Aggregationen im Browser,
 - GitHub Pages oder einen statischen Nginx-Container als einzige Laufzeit.
 
-Abgeschlossene Saisons werden unverändert wiederverwendet. Die laufenden Saisons werden täglich um 12:15 Uhr in `Europe/Berlin` neu erzeugt. Historische Korrekturen sind ein bewusster manueller Vollaufbau.
+Abgeschlossene Saisons werden unverändert wiederverwendet. Die laufenden Saisons werden täglich um 11:00 UTC neu erzeugt. Historische Korrekturen sind ein bewusster manueller Vollaufbau.
 
 ## Folgen
 

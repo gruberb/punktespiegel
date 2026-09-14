@@ -4,6 +4,8 @@
     "iterations": 180,
     "validationIterations": 120,
     "timeLimitSeconds": 180.0,
+    "interactiveBenchWeight": 0.08,
+    "interactiveMaxFieldPlayersFromTeam": 3,
     "classicResidualWeight": 0.5,
     "classicScenarios": 4
   },
@@ -28,7 +30,24 @@
         "DEF": 4,
         "MID": 4,
         "FWD": 2
-      }
+      },
+      "seasonOverrides": [
+        {
+          "throughSeason": 2023,
+          "rosterCounts": {
+            "GK": 2,
+            "DEF": 4,
+            "MID": 6,
+            "FWD": 3
+          },
+          "starterCounts": {
+            "GK": 1,
+            "DEF": 3,
+            "MID": 5,
+            "FWD": 2
+          }
+        }
+      ]
     },
     "interactive": {
       "rosterCounts": {
@@ -36,8 +55,7 @@
         "DEF": 7,
         "MID": 7,
         "FWD": 5
-      },
-      "goalkeepersFromSameTeam": true
+      }
     }
   }
 }

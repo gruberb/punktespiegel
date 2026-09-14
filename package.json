@@ -1,6 +1,6 @@
 {
   "name": "punktespiegel-dashboard",
-  "version": "1.21.2",
+  "version": "1.22.0",
   "type": "module",
   "workspaces": [
     "frontend"
@@ -17,6 +17,7 @@
     "generate:recommendations": "npm run generate:role-signals && npm run generate:recommendations:v2",
     "test:club-profiles": "python3 -m unittest scripts/fetch_club_profiles_test.py",
     "test:recommender-baseline": "node --experimental-strip-types --test scripts/manager-model.test.ts",
+    "test:recommender-oracle": "uv run --frozen python -m unittest scripts/recommender_oracle_test.py",
     "dev": "npm run dev --workspace frontend",
     "build": "npm run build --workspace frontend",
     "typecheck": "npm run typecheck --workspace frontend"

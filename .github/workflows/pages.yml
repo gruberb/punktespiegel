@@ -4,8 +4,8 @@ on:
   push:
     branches: [main]
   schedule:
-    - cron: "15 12 * * *"
-      timezone: Europe/Berlin
+    - cron: "0 11 * * *"
+      timezone: UTC
     - cron: "45 14 * * *"
       timezone: Europe/Berlin
   workflow_dispatch:

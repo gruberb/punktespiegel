@@ -82,6 +82,7 @@ export type ManagerRecommendation = {
   spentM: number;
   remainingM: number;
   winterPlan?: {
+    modeled?: boolean;
     startMatchday: number;
     transferLimit: number;
     transferCount: number;
@@ -160,6 +161,8 @@ export type ManagerRecommendation = {
     positions: Record<Position, number>;
     maxFromTeam: number | null;
     goalkeepersFromSameTeam?: boolean;
+    maxFieldPlayersFromTeam?: number | null;
+    strategyConstraints?: string;
     availabilityPolicy?: string;
   };
   players: ManagerPickPlayer[];

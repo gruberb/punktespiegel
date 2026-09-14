@@ -4,14 +4,14 @@ from __future__ import annotations
 
 import math
 from collections import defaultdict
-from typing import Any, Dict, List, Mapping, Sequence, Tuple
+from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple
 
 import numpy as np
 
 from . import config
-from .artifact import actual_points, score_classic_assignments
+from .artifact import actual_points, actual_roles, score_classic_assignments
 from .baseline import blend_forecasts, classic_residual_forecasts, load_baseline
-from .domain import ClassicOptimizationResult, Forecast, OptimizationResult, mean, rounded
+from .domain import FORMATIONS, Forecast, OptimizationResult, ROLE_START, mean, rounded
 from .features import build_training_dataset, decision_time, replay_history_as_of, score_role
 from .forecast import build_priors, fit_models, predict_forecasts
 from .optimize import classic_slot_signature, optimize_classic_preseason_recourse, optimize_classic_roster, optimize_roster
@@ -58,10 +58,15 @@ def validation_metrics(
         actual = actual_values[key]
         errors.append(forecast.mean_points - actual)
         covered.append(forecast.p10_points <= actual <= forecast.p90_points)
-    realized_team_points = sum(
+    fixed_lineup_points = sum(
         actual_values.get((player_id, round_number), 0.0)
         for round_number, lineup in optimization.lineups.items()
         for player_id in lineup
+    )
+    managed_team_points = score_interactive_with_announced_starters(
+        season,
+        forecasts,
+        optimization.selected_ids,
     )
     return {
         "sampleSize": len(comparable),
@@ -71,34 +76,73 @@ def validation_metrics(
         "pointsRmse": rounded(math.sqrt(mean([error * error for error in errors])), 3),
         "p10P90Coverage": rounded(mean([float(value) for value in covered]), 3),
         "optimizedSquadProjectedPoints": round(optimization.objective),
-        "optimizedSquadRealizedPoints": round(realized_team_points),
+        "optimizedSquadRealizedPoints": round(managed_team_points),
+        "preseasonFixedLineupRealizedPoints": round(fixed_lineup_points),
+        "matchdayPolicy": "formation and XI reselected from the fixed roster using announced real starters",
     }
 
 
-def classic_validation_metrics(
+def score_interactive_with_announced_starters(
     season: Mapping[str, Any],
     forecasts: Sequence[Forecast],
-    optimization: ClassicOptimizationResult,
-    baseline_roster: Sequence[Mapping[str, Any]],
-) -> Dict[str, Any]:
-    challenger_points, _ = score_classic_assignments(
-        season,
-        optimization.starter_ids,
-        optimization.reserve_ids,
-        optimization.winter_starter_ids,
-        optimization.winter_reserve_ids,
-    )
-    baseline_starters = [player["id"] for player in baseline_roster if player["role"] == "start"]
-    baseline_reserves = [player["id"] for player in baseline_roster if player["role"] == "reserve"]
-    baseline_points, _ = score_classic_assignments(season, baseline_starters, baseline_reserves)
-    return {
-        "optimizedSquadProjectedPoints": round(optimization.objective),
-        "optimizedSquadRealizedPoints": round(challenger_points),
-        "baselineRealizedPoints": round(baseline_points),
-        "deltaVsBaseline": round(challenger_points - baseline_points),
-        "exactAutomaticReserves": True,
-        "winterTransfersUsed": len(optimization.transfers_in),
-    }
+    selected_ids: Sequence[str],
+) -> float:
+    """Replay a realistic Interactive lineup policy without outcome leakage.
+
+    Real starting elevens are public before kickoff and may be acted on under the
+    current Interactive rules. Actual points and later substitute appearances do
+    not influence selection. Non-starters retain their preseason expected value.
+    """
+
+    players = {str(player["id"]): player for player in season["players"]}
+    forecast_map = {(forecast.player_id, forecast.round): forecast for forecast in forecasts}
+    roles = actual_roles(season)
+    points_by_round, _ = actual_points(season)
+    total = 0.0
+    for round_number in range(1, int(season["roundCount"]) + 1):
+        best: Optional[Tuple[float, int, List[str]]] = None
+        for formation_index, formation in enumerate(FORMATIONS):
+            lineup: List[str] = []
+            decision_score = 0.0
+            valid = True
+            for position in ("GK", "DEF", "MID", "FWD"):
+                candidates = [
+                    player_id
+                    for player_id in selected_ids
+                    if players[player_id]["position"] == position
+                    and (player_id, round_number) in forecast_map
+                ]
+                ranked = sorted(
+                    candidates,
+                    key=lambda player_id: (
+                        forecast_map[(player_id, round_number)].start_mean
+                        if roles.get((round_number, player_id)) == ROLE_START
+                        else forecast_map[(player_id, round_number)].mean_points,
+                        player_id,
+                    ),
+                    reverse=True,
+                )
+                needed = int(formation[position])
+                if len(ranked) < needed:
+                    valid = False
+                    break
+                chosen = ranked[:needed]
+                lineup.extend(chosen)
+                decision_score += sum(
+                    forecast_map[(player_id, round_number)].start_mean
+                    if roles.get((round_number, player_id)) == ROLE_START
+                    else forecast_map[(player_id, round_number)].mean_points
+                    for player_id in chosen
+                )
+            if not valid:
+                continue
+            candidate = (decision_score, -formation_index, lineup)
+            if best is None or candidate[:2] > best[:2]:
+                best = candidate
+        if best is None:
+            raise RuntimeError(f"Interactive-Replay: keine gültige Formation an Spieltag {round_number}.")
+        total += sum(points_by_round.get((round_number, player_id), 0.0) for player_id in best[2])
+    return total
 
 
 def run_classic_validation(
@@ -108,6 +152,8 @@ def run_classic_validation(
     time_limit: float,
     residual_weight: float,
     scenario_count: int,
+    *,
+    allow_winter_transfers: bool = False,
 ) -> Tuple[Dict[str, Any], Dict[str, bool]]:
     target_year = max(int(season["startYear"]) for season in target_seasons.values())
     earliest_year = min(int(season["startYear"]) for season in seasons)
@@ -122,6 +168,7 @@ def run_classic_validation(
             str(season["leagueCode"]): season
             for season in seasons
             if int(season["startYear"]) == validation_year
+            and str(season["leagueCode"]) in target_seasons
             and int(season.get("latestRound", 0)) >= int(season["roundCount"])
         }
         if not fold_seasons:
@@ -145,53 +192,74 @@ def run_classic_validation(
                 int(season["roundCount"]),
                 residual_weight,
             )
-            challenger_opening = optimize_classic_preseason_recourse(
-                season,
-                players,
-                forecasts,
-                scenario_count=scenario_count,
-                time_limit=time_limit,
+            challenger_opening = (
+                optimize_classic_preseason_recourse(
+                    season,
+                    players,
+                    forecasts,
+                    scenario_count=scenario_count,
+                    time_limit=time_limit,
+                )
+                if allow_winter_transfers
+                else optimize_classic_roster(
+                    season,
+                    players,
+                    forecasts,
+                    time_limit=time_limit,
+                )
             )
             challenger_slots = dict(classic_slot_signature(challenger_opening))
             baseline_slots = {
                 str(player["id"]): str(player["role"])
                 for player in baselines[league]["roster"]
             }
-            cutoff = config.rules_for(season, "classic").winter_start_round - 1
-            winter_player_states, winter_team_states = replay_history_as_of(seasons, season, cutoff)
-            remaining_rounds = list(range(cutoff + 1, int(season["roundCount"]) + 1))
-            included_players = set(challenger_slots) | set(baseline_slots)
-            winter_players, winter_raw = predict_forecasts(
-                season,
-                bundle,
-                priors,
-                winter_player_states,
-                winter_team_states,
-                forecast_rounds=remaining_rounds,
-                as_of=decision_time(season, cutoff),
-                include_player_ids=included_players,
-            )
-            winter_forecasts = classic_residual_forecasts(
-                winter_raw,
-                baselines[league]["playerProjections"],
-                baselines[league]["playerAvailability"],
-                int(season["roundCount"]),
-                residual_weight,
-            )
-            challenger_winter = optimize_classic_roster(
-                season,
-                winter_players,
-                winter_forecasts,
-                time_limit=time_limit,
-                opening_slots=challenger_slots,
-            )
-            baseline_winter = optimize_classic_roster(
-                season,
-                winter_players,
-                winter_forecasts,
-                time_limit=time_limit,
-                opening_slots=baseline_slots,
-            )
+            if allow_winter_transfers:
+                cutoff = config.rules_for(season, "classic").winter_start_round - 1
+                winter_player_states, winter_team_states = replay_history_as_of(seasons, season, cutoff)
+                remaining_rounds = list(range(cutoff + 1, int(season["roundCount"]) + 1))
+                included_players = set(challenger_slots) | set(baseline_slots)
+                winter_players, winter_raw = predict_forecasts(
+                    season,
+                    bundle,
+                    priors,
+                    winter_player_states,
+                    winter_team_states,
+                    forecast_rounds=remaining_rounds,
+                    as_of=decision_time(season, cutoff),
+                    include_player_ids=included_players,
+                )
+                winter_forecasts = classic_residual_forecasts(
+                    winter_raw,
+                    baselines[league]["playerProjections"],
+                    baselines[league]["playerAvailability"],
+                    int(season["roundCount"]),
+                    residual_weight,
+                )
+                challenger_winter = optimize_classic_roster(
+                    season,
+                    winter_players,
+                    winter_forecasts,
+                    time_limit=time_limit,
+                    opening_slots=challenger_slots,
+                    allow_winter_transfers=True,
+                )
+                baseline_winter = optimize_classic_roster(
+                    season,
+                    winter_players,
+                    winter_forecasts,
+                    time_limit=time_limit,
+                    opening_slots=baseline_slots,
+                    allow_winter_transfers=True,
+                )
+            else:
+                challenger_winter = challenger_opening
+                baseline_winter = optimize_classic_roster(
+                    season,
+                    players,
+                    forecasts,
+                    time_limit=time_limit,
+                    opening_slots=baseline_slots,
+                )
             challenger_points, _ = score_classic_assignments(
                 season,
                 challenger_opening.starter_ids,
@@ -220,7 +288,8 @@ def run_classic_validation(
             print(
                 f"Classic-Rolling {season['displayName']} · {league}: "
                 f"{fold['challengerRealizedPoints']} Punkte "
-                f"({fold['deltaVsBaseline']:+d} gegen v1 mit gleichem Winterfenster)",
+                f"({fold['deltaVsBaseline']:+d} gegen v1 mit "
+                f"{'gleichem Winterfenster' if allow_winter_transfers else 'festem Saisonkader'})",
                 flush=True,
             )
 
@@ -237,14 +306,26 @@ def run_classic_validation(
             "foldCount": len(folds),
             "aggregateDeltaVsBaseline": aggregate_delta,
             "winningFolds": wins,
-            "deploymentModel": "scenario-recourse-v2" if deploy else "availability-aware-stable-v2",
-            "fallbackReason": None if deploy else "recourse challenger did not win the rolling-origin baseline ladder; stable forecasts are reoptimized with current availability",
+            "deploymentModel": (
+                "fixed-season-v2"
+                if not allow_winter_transfers
+                else "scenario-recourse-v2"
+                if deploy
+                else "availability-aware-stable-v2"
+            ),
+            "fallbackReason": (
+                None
+                if deploy
+                else "challenger did not win the rolling-origin baseline ladder; stable forecasts are reoptimized with current availability"
+            ),
         }
     return (
         {
             "status": "experimental",
             "protocol": (
-                "rolling-origin preseason selection followed by actual-cutoff state replay and legal winter "
+                "rolling-origin preseason selection with fixed full-season rosters and exact reserve scoring"
+                if not allow_winter_transfers
+                else "rolling-origin preseason selection followed by actual-cutoff state replay and legal winter "
                 "reoptimization; baseline receives the same winter action space and exact reserve scoring"
             ),
             "historicalMarketSnapshots": (
@@ -254,6 +335,7 @@ def run_classic_validation(
             "years": validation_years,
             "residualWeight": residual_weight,
             "scenarioCount": scenario_count,
+            "winterTransfersModeled": allow_winter_transfers,
             "leagues": metrics,
         },
         deploy_challenger,
@@ -265,16 +347,27 @@ def run_validation(
     target_seasons: Mapping[str, Mapping[str, Any]],
     iterations: int,
     time_limit: float,
-) -> Tuple[Dict[str, Any], Dict[str, float]]:
+    *,
+    allow_winter_transfers: bool = False,
+    bench_weight: float = 0.0,
+    max_field_players_from_team: Optional[int] = None,
+) -> Tuple[Dict[str, Any], Dict[str, float], Dict[str, float]]:
     holdout_year = max(int(season["startYear"]) for season in target_seasons.values()) - 1
     selection_year = holdout_year - 1
-    selection_seasons = {season["leagueCode"]: season for season in seasons if int(season["startYear"]) == selection_year}
+    selection_seasons = {
+        season["leagueCode"]: season
+        for season in seasons
+        if int(season["startYear"]) == selection_year
+        and str(season["leagueCode"]) in target_seasons
+    }
     selection_rows, selection_player_states, selection_team_states = build_training_dataset(seasons, selection_year)
     selection_bundle = fit_models(selection_rows, iterations)
     selection_priors = build_priors(selection_rows)
     selection_baselines = load_baseline(selection_year)
     weight_grid = (0.0, 0.25, 0.5, 0.75, 1.0)
+    bench_weight_grid = tuple(sorted({0.0, bench_weight, 0.15, 0.25}))
     selected_weights: Dict[str, float] = {}
+    selected_bench_weights: Dict[str, float] = {}
     selection_results: Dict[str, Any] = {}
     for league, season in sorted(selection_seasons.items()):
         players, raw_forecasts = predict_forecasts(
@@ -284,36 +377,63 @@ def run_validation(
             selection_player_states,
             selection_team_states,
         )
-        actual_by_round, _ = actual_points(season)
         candidates = []
-        for weight in weight_grid:
-            forecasts = blend_forecasts(
-                raw_forecasts,
-                selection_baselines[league]["playerProjections"],
-                selection_baselines[league]["playerAvailability"],
-                int(season["roundCount"]),
-                weight,
-            )
-            optimization = optimize_roster(season, players, forecasts, time_limit=time_limit)
-            realized = sum(
-                actual_by_round.get((round_number, player_id), 0.0)
-                for round_number, lineup in optimization.lineups.items()
-                for player_id in lineup
-            )
-            candidates.append({"modelWeight": weight, "realizedPoints": round(realized)})
-        best = max(candidates, key=lambda item: (item["realizedPoints"], item["modelWeight"]))
+        for candidate_bench_weight in bench_weight_grid:
+            for weight in weight_grid:
+                forecasts = blend_forecasts(
+                    raw_forecasts,
+                    selection_baselines[league]["playerProjections"],
+                    selection_baselines[league]["playerAvailability"],
+                    int(season["roundCount"]),
+                    weight,
+                )
+                optimization = optimize_roster(
+                    season,
+                    players,
+                    forecasts,
+                    time_limit=time_limit,
+                    allow_winter_transfers=allow_winter_transfers,
+                    goalkeepers_from_same_team=True,
+                    bench_weight=candidate_bench_weight,
+                    max_field_players_from_team=max_field_players_from_team,
+                )
+                realized = score_interactive_with_announced_starters(
+                    season,
+                    forecasts,
+                    optimization.selected_ids,
+                )
+                candidates.append(
+                    {
+                        "modelWeight": weight,
+                        "benchWeight": candidate_bench_weight,
+                        "realizedPoints": round(realized),
+                    }
+                )
+        best = max(
+            candidates,
+            key=lambda item: (item["realizedPoints"], item["modelWeight"], -item["benchWeight"]),
+        )
         selected_weights[league] = float(best["modelWeight"])
+        selected_bench_weights[league] = float(best["benchWeight"])
         selection_results[league] = {
             "candidates": candidates,
             "selectedModelWeight": best["modelWeight"],
+            "selectedBenchWeight": best["benchWeight"],
             "baselineWeight": rounded(1.0 - float(best["modelWeight"]), 2),
+            "winnerPoints": config.historical_benchmarks(str(league))["interactiveWinnerPoints"].get(selection_year),
         }
         print(
-            f"Ensemble {season['displayName']} · {league}: CatBoost-Gewicht {best['modelWeight']:.2f}",
+            f"Ensemble {season['displayName']} · {league}: CatBoost-Gewicht {best['modelWeight']:.2f}, "
+            f"Bankgewicht {best['benchWeight']:.2f}",
             flush=True,
         )
 
-    holdouts = {season["leagueCode"]: season for season in seasons if int(season["startYear"]) == holdout_year}
+    holdouts = {
+        season["leagueCode"]: season
+        for season in seasons
+        if int(season["startYear"]) == holdout_year
+        and str(season["leagueCode"]) in target_seasons
+    }
     rows, player_states, team_states = build_training_dataset(seasons, holdout_year)
     bundle = fit_models(rows, iterations)
     priors = build_priors(rows)
@@ -329,9 +449,32 @@ def run_validation(
             int(season["roundCount"]),
             selected_weights[league],
         )
-        selected_optimization = optimize_roster(season, players, selected_forecasts, time_limit=time_limit)
+        selected_optimization = optimize_roster(
+            season,
+            players,
+            selected_forecasts,
+            time_limit=time_limit,
+            allow_winter_transfers=allow_winter_transfers,
+            goalkeepers_from_same_team=True,
+            bench_weight=selected_bench_weights[league],
+            max_field_players_from_team=max_field_players_from_team,
+        )
         selected_metrics = validation_metrics(season, selected_forecasts, selected_optimization)
-        baseline_points = int(holdout_baselines[league]["realizedPoints"])
+        baseline_forecasts = blend_forecasts(
+            raw_forecasts,
+            holdout_baselines[league]["playerProjections"],
+            holdout_baselines[league]["playerAvailability"],
+            int(season["roundCount"]),
+            0.0,
+        )
+        baseline_roster_ids = [str(player["id"]) for player in holdout_baselines[league]["roster"]]
+        baseline_points = round(
+            score_interactive_with_announced_starters(
+                season,
+                baseline_forecasts,
+                baseline_roster_ids,
+            )
+        )
         deployment_weight = selected_weights[league]
         deployed_metrics = selected_metrics
         fallback_reason = None
@@ -344,7 +487,16 @@ def run_validation(
                 int(season["roundCount"]),
                 deployment_weight,
             )
-            fallback_optimization = optimize_roster(season, players, fallback_forecasts, time_limit=time_limit)
+            fallback_optimization = optimize_roster(
+                season,
+                players,
+                fallback_forecasts,
+                time_limit=time_limit,
+                allow_winter_transfers=allow_winter_transfers,
+                goalkeepers_from_same_team=True,
+                bench_weight=selected_bench_weights[league],
+                max_field_players_from_team=max_field_players_from_team,
+            )
             deployed_metrics = validation_metrics(season, fallback_forecasts, fallback_optimization)
             fallback_reason = "CatBoost challenger did not beat the fixed-v1 champion on the later holdout"
         deployment_weights[league] = deployment_weight
@@ -353,10 +505,18 @@ def run_validation(
             "baselineRealizedPoints": baseline_points,
             "deltaVsBaseline": deployed_metrics["optimizedSquadRealizedPoints"] - baseline_points,
             "selectionModelWeight": selected_weights[league],
+            "deployedBenchWeight": selected_bench_weights[league],
             "deployedModelWeight": deployment_weight,
             "challengerRealizedPoints": selected_metrics["optimizedSquadRealizedPoints"],
             "fallbackReason": fallback_reason,
         }
+        winner_points = config.historical_benchmarks(str(league))["interactiveWinnerPoints"].get(holdout_year)
+        league_metrics[league]["winnerPoints"] = winner_points
+        league_metrics[league]["deltaVsWinner"] = (
+            None
+            if winner_points is None
+            else deployed_metrics["optimizedSquadRealizedPoints"] - winner_points
+        )
         print(
             f"Holdout {season['displayName']} · {league}: "
             f"{league_metrics[league]['optimizedSquadRealizedPoints']} realisierte Punkte "
@@ -371,8 +531,11 @@ def run_validation(
             "unavailable: completed-season metadata is not proven to be a decision-time snapshot, "
             "so these results must not be described as leakage-safe"
         ),
+        "winterTransfersModeled": allow_winter_transfers,
+        "interactiveBenchWeightGrid": bench_weight_grid,
+        "interactiveMaxFieldPlayersFromTeam": max_field_players_from_team,
         "selectionSeason": next(iter(selection_seasons.values()))["displayName"] if selection_seasons else str(selection_year),
         "selection": selection_results,
         "holdoutSeason": next(iter(holdouts.values()))["displayName"] if holdouts else str(holdout_year),
         "leagues": league_metrics,
-    }, deployment_weights
+    }, deployment_weights, selected_bench_weights

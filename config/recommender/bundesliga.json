@@ -20,5 +20,12 @@
         "limit": 4
       }
     ]
+  },
+  "historicalBenchmarks": {
+    "source": "user-supplied kicker season-ranking screenshots",
+    "interactiveWinnerPoints": {
+      "2024": 2511,
+      "2025": 2914
+    }
   }
 }

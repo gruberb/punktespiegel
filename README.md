@@ -58,7 +58,7 @@ Der Import fragt Transfermarkt mit eindeutigem User-Agent, lokalem HTTP-Cache un
 
 ## GitHub Pages
 
-`.github/workflows/pages.yml` erzeugt täglich um 12:15 Uhr deutscher Zeit die aktuelle Saison, baut React und stellt ausschließlich das fertige Pages-Artefakt unter <https://punktespiegel.org/> bereit. Der Workflow benötigt weder PostgreSQL noch Repository-Secrets. Ein manueller Lauf kann bei Bedarf auch alle abgeschlossenen Saisons neu erzeugen.
+`.github/workflows/pages.yml` erzeugt täglich um 11:00 UTC die aktuelle Saison, baut React und stellt ausschließlich das fertige Pages-Artefakt unter <https://punktespiegel.org/> bereit. Der Workflow benötigt weder PostgreSQL noch Repository-Secrets. Ein manueller Lauf kann bei Bedarf auch alle abgeschlossenen Saisons neu erzeugen.
 
 Für die erstmalige Aktivierung muss in GitHub unter **Settings → Pages → Build and deployment** die Quelle **GitHub Actions** ausgewählt sein. Danach veröffentlichen Pushes auf `main` und der tägliche Datenlauf automatisch einen neuen konsistenten Stand.
 
@@ -89,7 +89,7 @@ docker compose build web
 - `frontend/public/data/current-availability-signals.json`: datierter Ausfallsnapshot für Bundesliga, 2. Bundesliga und 3. Liga.
 - `frontend/public/data/external-performance-benchmark.json`: unabhängiger Vergleich der LigaInsider-Leistungsrangfolge 2025/26 mit den historischen kicker-Punkten.
 - `recommendations/`: lokale Classic- und Interactive-Ergebnisse; nicht Teil des Website-Artefakts.
-- `recommender/`: der lokale Empfehlungsgenerator als Python-Paket mit rollenabhängiger Prognose, szenariobasierter Classic-Rekursentscheidung, echtem Winterlauf und Mehrspieltags-MILPs; das deterministische v1-Vergleichsmodell (`scripts/manager-model.ts` über `scripts/backtest-manager-baseline.ts`) bleibt als Ensemble-Baseline eingebunden.
+- `recommender/`: der lokale Empfehlungsgenerator als Python-Paket mit rollenabhängiger Prognose, regelgenauer Classic-Reservewertung, optionalem Winterlauf, Mehrspieltags-MILPs und exaktem historischem Interactive-Optimierungs-Audit; das deterministische v1-Vergleichsmodell (`scripts/manager-model.ts` über `scripts/backtest-manager-baseline.ts`) bleibt als Ensemble-Baseline eingebunden.
 - `config/recommender/`: Liga-Konfigurationen (Bundesliga, 2. Bundesliga, 3. Liga) und Modell-Voreinstellungen, dort dokumentiert.
 - `scripts/fetch-current-role-signals.py`: lokal ausgeführter, fail-closed Import der LigaInsider-Topelf, Vereinsthemen und medizinischen Verfügbarkeit aus LigaInsider/Transfermarkt.
 - `scripts/fetch-club-profiles.py`: rate-limitierter Transfermarkt-Import für Vereinsprofile und Karrierewerte mit lokalem HTTP-Cache.
@@ -102,5 +102,6 @@ Weitere Details:
 - [Architektur](docs/architecture.md)
 - [Classic-v2](docs/classic-v2.md)
 - [Interactive-v2](docs/interactive-v2.md)
+- [Bundesliga-Recommender-Audit 2026/27](docs/bundesliga-recommender-audit.md)
 - [Betrieb und Datenpflege](docs/operations.md)
 - [ADR: statische Saisonartefakte](docs/adr/0001-static-season-artifacts.md)

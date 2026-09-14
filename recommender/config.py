@@ -19,28 +19,6 @@ from .domain import Rules
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 
-_BUILTIN_MODEL_DEFAULTS = {
-    "iterations": 180,
-    "validationIterations": 120,
-    "timeLimitSeconds": 180.0,
-    "classicResidualWeight": 0.5,
-    "classicScenarios": 4,
-}
-_BUILTIN_BASELINE = {
-    "command": ["node", "--experimental-strip-types", "scripts/backtest-manager-baseline.ts"],
-    "cwdRelativeToRepoRoot": ".",
-}
-_BUILTIN_SQUAD_RULES = {
-    "classic": {
-        "rosterCounts": {"GK": 2, "DEF": 5, "MID": 5, "FWD": 3},
-        "starterCounts": {"GK": 1, "DEF": 4, "MID": 4, "FWD": 2},
-    },
-    "interactive": {
-        "rosterCounts": {"GK": 3, "DEF": 7, "MID": 7, "FWD": 5},
-        "goalkeepersFromSameTeam": True,
-    },
-}
-
 
 @dataclass(frozen=True)
 class RunPaths:
@@ -75,6 +53,8 @@ class LeagueConfig:
     interactive_budget_m: float
     interactive_transfer_limit: int
     interactive_transfer_limit_overrides: Tuple[Tuple[int, int], ...]
+    historical_benchmark_source: Optional[str]
+    interactive_winner_points: Tuple[Tuple[int, int], ...]
 
 
 @dataclass
@@ -106,6 +86,13 @@ def _league_config(payload: Mapping[str, Any], source: Path) -> LeagueConfig:
             for entry in interactive.get("transferLimitOverrides", [])
         )
     )
+    benchmarks = payload.get("historicalBenchmarks", {})
+    winner_points = tuple(
+        sorted(
+            (int(year), int(points))
+            for year, points in benchmarks.get("interactiveWinnerPoints", {}).items()
+        )
+    )
     return LeagueConfig(
         code=str(league["code"]),
         name=str(league["name"]),
@@ -117,6 +104,8 @@ def _league_config(payload: Mapping[str, Any], source: Path) -> LeagueConfig:
         interactive_budget_m=float(interactive["budgetM"]),
         interactive_transfer_limit=int(interactive["transferLimit"]),
         interactive_transfer_limit_overrides=overrides,
+        historical_benchmark_source=benchmarks.get("source"),
+        interactive_winner_points=winner_points,
     )
 
 
@@ -133,13 +122,15 @@ def initialize(config_dir: Path, data_dir: Path, output_dir: Optional[Path] = No
         leagues[league.code] = league
     if not leagues:
         raise ValueError(f"Keine Liga-Konfigurationen unter {config_dir} gefunden")
+    bundled_path = REPO_ROOT / "config" / "recommender" / "defaults.json"
+    bundled = _load_json(bundled_path)
     defaults_path = config_dir / "defaults.json"
-    defaults = _load_json(defaults_path) if defaults_path.exists() else {}
+    defaults = _load_json(defaults_path) if defaults_path.exists() and defaults_path.resolve() != bundled_path else {}
     _STATE = _State(
         leagues=leagues,
-        model_defaults={**_BUILTIN_MODEL_DEFAULTS, **defaults.get("model", {})},
-        baseline={**_BUILTIN_BASELINE, **defaults.get("baseline", {})},
-        squad_rules=defaults.get("squadRules", _BUILTIN_SQUAD_RULES),
+        model_defaults={**bundled["model"], **defaults.get("model", {})},
+        baseline={**bundled["baseline"], **defaults.get("baseline", {})},
+        squad_rules=defaults.get("squadRules", bundled["squadRules"]),
         paths=RunPaths.for_data_dir(data_dir, output_dir),
     )
 
@@ -184,16 +175,34 @@ def winter_start_round(league: str, round_count: int) -> int:
     return config.winter_start_round if config is not None else round_count // 2 + 1
 
 
-def classic_roster_counts() -> Dict[str, int]:
-    return _state().squad_rules["classic"]["rosterCounts"]
+def _classic_squad_rules(start_year: Optional[int] = None) -> Mapping[str, Any]:
+    rules = _state().squad_rules["classic"]
+    if start_year is None:
+        return rules
+    for override in sorted(rules.get("seasonOverrides", []), key=lambda item: int(item["throughSeason"])):
+        if start_year <= int(override["throughSeason"]):
+            return override
+    return rules
 
 
-def classic_starter_counts() -> Dict[str, int]:
-    return _state().squad_rules["classic"]["starterCounts"]
+def classic_roster_counts(start_year: Optional[int] = None) -> Dict[str, int]:
+    return dict(_classic_squad_rules(start_year)["rosterCounts"])
+
+
+def classic_starter_counts(start_year: Optional[int] = None) -> Dict[str, int]:
+    return dict(_classic_squad_rules(start_year)["starterCounts"])
 
 
 def interactive_roster_counts() -> Dict[str, int]:
-    return _state().squad_rules["interactive"]["rosterCounts"]
+    return dict(_state().squad_rules["interactive"]["rosterCounts"])
+
+
+def historical_benchmarks(code: str) -> Dict[str, Any]:
+    league = _state().leagues[code]
+    return {
+        "source": league.historical_benchmark_source,
+        "interactiveWinnerPoints": dict(league.interactive_winner_points),
+    }
 
 
 def model_default(key: str) -> Any:
@@ -227,8 +236,8 @@ def rules_for(season: Mapping[str, Any], mode: str) -> Rules:
             league=league,
             season=start_year,
             budget_m=config.classic_budget_m,
-            roster_counts=classic_roster_counts(),
-            starter_counts=classic_starter_counts(),
+            roster_counts=classic_roster_counts(start_year),
+            starter_counts=classic_starter_counts(start_year),
             max_from_team=config.classic_max_from_team,
             transfer_limit=config.classic_transfer_limit,
             winter_start_round=winter_start_round(league, round_count),

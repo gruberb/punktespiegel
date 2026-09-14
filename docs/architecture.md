@@ -6,7 +6,7 @@ Punktespiegel ist eine statische Datenanwendung. Die Build-Pipeline sammelt und 
 
 ```mermaid
 flowchart LR
-  S["GitHub Actions · täglich 12:15 Europe/Berlin"] --> G["Rust-Datencompiler"]
+  S["GitHub Actions · täglich 11:00 UTC"] --> G["Rust-Datencompiler"]
   G -->|"HTTPS"| K["Öffentliche kicker-Daten"]
   G --> C["catalog.json"]
   G --> J["Eine JSON-Datei je Liga-Saison"]
@@ -27,7 +27,7 @@ flowchart LR
 | React/Vite | Filter, Navigation, Tabellen, Detailseiten und sämtliche Aggregationen |
 | GitHub Pages/Nginx | Unveränderte statische Dateien ausliefern |
 
-Die Hauptansichten besitzen feste Pfade wie `/tabelle`, `/spieler`, `/mannschaften` und `/topspieler`. Der Produktionsbuild schreibt für jeden dieser Pfade einen statischen HTML-Einstiegspunkt, damit direkte Aufrufe auch auf GitHub Pages ohne Laufzeit-Router funktionieren. Liga, Saison, Spieltag und Unteransichten bleiben als Query-Parameter erhalten. Frühere Links mit `?view=...` sowie die eingestellten Pfade `/historie` und `/fantasy-team` werden beim Öffnen automatisch auf Tabelle beziehungsweise Mannschaften umgeleitet.
+Die Hauptansichten besitzen feste Pfade wie `/tabelle`, `/spieler` und `/mannschaften`. Die Spieleransicht verwendet eine gemeinsame Liste mit Suche, Positions- und Vereinsfilter; „Saison“ und „Historie“ wechseln nur die angezeigten Statistikspalten. Historische Spalten sind über `?columns=history` direkt erreichbar. Sobald Spieltage importiert sind, sortieren beide Ansichten standardmäßig nach Saisonpunkten, davor nach Vorsaisonpunkten. Der Produktionsbuild schreibt statische HTML-Einstiegspunkte, damit direkte Aufrufe auch auf GitHub Pages ohne Laufzeit-Router funktionieren. Liga, Saison, Spieltag und Unteransichten bleiben als Query-Parameter erhalten. Frühere Links mit `?view=...` sowie die eingestellten Pfade `/historie`, `/fantasy-team` und `/topspieler` werden beim Öffnen automatisch auf Tabelle, Mannschaften beziehungsweise die historischen Spielerspalten umgeleitet.
 
 ## Datenvertrag
 
@@ -56,7 +56,7 @@ Die Darstellung berechnet daraus deterministisch:
 
 Classic-v1 bleibt das deterministische Vergleichsmodell. Classic-v2 kombiniert dessen stabile Saisonprognose mit CatBoost-Spieltagresiduen und bewertet die positionsgebundene Reserve mit der vollständigen negativen wie positiven Punkteverteilung. Der Vorsaisonoptimierer teilt einen 15er-Septemberkader über mehrere latente Winterzustände und erlaubt je Zustand eine eigene regelkonforme Antwort mit höchstens drei positions- und slotgleichen Wechseln. Im echten Winterlauf werden der gekaufte Kader gesperrt, aktuelle Saisonzustände bis zum Cutoff eingespielt und nur die verbleibenden Spieltage optimiert.
 
-Interactive-v2 nutzt die vollständigen Spieler-Spiel-Daten. Ein chronologisch trainierter CatBoost-Klassifikator schätzt DNP, Einwechslung und Startelf; nach Position und Rolle getrennte Regressoren schätzen bedingten Mittelwert sowie P10, Median und P90. Spieler mit wenig Historie werden zu einem aus Position, Liga und Preisstufe gelernten empirischen Prior zurückgezogen. Das nachgelagerte HiGHS-Modell besitzt einen September- und einen Winterkader, die saisonabhängige Zahl positionsgleicher Winterwechsel sowie eigene Aufstellungs- und Formationsentscheide für jeden Spieltag. In beiden Kaderphasen bildet es eine Torwartversicherung aus drei Spielern desselben Vereins. Seine Hauptzielfunktion ist die Summe der erwarteten Punkte der jeweils besten gültigen Elf, nicht eine feste Startelf mit pauschalem Bankabschlag.
+Interactive-v2 nutzt die vollständigen Spieler-Spiel-Daten. Ein chronologisch trainierter CatBoost-Klassifikator schätzt DNP, Einwechslung und Startelf; nach Position und Rolle getrennte Regressoren schätzen bedingten Mittelwert sowie P10, Median und P90. Spieler mit wenig Historie werden zu einem aus Position, Liga und Preisstufe gelernten empirischen Prior zurückgezogen. Das nachgelagerte HiGHS-Modell wählt standardmäßig einen festen Saisonkader sowie eigene Aufstellungs- und Formationsentscheide für jeden Spieltag; Winterwechsel sind nur ein Opt-in-Experiment. Es bildet eine Torwartversicherung aus drei Spielern desselben Vereins, begrenzt Feldspieler eines Vereins strategisch und versieht Bankoptionen mit einem historisch gewählten Teilwert. Seine Hauptzielfunktion verbindet damit die erwarteten Punkte der jeweils besten gültigen Elf mit dem Optionswert der Kaderbreite.
 
 Vor dem finalen Interactive-Training wird das Mischgewicht auf einer früheren Vorsaison festgelegt. Eine zeitlich spätere Saison dient als Champion-/Challenger-Gate. Classic verwendet mehrere Rolling-Origin-Folds und gibt dem v1-Vergleich dieselbe legale Winteraktion. Die historischen Saisonartefakte enthalten jedoch noch keine nachweislichen Entscheidungszeit-Snapshots für Preis, Vereinszuordnung, `active` und `selectable`. Beide Validierungen werden deshalb als experimentell gekennzeichnet und nicht als leakage-sicher ausgegeben. Danach wird das Produktionsmodell mit allen abgeschlossenen Saisons neu trainiert.
 

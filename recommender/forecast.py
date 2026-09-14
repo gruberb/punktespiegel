@@ -557,7 +557,7 @@ def build_availability_audit(
         "sourceUrl": artifact["sourceUrl"],
         "policy": (
             "Aktuell verletzte, im Aufbautraining befindliche oder nicht berücksichtigte Spieler "
-            "sind für den Eröffnungskader und die vorab simulierte Winterphase gesperrt. "
+            "sind für den empfohlenen Saisonkader gesperrt. "
             "Sperren werden spieltagsspezifisch berücksichtigt."
         ),
         "checkedPlayerCount": len(players),

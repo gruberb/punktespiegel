@@ -30,15 +30,23 @@ Datei, Code-Änderungen sind nicht nötig.
 | `model.timeLimitSeconds` | HiGHS-Zeitlimit je Kaderoptimierung. |
 | `model.classicResidualWeight` | Gewicht des CatBoost-Residuums über dem stabilen Classic-Prior (0 bis 1). |
 | `model.classicScenarios` | Latente Winterszenarien für die Classic-Rekursbewertung (mindestens 2). |
+| `model.interactiveBenchWeight` | Optionswert eines nicht aufgestellten Interactive-Spielers relativ zu einem Starter; die Validierung wählt den Produktionswert aus einem festen Raster. |
+| `model.interactiveMaxFieldPlayersFromTeam` | Strategisches Diversifikationslimit für Interactive-Feldspieler je Verein; keine offizielle kicker-Regel. |
 | `baseline.command` | Kommando für das deterministische v1-Baseline-Modell (Node). |
 | `baseline.cwdRelativeToRepoRoot` | Arbeitsverzeichnis des Baseline-Kommandos relativ zur Repo-Wurzel. |
 | `squadRules.classic.rosterCounts` | Kadergrößen je Position (kicker-Regel, ligaweit gleich). |
 | `squadRules.classic.starterCounts` | Startelfgrößen je Position (feste 4-4-2-Slots). |
+| `squadRules.classic.seasonOverrides` | Historische Regelstände; bis 2023/24 gelten 2/4/6/3 Kaderplätze und ein festes 3-5-2. |
 | `squadRules.interactive.rosterCounts` | Interactive-Kadergrößen je Position. |
 
 Alle `model.*`-Werte lassen sich pro Lauf per CLI-Flag übersteuern
 (`--iterations`, `--validation-iterations`, `--time-limit`,
-`--classic-residual-weight`, `--classic-scenarios`).
+`--classic-residual-weight`, `--classic-scenarios`,
+`--interactive-bench-weight`, `--interactive-max-field-players-from-team`).
+
+Winterwechsel werden in der normalen Vorsaison-Empfehlung nicht modelliert. Sie
+sind nur ein optionales Experiment über `--with-winter-transfers`; die
+veröffentlichten Kader sind deshalb als vollständige Saisonkader zu verstehen.
 
 ## Eigenständiger Betrieb
 
@@ -55,3 +63,18 @@ uv run --frozen python -m recommender \
 begrenzt die Artefakterzeugung auf einzelne Ligen; das Modelltraining nutzt
 weiterhin die Historie aller Saisons im Datenverzeichnis. Einzige externe
 Abhängigkeit neben Python/uv ist Node (≥ 22) für das v1-Baseline-Ensemble.
+
+Der historische Optimierungs-Audit wird getrennt erzeugt:
+
+```bash
+uv run --frozen python -m recommender \
+  --mode historical-audit \
+  --league 0001
+```
+
+Er berechnet für jede abgeschlossene Bundesliga-Saison einen exakten
+Interactive-Hindsight-Upper-Bound unter den damaligen Budget- und Kaderregeln.
+Zusätzlich weist er den Preis der strategischen Torwartversicherung und
+Vereinsdiversifikation aus. Die Classic-Realisierung wird regelgenau bewertet;
+ein globaler Classic-Upper-Bound wird wegen der nichtlinearen Reserveaktivierung
+nicht als exakt behauptet.

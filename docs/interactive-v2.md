@@ -34,7 +34,7 @@ Sobald aktuelle Saisonspiele abgeschlossen sind, werden sie für alle drei Ligen
 
 Der LigaInsider-Leistungsindex 2025/26 wird zusätzlich gegen die kicker-Saisonhistorie gematcht. Er bleibt ein unabhängiger Rangbenchmark im statischen Artefakt und wird nicht als zweites Punktesystem in die Prognose addiert.
 
-Der CatBoost-Anteil an der Punkteprognose wird auf einer früheren Vorsaison aus der festen Menge 0/25/50/75/100 Prozent gewählt. Gemischt wird die bedingte Punktestärke bei einem Einsatz, nicht ein von der aktuellen Rolle losgelöster Saisonwert. Danach werden Start-, Einwechsel- und DNP-Wahrscheinlichkeiten angewendet. Eine zeitlich spätere, nicht zur Gewichtswahl verwendete Vorsaison dient als Champion-/Challenger-Gate. Wegen der oben beschriebenen Snapshot-Lücke ist „zeitlich getrennt“ hier bewusst nicht gleichbedeutend mit „vollständig leakage-sicher“. Auch bei Baselinegewicht 100 Prozent bleiben aktuelle Verfügbarkeit und der Mehrspieltags- und Winteroptimierer bindend.
+Der CatBoost-Anteil an der Punkteprognose wird auf einer früheren Vorsaison aus der festen Menge 0/25/50/75/100 Prozent gewählt. Gemischt wird die bedingte Punktestärke bei einem Einsatz, nicht ein von der aktuellen Rolle losgelöster Saisonwert. Danach werden Start-, Einwechsel- und DNP-Wahrscheinlichkeiten angewendet. Eine zeitlich spätere, nicht zur Gewichtswahl verwendete Vorsaison dient als Champion-/Challenger-Gate. Wegen der oben beschriebenen Snapshot-Lücke ist „zeitlich getrennt“ hier bewusst nicht gleichbedeutend mit „vollständig leakage-sicher“. Auch bei Baselinegewicht 100 Prozent bleiben aktuelle Verfügbarkeit und der Mehrspieltagsoptimierer bindend. Standardmäßig wird ein fester Kader für die gesamte Saison bewertet; Winterwechsel sind nur per Opt-in aktiv.
 
 ## Optimierung
 
@@ -44,7 +44,13 @@ Das gemischt-ganzzahlige Modell enthält:
 - `y[i,t]`: Spieler gehört an Spieltag `t` zur Elf;
 - `z[f,t]`: Formation `f` wird an Spieltag `t` verwendet.
 
-Es erzwingt Budget, 3/7/7/5-Kaderquoten, genau elf aufgestellte Kaderspieler und eine der sieben zulässigen Formationen je Spieltag. Die drei Torhüter müssen im Eröffnungs- und Winterkader jeweils demselben Verein angehören. So bleibt der Torwartplatz auch dann abgedeckt, wenn die Nummer eins verletzt oder gesperrt ausfällt; ein Vereinswechsel im Winter ist nur als vollständiger Tausch des Dreierpakets möglich. Aktuell medizinisch nicht verfügbare Spieler sind nicht wählbar; für die übrigen steckt das verbleibende Ausfallrisiko in den erwarteten Punkten. Für Feldspieler existiert in Interactive kein Vereinslimit. Die Transferzahl kommt aus der Regeln-Konfiguration; für 2026/27 sind es vier, für ältere Saisons drei. Optimiert wird die Summe der erwarteten Spieltagspunkte aller geplanten Elfen ab dem nächsten ungespielten Spieltag in beiden Saisonhälften. Ein numerisch winziger, datenabhängiger Tie-Break bevorzugt bei exakt gleicher Hauptzielfunktion die stärkere Bank; er kann keine schlechtere Hauptlösung auswählen.
+Es erzwingt das Budget als Obergrenze, 3/7/7/5-Kaderquoten, genau elf aufgestellte Kaderspieler und eine der sieben zulässigen Formationen je Spieltag. Das Budget muss nicht ausgeschöpft werden; bei punktgleicher Hauptlösung gewinnt der günstigere vollständige Kader.
+
+Zusätzlich zu den offiziellen Regeln verwendet der Produktionslauf zwei bewusst ausgewiesene Risikoregeln: Alle drei Torhüter kommen aus demselben Verein, damit der Ersatzmann einen verletzten, gesperrten oder verkauften Stammkeeper abdecken kann. Für Feldspieler gilt ein Diversifikationslimit von höchstens drei Spielern je Verein, damit eine schwache Vereinssaison nicht den ganzen Kader trifft. Beides sind Strategievorgaben und keine kicker-Regeln.
+
+Der Kaderwert besteht aus den erwarteten Punkten der jeweils besten Elf plus einem historisch ausgewählten Optionswert für die Bank. Dadurch kann der Solver entweder vier teure Topspieler mit günstigen Auffüllern oder einen breiteren Kader mit fünf belastbaren Spielern einer Position wählen; günstige Bankplätze sind nicht länger praktisch wertlos. Start-, Einwechsel- und DNP-Wahrscheinlichkeiten bewerten Ausfall- und Rotationsrisiken. Die Daten besitzen allerdings keinen zuverlässigen historischen Spielplan internationaler Wettbewerbe. Deshalb wird europäischen Teilnehmern kein frei erfundener Pauschalabzug gegeben; bisher beobachtete Rotation steckt bereits in Start-/DNP-Historie, ein explizites Belastungsfeature bleibt offene Datenarbeit.
+
+Standardmäßig wird die Summe der erwarteten Spieltagspunkte ab dem nächsten ungespielten Spieltag mit festem Saisonkader optimiert. `--with-winter-transfers` aktiviert die separat konfigurierte Transfermodellierung nur für Experimente.
 
 HiGHS-Ergebnisse werden nur geschrieben, wenn ein zulässiger Incumbent existiert, alle Kaderinvarianten erfüllt sind und die MIP-Lücke höchstens 0,5 Prozent beträgt. Status und Lücke stehen im Artefakt.
 
@@ -57,8 +63,12 @@ Das Artefakt enthält für die letzte abgeschlossene Saison:
 - empirische Abdeckung des P10–P90-Intervalls;
 - projizierte und realisierte Punkte des vom Modell gewählten Interactive-Kaders.
 - realisierte Punkte des festen v1-Champions, die Differenz und eine mögliche Rückfallentscheidung.
+- den auf einer früheren Saison gewählten Bank-Optionswert und den separaten Holdout-Wert;
+- die vom Nutzer belegten Bundesliga-Siegerwerte 2.511 (2024/25) und 2.914 (2025/26), sofern die Saison geprüft wird.
 
 Diese Prüfung ist zeitlich getrennt, besitzt wegen der fehlenden historischen Marktsnapshots aber noch keine vollständig belegte Leakage-Sicherheit. Sie ist außerdem noch kein vollständiger Kickoff-Block-Simulator. Alle Spieltagsentscheidungen werden derzeit auf Rundenebene getroffen.
+
+`--mode historical-audit` löst darüber hinaus für jede abgeschlossene Bundesliga-Saison das Interactive-Hindsight-Problem exakt. Der Audit zeigt getrennt den offiziellen regelkonformen Upper Bound und die Variante mit Torwartversicherung plus Feldspieler-Diversifikation. Er beweist damit die Optimierungslogik auf den vorhandenen Preisen und Saisonpunkten, nicht die Vorhersagekraft eines Vorsaisonmodells.
 
 ## Reproduzieren
 

@@ -35,6 +35,7 @@ from .forecast import (
     predict_forecasts,
 )
 from .optimize import optimize_classic_preseason_recourse, optimize_classic_roster, optimize_roster
+from .oracle import build_historical_audit, write_historical_audit
 from .validation import find_target_seasons, run_classic_validation, run_validation
 from .winter import run_classic_winter
 
@@ -48,15 +49,25 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "--mode",
-        choices=("preseason", "classic-winter"),
+        choices=("preseason", "classic-winter", "historical-audit"),
         default="preseason",
-        help="Generate all preseason artifacts or execute one real Classic winter decision",
+        help="Generate preseason artifacts, execute a real Classic winter decision, or prove historical optima",
     )
     parser.add_argument("--config-dir", default=str(DEFAULT_CONFIG_DIR), help="Directory with per-league JSON configs plus defaults.json")
     parser.add_argument("--data-dir", default=str(DEFAULT_DATA_DIR), help="Directory containing catalog.json, seasons/ and signal artifacts")
     parser.add_argument("--iterations", type=int, help="CatBoost iterations for the final mean/class models")
     parser.add_argument("--validation-iterations", type=int, help="CatBoost iterations for holdout models")
     parser.add_argument("--time-limit", type=float, help="HiGHS time limit per roster in seconds")
+    parser.add_argument(
+        "--interactive-bench-weight",
+        type=float,
+        help="Fractional expected-points value assigned to unused Interactive bench options",
+    )
+    parser.add_argument(
+        "--interactive-max-field-players-from-team",
+        type=int,
+        help="Diversification cap for non-goalkeepers from one club (strategy, not an official rule)",
+    )
     parser.add_argument("--skip-validation", action="store_true", help="Skip holdout fitting for a faster local iteration")
     parser.add_argument(
         "--league",
@@ -67,6 +78,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--through-round", type=int, help="Last completed round replayed for classic-winter")
     parser.add_argument("--opening-roster", help="JSON file containing the actual 15-player opening roster and slots")
     parser.add_argument("--output", help="Destination for classic-winter output (never defaults to a production artifact)")
+    parser.add_argument("--audit-output", help="Destination for the historical optimizer audit")
+    parser.add_argument(
+        "--with-winter-transfers",
+        action="store_true",
+        help="Include optional winter transfers in preseason modeling; disabled by default",
+    )
     parser.add_argument(
         "--classic-residual-weight",
         type=float,
@@ -92,6 +109,12 @@ def _resolve_defaults(args: argparse.Namespace) -> None:
         args.validation_iterations = int(config.model_default("validationIterations"))
     if args.time_limit is None:
         args.time_limit = float(config.model_default("timeLimitSeconds"))
+    if args.interactive_bench_weight is None:
+        args.interactive_bench_weight = float(config.model_default("interactiveBenchWeight"))
+    if args.interactive_max_field_players_from_team is None:
+        args.interactive_max_field_players_from_team = int(
+            config.model_default("interactiveMaxFieldPlayersFromTeam")
+        )
     if args.classic_residual_weight is None:
         args.classic_residual_weight = float(config.model_default("classicResidualWeight"))
     if args.classic_scenarios is None:
@@ -107,11 +130,26 @@ def main() -> int:
         raise RuntimeError("--classic-residual-weight muss zwischen 0 und 1 liegen.")
     if args.classic_scenarios < 2:
         raise RuntimeError("--classic-scenarios muss mindestens 2 sein.")
+    if not 0.0 <= args.interactive_bench_weight < 1.0:
+        raise RuntimeError("--interactive-bench-weight muss zwischen 0 (inklusive) und 1 (exklusive) liegen.")
+    if args.interactive_max_field_players_from_team < 1:
+        raise RuntimeError("--interactive-max-field-players-from-team muss positiv sein.")
     if args.league:
         unknown = sorted(set(args.league) - set(config.league_codes()))
         if unknown:
             raise RuntimeError(f"Nicht konfigurierte Liga-Codes: {', '.join(unknown)} (konfiguriert: {', '.join(config.league_codes())})")
     catalog, seasons = load_data()
+    if args.mode == "historical-audit":
+        leagues = args.league or list(config.league_codes())
+        payload = build_historical_audit(seasons, leagues, time_limit=args.time_limit)
+        destination = (
+            Path(args.audit_output)
+            if args.audit_output
+            else config.paths().recommendations_dir / "historical-optimizer-audit.json"
+        )
+        write_historical_audit(payload, destination)
+        print(f"Historischer Optimierungsbeweis → {destination}", flush=True)
+        return 0
     if args.mode == "classic-winter":
         if not args.league or len(args.league) != 1:
             raise RuntimeError("classic-winter erwartet genau eine Liga über --league.")
@@ -129,9 +167,18 @@ def main() -> int:
         validation: Dict[str, Any] = {"status": "not-run"}
         classic_validation: Dict[str, Any] = {"status": "not-run"}
         selected_weights = {league: 1.0 for league in targets}
+        selected_bench_weights = {league: args.interactive_bench_weight for league in targets}
         classic_deploy_challenger = {league: True for league in targets}
     else:
-        validation, selected_weights = run_validation(seasons, targets, args.validation_iterations, args.time_limit)
+        validation, selected_weights, selected_bench_weights = run_validation(
+            seasons,
+            targets,
+            args.validation_iterations,
+            args.time_limit,
+            allow_winter_transfers=args.with_winter_transfers,
+            bench_weight=args.interactive_bench_weight,
+            max_field_players_from_team=args.interactive_max_field_players_from_team,
+        )
         classic_validation, classic_deploy_challenger = run_classic_validation(
             seasons,
             targets,
@@ -139,6 +186,7 @@ def main() -> int:
             args.time_limit,
             args.classic_residual_weight,
             args.classic_scenarios,
+            allow_winter_transfers=args.with_winter_transfers,
         )
     print(f"Finales Modell: Training vor Saison {target_year}/{str(target_year + 1)[-2:]}", flush=True)
     rows, player_states, team_states = build_training_dataset(seasons, target_year)
@@ -195,7 +243,16 @@ def main() -> int:
         )
         forecasts = apply_realized_match_evidence(season, forecasts)
         optimization_forecasts = forecasts_for_remaining_optimization(forecasts, through_round)
-        optimization = optimize_roster(season, players, optimization_forecasts, time_limit=args.time_limit)
+        optimization = optimize_roster(
+            season,
+            players,
+            optimization_forecasts,
+            time_limit=args.time_limit,
+            allow_winter_transfers=args.with_winter_transfers,
+            goalkeepers_from_same_team=True,
+            bench_weight=selected_bench_weights[league],
+            max_field_players_from_team=args.interactive_max_field_players_from_team,
+        )
         recommendation = build_recommendation(
             catalog,
             season,
@@ -203,6 +260,8 @@ def main() -> int:
             forecasts,
             production_player_states,
             optimization,
+            winter_transfers_modeled=args.with_winter_transfers,
+            max_field_players_from_team=args.interactive_max_field_players_from_team,
         )
         recommendation["availabilityAudit"] = availability_audit
         recommendation["currentSeasonEvidence"] = current_season_evidence(season)
@@ -215,18 +274,22 @@ def main() -> int:
             len(rows),
             target_year - 1,
             selected_weights[league],
+            selected_bench_weights[league],
             output_dir,
+        )
+        deployed_classic_residual_weight = (
+            args.classic_residual_weight if classic_deploy_challenger[league] else 0.0
         )
         classic_forecasts = classic_residual_forecasts(
             raw_forecasts,
             classic_baselines[league]["playerProjections"],
             classic_baselines[league]["playerAvailability"],
             int(season["roundCount"]),
-            args.classic_residual_weight,
+            deployed_classic_residual_weight,
         )
         classic_forecasts = apply_realized_match_evidence(season, classic_forecasts)
         classic_optimization_forecasts = forecasts_for_remaining_optimization(classic_forecasts, through_round)
-        if classic_deploy_challenger[league]:
+        if classic_deploy_challenger[league] and args.with_winter_transfers:
             classic_optimization = optimize_classic_preseason_recourse(
                 season,
                 players,
@@ -240,6 +303,7 @@ def main() -> int:
                 players,
                 classic_optimization_forecasts,
                 time_limit=args.time_limit,
+                allow_winter_transfers=args.with_winter_transfers,
             )
         classic_recommendation = build_classic_recommendation(
             season,
@@ -247,9 +311,11 @@ def main() -> int:
             classic_forecasts,
             production_player_states,
             classic_optimization,
+            winter_transfers_modeled=args.with_winter_transfers,
         )
         classic_recommendation["availabilityAudit"] = availability_audit
         classic_recommendation["currentSeasonEvidence"] = current_season_evidence(season)
+        classic_recommendation["modelResidualWeight"] = deployed_classic_residual_weight
         classic_recommendation["rules"]["availabilityPolicy"] = "current medical status blocks opening-roster selection"
         write_classic_artifact(
             catalog,

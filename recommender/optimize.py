@@ -133,8 +133,15 @@ def optimize_roster(
     forecasts: Sequence[Forecast],
     *,
     time_limit: float = 180.0,
+    allow_winter_transfers: bool = False,
+    goalkeepers_from_same_team: bool = False,
+    bench_weight: float = 0.0,
+    max_field_players_from_team: Optional[int] = None,
 ) -> OptimizationResult:
     rules = config.rules_for(season, "interactive")
+    transfer_limit = rules.transfer_limit if allow_winter_transfers else 0
+    if not 0.0 <= bench_weight < 1.0:
+        raise ValueError("Interactive: bench_weight muss zwischen 0 (inklusive) und 1 (exklusive) liegen.")
     player_ids = sorted(players)
     rounds = list(range(1, int(season["roundCount"]) + 1))
     forecast_map = {(forecast.player_id, forecast.round): forecast for forecast in forecasts}
@@ -161,27 +168,40 @@ def optimize_roster(
         return index
 
     for player_id in player_ids:
-        season_mean = sum(forecast_map[(player_id, round_number)].mean_points for round_number in rounds)
-        x_summer_index[player_id] = add_binary(-season_mean * 1e-7)
-        x_winter_index[player_id] = add_binary(-season_mean * 1e-7)
+        opening_mean = sum(
+            forecast_map[(player_id, round_number)].mean_points
+            for round_number in rounds
+            if round_number < winter_round
+        )
+        winter_mean = sum(
+            forecast_map[(player_id, round_number)].mean_points
+            for round_number in rounds
+            if round_number >= winter_round
+        )
+        price_tiebreak = round(float(players[player_id]["priceM"]) * 100) * 1e-9
+        x_summer_index[player_id] = add_binary(-opening_mean * bench_weight + price_tiebreak)
+        x_winter_index[player_id] = add_binary(-winter_mean * bench_weight + price_tiebreak)
         transfer_out_index[player_id] = add_binary(0.0)
         transfer_in_index[player_id] = add_binary(0.0)
     goalkeepers_by_team: Dict[str, List[str]] = defaultdict(list)
     for player_id in player_ids:
         if players[player_id]["position"] == "GK":
             goalkeepers_by_team[str(players[player_id]["teamId"])].append(player_id)
-    eligible_goalkeeper_teams = sorted(
-        team_id for team_id, goalkeeper_ids in goalkeepers_by_team.items() if len(goalkeeper_ids) >= rules.roster_counts["GK"]
-    )
-    if not eligible_goalkeeper_teams:
-        raise RuntimeError("Interactive: kein Verein hat drei auswählbare Torhüter für die Torwartversicherung.")
-    for team_id in eligible_goalkeeper_teams:
-        goalkeeper_team_summer_index[team_id] = add_binary(0.0)
-        goalkeeper_team_winter_index[team_id] = add_binary(0.0)
+    if goalkeepers_from_same_team:
+        eligible_goalkeeper_teams = sorted(
+            team_id
+            for team_id, goalkeeper_ids in goalkeepers_by_team.items()
+            if len(goalkeeper_ids) >= rules.roster_counts["GK"]
+        )
+        if not eligible_goalkeeper_teams:
+            raise RuntimeError("Interactive: kein Verein hat drei auswählbare Torhüter für die optionale Torwartversicherung.")
+        for team_id in eligible_goalkeeper_teams:
+            goalkeeper_team_summer_index[team_id] = add_binary(0.0)
+            goalkeeper_team_winter_index[team_id] = add_binary(0.0)
     for round_number in rounds:
         for player_id in player_ids:
             forecast = forecast_map[(player_id, round_number)]
-            y_index[(player_id, round_number)] = add_binary(-forecast.mean_points)
+            y_index[(player_id, round_number)] = add_binary(-(1.0 - bench_weight) * forecast.mean_points)
         for formation_index in range(len(FORMATIONS)):
             z_index[(round_number, formation_index)] = add_binary(0.0)
 
@@ -215,16 +235,37 @@ def optimize_roster(
         winter_coefficients = {x_winter_index[player_id]: 1.0 for player_id in player_ids if players[player_id]["position"] == position}
         add_row(summer_coefficients, rules.roster_counts[position], rules.roster_counts[position])
         add_row(winter_coefficients, rules.roster_counts[position], rules.roster_counts[position])
-    add_row({index: 1.0 for index in goalkeeper_team_summer_index.values()}, 1.0, 1.0)
-    add_row({index: 1.0 for index in goalkeeper_team_winter_index.values()}, 1.0, 1.0)
-    for team_id, goalkeeper_ids in goalkeepers_by_team.items():
-        summer_coefficients = {x_summer_index[player_id]: 1.0 for player_id in goalkeeper_ids}
-        winter_coefficients = {x_winter_index[player_id]: 1.0 for player_id in goalkeeper_ids}
-        if team_id in goalkeeper_team_summer_index:
-            summer_coefficients[goalkeeper_team_summer_index[team_id]] = -float(rules.roster_counts["GK"])
-            winter_coefficients[goalkeeper_team_winter_index[team_id]] = -float(rules.roster_counts["GK"])
-        add_row(summer_coefficients, 0.0, 0.0)
-        add_row(winter_coefficients, 0.0, 0.0)
+    if max_field_players_from_team is not None:
+        if max_field_players_from_team < 1:
+            raise ValueError("Interactive: max_field_players_from_team muss positiv sein.")
+        for team_id in sorted({str(player["teamId"]) for player in players.values()}):
+            field_ids = [
+                player_id
+                for player_id in player_ids
+                if players[player_id]["position"] != "GK"
+                and str(players[player_id]["teamId"]) == team_id
+            ]
+            add_row(
+                {x_summer_index[player_id]: 1.0 for player_id in field_ids},
+                -highspy.kHighsInf,
+                float(max_field_players_from_team),
+            )
+            add_row(
+                {x_winter_index[player_id]: 1.0 for player_id in field_ids},
+                -highspy.kHighsInf,
+                float(max_field_players_from_team),
+            )
+    if goalkeepers_from_same_team:
+        add_row({index: 1.0 for index in goalkeeper_team_summer_index.values()}, 1.0, 1.0)
+        add_row({index: 1.0 for index in goalkeeper_team_winter_index.values()}, 1.0, 1.0)
+        for team_id, goalkeeper_ids in goalkeepers_by_team.items():
+            summer_coefficients = {x_summer_index[player_id]: 1.0 for player_id in goalkeeper_ids}
+            winter_coefficients = {x_winter_index[player_id]: 1.0 for player_id in goalkeeper_ids}
+            if team_id in goalkeeper_team_summer_index:
+                summer_coefficients[goalkeeper_team_summer_index[team_id]] = -float(rules.roster_counts["GK"])
+                winter_coefficients[goalkeeper_team_winter_index[team_id]] = -float(rules.roster_counts["GK"])
+            add_row(summer_coefficients, 0.0, 0.0)
+            add_row(winter_coefficients, 0.0, 0.0)
     for player_id in player_ids:
         add_row(
             {
@@ -241,8 +282,8 @@ def optimize_roster(
             -highspy.kHighsInf,
             1.0,
         )
-    add_row({transfer_in_index[player_id]: 1.0 for player_id in player_ids}, -highspy.kHighsInf, rules.transfer_limit)
-    add_row({transfer_out_index[player_id]: 1.0 for player_id in player_ids}, -highspy.kHighsInf, rules.transfer_limit)
+    add_row({transfer_in_index[player_id]: 1.0 for player_id in player_ids}, -highspy.kHighsInf, transfer_limit)
+    add_row({transfer_out_index[player_id]: 1.0 for player_id in player_ids}, -highspy.kHighsInf, transfer_limit)
     for position in POSITIONS:
         add_row(
             {
@@ -306,10 +347,11 @@ def optimize_roster(
     transfers_in = [player_id for player_id in player_ids if solution[transfer_in_index[player_id]] > 0.5]
     if len(selected_ids) != 22:
         raise RuntimeError(f"Ungültige Kadergröße aus HiGHS: {len(selected_ids)}")
-    if len(winter_selected_ids) != 22 or len(transfers_in) != len(transfers_out) or len(transfers_in) > rules.transfer_limit:
+    if len(winter_selected_ids) != 22 or len(transfers_in) != len(transfers_out) or len(transfers_in) > transfer_limit:
         raise RuntimeError("Ungültiger Winterkader aus HiGHS.")
-    validate_interactive_goalkeeper_stack(players, selected_ids, "Eröffnungskader")
-    validate_interactive_goalkeeper_stack(players, winter_selected_ids, "Winterkader")
+    if goalkeepers_from_same_team:
+        validate_interactive_goalkeeper_stack(players, selected_ids, "Eröffnungskader")
+        validate_interactive_goalkeeper_stack(players, winter_selected_ids, "Winterkader")
     lineups = {
         round_number: [player_id for player_id in player_ids if solution[y_index[(player_id, round_number)]] > 0.5]
         for round_number in rounds
@@ -364,6 +406,7 @@ def optimize_classic_roster(
     reserve_refinements: int = 5,
     reserve_candidates: Optional[List[ClassicOptimizationResult]] = None,
     reserve_signatures: Optional[Set[Tuple[Tuple[str, ...], ...]]] = None,
+    allow_winter_transfers: bool = False,
 ) -> ClassicOptimizationResult:
     """Solve Classic with fixed slots and independent reserve activation.
 
@@ -375,6 +418,7 @@ def optimize_classic_roster(
     """
 
     rules = config.rules_for(season, "classic")
+    transfer_limit = rules.transfer_limit if allow_winter_transfers else 0
     player_ids = sorted(players)
     rounds = sorted({int(forecast.round) for forecast in forecasts})
     if not rounds:
@@ -437,11 +481,10 @@ def optimize_classic_roster(
 
     for phase, phase_matchdays in phase_rounds.items():
         for player_id in player_ids:
-            season_mean = sum(forecast_map[(player_id, round_number)].mean_points for round_number in phase_matchdays)
             locked_role = opening_slots.get(player_id) if opening_slots is not None and phase == "opening" else None
             locked_member = locked_role is not None
             x_index[(phase, player_id)] = add_column(
-                -season_mean * 1e-7,
+                round(float(players[player_id]["priceM"]) * 100) * 1e-9,
                 maximum=1.0 if phase != "opening" or opening_slots is None or locked_member else 0.0,
                 minimum=1.0 if locked_member else 0.0,
             )
@@ -552,7 +595,7 @@ def optimize_classic_roster(
                 for role in ("starter", "reserve")
             },
             -highspy.kHighsInf,
-            rules.transfer_limit,
+            transfer_limit,
         )
     for position in POSITIONS:
         position_ids = [player_id for player_id in player_ids if players[player_id]["position"] == position]
@@ -686,6 +729,7 @@ def optimize_classic_roster(
             reserve_refinements=reserve_refinements - 1,
             reserve_candidates=reserve_candidates,
             reserve_signatures=reserve_signatures,
+            allow_winter_transfers=allow_winter_transfers,
         )
     best = max(reserve_candidates, key=lambda candidate: candidate.objective)
     suffix = "cycle" if repeated_signature else "iteration-limit"
@@ -777,6 +821,7 @@ def optimize_classic_preseason_recourse(
             players,
             scenario,
             time_limit=time_limit,
+            allow_winter_transfers=True,
         )
         signature = classic_slot_signature(result)
         candidates[signature] = dict(signature)
@@ -794,6 +839,7 @@ def optimize_classic_preseason_recourse(
                     scenario,
                     time_limit=time_limit,
                     opening_slots=opening_slots,
+                    allow_winter_transfers=True,
                 )
             responses.append(response)
         expected_points = mean([response.objective for response in responses])

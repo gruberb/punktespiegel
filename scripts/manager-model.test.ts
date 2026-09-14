@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { existsSync, readFileSync } from "node:fs";
 import test from "node:test";
-import { leagueProjectionFactor, recommendManagerSquad } from "./manager-model.ts";
+import { leagueProjectionFactor, managerRules, recommendManagerSquad } from "./manager-model.ts";
 import type { ManagerSeason } from "./manager-model.ts";
 import type { Catalog, Position } from "../frontend/src/types.ts";
 import type { ManagerMode, ManagerRecommendation } from "./manager-types.ts";
@@ -91,6 +91,13 @@ test("discounts historical points when a player moves into a higher league", () 
   assert.equal(leagueProjectionFactor("0001", "0002", "MID"), 1);
 });
 
+test("uses the season-correct historical Classic formation", () => {
+  assert.deepEqual(managerRules("classic", "0001", 2023).positions, { GK: 2, DEF: 4, MID: 6, FWD: 3 });
+  assert.deepEqual(managerRules("classic", "0001", 2023).formations, [{ GK: 1, DEF: 3, MID: 5, FWD: 2 }]);
+  assert.deepEqual(managerRules("classic", "0001", 2024).positions, { GK: 2, DEF: 5, MID: 5, FWD: 3 });
+  assert.deepEqual(managerRules("classic", "0001", 2024).formations, [{ GK: 1, DEF: 4, MID: 4, FWD: 2 }]);
+});
+
 test("tracks actual points for the recommended starting eleven by matchday", () => {
   const trackedSeason = {
     ...season,
@@ -167,6 +174,12 @@ for (const league of ["0001", "0002", "0003"]) {
         const teamCounts = new Map<string, number>();
         published.players.forEach((player) => teamCounts.set(player.teamId, (teamCounts.get(player.teamId) ?? 0) + 1));
         assert.ok([...teamCounts.values()].every((count) => count <= published.rules.maxFromTeam!));
+      }
+      if (published.rules.maxFieldPlayersFromTeam != null) {
+        const fieldTeamCounts = new Map<string, number>();
+        published.players.filter((player) => player.position !== "GK")
+          .forEach((player) => fieldTeamCounts.set(player.teamId, (fieldTeamCounts.get(player.teamId) ?? 0) + 1));
+        assert.ok([...fieldTeamCounts.values()].every((count) => count <= published.rules.maxFieldPlayersFromTeam!));
       }
       const starters = published.players.filter((player) => player.role === "start");
       assert.ok(starters.every((player) => (player.pStart ?? 0) + (player.pSub ?? 0) >= (player.position === "GK" ? 0.5 : 0.18)));
@@ -268,6 +281,10 @@ for (const league of ["0001", "0002", "0003"]) {
       assert.equal(recommendation.players.filter((player) => player.position === position && player.role === "reserve").length, 1);
     }
     assert.equal(recommendation.winterPlan?.transferLimit, 3);
+    if (league === "0001") {
+      assert.equal(recommendation.winterPlan?.modeled, false);
+      assert.equal(recommendation.winterPlan?.transferCount, 0);
+    }
     assert.ok((recommendation.winterPlan?.transferCount ?? 4) <= 3);
     assert.equal(recommendation.projectedMatchdays?.length, league === "0003" ? 38 : 34);
     assert.ok(recommendation.projectedMatchdays?.every((matchday) => matchday.players.length === 11));
@@ -290,12 +307,17 @@ for (const league of ["0001", "0002", "0003"]) {
     assert.equal(recommendation.players.filter((player) => player.role === "start").length, 11);
     assert.ok(recommendation.spentM <= recommendation.budgetM);
     assert.equal(recommendation.rules.goalkeepersFromSameTeam, true);
+    if (league === "0001") assert.equal(recommendation.rules.maxFieldPlayersFromTeam, 3);
     const openingGoalkeepers = recommendation.players.filter((player) => player.position === "GK");
     assert.equal(openingGoalkeepers.length, 3);
     assert.equal(new Set(openingGoalkeepers.map((player) => player.teamId)).size, 1);
     const roundCount = league === "0003" ? 38 : 34;
     assert.equal(recommendation.projectedMatchdays?.length, roundCount);
     assert.ok([3, 4].includes(recommendation.winterPlan?.transferLimit ?? 0));
+    if (league === "0001") {
+      assert.equal(recommendation.winterPlan?.modeled, false);
+      assert.equal(recommendation.winterPlan?.transferCount, 0);
+    }
     assert.ok((recommendation.winterPlan?.transferCount ?? 5) <= (recommendation.winterPlan?.transferLimit ?? 0));
     assert.ok((recommendation.winterPlan?.spentM ?? recommendation.budgetM + 1) <= recommendation.budgetM);
     for (const transfer of recommendation.winterPlan?.transfers ?? []) {

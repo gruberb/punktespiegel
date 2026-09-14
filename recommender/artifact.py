@@ -198,6 +198,9 @@ def build_recommendation(
     forecasts: Sequence[Forecast],
     player_states: Mapping[str, PlayerState],
     optimization: OptimizationResult,
+    *,
+    winter_transfers_modeled: bool = False,
+    max_field_players_from_team: Optional[int] = None,
 ) -> Dict[str, Any]:
     rules = config.rules_for(season, "interactive")
     teams = {team["id"]: team for team in season["teams"]}
@@ -330,6 +333,7 @@ def build_recommendation(
         "spentM": spent_m,
         "remainingM": rounded(rules.budget_m - spent_m, 2),
         "winterPlan": {
+            "modeled": winter_transfers_modeled,
             "startMatchday": winter_round,
             "transferLimit": rules.transfer_limit,
             "transferCount": len(winter_transfers),
@@ -347,6 +351,8 @@ def build_recommendation(
             "positions": rules.roster_counts,
             "maxFromTeam": None,
             "goalkeepersFromSameTeam": True,
+            "maxFieldPlayersFromTeam": max_field_players_from_team,
+            "strategyConstraints": "same-club goalkeeper depth and field-player club diversification are risk choices, not official kicker limits",
         },
         "optimization": {
             "solver": "HiGHS",
@@ -363,6 +369,8 @@ def build_classic_recommendation(
     forecasts: Sequence[Forecast],
     player_states: Mapping[str, PlayerState],
     optimization: ClassicOptimizationResult,
+    *,
+    winter_transfers_modeled: bool = False,
 ) -> Dict[str, Any]:
     rules = config.rules_for(season, "classic")
     teams = {team["id"]: team for team in season["teams"]}
@@ -534,6 +542,7 @@ def build_classic_recommendation(
             }
 
         winter_plan: Dict[str, Any] = {
+            "modeled": winter_transfers_modeled,
             "startMatchday": config.winter_start_round(season["leagueCode"], int(season["roundCount"])),
             "transferLimit": rules.transfer_limit,
             "transferCount": 0,
@@ -547,6 +556,7 @@ def build_classic_recommendation(
         }
     else:
         winter_plan = {
+            "modeled": winter_transfers_modeled,
             "startMatchday": config.winter_start_round(season["leagueCode"], int(season["roundCount"])),
             "transferLimit": rules.transfer_limit,
             "transferCount": len(transfers),
@@ -616,7 +626,7 @@ def validate_publication(recommendation: Mapping[str, Any]) -> None:
     starters = [player for player in recommendation["players"] if player["role"] == "start"]
     if len(starters) != 11:
         raise RuntimeError("Veröffentlichung abgebrochen: Startelf enthält nicht genau 11 Spieler.")
-    if recommendation.get("mode") == "interactive":
+    if recommendation.get("mode") == "interactive" and recommendation.get("rules", {}).get("goalkeepersFromSameTeam"):
         goalkeepers = [player for player in recommendation["players"] if player["position"] == "GK"]
         if len(goalkeepers) != config.interactive_roster_counts()["GK"] or len({player["teamId"] for player in goalkeepers}) != 1:
             raise RuntimeError(
@@ -632,6 +642,15 @@ def validate_publication(recommendation: Mapping[str, Any]) -> None:
             raise RuntimeError(
                 "Veröffentlichung abgebrochen: Interactive-Winterkader bricht die Torwartversicherung."
             )
+    if recommendation.get("mode") == "interactive":
+        field_limit = recommendation.get("rules", {}).get("maxFieldPlayersFromTeam")
+        if field_limit is not None:
+            field_counts: Dict[str, int] = defaultdict(int)
+            for player in recommendation["players"]:
+                if player["position"] != "GK":
+                    field_counts[str(player["teamId"])] += 1
+            if max(field_counts.values(), default=0) > int(field_limit):
+                raise RuntimeError("Veröffentlichung abgebrochen: Interactive-Kader bricht die Vereinsdiversifikation.")
     for player in starters:
         appearance = float(player.get("pStart", 0.0)) + float(player.get("pSub", 0.0))
         minimum = 0.50 if player["position"] == "GK" else 0.18
@@ -662,6 +681,7 @@ def write_artifact(
     training_rows: int,
     training_end_year: int,
     model_weight: float,
+    bench_weight: float,
     output_dir: Optional[Path] = None,
 ) -> None:
     validate_publication(recommendation)
@@ -684,10 +704,12 @@ def write_artifact(
             "quantiles": "heuristic unconditional UI intervals; not calibrated decision intervals",
             "coldStart": "price-tier empirical-Bayes prior",
             "optimizer": "multi-matchday mixed-integer model solved with HiGHS",
-            "goalkeeperInsurance": "three goalkeepers from one club in both roster phases",
+            "goalkeeperInsurance": "three goalkeepers from one club as an explicit risk strategy, not an official rule",
+            "benchOptionWeight": bench_weight,
+            "clubDiversification": recommendation["rules"].get("maxFieldPlayersFromTeam"),
             "objective": (
                 "sum of expected points from the best valid XI in every matchday with the "
-                "season-specific position-preserving winter window"
+                "fixed season roster; optional winter transfers are excluded unless explicitly requested"
             ),
             "lineupEligibility": "selectable and not currently injured, in rehabilitation, or not considered",
             "historicalMarketSnapshots": "unavailable; validation is experimental until archived snapshots exist",
@@ -748,6 +770,7 @@ def write_classic_artifact(
     output_dir: Optional[Path] = None,
 ) -> None:
     validate_publication(recommendation)
+    winter_transfers_modeled = bool(recommendation.get("winterPlan", {}).get("modeled"))
     role_signals = load_current_role_signals(season)
     availability_signals = load_current_availability_signals(season)
     performance_benchmark = load_external_performance_benchmark()
@@ -761,8 +784,20 @@ def write_classic_artifact(
             "seasonId": season["id"],
         },
         "model": {
-            "name": "Classic-v2 recourse" if deploy_challenger else "Classic-v2 availability-aware stable",
-            "deploymentModel": "scenario-recourse-v2" if deploy_challenger else "availability-aware-stable-v2",
+            "name": (
+                "Classic-v2 fixed-season"
+                if not winter_transfers_modeled
+                else "Classic-v2 recourse"
+                if deploy_challenger
+                else "Classic-v2 availability-aware stable"
+            ),
+            "deploymentModel": (
+                "fixed-season-v2"
+                if not winter_transfers_modeled
+                else "scenario-recourse-v2"
+                if deploy_challenger
+                else "availability-aware-stable-v2"
+            ),
             "roleModel": "CatBoost multiclass DNP/sub/starter",
             "pointsModel": "stable season prior plus configured CatBoost fixture residual",
             "quantiles": "heuristic unconditional UI intervals; not calibrated decision intervals",
@@ -771,19 +806,23 @@ def write_classic_artifact(
                 "best-response roster selection and exact candidate rescoring"
             ),
             "optimizer": (
-                "sample-average preseason recourse with a separate legal HiGHS winter response per scenario"
+                "one fixed full-season roster; optional winter transfers excluded"
+                if not winter_transfers_modeled
+                else "sample-average preseason recourse with a separate legal HiGHS winter response per scenario"
                 if deploy_challenger
                 else "fresh availability-aware optimization over the stable conditional scoring prior"
             ),
             "objective": (
-                "average expected points across latent winter states with the opening slots shared across scenarios"
+                "expected points of the fixed 4-4-2 and its exact position reserves over the full season"
+                if not winter_transfers_modeled
+                else "average expected points across latent winter states with the opening slots shared across scenarios"
                 if deploy_challenger
                 else "stable conditional scoring prior retained after the recourse challenger regressed; roster is never copied"
             ),
             "starterEligibility": "selectable and not currently injured, in rehabilitation, or not considered",
             "historicalMarketSnapshots": "unavailable; validation is experimental until archived snapshots exist",
-            "classicResidualWeight": validation.get("residualWeight"),
-            "winterScenarioCount": validation.get("scenarioCount") if deploy_challenger else None,
+            "classicResidualWeight": recommendation.get("modelResidualWeight", validation.get("residualWeight")),
+            "winterScenarioCount": validation.get("scenarioCount") if deploy_challenger and winter_transfers_modeled else None,
             "currentRoleSignals": None if role_signals is None else {
                 "provider": role_signals["provider"],
                 "generatedAt": role_signals["generatedAt"],

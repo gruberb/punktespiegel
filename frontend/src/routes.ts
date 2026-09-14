@@ -5,7 +5,6 @@ export type RouteView =
   | "player"
   | "teams"
   | "team"
-  | "top"
   | "about"
   | "methodology"
   | "sources"
@@ -18,7 +17,6 @@ const routePaths: Record<RouteView, string> = {
   player: "/spieler",
   teams: "/mannschaften",
   team: "/mannschaften",
-  top: "/topspieler",
   about: "/ueber",
   methodology: "/daten-methodik",
   sources: "/quellen",
@@ -29,7 +27,9 @@ const routePaths: Record<RouteView, string> = {
 // old links and the crawled /historie path keep resolving to the Tabellen page.
 // The Fantasy-Team page was removed with the shift to a stats-first product;
 // its crawled path resolves to the Mannschaften overview.
+// Topspieler now uses the history columns of the shared Spieler table.
 const legacyPaths: Record<string, RouteView> = {
+  "/topspieler": "players",
   "/historie": "table",
   "/fantasy-team": "teams",
 };
@@ -56,4 +56,12 @@ export function viewFromPathname(pathname: string, playerId: string | null, team
   if (legacyPaths[normalized]) return legacyPaths[normalized];
   return (Object.entries(routePaths) as [RouteView, string][])
     .find(([view, path]) => view !== "player" && view !== "team" && path === normalized)?.[0] ?? null;
+}
+
+export type PlayerColumns = "season" | "history";
+
+export function playerColumnsFromLocation(pathname: string, params: URLSearchParams): PlayerColumns {
+  return normalizedPathname(pathname) === "/topspieler" || params.get("view") === "top" || params.get("columns") === "history"
+    ? "history"
+    : "season";
 }

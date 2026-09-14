@@ -88,15 +88,19 @@ export function leagueProjectionFactor(fromLeague: string, toLeague: string, pos
   return factor;
 }
 
-export function managerRules(mode: ManagerMode, league: string): ManagerRules {
+export function managerRules(mode: ManagerMode, league: string, startYear = 2024): ManagerRules {
   const budgetM = budgets[mode][league];
   if (budgetM == null) throw new Error("Für diese Liga sind keine Manager-Regeln hinterlegt.");
   return mode === "classic"
     ? {
         budgetM,
-        positions: { GK: 2, DEF: 5, MID: 5, FWD: 3 },
+        positions: startYear < 2024
+          ? { GK: 2, DEF: 4, MID: 6, FWD: 3 }
+          : { GK: 2, DEF: 5, MID: 5, FWD: 3 },
         maxFromTeam: 3,
-        formations: [{ GK: 1, DEF: 4, MID: 4, FWD: 2 }],
+        formations: startYear < 2024
+          ? [{ GK: 1, DEF: 3, MID: 5, FWD: 2 }]
+          : [{ GK: 1, DEF: 4, MID: 4, FWD: 2 }],
         reserveWeight: 0.05,
         goalkeepersFromSameTeam: false,
       }
@@ -208,7 +212,7 @@ function buildCandidates(catalog: Catalog, season: ManagerSeason, rules: Manager
 }
 
 export function managerCandidateProjections(catalog: Catalog, season: ManagerSeason, mode: ManagerMode) {
-  const rules = managerRules(mode, season.leagueCode);
+  const rules = managerRules(mode, season.leagueCode, season.startYear);
   return buildCandidates(catalog, season, rules).map((candidate) => ({
     id: candidate.id,
     projectedPoints: candidate.projectedPoints,
@@ -414,7 +418,7 @@ function formationLabel(formation: Formation) {
 }
 
 export function recommendManagerSquad(catalog: Catalog, season: ManagerSeason, mode: ManagerMode): ManagerRecommendation {
-  const rules = managerRules(mode, season.leagueCode);
+  const rules = managerRules(mode, season.leagueCode, season.startYear);
   const candidates = buildCandidates(catalog, season, rules);
   const state = optimizeRoster(candidates, rules);
   const matchRounds = new Map(season.matches.map((match) => [match.id, match.round]));

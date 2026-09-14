@@ -111,6 +111,7 @@ def run_classic_winter(
         forecasts,
         time_limit=args.time_limit,
         opening_slots=opening_slots,
+        allow_winter_transfers=True,
     )
     teams = {team["id"]: team for team in season["teams"]}
     transfers = pair_classic_transfers(players, teams, optimization)
