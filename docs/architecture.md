@@ -23,6 +23,7 @@ flowchart LR
 | --- | --- |
 | `punktespiegel-data` | Quellverträge prüfen, historische Kaderzuordnung rekonstruieren und statische Snapshots schreiben |
 | Saisonartefakte | Normalisierte Teams, Spieler, Spieltage, Spiele und Punkteaktionen einer Liga-Saison |
+| Spieltagstexte | Kandidaten-Fakten je Spieltag, optional von Claude ausgewählt und formuliert, gegen die Fakten geprüft (`data/insights`) |
 | `catalog.json` | Kleine Einstiegdatei mit Liga-, Saison-, Aktualitäts- und Mannschaftszugehörigkeitsmetadaten |
 | React/Vite | Filter, Navigation, Tabellen, Detailseiten und sämtliche Aggregationen |
 | GitHub Pages/Nginx | Unveränderte statische Dateien ausliefern |
@@ -51,6 +52,10 @@ Die Darstellung berechnet daraus deterministisch:
 - Spieler- und Mannschaftsdetailseiten,
 - die punktstärkste reguläre Elf für Saison oder Spieltag,
 - nach Position gruppierte Vereinskader und eine mögliche Elf, die vor Saisonbeginn aus dem Bundesliga-Rollensnapshot und danach aus den häufigsten tatsächlichen Startelfeinsätzen abgeleitet wird.
+
+## Spieltagstexte
+
+`data/insights/<saison-id>.json` enthält je gespieltem Spieltag bis zu drei Karten (Titel, Frage, Ergebnis, Detail, eine Darstellung aus letzten Ergebnissen, Punkten je Spieltag oder Ausgängen je Spiel) und bis zu vier Kennzahlen (Wert, Kontext, Satz). Karten und Kennzahlen nennen ihren Verein oder Spieler samt kicker-Bild, damit die Oberfläche Logos und Porträts zeigt und auf Profile verlinkt. Alle Zahlen berechnet der Generator; ein Sprachmodell darf nur auswählen und umformulieren, und jede Formulierung wird vor der Veröffentlichung gegen die Fakten geprüft. Fehlt die Datei, zeigt die Überblickseite die Tabelle ohne Karten.
 
 ## Nachrichten
 

@@ -1,19 +1,85 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
   <title id="title">Punktespiegel</title>
-  <desc id="desc">Statistiken, Kader, Transfers, Noten und Punkte für Bundesliga, 2. Bundesliga und 3. Liga.</desc>
-  <rect width="1200" height="630" fill="#F7F6FB"/>
-  <circle cx="1090" cy="-10" r="300" fill="#EAE2FF"/>
-  <circle cx="1120" cy="600" r="220" fill="#D7C7FF" opacity=".62"/>
-  <g transform="translate(72 78) scale(1.12)">
-    <path fill="#7547E3" d="M62 8C31.1 8 12 27.1 12 58v48c0 7.7 6.3 14 14 14h40c30.9 0 50-19.1 50-50V58C116 27.1 96.9 8 66 8h-4Z"/>
-    <circle cx="46" cy="50" r="10" fill="#FFFFFF"/>
-    <circle cx="82" cy="78" r="8" fill="none" stroke="#D7C7FF" stroke-width="5"/>
+  <desc id="desc">Kicker-Noten, Managerpunkte, Tabellen und Kader für Bundesliga, 2. Bundesliga und 3. Liga.</desc>
+  <defs>
+    <pattern id="grid" width="24" height="24" patternUnits="userSpaceOnUse">
+      <path d="M24 0H0V24" fill="none" stroke="#131215" stroke-opacity=".05"/>
+    </pattern>
+    <linearGradient id="holo" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffb8dc"/><stop offset=".22" stop-color="#ffe9a6"/><stop offset=".42" stop-color="#b9f3d6"/>
+      <stop offset=".62" stop-color="#a9dcff"/><stop offset=".82" stop-color="#cbb7ff"/><stop offset="1" stop-color="#ffb8dc"/>
+    </linearGradient>
+    <radialGradient id="sheen" cx=".3" cy=".25" r=".6"><stop offset="0" stop-color="#fff" stop-opacity=".85"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
+    <symbol id="cross" viewBox="0 0 14 14"><circle cx="7" cy="7" r="4.5" fill="none" stroke="#b9b8b2"/><path d="M7 0v14M0 7h14" stroke="#b9b8b2"/></symbol>
+    <style>
+      .sans { font-family: Archivo, "Helvetica Neue", Arial, sans-serif; }
+      .mono { font-family: "IBM Plex Mono", "SF Mono", Menlo, monospace; letter-spacing: 1.6px; }
+    </style>
+  </defs>
+  <rect width="1200" height="630" fill="#eeeeeb"/>
+  <rect width="1200" height="630" fill="url(#grid)"/>
+  <path d="M760 0V630" stroke="#d9d8d3"/>
+  <use href="#cross" x="728" y="26" width="18" height="18"/>
+  <use href="#cross" x="1160" y="26" width="18" height="18"/>
+  <use href="#cross" x="24" y="586" width="18" height="18"/>
+
+  <!-- wordmark -->
+  <g transform="translate(72 64)">
+    <rect width="44" height="44" fill="#131215"/>
+    <path d="M7.15 36.85 36.85 7.15" fill="none" stroke="#f7f7f5" stroke-width="1.1" stroke-dasharray="2.4 2" opacity=".6"/>
+    <circle cx="15.1" cy="15.1" r="5.8" fill="#f7f7f5"/>
+    <circle cx="28.9" cy="28.9" r="5" fill="none" stroke="#f7f7f5" stroke-width="1.8"/>
+    <text class="sans" x="64" y="30" fill="#131215" font-size="22" font-weight="700" letter-spacing="1.8" font-stretch="112%">PUNKTESPIEGEL</text>
   </g>
-  <text x="230" y="160" fill="#180E30" font-family="Noto Sans, Arial, sans-serif" font-size="64" font-weight="760" letter-spacing="-2">Punktespiegel</text>
-  <text x="74" y="280" fill="#180E30" font-family="Noto Sans, Arial, sans-serif" font-size="46" font-weight="720">Fußballdaten im Detail.</text>
-  <text x="74" y="338" fill="#7547E3" font-family="Noto Sans, Arial, sans-serif" font-size="46" font-weight="720">Aktuell und historisch.</text>
-  <text x="76" y="402" fill="#5B526C" font-family="Noto Sans, Arial, sans-serif" font-size="23">Kader · Transfers · Noten · Punkte · Karrierewerte</text>
-  <rect x="74" y="474" width="612" height="66" rx="33" fill="#FFFFFF" stroke="#D7D2E0" stroke-width="2"/>
-  <text x="108" y="517" fill="#180E30" font-family="Noto Sans, Arial, sans-serif" font-size="23" font-weight="680">Bundesliga · 2. Bundesliga · 3. Liga</text>
-  <text x="1015" y="574" fill="#5B526C" font-family="Noto Sans, Arial, sans-serif" font-size="17" text-anchor="end">Unabhängiges Analyseprojekt</text>
+
+  <text class="mono" x="74" y="196" fill="#48464d" font-size="15">BUNDESLIGA · 2. BUNDESLIGA · 3. LIGA</text>
+  <text class="sans" x="68" y="300" fill="#131215" font-size="104" font-weight="560" letter-spacing="-5.5">Punkte,</text>
+  <text class="sans" x="68" y="398" fill="#131215" font-size="104" font-weight="560" letter-spacing="-5.5">Noten,</text>
+  <text class="sans" x="68" y="496" fill="#7b7980" font-size="104" font-weight="400" letter-spacing="-5.5">Tabellen.</text>
+  <rect x="72" y="540" width="248" height="46" fill="#131215"/>
+  <text class="sans" x="96" y="570" fill="#f7f7f5" font-size="19" font-weight="500">punktespiegel.org  →</text>
+  <text class="mono" x="370" y="560" fill="#48464d" font-size="12">KICKER-NOTEN · MANAGERPUNKTE</text>
+  <text class="mono" x="370" y="578" fill="#48464d" font-size="12">KADER · TRANSFERS · HISTORIE</text>
+
+  <!-- spec card -->
+  <g transform="translate(808 110)">
+    <text class="sans" x="0" y="34" fill="#48464d" font-size="36" font-weight="650" font-stretch="118%">SPITZE</text>
+    <text class="mono" x="266" y="32" fill="#7b7980" font-size="12">TABELLE</text>
+    <text class="mono" x="0" y="92" fill="#7b7980" font-size="11">FRAGE</text>
+    <text class="mono" x="0" y="116" fill="#48464d" font-size="17">WER FÜHRT DIE</text>
+    <text class="mono" x="0" y="140" fill="#48464d" font-size="17">TABELLE AN?</text>
+    <text class="mono" x="0" y="190" fill="#7b7980" font-size="11">ERGEBNIS</text>
+    <rect x="0" y="202" width="92" height="24" rx="12" fill="none" stroke="#bab9b3"/>
+    <text class="mono" x="12" y="218" fill="#7b7980" font-size="10">ERGEBNIS</text>
+    <text class="mono" x="106" y="220" fill="#131215" font-size="18">TÄGLICH</text>
+    <text class="mono" x="0" y="276" fill="#7b7980" font-size="11">SAISONVERLAUF</text>
+    <g fill="none" stroke="#bab9b3">
+      <circle cx="6" cy="298" r="5" fill="#131215" stroke="#131215"/><circle cx="22" cy="298" r="5" fill="#131215" stroke="#131215"/>
+      <circle cx="38" cy="298" r="5" fill="#131215" stroke="#131215"/><circle cx="54" cy="298" r="5"/><circle cx="70" cy="298" r="5"/>
+      <circle cx="86" cy="298" r="5"/><circle cx="102" cy="298" r="5"/><circle cx="118" cy="298" r="5"/><circle cx="134" cy="298" r="5"/>
+      <circle cx="150" cy="298" r="5"/><circle cx="166" cy="298" r="5"/><circle cx="182" cy="298" r="5"/><circle cx="198" cy="298" r="5"/>
+      <circle cx="214" cy="298" r="5"/><circle cx="230" cy="298" r="5"/><circle cx="246" cy="298" r="5"/><circle cx="262" cy="298" r="5"/>
+    </g>
+    <g opacity=".55" fill="#48464d">
+      <rect x="0" y="340" width="2" height="30"/><rect x="5" y="340" width="1" height="30"/><rect x="9" y="340" width="3" height="30"/><rect x="15" y="340" width="1" height="30"/>
+      <rect x="19" y="340" width="2" height="30"/><rect x="25" y="340" width="1" height="30"/><rect x="28" y="340" width="3" height="30"/><rect x="34" y="340" width="1" height="30"/>
+      <rect x="38" y="340" width="2" height="30"/><rect x="44" y="340" width="1" height="30"/><rect x="47" y="340" width="1" height="30"/><rect x="51" y="340" width="3" height="30"/>
+      <rect x="57" y="340" width="1" height="30"/><rect x="61" y="340" width="2" height="30"/><rect x="66" y="340" width="1" height="30"/><rect x="70" y="340" width="3" height="30"/>
+      <rect x="76" y="340" width="1" height="30"/><rect x="80" y="340" width="2" height="30"/><rect x="85" y="340" width="1" height="30"/><rect x="89" y="340" width="1" height="30"/>
+      <rect x="93" y="340" width="3" height="30"/><rect x="99" y="340" width="1" height="30"/><rect x="103" y="340" width="2" height="30"/><rect x="108" y="340" width="1" height="30"/>
+    </g>
+    <text class="mono" x="0" y="400" fill="#7b7980" font-size="11">34 SPIELTAGE · 3 LIGEN · SEIT 2022</text>
+  </g>
+
+  <!-- holographic trophy sticker -->
+  <g transform="translate(1004 236) rotate(-8) scale(1.35)">
+    <g fill="#ffffff" stroke="#ffffff" stroke-width="12" stroke-linejoin="round">
+      <path d="M38 22h52v28c0 18-11.6 32-26 32S38 68 38 50z"/><path d="M38 30H24c-1 14 5 24 16 26M90 30h14c1 14-5 24-16 26" fill="none"/><path d="M56 82h16v14H56z"/><path d="M42 96h44v12H42z"/>
+    </g>
+    <g fill="url(#holo)" stroke="#161418" stroke-width="3" stroke-linejoin="round">
+      <path d="M38 22h52v28c0 18-11.6 32-26 32S38 68 38 50z"/><path d="M38 30H24c-1 14 5 24 16 26M90 30h14c1 14-5 24-16 26" fill="none"/><path d="M56 82h16v14H56z"/><path d="M42 96h44v12H42z"/>
+    </g>
+    <path d="M38 22h52v28c0 18-11.6 32-26 32S38 68 38 50z" fill="url(#sheen)"/>
+    <path fill="#161418" d="m64 34 4 8.4 9.2 1.2-6.7 6.4 1.7 9.1L64 54.7l-8.2 4.4 1.7-9.1-6.7-6.4 9.2-1.2z"/>
+  </g>
 </svg>

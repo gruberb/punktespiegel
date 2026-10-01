@@ -1,3 +1,4 @@
+mod insights;
 mod media;
 
 use std::{
@@ -39,6 +40,18 @@ struct Args {
     news_only: bool,
     #[arg(long, default_value_t = 8)]
     concurrency: usize,
+    /// Only rebuild the matchday texts from the existing season files.
+    #[arg(long)]
+    insights_only: bool,
+    /// Claude model that selects and phrases the matchday texts.
+    #[arg(long, default_value = "claude-opus-5-5")]
+    insights_model: String,
+    /// Effort level for the matchday texts (low, medium, high).
+    #[arg(long, default_value = "low")]
+    insights_effort: String,
+    /// Maximum model requests per run; remaining matchdays keep their templates until a later run.
+    #[arg(long, default_value_t = 6)]
+    insights_model_budget: usize,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -415,7 +428,7 @@ async fn main() -> anyhow::Result<()> {
     let client = Client::builder()
         .user_agent("Punktespiegel/0.2 (static public football data dashboard)")
         .build()?;
-    if args.news_only {
+    if args.news_only || args.insights_only {
         let season_directory = args.output.join("seasons");
         let mut seasons = std::fs::read_dir(&season_directory)
             .with_context(|| format!("{} lesen", season_directory.display()))?
@@ -429,7 +442,13 @@ async fn main() -> anyhow::Result<()> {
             .map(|entry| read_season(&entry.path()))
             .collect::<anyhow::Result<Vec<_>>>()?;
         seasons.sort_by_key(|season| (season.league_code.clone(), season.start_year));
-        news::refresh_news(&client, &args.output, &seasons, current_year).await?;
+        if args.news_only {
+            news::refresh_news(&client, &args.output, &seasons, current_year).await?;
+        }
+        if args.insights_only {
+            insights::refresh_insights(&client, &args.output, &seasons, &insights_config(&args))
+                .await?;
+        }
         return Ok(());
     }
     let targets = build_targets(&args.leagues, args.start_year, current_year)?;
@@ -497,7 +516,19 @@ async fn main() -> anyhow::Result<()> {
         args.output.display()
     );
     news::refresh_news(&client, &args.output, &completed, current_year).await?;
+    insights::refresh_insights(&client, &args.output, &completed, &insights_config(&args)).await?;
     Ok(())
+}
+
+fn insights_config(args: &Args) -> insights::InsightsConfig {
+    insights::InsightsConfig {
+        api_key: std::env::var("ANTHROPIC_API_KEY")
+            .ok()
+            .filter(|key| !key.trim().is_empty()),
+        model: args.insights_model.clone(),
+        effort: args.insights_effort.clone(),
+        model_budget: args.insights_model_budget,
+    }
 }
 
 fn validate_args(args: &Args) -> anyhow::Result<()> {
@@ -506,6 +537,12 @@ fn validate_args(args: &Args) -> anyhow::Result<()> {
     }
     if args.concurrency == 0 || args.concurrency > 32 {
         bail!("--concurrency muss zwischen 1 und 32 liegen");
+    }
+    if !matches!(
+        args.insights_effort.as_str(),
+        "low" | "medium" | "high" | "xhigh" | "max"
+    ) {
+        bail!("--insights-effort muss low, medium, high, xhigh oder max sein");
     }
     for league in &args.leagues {
         if league.len() != 4 || !league.chars().all(|character| character.is_ascii_digit()) {
@@ -1042,6 +1079,7 @@ fn validate_output(output: &Path) -> anyhow::Result<()> {
         {
             bail!("Saisondatei enthält verwaiste Verweise: {}", entry.id);
         }
+        insights::validate_insights_file(&insights::insights_path(output, &season.id), &season)?;
         validated_seasons.push(season);
     }
     news::validate_news_file(&output.join("news.json"), &validated_seasons, current_year)?;

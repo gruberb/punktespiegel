@@ -21,9 +21,14 @@ import type {
   LeagueStandings,
   LeagueTableFormEntry,
   LeagueTableRow,
+  LeagueTableTeam,
   MatchdayContributor,
   MatchdayFixture,
   MatchdayFixtureSide,
+  InsightCard as InsightCardData,
+  InsightFact,
+  InsightSubject,
+  InsightVisual as InsightVisualData,
   NewsArticle,
   Player,
   PlayerDetail,
@@ -36,6 +41,7 @@ import type {
   TeamPlayerScore,
   TeamScore,
   PlayerTableRow,
+  RoundInsights,
 } from "./types";
 
 type InfoView = "about" | "methodology" | "sources" | "faq";
@@ -87,6 +93,13 @@ const navMobile: Record<(typeof nav)[number]["id"], { label: string; icon: React
   },
 };
 const infoViews: InfoView[] = ["about", "methodology", "sources", "faq"];
+const infoNav = [
+  { id: "about", label: "Über" },
+  { id: "methodology", label: "Daten & Methodik" },
+  { id: "sources", label: "Quellen" },
+  { id: "faq", label: "FAQ" },
+] satisfies { id: InfoView; label: string }[];
+const themeColor: Record<Theme, string> = { light: "#eeeeeb", dark: "#0e0d10" };
 const faqItems = [
   {
     question: "Welche Daten zeigt Punktespiegel?",
@@ -99,6 +112,10 @@ const faqItems = [
   {
     question: "Wie aktuell sind die Daten?",
     answer: "Die laufende Saison wird täglich neu importiert und veröffentlicht. Abgeschlossene Saisons bleiben unverändert, sofern kein vollständiger manueller Neuaufbau angestoßen wird.",
+  },
+  {
+    question: "Wie entstehen die Spieltagskarten im Überblick?",
+    answer: "Der tägliche Build berechnet alle Zahlen eines Spieltags aus den kicker-Daten. Ein Sprachmodell (Claude von Anthropic) wählt daraus die auffälligsten Kennzahlen aus und formuliert Frage und Satz. Jede Zahl und jeder Vereins- oder Spielername im Text wird gegen die berechneten Werte geprüft; besteht ein Text die Prüfung nicht, erscheint ein fester Vorlagentext.",
   },
   {
     question: "Was zeigen die Mannschafts- und Spielerprofile?",
@@ -254,7 +271,7 @@ export default function App() {
   useLayoutEffect(() => {
     document.documentElement.dataset.theme = theme;
     document.documentElement.style.colorScheme = theme;
-    document.querySelector<HTMLMetaElement>('meta[name="theme-color"]')?.setAttribute("content", theme === "light" ? "#f7f6fb" : "#131215");
+    document.querySelector<HTMLMetaElement>('meta[name="theme-color"]')?.setAttribute("content", themeColor[theme]);
     try {
       window.localStorage.setItem(themeStorageKey, theme);
     } catch {
@@ -619,8 +636,15 @@ export default function App() {
         <nav className="main-nav" aria-label="Bereiche">
           {nav.map((item) => (
             <a key={item.id} href={viewHref(item.id, filters)} className={navActive === item.id ? "active" : ""} aria-current={navActive === item.id ? "page" : undefined} onClick={(event) => { event.preventDefault(); setView(item.id); }}>
-              {item.label}
+              <span className="main-nav-icon" aria-hidden="true">{navMobile[item.id].icon}</span>
+              <span>{item.label}</span>
             </a>
+          ))}
+        </nav>
+        <nav className="side-nav" aria-label="Informationen">
+          <span className="side-nav-label">Info</span>
+          {infoNav.map((item) => (
+            <a key={item.id} href={viewHref(item.id, filters)} aria-current={view === item.id ? "page" : undefined} onClick={(event) => { event.preventDefault(); setView(item.id); }}>{item.label}</a>
           ))}
         </nav>
         <button
@@ -643,9 +667,9 @@ export default function App() {
                 ? <StepperSelect label="Saison" value={String(selectedPlayerSeason?.startYear ?? filters.season)} options={[...playerSeasons].reverse().map((season) => ({ value: String(season.startYear), label: season.displayName }))} onChange={updatePlayerSeason} />
                 : view !== "table" && <StepperSelect label="Saison" value={filters.season} options={[...seasons].reverse().map((season) => ({ value: String(season.startYear), label: season.displayName }))} onChange={(value) => updateFilter("season", value)} />}
             {view === "table" && latestRound > 0 && <>
-              <div className="scope-switch acorn-segmented-control header-scope-switch" aria-label="Zeitraum">
-                <button className={`acorn-segment ${overviewScope === "through" ? "active is-selected" : ""}`} onClick={() => setOverviewScope("through")}>Gesamt</button>
-                <button className={`acorn-segment ${overviewScope === "matchday" ? "active is-selected" : ""}`} onClick={() => setOverviewScope("matchday")}>Nur Spieltag</button>
+              <div className="scope-switch segmented header-scope-switch" aria-label="Zeitraum">
+                <button className={`segment ${overviewScope === "through" ? "active is-selected" : ""}`} onClick={() => setOverviewScope("through")}>Gesamt</button>
+                <button className={`segment ${overviewScope === "matchday" ? "active is-selected" : ""}`} onClick={() => setOverviewScope("matchday")}>Nur Spieltag</button>
               </div>
               <StepperSelect label="Spieltag" value={String(overviewRound)} options={Array.from({ length: Math.max(1, latestRound) }, (_, index) => ({ value: String(index + 1), label: `Spieltag ${index + 1}` }))} onChange={(value) => updateFilter("round", value)} />
             </>}
@@ -673,9 +697,9 @@ export default function App() {
   );
 }
 
-function PageHeader({ title, description, controls, className = "" }: { title: string; description: string; controls?: ReactNode; className?: string }) {
+function PageHeader({ title, titleNote, eyebrow = "kicker-Daten · kicker Manager-Liga", description, controls, className = "" }: { title: string; titleNote?: string; eyebrow?: string; description?: string; controls?: ReactNode; className?: string }) {
   return <section className={`control-deck page-header ${className}`} aria-label="Seitenkopf und Datenauswahl">
-    <div className="intro"><p className="kicker">kicker-Daten · kicker Manager-Liga</p><h1>{title}</h1><p>{description}</p></div>
+    <div className="intro"><p className="kicker">{eyebrow}</p><h1>{title}{titleNote && <span className="page-title-note">{titleNote}</span>}</h1>{description && <p>{description}</p>}</div>
     {controls}
   </section>;
 }
@@ -827,6 +851,7 @@ function InfoPage({ view, filters, onView }: { view: InfoView; filters: Filters;
         <li><span>02</span><div><h2>Datenvertrag prüfen</h2><p>Ligen, Saisons, Spieltage, Spieler, Vereine und Wertungen werden normalisiert und vor jeder Veröffentlichung auf Vollständigkeit und Konsistenz geprüft.</p></div></li>
         <li><span>03</span><div><h2>Statische Saisonartefakte bauen</h2><p>Je Liga und Saison entsteht ein kompaktes JSON-Artefakt. Der Browser lädt nur die ausgewählte Saison; es gibt keinen Laufzeitserver, keine Datenbank und kein Benutzerkonto.</p></div></li>
         <li><span>04</span><div><h2>Profil- und Verfügbarkeitssignale ergänzen</h2><p>Externe Snapshots von LigaInsider und Transfermarkt ergänzen die Wertungen um Rollen-, Verfügbarkeits- und Vereinskontext. Jedes Signal bleibt mit Quelle und Stand ausgewiesen.</p></div></li>
+        <li><span>05</span><div><h2>Spieltagskarten erzeugen und prüfen</h2><p>Für jeden Spieltag berechnet der Generator Kandidaten wie Tabellenführer, höchsten Sieg, torreichstes Spiel, größten Sprung oder punktbesten Spieler. Claude von Anthropic wählt daraus drei Karten und vier Kennzahlen und formuliert Frage und Satz. Jede Zahl und jeder Vereins- oder Spielername wird anschließend gegen die berechneten Werte geprüft; besteht ein Text die Prüfung nicht oder ist das Modell nicht erreichbar, erscheint ein fester Vorlagentext.</p></div></li>
       </ol>
       <div className="info-grid">
         <section className="info-card"><h2>Aktualisierung</h2><p>Die laufende Saison wird täglich um 12:15 Uhr deutscher Zeit neu gebaut. Ein manueller Lauf kann zusätzlich alle abgeschlossenen Saisons aktualisieren.</p></section>
@@ -838,7 +863,8 @@ function InfoPage({ view, filters, onView }: { view: InfoView; filters: Filters;
       <div className="info-grid">
         <section className="info-card"><h2>Noten, Punkte und Medien</h2><p>Spiel- und Wertungsdaten sowie Spielerfotos und Vereinslogos stammen aus öffentlichen kicker-Quellen. Spielerprofile verlinken zusätzlich auf die jeweiligen kicker-Seiten.</p></section>
         <section className="info-card"><h2>Profile und Verfügbarkeit</h2><p>Transfermarkt-Snapshots liefern Trainer, Kapitän, Transfers, Kaderbiografien und Karrierewerte. LigaInsider ergänzt Bundesliga-Rollen- und Topelf-Signale; medizinische Verfügbarkeit kommt je Liga aus LigaInsider oder Transfermarkt.</p></section>
-        <section className="info-card info-card-wide"><h2>Fußball-News</h2><p>Spielerbezogene Überschriften werden über NewsAPI oder öffentliche RSS-Feeds gesammelt. Jede Meldung öffnet die Originalquelle; Punktespiegel übernimmt keine redaktionelle Verantwortung für externe Inhalte.</p></section>
+        <section className="info-card"><h2>Spieltagskarten</h2><p>Die Texte der Spieltagskarten formuliert Claude von Anthropic ausschließlich auf Basis der von Punktespiegel berechneten Zahlen. Das Modell erhält keine externen Inhalte, nur Kennzahlen sowie Vereins- und Spielernamen.</p></section>
+        <section className="info-card"><h2>Fußball-News</h2><p>Spielerbezogene Überschriften werden über NewsAPI oder öffentliche RSS-Feeds gesammelt. Jede Meldung öffnet die Originalquelle; Punktespiegel übernimmt keine redaktionelle Verantwortung für externe Inhalte.</p></section>
       </div>
       <nav className="source-directory" aria-label="Externe Quellen">
         <a href="https://www.kicker.de/games/startseite" target="_blank" rel="noreferrer external"><strong>kicker Games</strong><span>Punkteregeln der kicker Manager-Liga ↗</span></a>
@@ -883,7 +909,6 @@ function SiteFooter({ currentView, filters, onView }: { currentView: View; filte
       </nav>
     </div>
     <div className="site-footer-meta">
-      <p><strong>Datenbasis</strong> Öffentliche kicker-Daten und Wertungen der kicker Manager-Liga. Punktespiegel ist ein unabhängiges Projekt.</p>
       <nav aria-label="Technische Links"><a href="https://github.com/gruberb/punktespiegel" target="_blank" rel="noreferrer external">GitHub ↗</a><a href={`${import.meta.env.BASE_URL}sitemap.xml`}>Sitemap</a></nav>
     </div>
   </footer>;
@@ -1058,8 +1083,19 @@ function TabelleView({ filters, leagues, seasons, onFilter, onTeam, onPlayer }: 
   const maximumRound = Math.max(1, selectedSeason?.latestRound ?? 0);
   const round = Math.min(maximumRound, Math.max(1, Number(filters.round) || 1));
   const [standings, setStandings] = useState<LeagueStandings | null>(null);
+  const [insights, setInsights] = useState<RoundInsights | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const leagueName = leagues.find((league) => league.code === filters.league)?.name ?? "Bundesliga";
+
+  useEffect(() => {
+    const controller = new AbortController();
+    setInsights(null);
+    api.insights(new URLSearchParams({ league: filters.league, season: filters.season, round: String(round) }), controller.signal)
+      .then(setInsights)
+      .catch(() => { /* The page works without matchday texts. */ });
+    return () => controller.abort();
+  }, [filters.league, filters.season, round]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -1074,7 +1110,7 @@ function TabelleView({ filters, leagues, seasons, onFilter, onTeam, onPlayer }: 
 
   return (
     <div className="tabelle-view">
-      <PageHeader title="Überblick" description={`${selectedSeason?.displayName ?? "Gewählte Saison"} · Stand nach Spieltag ${round}`} controls={<div className="selectors">
+      <PageHeader className="page-header--hero" eyebrow={`${leagueName} · ${selectedSeason?.displayName ?? "Gewählte Saison"} · Stand nach`} title={`Spieltag ${round}`} titleNote={`von ${selectedSeason?.roundCount ?? 34}`} controls={<div className="selectors">
         <StepperSelect label="Liga" value={filters.league} options={leagues.map((league) => ({ value: league.code, label: league.name }))} onChange={(value) => onFilter("league", value)} />
         <StepperSelect label="Saison" value={filters.season} options={[...seasons].reverse().map((season) => ({ value: String(season.startYear), label: season.displayName }))} onChange={(value) => onFilter("season", value)} />
         <StepperSelect label="Spieltag" value={String(round)} options={Array.from({ length: maximumRound }, (_, index) => ({ value: String(index + 1), label: `Spieltag ${index + 1}` }))} onChange={(value) => onFilter("round", value)} />
@@ -1083,6 +1119,8 @@ function TabelleView({ filters, leagues, seasons, onFilter, onTeam, onPlayer }: 
         : loading || !standings ? <LoadingState />
           : standings.context.playedMatchCount < 1 ? <section className="detail-section"><Empty message="Für diese Auswahl liegen noch keine gespielten Partien vor." /></section>
             : <>
+              {insights && insights.cards.length > 0 && <InsightCards cards={insights.cards} onTeam={onTeam} onPlayer={onPlayer} />}
+              {insights && insights.facts.length > 0 && <InsightFacts round={round} facts={insights.facts} onTeam={onTeam} onPlayer={onPlayer} />}
               <MatchdayFixturesCard standings={standings} onTeam={onTeam} onPlayer={onPlayer} />
               <FormTableCard standings={standings} league={filters.league} onTeam={onTeam} />
               <BumpChartCard standings={standings} zones={leagueZones[filters.league] ?? []} />
@@ -1090,6 +1128,111 @@ function TabelleView({ filters, leagues, seasons, onFilter, onTeam, onPlayer }: 
             </>}
     </div>
   );
+}
+
+function InsightCards({ cards, onTeam, onPlayer }: { cards: InsightCardData[]; onTeam: (id: string) => void; onPlayer: (id: string) => void }) {
+  return (
+    <section className="insight-band" aria-label="Spieltag auf einen Blick">
+      {cards.map((card) => (
+        <article className="insight-card" key={card.id}>
+          <header><h2>{card.title}</h2><span>{card.category}</span></header>
+          <dl>
+            <div className="insight-beside-sticker"><dt>Frage</dt><dd className="insight-question">{card.question}</dd></div>
+            <div className="insight-beside-sticker"><dt>Ergebnis</dt><dd className="insight-answer">
+              {card.subject && <SubjectMedia subject={card.subject} onTeam={onTeam} onPlayer={onPlayer} />}
+              <span>{card.answer}</span>
+            </dd></div>
+            <div><dt>{card.detailLabel}</dt><dd>{card.detail}</dd></div>
+            <div><dt>{card.visual.label}</dt><dd><InsightVisual visual={card.visual} /></dd></div>
+          </dl>
+          <Sticker kind={card.kind} />
+          <Crosshair />
+        </article>
+      ))}
+    </section>
+  );
+}
+
+function InsightVisual({ visual }: { visual: InsightVisualData }) {
+  if (visual.type === "results") {
+    return <ol className="insight-rows">{visual.rows.map((row) => (
+      <li key={row.round}><span>ST {row.round}</span><i className={`form-chip form-chip-${row.outcome.toLowerCase()}`}>{row.outcome}</i><b>{row.score}</b><span>{row.home ? "gegen" : "bei"} {row.opponent}</span></li>
+    ))}</ol>;
+  }
+  if (visual.type === "roundPoints") {
+    return <ol className="insight-rows">{visual.rows.map((row) => (
+      <li key={row.round}><span>ST {row.round}</span><b>{row.points}</b><small>Pkt.</small><span>{row.opponent ? `gegen ${row.opponent}` : ""}</span></li>
+    ))}</ol>;
+  }
+  return <span className="insight-outcomes">{visual.values.map((value, index) => <i key={index} className={`outcome-${value.toLowerCase()}`} title={value === "H" ? "Heimsieg" : value === "A" ? "Auswärtssieg" : "Unentschieden"}>{value}</i>)}</span>;
+}
+
+function InsightFacts({ round, facts, onTeam, onPlayer }: { round: number; facts: InsightFact[]; onTeam: (id: string) => void; onPlayer: (id: string) => void }) {
+  return (
+    <section className="tabelle-block">
+      <div className="section-copy"><p className="kicker">Spieltag {round}</p><h2>Der Spieltag in Zahlen</h2></div>
+      <div className="insight-facts">
+        {facts.map((fact) => (
+          <article className="insight-fact" key={fact.id}>
+            <h3>{fact.title}</h3>
+            <div className="insight-fact-value"><span className={fact.tone ? `tone-${fact.tone}` : undefined}>{fact.value}</span><small>{fact.context}</small></div>
+            {fact.subjects && fact.subjects.length > 0 && <div className="insight-subjects">{fact.subjects.map((subject) => <SubjectMedia key={subject.id} subject={subject} onTeam={onTeam} onPlayer={onPlayer} />)}</div>}
+            <p>{fact.text}</p>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function SubjectMedia({ subject, onTeam, onPlayer }: { subject: InsightSubject; onTeam: (id: string) => void; onPlayer: (id: string) => void }) {
+  const isTeam = subject.kind === "team";
+  const label = `${subject.name}: ${isTeam ? "Mannschaftsprofil" : "Spielerprofil"} öffnen`;
+  return (
+    <button className={`subject-media subject-${subject.kind}`} title={label} aria-label={label} onClick={() => (isTeam ? onTeam : onPlayer)(subject.id)}>
+      {isTeam
+        ? <TeamLogo code={initialsOf(subject.name)} url={subject.imageUrl ?? null} />
+        : <PlayerPortrait name={subject.name} url={subject.imageUrl ?? null} teamCode={initialsOf(subject.name)} teamLogoUrl={null} />}
+    </button>
+  );
+}
+
+function Crosshair() {
+  return <svg className="crosshair" viewBox="0 0 14 14" aria-hidden="true"><circle cx="7" cy="7" r="4.5" /><path d="M7 0v14M0 7h14" /></svg>;
+}
+
+// Holographic stickers mark the card type; gradient ids are per instance so
+// several stickers on one page do not share (and lose) their definitions.
+function Sticker({ kind }: { kind: string }) {
+  const id = useId().replace(/:/g, "");
+  const shape = kind === "topPlayer" || kind === "roundTopPlayer" ? "ball" : kind === "roundGoals" ? "whistle" : "trophy";
+  const outline = shape === "ball"
+    ? <circle cx="64" cy="64" r="44" />
+    : shape === "whistle"
+      ? <path d="M44 42h60a6 6 0 0 1 6 6v12a6 6 0 0 1-6 6H76a30 30 0 1 1-32-24z" />
+      : <><path d="M38 22h52v28c0 18-11.6 32-26 32S38 68 38 50z" /><path d="M38 30H24c-1 14 5 24 16 26M90 30h14c1 14-5 24-16 26" fill="none" /><path d="M56 82h16v14H56z" /><path d="M42 96h44v12H42z" /></>;
+  return (
+    <svg className={`sticker sticker-${shape}`} viewBox="0 0 128 128" aria-hidden="true">
+      <defs>
+        <linearGradient id={`${id}-holo`} x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#ffb8dc" /><stop offset=".22" stopColor="#ffe9a6" /><stop offset=".42" stopColor="#b9f3d6" />
+          <stop offset=".62" stopColor="#a9dcff" /><stop offset=".82" stopColor="#cbb7ff" /><stop offset="1" stopColor="#ffb8dc" />
+        </linearGradient>
+      </defs>
+      <g className="sticker-halo">{outline}</g>
+      <g className="sticker-body" fill={`url(#${id}-holo)`}>{outline}</g>
+      {shape === "trophy" && <path className="sticker-ink" d="m64 34 4 8.4 9.2 1.2-6.7 6.4 1.7 9.1L64 54.7l-8.2 4.4 1.7-9.1-6.7-6.4 9.2-1.2z" />}
+      {shape === "ball" && <>
+        <path className="sticker-ink" d="m64 46 17 12.4-6.5 20H53.5L47 58.4z" />
+        <path className="sticker-line" d="M64 46V24M81 58.4l20-6.5M74.5 78.4l12.4 17M53.5 78.4l-12.4 17M47 58.4l-20-6.5" />
+      </>}
+      {shape === "whistle" && <><circle className="sticker-line" cx="46" cy="74" r="10" /><path className="sticker-ink" d="M88 42h6v8h-6z" /></>}
+    </svg>
+  );
+}
+
+function initialsOf(name: string) {
+  return name.split(/\s+/).filter((part) => /^\p{L}/u.test(part)).map((part) => part[0]).slice(0, 3).join("").toUpperCase();
 }
 
 function MatchdayFixturesCard({ standings, onTeam, onPlayer }: { standings: LeagueStandings; onTeam: (id: string) => void; onPlayer: (id: string) => void }) {
@@ -1309,7 +1452,7 @@ function FormTableCard({ standings, league, onTeam }: { standings: LeagueStandin
     { id: "goals", label: "Tore", numeric: true, render: (row) => `${row.goalsFor}:${row.goalsAgainst}` },
     { id: "difference", label: "Tordifferenz", shortLabel: "TD", numeric: true, sort: sortProps("difference"), render: (row) => row.goalDifference > 0 ? `+${row.goalDifference}` : row.goalDifference },
     { id: "points", label: "Punkte", shortLabel: "Pkt", numeric: true, className: "primary-num", render: (row) => row.points },
-    { id: "form", label: "Letzte 5", shortLabel: "Form", sort: sortProps("form"), render: (row) => <span className="form-cell"><FormChips form={row.form} /><small>{row.formPoints}/{row.form.length * 3}</small></span> },
+    { id: "form", label: "Letzte 5", shortLabel: "Form", sort: sortProps("form"), render: (row) => <span className="form-cell"><FormChips form={row.form} team={row.team} /></span> },
     { id: "course", label: "Verlauf", render: (row) => <RankSparkline positions={row.positions} teamCount={standings.rows.length} /> },
   ];
 
@@ -1338,11 +1481,45 @@ function TrendBadge({ trend }: { trend: number | null }) {
   return <span className="trend-badge trend-flat" title={title}>＝</span>;
 }
 
-function FormChips({ form }: { form: LeagueTableFormEntry[] }) {
+function FormChips({ form, team }: { form: LeagueTableFormEntry[]; team: LeagueTableTeam }) {
   if (!form.length) return <span className="form-chips-empty">—</span>;
-  return <span className="form-chips">{form.map((entry) => (
-    <i key={entry.round} className={`form-chip form-chip-${entry.outcome.toLowerCase()}`} title={`Spieltag ${entry.round} · ${entry.home ? "gegen" : "bei"} ${entry.opponent.name} · ${entry.score}`}>{entry.outcome}</i>
-  ))}</span>;
+  return <span className="form-chips">{form.map((entry) => <FormChip key={entry.round} entry={entry} team={team} />)}</span>;
+}
+
+function FormChip({ entry, team }: { entry: LeagueTableFormEntry; team: LeagueTableTeam }) {
+  const anchorRef = useRef<HTMLElement>(null);
+  const tooltipId = useId();
+  const [hovered, setHovered] = useState(false);
+  const [focused, setFocused] = useState(false);
+  const open = hovered || focused;
+  // The entry's score is from this team's point of view; the popover shows it home side first.
+  const [scored, conceded] = entry.score.split(":");
+  const [home, away] = entry.home ? [team, entry.opponent] : [entry.opponent, team];
+  const score = entry.home ? `${scored}:${conceded}` : `${conceded}:${scored}`;
+  const outcome = entry.outcome === "S" ? "Sieg" : entry.outcome === "N" ? "Niederlage" : "Unentschieden";
+  return (
+    <i
+      ref={anchorRef}
+      className={`form-chip form-chip-${entry.outcome.toLowerCase()}`}
+      tabIndex={0}
+      aria-label={`Spieltag ${entry.round}: ${outcome}, ${home.name} ${score} ${away.name}`}
+      aria-describedby={open ? tooltipId : undefined}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      onFocus={() => setFocused(true)}
+      onBlur={() => setFocused(false)}
+    >
+      {entry.outcome}
+      <FloatingScorePopover anchorRef={anchorRef} open={open} id={tooltipId} className="form-popover" preferredWidth={300}>
+        <header><strong>Spieltag {entry.round}</strong><span>{outcome} · {entry.home ? "Heim" : "Auswärts"}</span></header>
+        <div className="form-popover-match">
+          <span className="form-popover-team home"><strong title={home.name}>{home.code}</strong><TeamLogo code={home.code} url={home.logoUrl} /></span>
+          <span className="fixture-score">{score.replace(":", " : ")}</span>
+          <span className="form-popover-team"><TeamLogo code={away.code} url={away.logoUrl} /><strong title={away.name}>{away.code}</strong></span>
+        </div>
+      </FloatingScorePopover>
+    </i>
+  );
 }
 
 function RankSparkline({ positions, teamCount }: { positions: number[]; teamCount: number }) {
@@ -1361,7 +1538,8 @@ function RankSparkline({ positions, teamCount }: { positions: number[]; teamCoun
 
 function CrossTableCard({ standings, onTeam }: { standings: LeagueStandings; onTeam: (id: string) => void }) {
   const teams = standings.rows.map((row) => row.team);
-  const nameById = new Map(teams.map((team) => [team.id, team.name]));
+  // Row and column of the hovered cell, so the reader can trace both teams.
+  const [active, setActive] = useState<{ home: string; away: string } | null>(null);
   return (
     <section className="tabelle-block">
       <div className="section-copy cross-copy">
@@ -1370,27 +1548,20 @@ function CrossTableCard({ standings, onTeam }: { standings: LeagueStandings; onT
       </div>
       <div className="detail-section cross-card">
         <div className="cross-scroll">
-          <table className="cross-table">
+          <table className="cross-table" onMouseLeave={() => setActive(null)}>
             <thead>
               <tr>
                 <th className="cross-corner">Heim \ Ausw.</th>
-                {teams.map((team) => <th key={team.id} title={team.name}><TeamLogo code={team.code} url={team.logoUrl} /></th>)}
+                {teams.map((team) => <th key={team.id} title={team.name} className={active?.away === team.id ? "is-active" : undefined}><TeamLogo code={team.code} url={team.logoUrl} /></th>)}
               </tr>
             </thead>
             <tbody>
               {teams.map((home) => (
                 <tr key={home.id}>
-                  <th scope="row"><button className="cross-row-head" onClick={() => onTeam(home.id)} title={`${home.name}: Mannschaftsprofil öffnen`}><TeamLogo code={home.code} url={home.logoUrl} /><span>{home.code}</span></button></th>
-                  {teams.map((away) => {
-                    if (home.id === away.id) return <td key={away.id} className="cross-self" />;
-                    const cell = standings.cross.cells[`${home.id}|${away.id}`];
-                    if (!cell || cell.homeScore == null || cell.awayScore == null) {
-                      const planned = cell ? `${home.name} – ${nameById.get(away.id)} · Spieltag ${cell.round}${cell.scheduledAt ? ` · ${formatDateWithYear(cell.scheduledAt)}` : ""}` : `${home.name} – ${nameById.get(away.id)}`;
-                      return <td key={away.id} className="cross-open" title={planned}>–</td>;
-                    }
-                    const outcome = cell.homeScore > cell.awayScore ? "s" : cell.homeScore < cell.awayScore ? "n" : "u";
-                    return <td key={away.id} className={`cross-cell-${outcome}`} title={`${home.name} ${cell.homeScore}:${cell.awayScore} ${nameById.get(away.id)} · Spieltag ${cell.round}`}>{cell.homeScore}:{cell.awayScore}</td>;
-                  })}
+                  <th scope="row" className={active?.home === home.id ? "is-active" : undefined}><button className="cross-row-head" onClick={() => onTeam(home.id)} title={`${home.name}: Mannschaftsprofil öffnen`}><TeamLogo code={home.code} url={home.logoUrl} /><span>{home.code}</span></button></th>
+                  {teams.map((away) => home.id === away.id
+                    ? <td key={away.id} className="cross-self" onMouseEnter={() => setActive(null)} />
+                    : <CrossCell key={away.id} home={home} away={away} cell={standings.cross.cells[`${home.id}|${away.id}`]} onActive={setActive} />)}
                 </tr>
               ))}
             </tbody>
@@ -1398,6 +1569,51 @@ function CrossTableCard({ standings, onTeam }: { standings: LeagueStandings; onT
         </div>
       </div>
     </section>
+  );
+}
+
+function CrossCell({ home, away, cell, onActive }: {
+  home: LeagueTableTeam;
+  away: LeagueTableTeam;
+  cell: LeagueStandings["cross"]["cells"][string] | undefined;
+  onActive: (pair: { home: string; away: string } | null) => void;
+}) {
+  const anchorRef = useRef<HTMLTableCellElement>(null);
+  const tooltipId = useId();
+  const [hovered, setHovered] = useState(false);
+  const [focused, setFocused] = useState(false);
+  const open = hovered || focused;
+  const played = cell != null && cell.homeScore != null && cell.awayScore != null;
+  const outcome = !played ? null : cell.homeScore! > cell.awayScore! ? "s" : cell.homeScore! < cell.awayScore! ? "n" : "u";
+  const result = played ? `${cell.homeScore}:${cell.awayScore}` : null;
+  const status = !cell ? "Keine Partie angesetzt" : played ? (outcome === "s" ? "Heimsieg" : outcome === "n" ? "Auswärtssieg" : "Unentschieden") : "Noch offen";
+  const date = cell?.scheduledAt ? formatDateWithYear(cell.scheduledAt) : null;
+  const enter = (focus: boolean) => {
+    if (focus) setFocused(true); else setHovered(true);
+    onActive({ home: home.id, away: away.id });
+  };
+  return (
+    <td
+      ref={anchorRef}
+      className={outcome ? `cross-cell-${outcome}` : "cross-open"}
+      tabIndex={0}
+      aria-label={`${home.name} gegen ${away.name}: ${result ?? status}${cell ? `, Spieltag ${cell.round}` : ""}`}
+      aria-describedby={open ? tooltipId : undefined}
+      onMouseEnter={() => enter(false)}
+      onMouseLeave={() => setHovered(false)}
+      onFocus={() => enter(true)}
+      onBlur={() => setFocused(false)}
+    >
+      {result ?? "–"}
+      <FloatingScorePopover anchorRef={anchorRef} open={open} id={tooltipId} className="form-popover" preferredWidth={320}>
+        <header><strong>{cell ? `Spieltag ${cell.round}` : "Direktvergleich"}</strong><span>{status}{date ? ` · ${date}` : ""}</span></header>
+        <div className="form-popover-match">
+          <span className="form-popover-team home"><strong title={home.name}>{home.code}</strong><TeamLogo code={home.code} url={home.logoUrl} /></span>
+          <span className={`fixture-score ${played ? "" : "fixture-score-open"}`}>{result ? result.replace(":", " : ") : "– : –"}</span>
+          <span className="form-popover-team"><TeamLogo code={away.code} url={away.logoUrl} /><strong title={away.name}>{away.code}</strong></span>
+        </div>
+      </FloatingScorePopover>
+    </td>
   );
 }
 
@@ -1483,9 +1699,9 @@ function PlayersView({ filters, seasonName, hasSeasonPoints, hasPreviousSeason, 
     <section className="data-page-section">
       {error ? <ErrorState message={error} /> : <DataTable
         ariaLabel="Spielerwertung"
-        leading={<div className="scope-switch acorn-segmented-control" role="group" aria-label="Spielerstatistik">
-          <button className={`acorn-segment ${columnsMode === "season" ? "active is-selected" : ""}`} aria-pressed={columnsMode === "season"} onClick={() => onColumnsMode("season")}>Saison</button>
-          <button className={`acorn-segment ${columnsMode === "history" ? "active is-selected" : ""}`} aria-pressed={columnsMode === "history"} onClick={() => onColumnsMode("history")}>Historie</button>
+        leading={<div className="scope-switch segmented" role="group" aria-label="Spielerstatistik">
+          <button className={`segment ${columnsMode === "season" ? "active is-selected" : ""}`} aria-pressed={columnsMode === "season"} onClick={() => onColumnsMode("season")}>Saison</button>
+          <button className={`segment ${columnsMode === "history" ? "active is-selected" : ""}`} aria-pressed={columnsMode === "history"} onClick={() => onColumnsMode("history")}>Historie</button>
         </div>}
         rows={visiblePlayers}
         columns={columns}
@@ -1540,9 +1756,9 @@ function PlayerDetailView({ filters, playerId, backLabel, onBack, onTeam, onSeas
           <span><strong>{formatPlayerValue(detail.value)}</strong><small>Wert · Pkt. / Mio. €</small></span>
         </div>
       </header>
-      <nav className="player-detail-tabs scope-switch acorn-segmented-control" role="tablist" aria-label="Spielerprofil-Bereiche">
-        <button id="player-points-tab" role="tab" aria-controls="player-points-panel" aria-selected={activeTab === "points"} className={`acorn-segment ${activeTab === "points" ? "active is-selected" : ""}`} onClick={() => setActiveTab("points")}>Punkte &amp; Spiele</button>
-        <button id="player-profile-tab" role="tab" aria-controls="player-profile-panel" aria-selected={activeTab === "profile"} className={`acorn-segment ${activeTab === "profile" ? "active is-selected" : ""}`} onClick={() => setActiveTab("profile")}>Profil &amp; Karriere</button>
+      <nav className="player-detail-tabs scope-switch segmented" role="tablist" aria-label="Spielerprofil-Bereiche">
+        <button id="player-points-tab" role="tab" aria-controls="player-points-panel" aria-selected={activeTab === "points"} className={`segment ${activeTab === "points" ? "active is-selected" : ""}`} onClick={() => setActiveTab("points")}>Punkte &amp; Spiele</button>
+        <button id="player-profile-tab" role="tab" aria-controls="player-profile-panel" aria-selected={activeTab === "profile"} className={`segment ${activeTab === "profile" ? "active is-selected" : ""}`} onClick={() => setActiveTab("profile")}>Profil &amp; Karriere</button>
       </nav>
       {activeTab === "profile" && (
         <div className="player-tab-panel" id="player-profile-panel" role="tabpanel" aria-labelledby="player-profile-tab">

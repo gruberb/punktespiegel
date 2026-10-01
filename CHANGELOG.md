@@ -2,6 +2,27 @@
 
 Alle wesentlichen Änderungen an Punktespiegel werden in dieser Datei dokumentiert.
 
+## [1.24.0] – 2026-10-01
+
+### Hinzugefügt
+
+- Spieltagskarten im Überblick: Drei Karten (etwa Tabellenspitze, punktbester Spieler, Tore des Spieltags) mit Frage, Ergebnis, letzten Ergebnissen beziehungsweise Punkten je Spieltag sowie vier Kennzahlen unter „Der Spieltag in Zahlen“. Karten und Kennzahlen zeigen Vereinslogos und Spielerporträts und öffnen das jeweilige Profil.
+- Der Datencompiler erzeugt die Spieltagskarten in `data/insights`. Alle Zahlen werden aus den kicker-Daten berechnet. Mit dem optionalen Secret `ANTHROPIC_API_KEY` wählt Claude die Karten aus und formuliert Frage und Satz; jede Zahl und jeder Vereins- oder Spielername wird gegen die berechneten Werte geprüft, sonst gilt ein fester Vorlagentext. Neue Optionen: `--insights-only`, `--insights-model`, `--insights-effort`, `--insights-model-budget`.
+- Die Formtabelle zeigt beim Überfahren oder Fokussieren eines Formfelds Spieltag, Gegner und Ergebnis.
+- Die Kreuztabelle zeigt beim Überfahren oder Fokussieren einer Zelle Spieltag, Datum, beide Vereine und das Ergebnis und hebt Heim- und Auswärtsteam hervor.
+
+### Geändert
+
+- Neues Erscheinungsbild für alle Ansichten, Profile und Infoseiten: Seitenleiste statt Kopfzeile, Papier- und Tintentöne mit Haarlinien, Archivo und IBM Plex Mono als selbst gehostete Schriften, quadratische Bedienelemente und schwarze Ergebnisfelder. Hell und Dunkel bleiben wählbar.
+- Neues Logo, Favicon, App-Symbole und Vorschaubild. `scripts/render-brand-assets.sh` erzeugt die PNG-Dateien aus den SVG-Quellen.
+- Die Überblickseite beginnt mit dem Spieltag als Titel; die Spiele des Spieltags stehen in zwei Spalten, die Kreuztabelle nutzt die volle Breite.
+- Die Formtabelle verzichtet auf die zusätzliche Punktsumme neben den letzten fünf Spielen.
+- Die Fußzeile enthält nur noch Links.
+
+### Entfernt
+
+- Die Acorn-Designtokens und die Noto-Sans-Schriftdateien.
+
 ## [1.23.0] – 2026-09-14
 
 ### Entfernt

@@ -1,8 +1,8 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 450 128" role="img" aria-labelledby="title desc">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 64" role="img" aria-labelledby="title">
   <title id="title">Punktespiegel</title>
-  <desc id="desc">Das Punktespiegel-Zeichen mit Wortmarke.</desc>
-  <path fill="#7547E3" d="M62 8C31.1 8 12 27.1 12 58v48c0 7.7 6.3 14 14 14h40c30.9 0 50-19.1 50-50V58C116 27.1 96.9 8 66 8h-4Z"/>
-  <circle cx="46" cy="50" r="10" fill="#FFFFFF"/>
-  <circle cx="82" cy="78" r="8" fill="none" stroke="#D7C7FF" stroke-width="5"/>
-  <text x="146" y="80" fill="#180E30" font-family="Noto Sans, Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="48" font-weight="700" letter-spacing="-1.7">Punktespiegel</text>
+  <rect width="64" height="64" fill="#131215"/>
+  <path d="M10.1 53.9 53.9 10.1" fill="none" stroke="#F7F7F5" stroke-width="1.6" stroke-dasharray="3.5 3" opacity=".6"/>
+  <circle cx="22" cy="22" r="8.5" fill="#F7F7F5"/>
+  <circle cx="42" cy="42" r="7.2" fill="none" stroke="#F7F7F5" stroke-width="2.6"/>
+  <text x="88" y="43" fill="#131215" font-family="Archivo, 'Helvetica Neue', Arial, sans-serif" font-stretch="112%" font-size="30" font-weight="700" letter-spacing="2.2">PUNKTESPIEGEL</text>
 </svg>

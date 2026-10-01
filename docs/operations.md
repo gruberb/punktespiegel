@@ -104,7 +104,7 @@ Der Workflow:
 5. lädt `frontend/dist` als Pages-Artefakt hoch,
 6. ersetzt die Website nur nach einem vollständig erfolgreichen Build.
 
-Es gibt kein `DATABASE_URL`-Secret. Der Workflow schreibt auch nicht zurück in den Branch und bläht deshalb die Git-Historie nicht täglich auf.
+Es gibt kein `DATABASE_URL`-Secret; optional sind nur `NEWS_API_KEY` und `ANTHROPIC_API_KEY`. Der Workflow schreibt auch nicht zurück in den Branch und bläht deshalb die Git-Historie nicht täglich auf.
 
 ### Nachrichtenabgleich
 
@@ -117,6 +117,18 @@ Der Generator durchsucht Überschrift und Kurzbeschreibung der letzten 14 Tage. 
 Jeder Abruf erhält in `feeds` einen Status (`ok`, `error` oder `unmapped`) samt Abrufzeit und Zahl der gelesenen beziehungsweise akzeptierten Einträge. Ein einzelner ausgefallener Feed stoppt den Lauf nicht. Jeder Lauf ersetzt den vorherigen RSS-Stand vollständig. Sind alle Quellen nicht erreichbar, schreibt der Generator ein frisches, leeres Nachrichtenartefakt mit Fehlerstatus, damit alte kicker-Inhalte nicht archiviert oder als aktuell ausgeliefert werden. Für einen separaten lokalen Abgleich genügt `cargo run --locked -p punktespiegel-data -- --news-only`.
 
 Die kicker-Spielerarchive und internen APIs werden nicht gescrapt. Der Browser verlinkt bekannte stabile Archiv-Slugs direkt; bei nicht verifizierten Slugs bietet er eine klar bezeichnete, auf kicker beschränkte Suche an. Für kicker-RSS-Treffer müssen die sichtbare Quellenangabe und der direkte, ungeframte Link erhalten bleiben; Bilder werden nicht übernommen. Vor einer kommerziellen oder weitergehenden systematischen Nutzung ist eine Syndizierungsfreigabe einzuholen.
+
+### Spieltagstexte
+
+Nach den Nachrichten schreibt derselbe Lauf je Liga-Saison `data/insights/<saison-id>.json`. Für jeden gespielten Spieltag berechnet der Generator Kandidaten (Tabellenführer, punktbester Spieler, Tore des Spieltags, höchster Sieg, torreichstes Spiel, größter Sprung und Absturz, Mehrfachtorschützen, Serien, ungeschlagene und sieglose Teams, Zu-null-Spiele) samt festen deutschen Vorlagentexten. Die Überblickseite zeigt daraus drei Karten und vier Kennzahlen.
+
+Ist das Secret `ANTHROPIC_API_KEY` gesetzt, wählt Claude die Karten aus und formuliert Frage und Satz über strukturierte Ausgabe. Jeder Modelltext wird gegen die Fakten seines Kandidaten geprüft: Jede Zahl muss in den Fakten stehen, jeder genannte Verein oder Spieler muss zum Kandidaten gehören, Zahlwörter, Markdown, Ausrufezeichen und überlange Texte werden verworfen. Ein verworfener Text behält die Vorlage. Ohne Schlüssel erscheinen ausschließlich Vorlagentexte.
+
+Einträge sind über einen Hash der Fakten zwischengespeichert. Das Modell wird nur für neue oder geänderte Spieltage gefragt, höchstens dreimal je Spieltag und höchstens `--insights-model-budget` Mal je Lauf (Standard 6, neueste Spieltage zuerst). Der Pages-Workflow sichert `data/insights` deshalb mit `actions/cache` zwischen den Läufen; die Dateien sind nicht eingecheckt. Weitere Optionen: `--insights-model` (Standard `claude-opus-5-5`), `--insights-effort` (Standard `low`) und `--insights-only`, das nur die Texte aus vorhandenen Saisondateien neu baut:
+
+```bash
+ANTHROPIC_API_KEY=… cargo run --locked -p punktespiegel-data -- --insights-only
+```
 
 ## GitHub Pages aktivieren
 

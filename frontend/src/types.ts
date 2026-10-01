@@ -491,3 +491,46 @@ export type PlayerHistory = {
 };
 
 export type PlayerTableRow = Player & { analysis: PlayerHistory };
+
+// Spieltagstexte, written by the data generator (generator/src/insights.rs).
+export type InsightSubject = {
+  kind: "team" | "player";
+  id: string;
+  name: string;
+  imageUrl?: string;
+};
+
+export type InsightVisual =
+  | { type: "results"; label: string; rows: { round: number; outcome: "S" | "U" | "N"; score: string; opponent: string; home: boolean }[] }
+  | { type: "roundPoints"; label: string; rows: { round: number; points: number; opponent: string | null }[] }
+  | { type: "outcomes"; label: string; values: ("H" | "U" | "A")[] };
+
+export type InsightCard = {
+  id: string;
+  kind: string;
+  title: string;
+  category: string;
+  question: string;
+  answer: string;
+  detailLabel: string;
+  detail: string;
+  visual: InsightVisual;
+  subject?: InsightSubject;
+};
+
+export type InsightFact = {
+  id: string;
+  kind: string;
+  title: string;
+  value: string;
+  context: string;
+  tone: "" | "up" | "down";
+  text: string;
+  subjects?: InsightSubject[];
+};
+
+export type RoundInsights = {
+  round: number;
+  cards: InsightCard[];
+  facts: InsightFact[];
+};

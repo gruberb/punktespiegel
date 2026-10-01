@@ -47,9 +47,19 @@ jobs:
           node-version: 24
           cache: npm
 
+      # Spieltagstexte are cached by facts hash; restoring them keeps model
+      # requests to new or changed matchdays instead of every run.
+      - name: Spieltagstexte wiederherstellen
+        uses: actions/cache@v4
+        with:
+          path: frontend/public/data/insights
+          key: insights-${{ github.run_id }}
+          restore-keys: insights-
+
       - name: Statische Daten aktualisieren
         env:
           NEWS_API_KEY: ${{ secrets.NEWS_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: |
           if [ "${{ inputs.refresh_all }}" = "true" ]; then
             cargo run --locked -p punktespiegel-data -- --refresh-all

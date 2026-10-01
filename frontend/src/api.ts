@@ -25,7 +25,7 @@ import { kickerPlayerNewsLink } from "./kicker-links";
 import { analyzePlayerHistory, previousSeasonPointsByPlayer } from "./player-table";
 import { latestImportedRound } from "./rounds";
 import { computeTable, crossTable, formLastN, formPoints, positionsByRound, trendVsRound } from "./standings";
-import type { LeagueStandings, LeagueTableRow, LeagueTableTeam, MatchdayContributor, MatchdayFixture } from "./types";
+import type { LeagueStandings, LeagueTableRow, LeagueTableTeam, MatchdayContributor, MatchdayFixture, RoundInsights } from "./types";
 type StaticCatalog = Catalog & { schemaVersion: number; generatedAt: string };
 
 type StaticClubProfiles = {
@@ -191,6 +191,7 @@ const availabilitySignalsCache = loadJson<StaticAvailabilitySignals>(asset("data
 const seasonCache = new Map<string, Promise<SeasonIndex>>();
 const clubProfilesCache = new Map<string, Promise<StaticClubProfiles | null>>();
 const playerCareersCache = new Map<string, Promise<StaticPlayerCareers | null>>();
+const insightsCache = new Map<string, Promise<RoundInsights[]>>();
 
 function asset(path: string) {
   return `${import.meta.env.BASE_URL}${path}`;
@@ -228,6 +229,22 @@ function loadSeason(params: URLSearchParams): Promise<SeasonIndex> {
       };
     });
     seasonCache.set(id, pending);
+  }
+  return pending;
+}
+
+// Matchday texts are optional: a season without a generated file (older
+// deployments, a build without the generator step) shows the page without them.
+function loadInsights(params: URLSearchParams): Promise<RoundInsights[]> {
+  const league = params.get("league") ?? "0001";
+  const year = params.get("season") ?? String(currentSeasonStartYear());
+  const id = `se-k${league}${year}`;
+  let pending = insightsCache.get(id);
+  if (!pending) {
+    pending = loadJson<{ schemaVersion: number; rounds: RoundInsights[] }>(asset(`data/insights/${id}.json`))
+      .then((file) => (file.schemaVersion === 1 ? file.rounds : []))
+      .catch(() => []);
+    insightsCache.set(id, pending);
   }
   return pending;
 }
@@ -955,5 +972,9 @@ export const api = {
     const season = Number(params.get("season") ?? currentSeasonStartYear());
     return abortable(Promise.all([loadSeason(params), roleSignalsCache, loadClubProfiles(league, season)]).then(([index, roleSignals, clubProfiles]) => teamDetail(index, teamId, roleSignals, clubProfiles)), signal);
   },
+  insights: (params: URLSearchParams, signal?: AbortSignal): Promise<RoundInsights | null> => abortable(loadInsights(params).then((rounds) => {
+    const round = Number(params.get("round"));
+    return rounds.find((entry) => entry.round === round) ?? null;
+  }), signal),
   bestEleven: (params: URLSearchParams, signal?: AbortSignal) => abortable(loadSeason(params).then((index) => bestEleven(index, params.get("scope") === "season" ? "season" : "matchday", selectedRound(params, index.season))), signal),
 };
