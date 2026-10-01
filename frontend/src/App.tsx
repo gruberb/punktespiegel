@@ -851,7 +851,7 @@ function InfoPage({ view, filters, onView }: { view: InfoView; filters: Filters;
         <li><span>02</span><div><h2>Datenvertrag prüfen</h2><p>Ligen, Saisons, Spieltage, Spieler, Vereine und Wertungen werden normalisiert und vor jeder Veröffentlichung auf Vollständigkeit und Konsistenz geprüft.</p></div></li>
         <li><span>03</span><div><h2>Statische Saisonartefakte bauen</h2><p>Je Liga und Saison entsteht ein kompaktes JSON-Artefakt. Der Browser lädt nur die ausgewählte Saison; es gibt keinen Laufzeitserver, keine Datenbank und kein Benutzerkonto.</p></div></li>
         <li><span>04</span><div><h2>Profil- und Verfügbarkeitssignale ergänzen</h2><p>Externe Snapshots von LigaInsider und Transfermarkt ergänzen die Wertungen um Rollen-, Verfügbarkeits- und Vereinskontext. Jedes Signal bleibt mit Quelle und Stand ausgewiesen.</p></div></li>
-        <li><span>05</span><div><h2>Spieltagskarten erzeugen und prüfen</h2><p>Für jeden Spieltag berechnet der Generator Kandidaten wie Tabellenführer, höchsten Sieg, torreichstes Spiel, größten Sprung oder punktbesten Spieler. Claude von Anthropic wählt daraus drei Karten und vier Kennzahlen und formuliert Frage und Satz. Jede Zahl und jeder Vereins- oder Spielername wird anschließend gegen die berechneten Werte geprüft; besteht ein Text die Prüfung nicht oder ist das Modell nicht erreichbar, erscheint ein fester Vorlagentext.</p></div></li>
+        <li><span>05</span><div><h2>Spieltagskarten erzeugen und prüfen</h2><p>Für jeden Spieltag berechnet der Generator Kandidaten wie Tabellenführer, höchsten Sieg, torreichstes Spiel, größten Sprung oder punktbesten Spieler. Claude von Anthropic wählt daraus sechs Karten und vier Kennzahlen und formuliert Frage und Satz. Jede Zahl und jeder Vereins- oder Spielername wird anschließend gegen die berechneten Werte geprüft; besteht ein Text die Prüfung nicht oder ist das Modell nicht erreichbar, erscheint ein fester Vorlagentext.</p></div></li>
       </ol>
       <div className="info-grid">
         <section className="info-card"><h2>Aktualisierung</h2><p>Die laufende Saison wird täglich um 12:15 Uhr deutscher Zeit neu gebaut. Ein manueller Lauf kann zusätzlich alle abgeschlossenen Saisons aktualisieren.</p></section>
@@ -1155,16 +1155,37 @@ function InsightCards({ cards, onTeam, onPlayer }: { cards: InsightCardData[]; o
 
 function InsightVisual({ visual }: { visual: InsightVisualData }) {
   if (visual.type === "results") {
-    return <ol className="insight-rows">{visual.rows.map((row) => (
-      <li key={row.round}><span>ST {row.round}</span><i className={`form-chip form-chip-${row.outcome.toLowerCase()}`}>{row.outcome}</i><b>{row.score}</b><span>{row.home ? "gegen" : "bei"} {row.opponent}</span></li>
-    ))}</ol>;
+    return <>
+      {visual.summary && <p className="insight-summary">{visual.summary}</p>}
+      <ol className="insight-rows">{visual.rows.map((row) => (
+        <li key={row.round}><span>ST {row.round}</span><i className={`form-chip form-chip-${row.outcome.toLowerCase()}`}>{row.outcome}</i><b>{row.score}</b><span>{row.home ? "gegen" : "bei"} {row.opponent}</span></li>
+      ))}</ol>
+    </>;
   }
-  if (visual.type === "roundPoints") {
-    return <ol className="insight-rows">{visual.rows.map((row) => (
-      <li key={row.round}><span>ST {row.round}</span><b>{row.points}</b><small>Pkt.</small><span>{row.opponent ? `gegen ${row.opponent}` : ""}</span></li>
-    ))}</ol>;
+  if (visual.type === "roundValues") {
+    return <>
+      {visual.summary && <p className="insight-summary">{visual.summary}</p>}
+      <ol className="insight-rows">{visual.rows.map((row) => (
+        <li key={row.round}><span>ST {row.round}</span><b>{row.value}</b><small>{visual.unit}</small><span>{row.opponent ? `gegen ${row.opponent}` : ""}</span></li>
+      ))}</ol>
+    </>;
   }
-  return <span className="insight-outcomes">{visual.values.map((value, index) => <i key={index} className={`outcome-${value.toLowerCase()}`} title={value === "H" ? "Heimsieg" : value === "A" ? "Auswärtssieg" : "Unentschieden"}>{value}</i>)}</span>;
+  if (visual.type !== "outcomes") return null;
+  return <span className="insight-outcomes">{visual.values.map((value, index) => <OutcomeSquare key={index} value={value} match={visual.matches?.[index]} />)}</span>;
+}
+
+const outcomeName = { H: "Heimsieg", U: "Unentschieden", A: "Auswärtssieg" } as const;
+
+function OutcomeSquare({ value, match }: { value: "H" | "U" | "A"; match?: { home: InsightSubject; away: InsightSubject; score: string } }) {
+  const hover = useHoverState<HTMLElement>();
+  const team = (subject: InsightSubject): PopoverTeam => ({ name: subject.name, code: subject.short ?? initialsOf(subject.name), logoUrl: subject.imageUrl ?? null });
+  if (!match) return <i className={`outcome-${value.toLowerCase()}`} title={outcomeName[value]}>{value}</i>;
+  return (
+    <i ref={hover.ref} className={`outcome-${value.toLowerCase()}`} tabIndex={0} aria-label={`${outcomeName[value]}: ${match.home.name} ${match.score} ${match.away.name}`} {...hover.handlers}>
+      {value}
+      <MatchPopover hover={hover} title={outcomeName[value]} status="Spiel des Spieltags" home={team(match.home)} away={team(match.away)} score={match.score} />
+    </i>
+  );
 }
 
 function InsightFacts({ round, facts, onTeam, onPlayer }: { round: number; facts: InsightFact[]; onTeam: (id: string) => void; onPlayer: (id: string) => void }) {
@@ -1205,12 +1226,21 @@ function Crosshair() {
 // several stickers on one page do not share (and lose) their definitions.
 function Sticker({ kind }: { kind: string }) {
   const id = useId().replace(/:/g, "");
-  const shape = kind === "topPlayer" || kind === "roundTopPlayer" ? "ball" : kind === "roundGoals" ? "whistle" : "trophy";
-  const outline = shape === "ball"
+  const shape = kind === "topPlayer" || kind === "roundTopPlayer" ? "ball"
+    : kind === "roundGoals" ? "whistle"
+    : kind === "topScorer" ? "boot"
+    : kind === "value" ? "coin"
+    : kind === "form" ? "flame"
+    : "trophy";
+  const outline = shape === "ball" || shape === "coin"
     ? <circle cx="64" cy="64" r="44" />
     : shape === "whistle"
       ? <path d="M44 42h60a6 6 0 0 1 6 6v12a6 6 0 0 1-6 6H76a30 30 0 1 1-32-24z" />
-      : <><path d="M38 22h52v28c0 18-11.6 32-26 32S38 68 38 50z" /><path d="M38 30H24c-1 14 5 24 16 26M90 30h14c1 14-5 24-16 26" fill="none" /><path d="M56 82h16v14H56z" /><path d="M42 96h44v12H42z" /></>;
+      : shape === "boot"
+        ? <path d="M34 22h30v42l30 10c10 3 16 10 16 18v8H34z" />
+        : shape === "flame"
+          ? <path d="M64 16c6 18 30 30 30 58a30 30 0 0 1-60 0c0-14 8-24 14-30 1 10 6 16 12 18-6-16-2-32 4-46z" />
+          : <><path d="M38 22h52v28c0 18-11.6 32-26 32S38 68 38 50z" /><path d="M38 30H24c-1 14 5 24 16 26M90 30h14c1 14-5 24-16 26" fill="none" /><path d="M56 82h16v14H56z" /><path d="M42 96h44v12H42z" /></>;
   return (
     <svg className={`sticker sticker-${shape}`} viewBox="0 0 128 128" aria-hidden="true">
       <defs>
@@ -1227,12 +1257,30 @@ function Sticker({ kind }: { kind: string }) {
         <path className="sticker-line" d="M64 46V24M81 58.4l20-6.5M74.5 78.4l12.4 17M53.5 78.4l-12.4 17M47 58.4l-20-6.5" />
       </>}
       {shape === "whistle" && <><circle className="sticker-line" cx="46" cy="74" r="10" /><path className="sticker-ink" d="M88 42h6v8h-6z" /></>}
+      {shape === "boot" && <><path className="sticker-line" d="M34 92h76" /><path className="sticker-ink" d="M42 100h8v8h-8zM64 100h8v8h-8zM88 100h8v8h-8z" /><path className="sticker-line" d="M64 64v12" /></>}
+      {shape === "coin" && <><circle className="sticker-line" cx="64" cy="64" r="34" /><text className="sticker-glyph" x="64" y="80" textAnchor="middle">€</text></>}
+      {shape === "flame" && <path className="sticker-ink" d="M64 62c3 8 12 12 12 24a12 12 0 0 1-24 0c0-6 4-10 6-13 1 5 3 7 6 8-2-7-1-13 0-19z" />}
     </svg>
   );
 }
 
 function initialsOf(name: string) {
   return name.split(/\s+/).filter((part) => /^\p{L}/u.test(part)).map((part) => part[0]).slice(0, 3).join("").toUpperCase();
+}
+
+// Fixed columns instead of CSS multi-column: expanding a match must not
+// reflow kickoff groups from one column into the other.
+function fixtureColumns<Group extends { fixtures: unknown[] }>(groups: Group[]): Group[][] {
+  const total = groups.reduce((sum, group) => sum + group.fixtures.length, 0);
+  const left: Group[] = [];
+  let count = 0;
+  for (const group of groups) {
+    if (count >= total / 2) break;
+    left.push(group);
+    count += group.fixtures.length;
+  }
+  const right = groups.slice(left.length);
+  return right.length ? [left, right] : [left];
 }
 
 function MatchdayFixturesCard({ standings, onTeam, onPlayer }: { standings: LeagueStandings; onTeam: (id: string) => void; onPlayer: (id: string) => void }) {
@@ -1247,10 +1295,14 @@ function MatchdayFixturesCard({ standings, onTeam, onPlayer }: { standings: Leag
     <section className="tabelle-block">
       <div className="section-copy"><p className="kicker">Spieltag {standings.context.round}</p><h2>Spiele des Spieltags</h2></div>
       <div className="detail-section fixtures-card">
-        {groups.map((group) => (
-          <div className="fixture-slot" key={group.slot ?? "offen"}>
-            <h4>{formatFixtureSlot(group.slot)}</h4>
-            {group.fixtures.map((fixture) => <TabelleFixture key={fixture.id} fixture={fixture} onTeam={onTeam} onPlayer={onPlayer} />)}
+        {fixtureColumns(groups).map((column, index) => (
+          <div className="fixtures-column" key={index}>
+            {column.map((group) => (
+              <div className="fixture-slot" key={group.slot ?? "offen"}>
+                <h4>{formatFixtureSlot(group.slot)}</h4>
+                {group.fixtures.map((fixture) => <TabelleFixture key={fixture.id} fixture={fixture} onTeam={onTeam} onPlayer={onPlayer} />)}
+              </div>
+            ))}
           </div>
         ))}
       </div>
@@ -1487,38 +1539,53 @@ function FormChips({ form, team }: { form: LeagueTableFormEntry[]; team: LeagueT
 }
 
 function FormChip({ entry, team }: { entry: LeagueTableFormEntry; team: LeagueTableTeam }) {
-  const anchorRef = useRef<HTMLElement>(null);
-  const tooltipId = useId();
-  const [hovered, setHovered] = useState(false);
-  const [focused, setFocused] = useState(false);
-  const open = hovered || focused;
+  const hover = useHoverState<HTMLElement>();
   // The entry's score is from this team's point of view; the popover shows it home side first.
   const [scored, conceded] = entry.score.split(":");
   const [home, away] = entry.home ? [team, entry.opponent] : [entry.opponent, team];
   const score = entry.home ? `${scored}:${conceded}` : `${conceded}:${scored}`;
   const outcome = entry.outcome === "S" ? "Sieg" : entry.outcome === "N" ? "Niederlage" : "Unentschieden";
   return (
-    <i
-      ref={anchorRef}
-      className={`form-chip form-chip-${entry.outcome.toLowerCase()}`}
-      tabIndex={0}
-      aria-label={`Spieltag ${entry.round}: ${outcome}, ${home.name} ${score} ${away.name}`}
-      aria-describedby={open ? tooltipId : undefined}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      onFocus={() => setFocused(true)}
-      onBlur={() => setFocused(false)}
-    >
+    <i ref={hover.ref} className={`form-chip form-chip-${entry.outcome.toLowerCase()}`} tabIndex={0} aria-label={`Spieltag ${entry.round}: ${outcome}, ${home.name} ${score} ${away.name}`} {...hover.handlers}>
       {entry.outcome}
-      <FloatingScorePopover anchorRef={anchorRef} open={open} id={tooltipId} className="form-popover" preferredWidth={300}>
-        <header><strong>Spieltag {entry.round}</strong><span>{outcome} · {entry.home ? "Heim" : "Auswärts"}</span></header>
-        <div className="form-popover-match">
-          <span className="form-popover-team home"><strong title={home.name}>{home.code}</strong><TeamLogo code={home.code} url={home.logoUrl} /></span>
-          <span className="fixture-score">{score.replace(":", " : ")}</span>
-          <span className="form-popover-team"><TeamLogo code={away.code} url={away.logoUrl} /><strong title={away.name}>{away.code}</strong></span>
-        </div>
-      </FloatingScorePopover>
+      <MatchPopover hover={hover} title={`Spieltag ${entry.round}`} status={`${outcome} · ${entry.home ? "Heim" : "Auswärts"}`} home={home} away={away} score={score} />
     </i>
+  );
+}
+
+type PopoverTeam = { name: string; code: string; logoUrl: string | null };
+
+/** Hover and keyboard focus both open a popover; either one keeps it open. */
+function useHoverState<Element extends HTMLElement>(onEnter?: () => void) {
+  const ref = useRef<Element>(null);
+  const id = useId();
+  const [hovered, setHovered] = useState(false);
+  const [focused, setFocused] = useState(false);
+  const open = hovered || focused;
+  return {
+    ref,
+    id,
+    open,
+    handlers: {
+      "aria-describedby": open ? id : undefined,
+      onMouseEnter: () => { setHovered(true); onEnter?.(); },
+      onMouseLeave: () => setHovered(false),
+      onFocus: () => { setFocused(true); onEnter?.(); },
+      onBlur: () => setFocused(false),
+    },
+  };
+}
+
+function MatchPopover({ hover, title, status, home, away, score }: { hover: ReturnType<typeof useHoverState<HTMLElement>>; title: string; status: string; home: PopoverTeam; away: PopoverTeam; score: string | null }) {
+  return (
+    <FloatingScorePopover anchorRef={hover.ref} open={hover.open} id={hover.id} className="form-popover" preferredWidth={320}>
+      <header><strong>{title}</strong><span>{status}</span></header>
+      <div className="form-popover-match">
+        <span className="form-popover-team home"><strong title={home.name}>{home.code}</strong><TeamLogo code={home.code} url={home.logoUrl} /></span>
+        <span className={`fixture-score ${score ? "" : "fixture-score-open"}`}>{score ? score.replace(":", " : ") : "– : –"}</span>
+        <span className="form-popover-team"><TeamLogo code={away.code} url={away.logoUrl} /><strong title={away.name}>{away.code}</strong></span>
+      </div>
+    </FloatingScorePopover>
   );
 }
 
@@ -1578,41 +1645,22 @@ function CrossCell({ home, away, cell, onActive }: {
   cell: LeagueStandings["cross"]["cells"][string] | undefined;
   onActive: (pair: { home: string; away: string } | null) => void;
 }) {
-  const anchorRef = useRef<HTMLTableCellElement>(null);
-  const tooltipId = useId();
-  const [hovered, setHovered] = useState(false);
-  const [focused, setFocused] = useState(false);
-  const open = hovered || focused;
+  const hover = useHoverState<HTMLElement>(() => onActive({ home: home.id, away: away.id }));
   const played = cell != null && cell.homeScore != null && cell.awayScore != null;
   const outcome = !played ? null : cell.homeScore! > cell.awayScore! ? "s" : cell.homeScore! < cell.awayScore! ? "n" : "u";
   const result = played ? `${cell.homeScore}:${cell.awayScore}` : null;
   const status = !cell ? "Keine Partie angesetzt" : played ? (outcome === "s" ? "Heimsieg" : outcome === "n" ? "Auswärtssieg" : "Unentschieden") : "Noch offen";
   const date = cell?.scheduledAt ? formatDateWithYear(cell.scheduledAt) : null;
-  const enter = (focus: boolean) => {
-    if (focus) setFocused(true); else setHovered(true);
-    onActive({ home: home.id, away: away.id });
-  };
   return (
     <td
-      ref={anchorRef}
+      ref={hover.ref as RefObject<HTMLTableCellElement>}
       className={outcome ? `cross-cell-${outcome}` : "cross-open"}
       tabIndex={0}
       aria-label={`${home.name} gegen ${away.name}: ${result ?? status}${cell ? `, Spieltag ${cell.round}` : ""}`}
-      aria-describedby={open ? tooltipId : undefined}
-      onMouseEnter={() => enter(false)}
-      onMouseLeave={() => setHovered(false)}
-      onFocus={() => enter(true)}
-      onBlur={() => setFocused(false)}
+      {...hover.handlers}
     >
       {result ?? "–"}
-      <FloatingScorePopover anchorRef={anchorRef} open={open} id={tooltipId} className="form-popover" preferredWidth={320}>
-        <header><strong>{cell ? `Spieltag ${cell.round}` : "Direktvergleich"}</strong><span>{status}{date ? ` · ${date}` : ""}</span></header>
-        <div className="form-popover-match">
-          <span className="form-popover-team home"><strong title={home.name}>{home.code}</strong><TeamLogo code={home.code} url={home.logoUrl} /></span>
-          <span className={`fixture-score ${played ? "" : "fixture-score-open"}`}>{result ? result.replace(":", " : ") : "– : –"}</span>
-          <span className="form-popover-team"><TeamLogo code={away.code} url={away.logoUrl} /><strong title={away.name}>{away.code}</strong></span>
-        </div>
-      </FloatingScorePopover>
+      <MatchPopover hover={hover} title={cell ? `Spieltag ${cell.round}` : "Direktvergleich"} status={`${status}${date ? ` · ${date}` : ""}`} home={home} away={away} score={result} />
     </td>
   );
 }

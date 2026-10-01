@@ -2,6 +2,19 @@
 
 Alle wesentlichen Änderungen an Punktespiegel werden in dieser Datei dokumentiert.
 
+## [1.25.0] – 2026-10-01
+
+### Hinzugefügt
+
+- Drei weitere Spieltagskarten: „Form“ (meiste Punkte der letzten fünf Spieltage), „Torjäger“ (meiste Saisontore) und „Wert“ (Punkte pro Million Euro Marktwert, ab der Hälfte der bisherigen Spieltage). Der Überblick zeigt sechs Karten in zwei Reihen.
+- Listenkarten zeigen über den letzten fünf Spieltagen eine Saisonzeile, etwa Bilanz und „vorn seit ST 3“ oder Punkteschnitt und besten Spieltag. Die Karten bleiben so über die ganze Saison gleich hoch.
+- Die Felder „Ausgang je Spiel“ zeigen beim Überfahren oder Fokussieren die Partie mit beiden Vereinen und dem Ergebnis.
+
+### Behoben
+
+- Das Aufklappen eines Spiels unter „Spiele des Spieltags“ verschiebt keine Anstoßzeiten mehr in die andere Spalte; die Trennlinie bleibt stehen.
+- Geänderte Kartenauswahl baut zwischengespeicherte Spieltage neu auf.
+
 ## [1.24.0] – 2026-10-01
 
 ### Hinzugefügt

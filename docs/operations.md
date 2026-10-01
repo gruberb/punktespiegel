@@ -120,7 +120,7 @@ Die kicker-Spielerarchive und internen APIs werden nicht gescrapt. Der Browser v
 
 ### Spieltagstexte
 
-Nach den Nachrichten schreibt derselbe Lauf je Liga-Saison `data/insights/<saison-id>.json`. Für jeden gespielten Spieltag berechnet der Generator Kandidaten (Tabellenführer, punktbester Spieler, Tore des Spieltags, höchster Sieg, torreichstes Spiel, größter Sprung und Absturz, Mehrfachtorschützen, Serien, ungeschlagene und sieglose Teams, Zu-null-Spiele) samt festen deutschen Vorlagentexten. Die Überblickseite zeigt daraus drei Karten und vier Kennzahlen.
+Nach den Nachrichten schreibt derselbe Lauf je Liga-Saison `data/insights/<saison-id>.json`. Für jeden gespielten Spieltag berechnet der Generator Kandidaten (Tabellenführer, Formtabelle, Torjäger, Punkte pro Million Marktwert, punktbester Spieler, Tore des Spieltags, höchster Sieg, torreichstes Spiel, größter Sprung und Absturz, Mehrfachtorschützen, Serien, ungeschlagene und sieglose Teams, Zu-null-Spiele) samt festen deutschen Vorlagentexten. Die Überblickseite zeigt daraus sechs Karten und vier Kennzahlen.
 
 Ist das Secret `ANTHROPIC_API_KEY` gesetzt, wählt Claude die Karten aus und formuliert Frage und Satz über strukturierte Ausgabe. Jeder Modelltext wird gegen die Fakten seines Kandidaten geprüft: Jede Zahl muss in den Fakten stehen, jeder genannte Verein oder Spieler muss zum Kandidaten gehören, Zahlwörter, Markdown, Ausrufezeichen und überlange Texte werden verworfen. Ein verworfener Text behält die Vorlage. Ohne Schlüssel erscheinen ausschließlich Vorlagentexte.
 

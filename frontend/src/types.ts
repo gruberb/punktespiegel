@@ -497,13 +497,14 @@ export type InsightSubject = {
   kind: "team" | "player";
   id: string;
   name: string;
+  short?: string;
   imageUrl?: string;
 };
 
 export type InsightVisual =
-  | { type: "results"; label: string; rows: { round: number; outcome: "S" | "U" | "N"; score: string; opponent: string; home: boolean }[] }
-  | { type: "roundPoints"; label: string; rows: { round: number; points: number; opponent: string | null }[] }
-  | { type: "outcomes"; label: string; values: ("H" | "U" | "A")[] };
+  | { type: "results"; label: string; summary: string; rows: { round: number; outcome: "S" | "U" | "N"; score: string; opponent: string; home: boolean }[] }
+  | { type: "roundValues"; label: string; unit: string; summary: string; rows: { round: number; value: number; opponent: string | null }[] }
+  | { type: "outcomes"; label: string; values: ("H" | "U" | "A")[]; matches?: { home: InsightSubject; away: InsightSubject; score: string }[] };
 
 export type InsightCard = {
   id: string;

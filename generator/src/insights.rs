@@ -25,9 +25,9 @@ use super::{StaticMatch, StaticPlayer, StaticSeason, StaticTeam, write_json};
 pub const INSIGHTS_SCHEMA_VERSION: u32 = 1;
 // Part of the cache key: bump it when the prompt, the candidate set or a
 // template changes, so every matchday is rebuilt on the next run.
-const PROMPT_VERSION: u32 = 1;
+const PROMPT_VERSION: u32 = 2;
 const MAX_MODEL_ATTEMPTS: u32 = 3;
-const CARD_COUNT: usize = 3;
+const CARD_COUNT: usize = 6;
 const FACT_COUNT: usize = 4;
 const MAX_QUESTION_CHARS: usize = 70;
 const MAX_TEXT_CHARS: usize = 220;
@@ -76,6 +76,9 @@ pub enum Kind {
     RoundGoals,
     RoundTopPlayer,
     WinStreak,
+    Form,
+    TopScorer,
+    Value,
     BiggestWin,
     MostGoals,
     BiggestClimb,
@@ -89,12 +92,28 @@ pub enum Kind {
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(tag = "type", rename_all = "camelCase")]
 pub enum Visual {
-    /// The team's most recent results, oldest first.
-    Results { label: String, rows: Vec<ResultRow> },
-    /// The player's points in their most recent appearances, oldest first.
-    RoundPoints { label: String, rows: Vec<PointsRow> },
+    /// The team's most recent results, oldest first. The list is capped at
+    /// `RECENT_ROUNDS`; `summary` carries the whole season in one line.
+    Results {
+        label: String,
+        summary: String,
+        rows: Vec<ResultRow>,
+    },
+    /// A player's value (points, goals) in their most recent appearances.
+    RoundValues {
+        label: String,
+        unit: String,
+        summary: String,
+        rows: Vec<ValueRow>,
+    },
     /// One entry per match of the matchday: "H", "U" or "A".
-    Outcomes { label: String, values: Vec<String> },
+    Outcomes {
+        label: String,
+        values: Vec<String>,
+        /// Same order as `values`, so each square can show its match.
+        #[serde(default)]
+        matches: Vec<OutcomeMatch>,
+    },
 }
 
 /// The team or player a card or fact is about, so the page can show its logo
@@ -105,6 +124,9 @@ pub struct Subject {
     pub kind: SubjectKind,
     pub id: String,
     pub name: String,
+    /// Club short name ("Frankfurt"); absent for players.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub short: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub image_url: Option<String>,
 }
@@ -114,6 +136,15 @@ pub struct Subject {
 pub enum SubjectKind {
     Team,
     Player,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct OutcomeMatch {
+    pub home: Subject,
+    pub away: Subject,
+    /// Home goals first, e.g. "2:1".
+    pub score: String,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -130,9 +161,9 @@ pub struct ResultRow {
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct PointsRow {
+pub struct ValueRow {
     pub round: i32,
-    pub points: i32,
+    pub value: i32,
     pub opponent: Option<String>,
 }
 
@@ -460,6 +491,7 @@ impl<'a> SeasonIndex<'a> {
             kind: SubjectKind::Team,
             id: team.id.clone(),
             name: team.name.clone(),
+            short: Some(team.code.clone()),
             image_url: team.logo_url.clone(),
         })
     }
@@ -470,6 +502,7 @@ impl<'a> SeasonIndex<'a> {
             kind: SubjectKind::Player,
             id: player.id.clone(),
             name: player.name.clone(),
+            short: None,
             image_url: player.photo_url.clone(),
         })
     }
@@ -707,6 +740,9 @@ impl<'a> SeasonIndex<'a> {
         candidates.extend(context.round_goals());
         candidates.extend(context.round_top_player());
         candidates.extend(context.win_streak());
+        candidates.extend(context.form());
+        candidates.extend(context.top_scorer());
+        candidates.extend(context.value());
         candidates.extend(context.biggest_win());
         candidates.extend(context.most_goals());
         candidates.extend(context.rank_moves());
@@ -799,33 +835,94 @@ impl RoundContext<'_, '_> {
         self.index.players.get(player_id).copied()
     }
 
-    fn recent_points(&self, player_id: &str) -> Visual {
+    fn recent_values(
+        &self,
+        player_id: &str,
+        label: &str,
+        unit: &str,
+        value: fn(&RoundLine) -> i32,
+        summary: String,
+    ) -> Visual {
         let first = self.round - RECENT_ROUNDS + 1;
         let rows = self
             .totals
             .get(player_id)
             .into_iter()
             .flat_map(|totals| totals.by_round.range(first..=self.round))
-            .map(|(round, line)| PointsRow {
+            .map(|(round, line)| ValueRow {
                 round: *round,
-                points: line.points,
+                value: value(line),
                 opponent: line.opponent.clone(),
             })
             .collect();
-        Visual::RoundPoints {
-            label: "Punkte je Spieltag".to_owned(),
+        Visual::RoundValues {
+            label: label.to_owned(),
+            unit: unit.to_owned(),
+            summary,
             rows,
         }
     }
 
-    fn recent_results(&self, team_id: &str) -> Visual {
+    fn recent_points(&self, player_id: &str) -> Visual {
+        self.recent_values(
+            player_id,
+            "Punkte je Spieltag",
+            "Pkt.",
+            |line| line.points,
+            self.points_summary(player_id),
+        )
+    }
+
+    fn points_summary(&self, player_id: &str) -> String {
+        let Some(totals) = self.totals.get(player_id) else {
+            return String::new();
+        };
+        let appearances = totals.by_round.len().max(1) as f64;
+        let best = totals
+            .by_round
+            .iter()
+            .max_by(|left, right| left.1.points.cmp(&right.1.points).then(right.0.cmp(left.0)));
+        let mut summary = format!(
+            "Saison: Ø {} Pkt.",
+            decimal(f64::from(totals.points) / appearances, 1)
+        );
+        if let Some((round, line)) = best {
+            summary.push_str(&format!(" · bester Spieltag ST {round} ({})", line.points));
+        }
+        summary
+    }
+
+    fn recent_results(&self, team_id: &str, summary: String) -> Visual {
         let mut rows = self.index.results(team_id, self.round);
         let skip = rows.len().saturating_sub(RECENT_ROUNDS as usize);
         rows.drain(..skip);
         Visual::Results {
             label: "Letzte Spiele".to_owned(),
+            summary,
             rows,
         }
+    }
+
+    fn record_summary(&self, row: &Row) -> String {
+        format!(
+            "Saison: {} S · {} U · {} N · {} Pkt",
+            row.wins, row.draws, row.losses, row.points
+        )
+    }
+
+    /// Consecutive matchdays, up to this one, that `team_id` led the table.
+    fn leading_since(&self, team_id: &str) -> i32 {
+        let mut since = self.round;
+        while since > 1
+            && self
+                .index
+                .table(since - 1)
+                .first()
+                .is_some_and(|row| row.team_id == team_id)
+        {
+            since -= 1;
+        }
+        since
     }
 
     fn leader(&self) -> Option<Candidate> {
@@ -849,7 +946,20 @@ impl RoundContext<'_, '_> {
                     "{share} % · {} S / {} U / {} N",
                     leader.wins, leader.draws, leader.losses
                 ),
-                visual: self.recent_results(&leader.team_id),
+                visual: self.recent_results(&leader.team_id, {
+                    let since = self.leading_since(&leader.team_id);
+                    if since == self.round {
+                        format!(
+                            "Saison: {} S · {} U · {} N · neu an der Spitze",
+                            leader.wins, leader.draws, leader.losses
+                        )
+                    } else {
+                        format!(
+                            "Saison: {} S · {} U · {} N · vorn seit ST {since}",
+                            leader.wins, leader.draws, leader.losses
+                        )
+                    }
+                }),
                 subject: None,
                 source: Source::Template,
                 rejected: None,
@@ -964,6 +1074,16 @@ impl RoundContext<'_, '_> {
                         .iter()
                         .map(|outcome| (*outcome).to_owned())
                         .collect(),
+                    matches: ordered
+                        .iter()
+                        .filter_map(|fixture| {
+                            Some(OutcomeMatch {
+                                home: self.index.team_subject(fixture.home)?,
+                                away: self.index.team_subject(fixture.away)?,
+                                score: format!("{}:{}", fixture.home_goals, fixture.away_goals),
+                            })
+                        })
+                        .collect(),
                 },
                 subject: None,
                 source: Source::Template,
@@ -994,7 +1114,7 @@ impl RoundContext<'_, '_> {
         Some(Candidate {
             score: 50
                 - if season_leader == Some(player_id) {
-                    15
+                    30
                 } else {
                     0
                 },
@@ -1063,7 +1183,7 @@ impl RoundContext<'_, '_> {
                 answer: format!("{short} · {streak} Siege"),
                 detail_label: "Platz".to_owned(),
                 detail: format!("{} · {} Pkt", row.rank, row.points),
-                visual: self.recent_results(&row.team_id),
+                visual: self.recent_results(&row.team_id, self.record_summary(row)),
                 subject: None,
                 source: Source::Template,
                 rejected: None,
@@ -1072,6 +1192,164 @@ impl RoundContext<'_, '_> {
                     ("wins", json!(streak)),
                     ("rank", json!(row.rank)),
                     ("points", json!(row.points)),
+                ]),
+            }),
+        })
+    }
+
+    /// Most points over the last `RECENT_ROUNDS` matchdays.
+    fn form(&self) -> Option<Candidate> {
+        if self.round < 3 {
+            return None;
+        }
+        let first = self.round - RECENT_ROUNDS + 1;
+        let (row, points, record) = self
+            .table
+            .iter()
+            .map(|row| {
+                let recent = self
+                    .index
+                    .results(&row.team_id, self.round)
+                    .into_iter()
+                    .filter(|result| result.round >= first)
+                    .collect::<Vec<_>>();
+                let count = |outcome: &str| {
+                    recent
+                        .iter()
+                        .filter(|result| result.outcome == outcome)
+                        .count() as i32
+                };
+                let record = (count("S"), count("U"), count("N"));
+                (row, 3 * record.0 + record.1, record)
+            })
+            .max_by(|left, right| left.1.cmp(&right.1).then(right.0.rank.cmp(&left.0.rank)))?;
+        let span = self.round - first.max(1) + 1;
+        let short = self.index.short(&row.team_id);
+        Some(Candidate {
+            score: 45 - if row.rank == 1 { 5 } else { 0 },
+            team_ids: vec![row.team_id.clone()],
+            player_ids: Vec::new(),
+            item: Item::Card(Card {
+                id: "form".to_owned(),
+                kind: Kind::Form,
+                title: "Form".to_owned(),
+                category: "Tabelle".to_owned(),
+                question: format!("Wer holte aus den letzten {span} Spielen die meisten Punkte?"),
+                answer: format!("{short} · {points} Pkt"),
+                detail_label: format!("Letzte {span} Spieltage"),
+                detail: format!(
+                    "{} S / {} U / {} N · Platz {}",
+                    record.0, record.1, record.2, row.rank
+                ),
+                visual: self.recent_results(&row.team_id, self.record_summary(row)),
+                subject: None,
+                source: Source::Template,
+                rejected: None,
+                facts: facts([
+                    ("team", self.team_facts(&row.team_id)),
+                    ("matchdays", json!(span)),
+                    ("points", json!(points)),
+                    ("wins", json!(record.0)),
+                    ("draws", json!(record.1)),
+                    ("losses", json!(record.2)),
+                    ("rank", json!(row.rank)),
+                ]),
+            }),
+        })
+    }
+
+    fn top_scorer(&self) -> Option<Candidate> {
+        let (player_id, totals) =
+            self.best_player(|totals| totals.goals * 1000 + totals.points.max(0))?;
+        let player = self.player(player_id)?;
+        let appearances = totals.by_round.len() as i32;
+        let per_game = decimal(f64::from(totals.goals) / f64::from(appearances.max(1)), 2);
+        let summary = format!("Saison: {} Tore in {appearances} Spielen", totals.goals);
+        Some(Candidate {
+            score: 42,
+            team_ids: vec![player.team_id.clone()],
+            player_ids: vec![player.id.clone()],
+            item: Item::Card(Card {
+                id: "top-scorer".to_owned(),
+                kind: Kind::TopScorer,
+                title: "Torjäger".to_owned(),
+                category: "Spieler".to_owned(),
+                question: "Wer trifft am häufigsten?".to_owned(),
+                answer: format!("{} · {} Tore", last_name(&player.name), totals.goals),
+                detail_label: "Pro Spiel".to_owned(),
+                detail: format!("Ø {per_game} · {} Vorl.", totals.assists),
+                visual: self.recent_values(
+                    player_id,
+                    "Tore je Spieltag",
+                    "Tore",
+                    |line| line.goals,
+                    summary,
+                ),
+                subject: None,
+                source: Source::Template,
+                rejected: None,
+                facts: facts([
+                    (
+                        "player",
+                        json!({ "name": player.name, "short": last_name(&player.name) }),
+                    ),
+                    ("team", self.team_facts(&player.team_id)),
+                    ("goals", json!(totals.goals)),
+                    ("appearances", json!(appearances)),
+                    ("goalsPerGame", json!(per_game)),
+                    ("assists", json!(totals.assists)),
+                ]),
+            }),
+        })
+    }
+
+    /// Points per million euro of kicker market value. Players need half of
+    /// the matchdays so far, so one strong cameo does not top the list.
+    fn value(&self) -> Option<Candidate> {
+        let minimum = ((self.round + 1) / 2).max(1) as usize;
+        let (player, totals, ratio) = self
+            .totals
+            .iter()
+            .filter(|(_, totals)| totals.points > 0 && totals.by_round.len() >= minimum)
+            .filter_map(|(id, totals)| {
+                let player = self.player(id)?;
+                // 999 is the source's placeholder for "no market value".
+                (player.price_m > 0.0 && player.price_m < 999.0)
+                    .then(|| (player, totals, f64::from(totals.points) / player.price_m))
+            })
+            .max_by(|left, right| {
+                left.2
+                    .total_cmp(&right.2)
+                    .then_with(|| right.0.name.cmp(&left.0.name))
+            })?;
+        let ratio_text = decimal(ratio, 1);
+        let price = decimal(player.price_m, 1);
+        Some(Candidate {
+            score: 40,
+            team_ids: vec![player.team_id.clone()],
+            player_ids: vec![player.id.clone()],
+            item: Item::Card(Card {
+                id: "value".to_owned(),
+                kind: Kind::Value,
+                title: "Wert".to_owned(),
+                category: "Spieler".to_owned(),
+                question: "Wer liefert die meisten Punkte pro Euro?".to_owned(),
+                answer: format!("{} · {ratio_text} Pkt./Mio.", last_name(&player.name)),
+                detail_label: "Marktwert".to_owned(),
+                detail: format!("{price} Mio. € · {} Pkt", totals.points),
+                visual: self.recent_points(&player.id),
+                subject: None,
+                source: Source::Template,
+                rejected: None,
+                facts: facts([
+                    (
+                        "player",
+                        json!({ "name": player.name, "short": last_name(&player.name) }),
+                    ),
+                    ("team", self.team_facts(&player.team_id)),
+                    ("points", json!(totals.points)),
+                    ("marketValueMillions", json!(price)),
+                    ("pointsPerMillion", json!(ratio_text)),
                 ]),
             }),
         })
@@ -1579,7 +1857,9 @@ fn facts_hash(candidates: &[Candidate]) -> String {
             Item::Fact(fact) => serde_json::to_vec(fact),
         }
         .unwrap_or_default();
-        for byte in bytes {
+        // The template ranking decides which candidates are shown, so a changed
+        // score must rebuild the matchday just like changed facts.
+        for byte in bytes.into_iter().chain(candidate.score.to_le_bytes()) {
             hash ^= u64::from(byte);
             hash = hash.wrapping_mul(0x0100_0000_01b3);
         }
@@ -2279,22 +2559,71 @@ mod tests {
                 .collect::<Vec<_>>(),
             [(SubjectKind::Player, "olise")]
         );
+        let Item::Card(goals_card) = &candidate(&candidates, "round-goals").item else {
+            panic!("card")
+        };
+        let Visual::Outcomes {
+            values, matches, ..
+        } = &goals_card.visual
+        else {
+            panic!("outcomes")
+        };
+        assert_eq!(values.len(), matches.len());
+        assert_eq!(
+            matches
+                .iter()
+                .map(|game| (
+                    game.home.id.as_str(),
+                    game.score.as_str(),
+                    game.away.id.as_str()
+                ))
+                .collect::<Vec<_>>(),
+            [("fcb", "7:0", "s04"), ("koe", "3:4", "m05")]
+        );
         let Item::Card(round) = &candidate(&candidates, "round-top-player").item else {
             panic!("card")
         };
         assert_eq!(round.answer, "Olise · 25");
-        let Visual::RoundPoints { rows, .. } = &round.visual else {
+        let Visual::RoundValues { rows, summary, .. } = &round.visual else {
             panic!("points")
         };
+        assert_eq!(summary, "Saison: Ø 15,3 Pkt. · bester Spieltag ST 3 (25)");
         assert_eq!(
             rows.iter()
-                .map(|row| (row.round, row.points, row.opponent.as_deref()))
+                .map(|row| (row.round, row.value, row.opponent.as_deref()))
                 .collect::<Vec<_>>(),
             [
                 (1, 9, Some("Köln")),
                 (2, 12, Some("Mainz")),
                 (3, 25, Some("Schalke"))
             ]
+        );
+        let Visual::Results { summary, .. } = &leader.visual else {
+            panic!("results")
+        };
+        assert_eq!(summary, "Saison: 3 S · 0 U · 0 N · vorn seit ST 1");
+        let card = |id: &str| match &candidate(&candidates, id).item {
+            Item::Card(card) => (card.answer.clone(), card.detail.clone()),
+            Item::Fact(_) => panic!("card"),
+        };
+        assert_eq!(
+            card("form"),
+            (
+                "Bayern · 9 Pkt".to_owned(),
+                "3 S / 0 U / 0 N · Platz 1".to_owned()
+            )
+        );
+        assert_eq!(
+            card("top-scorer"),
+            ("Olise · 5 Tore".to_owned(), "Ø 1,67 · 0 Vorl.".to_owned())
+        );
+        // Becker has one appearance in three matchdays and stays below the minimum.
+        assert_eq!(
+            card("value"),
+            (
+                "Olise · 46,0 Pkt./Mio.".to_owned(),
+                "1,0 Mio. € · 46 Pkt".to_owned()
+            )
         );
         // Every template text passes the same validation the model text faces.
         let vocabulary = SeasonIndex::new(&season).vocabulary(3);

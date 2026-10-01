@@ -55,7 +55,7 @@ Die Darstellung berechnet daraus deterministisch:
 
 ## Spieltagstexte
 
-`data/insights/<saison-id>.json` enthält je gespieltem Spieltag bis zu drei Karten (Titel, Frage, Ergebnis, Detail, eine Darstellung aus letzten Ergebnissen, Punkten je Spieltag oder Ausgängen je Spiel) und bis zu vier Kennzahlen (Wert, Kontext, Satz). Karten und Kennzahlen nennen ihren Verein oder Spieler samt kicker-Bild, damit die Oberfläche Logos und Porträts zeigt und auf Profile verlinkt. Alle Zahlen berechnet der Generator; ein Sprachmodell darf nur auswählen und umformulieren, und jede Formulierung wird vor der Veröffentlichung gegen die Fakten geprüft. Fehlt die Datei, zeigt die Überblickseite die Tabelle ohne Karten.
+`data/insights/<saison-id>.json` enthält je gespieltem Spieltag bis zu sechs Karten (Titel, Frage, Ergebnis, Detail, eine Darstellung aus letzten Ergebnissen, Punkten je Spieltag oder Ausgängen je Spiel) und bis zu vier Kennzahlen (Wert, Kontext, Satz). Karten und Kennzahlen nennen ihren Verein oder Spieler samt kicker-Bild, damit die Oberfläche Logos und Porträts zeigt und auf Profile verlinkt. Alle Zahlen berechnet der Generator; ein Sprachmodell darf nur auswählen und umformulieren, und jede Formulierung wird vor der Veröffentlichung gegen die Fakten geprüft. Fehlt die Datei, zeigt die Überblickseite die Tabelle ohne Karten.
 
 ## Nachrichten
 
