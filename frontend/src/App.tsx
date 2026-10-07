@@ -73,6 +73,7 @@ const availabilityStatusName: Record<NonNullable<PlayerDetail["availability"]>["
 };
 const nav = [
   { id: "overview", label: "Überblick" },
+  { id: "matchday", label: "Spieltag" },
   { id: "table", label: "Tabellen" },
   { id: "players", label: "Spieler" },
   { id: "teams", label: "Mannschaften" },
@@ -81,6 +82,10 @@ const navMobile: Record<(typeof nav)[number]["id"], { label: string; icon: React
   overview: {
     label: "Überblick",
     icon: <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3.7 10.9 8.3-7 8.3 7" /><path d="M6 9.7V20h12V9.7" /></svg>,
+  },
+  matchday: {
+    label: "Spieltag",
+    icon: <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="1" /><path d="M3.5 9.5h17M8 3v4M16 3v4M8 13.5h2M14 13.5h2M8 16.5h2" /></svg>,
   },
   table: {
     label: "Tabellen",
@@ -173,7 +178,7 @@ function initialView(): View {
   if (value === "match" && !params.get("match")) return "overview";
   if (value === "top") return "players";
   if (value === "history") return "table";
-  return (["overview", "table", "players", "player", "teams", "team", "match", ...infoViews] as View[]).includes(value as View)
+  return (["overview", "matchday", "table", "players", "player", "teams", "team", "match", ...infoViews] as View[]).includes(value as View)
     ? (value as View)
     : "overview";
 }
@@ -235,6 +240,7 @@ function seasonsForPlayer(catalog: Catalog | null, playerId: string | null) {
 function viewBackLabel(view: View) {
   return ({
     overview: "zum Überblick",
+    matchday: "zum Spieltag",
     players: "zu den Spielern",
     player: "zum Spielerprofil",
     teams: "zu den Mannschaften",
@@ -321,6 +327,10 @@ export default function App() {
     const leagueName = catalog?.leagues.find((league) => league.code === filters.league)?.name ?? "Bundesliga";
     const seasonName = selectedSeason?.displayName ?? filters.season;
     const seo = ({
+      matchday: {
+        title: `Spieltag ${filters.round} ${leagueName} ${seasonName}: Ergebnisse & Noten`,
+        description: `Alle Ergebnisse von Spieltag ${filters.round} der ${leagueName} ${seasonName} mit Spieler des Tages, Elf des Tages, Torschützen, Scorern und Notenbesten.`,
+      },
       overview: {
         title: `Tabelle & Formkurve ${leagueName} ${seasonName}`,
         description: `Tabelle der ${leagueName} ${seasonName} nach Spieltag: Platzierungsverlauf, Form der letzten fünf Spiele und Kreuztabelle aller Paarungen.`,
@@ -561,7 +571,7 @@ export default function App() {
       : latestPublishedSeason;
     const nextFilters = next === "table" && latestPublishedSeason
       ? { ...filters, season: String(latestPublishedSeason.startYear), round: String(Math.max(1, latestPublishedSeason.latestRound)) }
-      : next === "overview" && overviewSeason
+      : (next === "overview" || next === "matchday") && overviewSeason
         ? { ...filters, season: String(overviewSeason.startYear), round: String(latestAvailableRound(overviewSeason)) }
         : filters;
     if (nextFilters !== filters) setFilters(nextFilters);
@@ -671,7 +681,7 @@ export default function App() {
       </header>
 
       <main>
-        {!isInfoView(view) && view !== "overview" && view !== "match" && <PageHeader title={title ?? ""} description={description} controls={<div className="selectors">
+        {!isInfoView(view) && view !== "overview" && view !== "matchday" && view !== "match" && <PageHeader title={title ?? ""} description={description} controls={<div className="selectors">
             {view !== "team" && view !== "player" && <StepperSelect label="Liga" value={filters.league} options={(catalog?.leagues ?? []).map((league) => ({ value: league.code, label: league.name }))} onChange={(value) => updateFilter("league", value)} />}
             {view === "team"
               ? <StepperSelect label="Saison" value={String(selectedTeamSeason?.startYear ?? filters.season)} options={[...teamSeasons].reverse().map((season) => ({ value: String(season.startYear), label: season.displayName }))} onChange={updateTeamSeason} />
@@ -700,6 +710,7 @@ export default function App() {
             {view === "teams" && <TeamsView filters={filters} onTeam={openTeam} />}
             {view === "team" && teamId && (teamSelectionPending ? <LoadingState /> : <TeamDetailView filters={filters} teamId={teamId} backLabel={backLabel} onBack={() => goBack("teams")} onPlayer={openPlayer} onTeam={openTeam} onMatch={openMatch} />)}
             {view === "match" && matchId && <MatchDetailView filters={filters} matchId={matchId} backLabel={backLabel} onBack={() => goBack("overview")} onPlayer={openPlayer} onTeam={openTeam} onMatch={(id) => { setMatchId(id); syncUrl(filters, "match", null, null, playerColumns, id); scrollToTop(); }} />}
+            {view === "matchday" && <MatchdayView filters={filters} leagues={catalog.leagues} seasons={seasons} onFilter={updateFilter} onPlayer={openPlayer} onMatch={openMatch} />}
             {view === "overview" && <TabelleView filters={filters} leagues={catalog.leagues} seasons={seasons} onFilter={updateFilter} onTeam={openTeam} onPlayer={openPlayer} onMatch={openMatch} />}
           </>
         )}
@@ -1134,8 +1145,6 @@ function TabelleView({ filters, leagues, seasons, onFilter, onTeam, onPlayer, on
             : <>
               {insights && insights.cards.length > 0 && <InsightCards cards={insights.cards} onTeam={onTeam} onPlayer={onPlayer} />}
               {insights && insights.facts.length > 0 && <InsightFacts round={round} facts={insights.facts} onTeam={onTeam} onPlayer={onPlayer} />}
-              <MatchdayFixturesCard standings={standings} onTeam={onTeam} onMatch={onMatch} />
-              <MatchdayReport filters={filters} round={round} onPlayer={onPlayer} />
               <FormTableCard standings={standings} league={filters.league} onTeam={onTeam} />
               <BumpChartCard standings={standings} zones={leagueZones[filters.league] ?? []} />
               <CrossTableCard standings={standings} onTeam={onTeam} onMatch={onMatch} />
@@ -1282,69 +1291,73 @@ function initialsOf(name: string) {
   return name.split(/\s+/).filter((part) => /^\p{L}/u.test(part)).map((part) => part[0]).slice(0, 3).join("").toUpperCase();
 }
 
-// Fixed columns instead of CSS multi-column: expanding a match must not
-// reflow kickoff groups from one column into the other.
-function fixtureColumns<Group extends { fixtures: unknown[] }>(groups: Group[]): Group[][] {
-  const total = groups.reduce((sum, group) => sum + group.fixtures.length, 0);
-  const left: Group[] = [];
-  let count = 0;
-  for (const group of groups) {
-    if (count >= total / 2) break;
-    left.push(group);
-    count += group.fixtures.length;
-  }
-  const right = groups.slice(left.length);
-  return right.length ? [left, right] : [left];
-}
+type TileMatch = { id: string; scheduledAt: string | null; home: LeagueTableTeam; away: LeagueTableTeam; homeScore: number | null; awayScore: number | null };
 
-function MatchdayFixturesCard({ standings, onTeam, onMatch }: { standings: LeagueStandings; onTeam: (id: string) => void; onMatch: (id: string) => void }) {
-  if (!standings.fixtures.length) return null;
-  const groups: { slot: string | null; fixtures: MatchdayFixture[] }[] = [];
-  for (const fixture of standings.fixtures) {
-    const last = groups[groups.length - 1];
-    if (last && last.slot === fixture.scheduledAt) last.fixtures.push(fixture);
-    else groups.push({ slot: fixture.scheduledAt, fixtures: [fixture] });
-  }
+// Compact tiles that wrap instead of scrolling sideways; every matchday fits
+// on one screen and each tile opens its match report.
+function MatchTiles({ matches, currentId, onMatch }: { matches: TileMatch[]; currentId?: string; onMatch: (id: string) => void }) {
   return (
-    <section className="tabelle-block">
-      <div className="section-copy"><p className="kicker">Spieltag {standings.context.round}</p><h2>Spiele des Spieltags</h2></div>
-      <div className="detail-section fixtures-card">
-        {fixtureColumns(groups).map((column, index) => (
-          <div className="fixtures-column" key={index}>
-            {column.map((group) => (
-              <div className="fixture-slot" key={group.slot ?? "offen"}>
-                <h4>{formatFixtureSlot(group.slot)}</h4>
-                {group.fixtures.map((fixture) => <TabelleFixture key={fixture.id} fixture={fixture} onTeam={onTeam} onMatch={onMatch} />)}
-              </div>
-            ))}
-          </div>
-        ))}
-      </div>
-    </section>
+    <ol className="match-tiles">
+      {matches.map((match) => {
+        const played = match.homeScore != null && match.awayScore != null;
+        const current = match.id === currentId;
+        const winner = !played ? null : match.homeScore! > match.awayScore! ? "home" : match.homeScore! < match.awayScore! ? "away" : null;
+        return (
+          <li key={match.id}>
+            <button className="match-tile" aria-current={current ? "true" : undefined} onClick={() => !current && onMatch(match.id)}
+              aria-label={`${match.home.name} ${played ? `${match.homeScore}:${match.awayScore}` : "gegen"} ${match.away.name}: Spielbericht öffnen`}>
+              <span className="match-tile-time">{formatTileSlot(match.scheduledAt)}</span>
+              {(["home", "away"] as const).map((side) => (
+                <span key={side} className={`match-tile-team ${winner === side ? "is-winner" : ""}`}>
+                  <TeamLogo code={match[side].code} url={match[side].logoUrl} />
+                  <span>{match[side].code}</span>
+                  <b>{played ? (side === "home" ? match.homeScore : match.awayScore) : "–"}</b>
+                </span>
+              ))}
+            </button>
+          </li>
+        );
+      })}
+    </ol>
   );
 }
 
-function TabelleFixture({ fixture, onTeam, onMatch }: { fixture: MatchdayFixture; onTeam: (id: string) => void; onMatch: (id: string) => void }) {
-  const played = fixture.homeScore != null && fixture.awayScore != null;
-  const teamButton = (side: MatchdayFixtureSide, align: "home" | "away") => (
-    <span className={`fixture-team ${align}`}>
-      {align === "away" && <TeamLogo code={side.team.code} url={side.team.logoUrl} />}
-      <button onClick={(event) => { event.stopPropagation(); onTeam(side.team.id); }} title={`${side.team.name}: Mannschaftsprofil öffnen`}>
-        <span className="player-name-full">{side.team.name}</span><span className="player-name-short">{side.team.code}</span>
-      </button>
-      {align === "home" && <TeamLogo code={side.team.code} url={side.team.logoUrl} />}
-    </span>
-  );
-  const label = `${fixture.home.team.name} gegen ${fixture.away.team.name}: Spielbericht öffnen`;
-  // The whole row opens the match report; the team names keep their own profile links.
+function formatTileSlot(value: string | null) {
+  if (!value) return "Termin offen";
+  return new Intl.DateTimeFormat("de-DE", { weekday: "short", day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" }).format(new Date(value)).replace(",", "");
+}
+
+function MatchdayView({ filters, leagues, seasons, onFilter, onPlayer, onMatch }: { filters: Filters; leagues: Catalog["leagues"]; seasons: Catalog["seasons"]; onFilter: (key: keyof Filters, value: string) => void; onPlayer: (id: string) => void; onMatch: (id: string) => void }) {
+  const selectedSeason = seasons.find((season) => String(season.startYear) === filters.season);
+  const maximumRound = Math.max(1, selectedSeason?.latestRound ?? 0);
+  const round = Math.min(maximumRound, Math.max(1, Number(filters.round) || 1));
+  const [standings, setStandings] = useState<LeagueStandings | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const leagueName = leagues.find((league) => league.code === filters.league)?.name ?? "Bundesliga";
+  useEffect(() => {
+    const controller = new AbortController();
+    setStandings(null);
+    setError(null);
+    api.standings(new URLSearchParams({ league: filters.league, season: filters.season, round: String(round) }), controller.signal)
+      .then(setStandings)
+      .catch((reason: Error) => { if (!isAbort(reason)) setError(reason.message); });
+    return () => controller.abort();
+  }, [filters.league, filters.season, round]);
+  const matches: TileMatch[] = standings?.fixtures.map((fixture) => ({ id: fixture.id, scheduledAt: fixture.scheduledAt, home: fixture.home.team, away: fixture.away.team, homeScore: fixture.homeScore, awayScore: fixture.awayScore })) ?? [];
   return (
-    <div className="fixture-card fixture-card-flat fixture-link" role="link" tabIndex={0} aria-label={label} title={label}
-      onClick={() => onMatch(fixture.id)}
-      onKeyDown={(event) => { if (event.target === event.currentTarget && (event.key === "Enter" || event.key === " ")) { event.preventDefault(); onMatch(fixture.id); } }}>
-      {teamButton(fixture.home, "home")}
-      <span className={`fixture-score ${played ? "" : "fixture-score-open"}`}>{played ? `${fixture.homeScore} : ${fixture.awayScore}` : "– : –"}</span>
-      {teamButton(fixture.away, "away")}
-      <span className="fixture-toggle" aria-hidden="true">›</span>
+    <div className="tabelle-view">
+      <PageHeader eyebrow={`${leagueName} · ${selectedSeason?.displayName ?? "Gewählte Saison"}`} title={`Spieltag ${round}`} controls={<div className="selectors">
+        <StepperSelect label="Liga" value={filters.league} options={leagues.map((league) => ({ value: league.code, label: league.name }))} onChange={(value) => onFilter("league", value)} />
+        <StepperSelect label="Saison" value={filters.season} options={[...seasons].reverse().map((season) => ({ value: String(season.startYear), label: season.displayName }))} onChange={(value) => onFilter("season", value)} />
+        <StepperSelect label="Spieltag" value={String(round)} options={Array.from({ length: maximumRound }, (_, index) => ({ value: String(index + 1), label: `Spieltag ${index + 1}` }))} onChange={(value) => onFilter("round", value)} />
+      </div>} />
+      {error ? <ErrorState message={error} /> : !standings ? <LoadingState /> : <>
+        <section className="tabelle-block">
+          <div className="section-copy"><p className="kicker">{matches.length} Spiele · antippen öffnet den Spielbericht</p><h2>Ergebnisse</h2></div>
+          <MatchTiles matches={matches} onMatch={onMatch} />
+        </section>
+        {standings.context.playedMatchCount > 0 && <MatchdayReport filters={filters} round={round} onPlayer={onPlayer} />}
+      </>}
     </div>
   );
 }
@@ -1788,13 +1801,7 @@ function MatchDetailView({ filters, matchId, backLabel, onBack, onPlayer, onTeam
           <button className="match-team" onClick={() => onTeam(away.team.id)}><TeamLogo code={away.team.code} url={away.team.logoUrl} large /><span><strong>{away.team.name}</strong>{away.rankAfter != null && <small>Platz {away.rankAfter} nach dem Spiel</small>}</span></button>
         </div>
       </header>
-      <nav className="match-strip" aria-label="Weitere Spiele des Spieltags">
-        {detail.roundMatches.map((entry) => (
-          <button key={entry.id} aria-current={entry.id === detail.id ? "true" : undefined} onClick={() => entry.id !== detail.id && onMatch(entry.id)}>
-            <span>{entry.home.code}</span><b>{entry.homeScore != null && entry.awayScore != null ? `${entry.homeScore}:${entry.awayScore}` : "–:–"}</b><span>{entry.away.code}</span>
-          </button>
-        ))}
-      </nav>
+      <nav aria-label="Weitere Spiele des Spieltags"><MatchTiles matches={detail.roundMatches} currentId={detail.id} onMatch={onMatch} /></nav>
       {!played || !allPlayers.length ? <Empty message="Für dieses Spiel liegen noch keine Noten und Wertungen vor." /> : <>
         <div className="match-grid">
           <section className="match-lineup">
@@ -1816,8 +1823,9 @@ function MatchDetailView({ filters, matchId, backLabel, onBack, onPlayer, onTeam
             </div>
           </section>
           <aside className="match-aside">
+            <div className="section-copy"><p className="kicker">Mannschaften</p><h2>Vergleich</h2></div>
             <div className="match-compare">
-              <header><span>{home.team.code}</span><span className="kicker">Vergleich</span><span>{away.team.code}</span></header>
+              <header><span>{home.team.code}</span><span>{away.team.code}</span></header>
               {comparison.map((row) => {
                 const total = Math.abs(row.home ?? 0) + Math.abs(row.away ?? 0);
                 const homeShare = total ? Math.abs(row.home ?? 0) / total : .5;

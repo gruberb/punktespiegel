@@ -653,7 +653,7 @@ function matchDetail(index: SeasonIndex, matchId: string): MatchDetail {
     mvp: mvpEntry ? { ...mvpEntry.player, team: mvpEntry.team } : null,
     roundMatches: index.season.matches.filter((entry) => entry.round === match.round)
       .sort((left, right) => (left.scheduledAt ?? "").localeCompare(right.scheduledAt ?? "") || left.id.localeCompare(right.id))
-      .map((entry) => ({ id: entry.id, home: toTeam(entry.homeTeamId), away: toTeam(entry.awayTeamId), homeScore: entry.homeScore, awayScore: entry.awayScore })),
+      .map((entry) => ({ id: entry.id, scheduledAt: entry.scheduledAt, home: toTeam(entry.homeTeamId), away: toTeam(entry.awayTeamId), homeScore: entry.homeScore, awayScore: entry.awayScore })),
   };
 }
 

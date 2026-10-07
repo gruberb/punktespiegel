@@ -586,5 +586,5 @@ export type MatchDetail = {
   home: MatchSide;
   away: MatchSide;
   mvp: (MatchPlayer & { team: LeagueTableTeam }) | null;
-  roundMatches: { id: string; home: LeagueTableTeam; away: LeagueTableTeam; homeScore: number | null; awayScore: number | null }[];
+  roundMatches: { id: string; scheduledAt: string | null; home: LeagueTableTeam; away: LeagueTableTeam; homeScore: number | null; awayScore: number | null }[];
 };

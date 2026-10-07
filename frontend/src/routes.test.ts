@@ -55,3 +55,8 @@ test("opens the match report on its own path", () => {
   assert.equal(viewFromPathname("/spiel", null, null), "match");
   assert.equal(hrefForView("match", new URLSearchParams({ league: "0001", season: "2026", match: "mt-1" })), "/spiel?league=0001&season=2026&match=mt-1");
 });
+
+test("gives the matchday report its own path", () => {
+  assert.equal(pathForView("matchday"), "/spieltag");
+  assert.equal(viewFromPathname("/spieltag/", null, null), "matchday");
+});

@@ -4,7 +4,7 @@ import { copyFile, mkdir } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 
 // Retired routes stay as entrypoints so old links reach the current views.
-const staticRoutes = ["tabelle", "spieler", "mannschaften", "spiel", "historie", "topspieler", "fantasy-team", "ueber", "daten-methodik", "quellen", "faq"];
+const staticRoutes = ["spieltag", "tabelle", "spieler", "mannschaften", "spiel", "historie", "topspieler", "fantasy-team", "ueber", "daten-methodik", "quellen", "faq"];
 
 function staticRouteEntrypoints() {
   return {

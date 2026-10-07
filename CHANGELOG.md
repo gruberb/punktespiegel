@@ -2,6 +2,18 @@
 
 Alle wesentlichen Änderungen an Punktespiegel werden in dieser Datei dokumentiert.
 
+## [1.27.0] – 2026-10-07
+
+### Hinzugefügt
+
+- Eigener Menüpunkt „Spieltag“ unter `/spieltag`: alle Ergebnisse eines Spieltags als kompakte Kacheln mit Anstoß, Logos und Ergebnis, darunter „Spieltag kompakt“. Jede Kachel öffnet den Spielbericht.
+
+### Geändert
+
+- Der Spielbericht zeigt die übrigen Spiele des Spieltags als umbrechende Kacheln statt als seitlich scrollende Leiste.
+- Im Spielbericht beginnen Mannschaftsvergleich und Aufstellung auf gleicher Höhe; die rechte Spalte hat eine eigene Überschrift.
+- Der Überblick konzentriert sich auf Spieltagskarten, Kennzahlen, Formtabelle, Verlauf und Kreuztabelle; Ergebnisse und Ranglisten stehen auf der Spieltagsseite.
+
 ## [1.26.0] – 2026-10-06
 
 ### Hinzugefügt

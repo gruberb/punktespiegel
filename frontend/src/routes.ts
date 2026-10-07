@@ -1,5 +1,6 @@
 export type RouteView =
   | "overview"
+  | "matchday"
   | "table"
   | "players"
   | "player"
@@ -13,6 +14,7 @@ export type RouteView =
 
 const routePaths: Record<RouteView, string> = {
   overview: "/",
+  matchday: "/spieltag",
   table: "/tabelle",
   players: "/spieler",
   player: "/spieler",
