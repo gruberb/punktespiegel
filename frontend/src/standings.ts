@@ -1,4 +1,5 @@
 export type StandingsMatch = {
+  id: string;
   round: number;
   homeTeamId: string;
   awayTeamId: string;
@@ -30,6 +31,7 @@ export type FormResult = {
 };
 
 export type CrossTableCell = {
+  matchId: string;
   round: number;
   scheduledAt: string | null;
   homeScore: number | null;
@@ -46,7 +48,10 @@ function playedThrough(matches: StandingsMatch[], throughRound: number) {
   return matches.filter((match) => match.round <= throughRound && isPlayed(match));
 }
 
-export function computeTable(matches: StandingsMatch[], teamIds: string[], throughRound: number, teamName: TeamName): StandingsRow[] {
+/** "home" or "away" counts only that side of each match (kicker's Heim- and Auswärtstabelle). */
+export type Venue = "all" | "home" | "away";
+
+export function computeTable(matches: StandingsMatch[], teamIds: string[], throughRound: number, teamName: TeamName, venue: Venue = "all"): StandingsRow[] {
   const rows = new Map<string, StandingsRow>(teamIds.map((teamId) => [teamId, {
     teamId,
     rank: 0,
@@ -63,28 +68,8 @@ export function computeTable(matches: StandingsMatch[], teamIds: string[], throu
     const home = rows.get(match.homeTeamId);
     const away = rows.get(match.awayTeamId);
     if (!home || !away) continue;
-    const homeScore = match.homeScore!;
-    const awayScore = match.awayScore!;
-    home.played += 1;
-    away.played += 1;
-    home.goalsFor += homeScore;
-    home.goalsAgainst += awayScore;
-    away.goalsFor += awayScore;
-    away.goalsAgainst += homeScore;
-    if (homeScore > awayScore) {
-      home.wins += 1;
-      home.points += 3;
-      away.losses += 1;
-    } else if (homeScore < awayScore) {
-      away.wins += 1;
-      away.points += 3;
-      home.losses += 1;
-    } else {
-      home.draws += 1;
-      away.draws += 1;
-      home.points += 1;
-      away.points += 1;
-    }
+    if (venue !== "away") record(home, match.homeScore!, match.awayScore!);
+    if (venue !== "home") record(away, match.awayScore!, match.homeScore!);
   }
   const table = [...rows.values()];
   for (const row of table) row.goalDifference = row.goalsFor - row.goalsAgainst;
@@ -94,6 +79,21 @@ export function computeTable(matches: StandingsMatch[], teamIds: string[], throu
     || teamName(left.teamId).localeCompare(teamName(right.teamId), "de"));
   table.forEach((row, index) => { row.rank = index + 1; });
   return table;
+}
+
+function record(row: StandingsRow, scored: number, conceded: number) {
+  row.played += 1;
+  row.goalsFor += scored;
+  row.goalsAgainst += conceded;
+  if (scored > conceded) {
+    row.wins += 1;
+    row.points += 3;
+  } else if (scored < conceded) {
+    row.losses += 1;
+  } else {
+    row.draws += 1;
+    row.points += 1;
+  }
 }
 
 export function positionsByRound(matches: StandingsMatch[], teamIds: string[], throughRound: number, teamName: TeamName): Map<string, number[]> {
@@ -144,6 +144,7 @@ export function crossTable(matches: StandingsMatch[], throughRound: number): Map
   for (const match of matches) {
     const revealed = match.round <= throughRound && isPlayed(match);
     cells.set(`${match.homeTeamId}|${match.awayTeamId}`, {
+      matchId: match.id,
       round: match.round,
       scheduledAt: match.scheduledAt,
       homeScore: revealed ? match.homeScore : null,

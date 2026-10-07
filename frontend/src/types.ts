@@ -84,6 +84,7 @@ export type LeagueTableRow = {
 };
 
 export type LeagueStandingsCrossCell = {
+  matchId: string;
   round: number;
   scheduledAt: string | null;
   homeScore: number | null;
@@ -113,7 +114,21 @@ export type MatchdayFixture = {
   away: MatchdayFixtureSide;
 };
 
+export type VenueTableRow = {
+  team: LeagueTableTeam;
+  rank: number;
+  played: number;
+  wins: number;
+  draws: number;
+  losses: number;
+  goalsFor: number;
+  goalsAgainst: number;
+  goalDifference: number;
+  points: number;
+};
+
 export type LeagueStandings = {
+  venues: { home: VenueTableRow[]; away: VenueTableRow[] };
   context: {
     league: string;
     leagueName: string;
@@ -413,6 +428,7 @@ export type TeamMatchContributor = {
 };
 
 export type TeamDetailMatch = {
+  matchId: string;
   matchday: number;
   scheduledAt: string | null;
   opponentId: string;
@@ -534,4 +550,41 @@ export type RoundInsights = {
   round: number;
   cards: InsightCard[];
   facts: InsightFact[];
+};
+
+export type MatchPlayer = {
+  id: string;
+  name: string;
+  photoUrl: string | null;
+  position: Position;
+  grade: number | null;
+  goals: number;
+  assists: number;
+  points: number;
+  starter: boolean;
+  mvp: boolean;
+  card: "Gelb-Rot" | "Rot" | null;
+};
+
+export type MatchSide = {
+  team: LeagueTableTeam;
+  rankAfter: number | null;
+  averageGrade: number | null;
+  points: number;
+  players: MatchPlayer[];
+};
+
+export type MatchDetail = {
+  id: string;
+  league: string;
+  leagueName: string;
+  season: string;
+  round: number;
+  scheduledAt: string | null;
+  homeScore: number | null;
+  awayScore: number | null;
+  home: MatchSide;
+  away: MatchSide;
+  mvp: (MatchPlayer & { team: LeagueTableTeam }) | null;
+  roundMatches: { id: string; home: LeagueTableTeam; away: LeagueTableTeam; homeScore: number | null; awayScore: number | null }[];
 };

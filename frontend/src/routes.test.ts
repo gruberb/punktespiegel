@@ -49,3 +49,9 @@ test("builds a clean href with filter parameters", () => {
     "/mannschaften?league=0002&season=2026",
   );
 });
+
+test("opens the match report on its own path", () => {
+  assert.equal(pathForView("match"), "/spiel");
+  assert.equal(viewFromPathname("/spiel", null, null), "match");
+  assert.equal(hrefForView("match", new URLSearchParams({ league: "0001", season: "2026", match: "mt-1" })), "/spiel?league=0001&season=2026&match=mt-1");
+});

@@ -25,7 +25,7 @@ import { kickerPlayerNewsLink } from "./kicker-links";
 import { analyzePlayerHistory, previousSeasonPointsByPlayer } from "./player-table";
 import { latestImportedRound } from "./rounds";
 import { computeTable, crossTable, formLastN, formPoints, positionsByRound, trendVsRound } from "./standings";
-import type { LeagueStandings, LeagueTableRow, LeagueTableTeam, MatchdayContributor, MatchdayFixture, RoundInsights } from "./types";
+import type { LeagueStandings, LeagueTableRow, LeagueTableTeam, MatchDetail, MatchdayContributor, MatchdayFixture, MatchPlayer, MatchSide, RoundInsights } from "./types";
 type StaticCatalog = Catalog & { schemaVersion: number; generatedAt: string };
 
 type StaticClubProfiles = {
@@ -573,7 +573,9 @@ function leagueStandings(index: SeasonIndex, round: number): LeagueStandings {
       };
     });
 
+  const venueRows = (venue: "home" | "away") => computeTable(matches, teamIds, round, teamName, venue).map((row) => ({ ...row, team: toTeam(row.teamId) }));
   return {
+    venues: { home: venueRows("home"), away: venueRows("away") },
     context: {
       league: index.season.leagueCode,
       leagueName: index.season.leagueName,
@@ -588,6 +590,70 @@ function leagueStandings(index: SeasonIndex, round: number): LeagueStandings {
       order: rows.map((row) => row.team.id),
       cells: Object.fromEntries(crossTable(matches, round)),
     },
+  };
+}
+
+const positionOrder: Record<Position, number> = { GK: 0, DEF: 1, MID: 2, FWD: 3 };
+
+function matchDetail(index: SeasonIndex, matchId: string): MatchDetail {
+  const match = index.matches.get(matchId);
+  if (!match) throw new Error("Dieses Spiel ist in der gewählten Saison nicht enthalten.");
+  const toTeam = (teamId: string): LeagueTableTeam => {
+    const team = index.teams.get(teamId);
+    return { id: teamId, name: team?.name ?? "Unbekannter Verein", code: team?.code ?? "—", logoUrl: team?.logoUrl ?? null };
+  };
+  const teamName = (teamId: string) => index.teams.get(teamId)?.name ?? teamId;
+  const played = match.homeScore != null && match.awayScore != null;
+  const table = played ? computeTable(index.season.matches, index.season.teams.map((team) => team.id), match.round, teamName) : [];
+  const scores = index.season.scores.filter((score) => score.matchId === matchId && scoreCountsAsAppearance(score));
+  const toPlayer = (score: StaticScore): MatchPlayer => {
+    const player = index.players.get(score.playerId);
+    return {
+      id: score.playerId,
+      name: player?.name ?? "Unbekannt",
+      photoUrl: player?.photoUrl ?? null,
+      position: player?.position ?? "MID",
+      grade: score.grade != null && score.grade > 0 ? score.grade / 100 : null,
+      goals: score.goals,
+      assists: score.assists,
+      points: score.totalPoints,
+      // kicker awards Startelf points only to starters; substitutes appear without them.
+      starter: score.pointsStarter > 0,
+      mvp: score.pointsMvp > 0,
+      card: score.pointsCards === -6 ? "Rot" : score.pointsCards === -3 ? "Gelb-Rot" : null,
+    };
+  };
+  const side = (teamId: string): MatchSide => {
+    const players = scores.filter((score) => score.teamId === teamId).map(toPlayer)
+      .sort((left, right) => positionOrder[left.position] - positionOrder[right.position] || right.points - left.points || left.name.localeCompare(right.name, "de"));
+    const graded = players.filter((player) => player.grade != null);
+    return {
+      team: toTeam(teamId),
+      rankAfter: table.find((row) => row.teamId === teamId)?.rank ?? null,
+      averageGrade: graded.length ? graded.reduce((sum, player) => sum + player.grade!, 0) / graded.length : null,
+      points: players.reduce((sum, player) => sum + player.points, 0),
+      players,
+    };
+  };
+  const home = side(match.homeTeamId);
+  const away = side(match.awayTeamId);
+  const mvpEntry = [...home.players.map((player) => ({ player, team: home.team })), ...away.players.map((player) => ({ player, team: away.team }))]
+    .find(({ player }) => player.mvp);
+  return {
+    id: match.id,
+    league: index.season.leagueCode,
+    leagueName: index.season.leagueName,
+    season: index.season.displayName,
+    round: match.round,
+    scheduledAt: match.scheduledAt,
+    homeScore: match.homeScore,
+    awayScore: match.awayScore,
+    home,
+    away,
+    mvp: mvpEntry ? { ...mvpEntry.player, team: mvpEntry.team } : null,
+    roundMatches: index.season.matches.filter((entry) => entry.round === match.round)
+      .sort((left, right) => (left.scheduledAt ?? "").localeCompare(right.scheduledAt ?? "") || left.id.localeCompare(right.id))
+      .map((entry) => ({ id: entry.id, home: toTeam(entry.homeTeamId), away: toTeam(entry.awayTeamId), homeScore: entry.homeScore, awayScore: entry.awayScore })),
   };
 }
 
@@ -854,6 +920,7 @@ function teamDetail(index: SeasonIndex, teamId: string, roleSignals: StaticRoleS
       return player ? [{ id: player.id, name: player.name, position: player.position, points: score.totalPoints, photoUrl: player.photoUrl }] : [];
     }).sort((left, right) => right.points - left.points || left.name.localeCompare(right.name, "de"));
     return {
+      matchId: match.id,
       matchday: match.round,
       scheduledAt: match.scheduledAt,
       opponentId: opponent.id,
@@ -976,5 +1043,6 @@ export const api = {
     const round = Number(params.get("round"));
     return rounds.find((entry) => entry.round === round) ?? null;
   }), signal),
+  match: (matchId: string, params: URLSearchParams, signal?: AbortSignal) => abortable(loadSeason(params).then((index) => matchDetail(index, matchId)), signal),
   bestEleven: (params: URLSearchParams, signal?: AbortSignal) => abortable(loadSeason(params).then((index) => bestEleven(index, params.get("scope") === "season" ? "season" : "matchday", selectedRound(params, index.season))), signal),
 };

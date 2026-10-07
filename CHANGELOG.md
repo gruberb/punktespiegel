@@ -2,6 +2,22 @@
 
 Alle wesentlichen Änderungen an Punktespiegel werden in dieser Datei dokumentiert.
 
+## [1.26.0] – 2026-10-06
+
+### Hinzugefügt
+
+- Spielbericht unter `/spiel`: Ergebnis mit Tabellenplatz nach dem Spiel, Aufstellung auf dem Spielfeld mit kicker-Noten, Toren, Vorlagen, Platzverweisen und Spieler des Spiels, Einwechslungen, Mannschaftsvergleich (Ø-Note, Managerpunkte, Vorlagen, eingesetzte Spieler, Platzverweise) und alle Spielerpunkte. Eine Leiste wechselt zwischen den Spielen des Spieltags.
+- Spiele des Spieltags, Kreuztabellenzellen und die Spiele im Mannschaftsprofil öffnen den Spielbericht.
+- „Spieltag kompakt“ im Überblick: Spieler des Tages, Elf des Tages, Platzverweise sowie Torschützen, Scorer, Top-Torhüter und Top-Feldspieler nach Notenschnitt.
+- Heim- und Auswärtstabelle als Umschalter an der Formtabelle.
+- Mannschaftsprofile gliedern sich in die Reiter Spiele, Kader und Transfers; Kopf und Vereinsdaten bleiben auf jedem Reiter sichtbar.
+
+### Geändert
+
+- Der Überblick zeigt im Kopf nur noch den Spieltag, ohne „von 34“.
+- Die Seitenleiste enthält nur noch die Hauptbereiche; Infoseiten bleiben über die Fußzeile erreichbar.
+- Spiele des Spieltags klappen nicht mehr auf, sondern öffnen den Spielbericht.
+
 ## [1.25.0] – 2026-10-01
 
 ### Hinzugefügt

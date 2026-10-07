@@ -8,7 +8,7 @@ const names: Record<string, string> = { a: "Aue", b: "Bochum", c: "Chemnitz", d:
 const teamName = (teamId: string) => names[teamId];
 
 function match(round: number, home: string, away: string, homeScore: number | null, awayScore: number | null): StandingsMatch {
-  return { round, homeTeamId: home, awayTeamId: away, scheduledAt: `2025-0${round}-01T15:30:00+00:00`, homeScore, awayScore };
+  return { id: `${round}-${home}-${away}`, round, homeTeamId: home, awayTeamId: away, scheduledAt: `2025-0${round}-01T15:30:00+00:00`, homeScore, awayScore };
 }
 
 const matches: StandingsMatch[] = [
@@ -73,8 +73,25 @@ test("trend compares the rank five rounds earlier and clamps at the season start
 
 test("cross table reveals played pairings up to the cutoff and keeps later ones scheduled", () => {
   const cells = crossTable(matches, 2);
-  assert.deepEqual(cells.get("a|b"), { round: 1, scheduledAt: "2025-01-01T15:30:00+00:00", homeScore: 2, awayScore: 0 });
+  assert.deepEqual(cells.get("a|b"), { matchId: "1-a-b", round: 1, scheduledAt: "2025-01-01T15:30:00+00:00", homeScore: 2, awayScore: 0 });
   assert.equal(cells.get("d|a")!.homeScore, null);
   assert.equal(cells.get("a|c")!.homeScore, null);
   assert.equal(cells.get("a|c")!.round, 3);
+});
+
+test("splits the table into home and away records", () => {
+  const home = computeTable(matches, teamIds, 3, teamName, "home");
+  const away = computeTable(matches, teamIds, 3, teamName, "away");
+  const row = (table: typeof home, teamId: string) => table.find((entry) => entry.teamId === teamId)!;
+  // a: 2:0 at home vs b, 0:3 at home vs c; never played away.
+  assert.deepEqual([row(home, "a").played, row(home, "a").points, row(home, "a").goalsFor, row(home, "a").goalsAgainst], [2, 3, 2, 3]);
+  assert.equal(row(away, "a").played, 0);
+  // c: 1:1 at home vs d, won 1:0 at b and 3:0 at a.
+  assert.deepEqual([row(away, "c").played, row(away, "c").points], [2, 6]);
+  const all = computeTable(matches, teamIds, 3, teamName);
+  for (const teamId of teamIds) assert.equal(row(home, teamId).points + row(away, teamId).points, row(all, teamId).points);
+});
+
+test("cross table cells carry their match id", () => {
+  assert.equal(crossTable(matches, 3).get("a|b")?.matchId, "1-a-b");
 });
