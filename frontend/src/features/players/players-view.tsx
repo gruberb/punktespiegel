@@ -2,7 +2,7 @@ import { EntityLink } from "../../components/entity-link";
 import type { DataTableColumn } from "@gruberb/fun-ui";
 import { DataTable, Notice, Segmented } from "@gruberb/fun-ui";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { ErrorState } from "../../components/feedback";
+import { ResourcePanel } from "../../components/resource-panel";
 import { PlayerName, PlayerPortrait, PositionTag, positionName } from "../../components/player-identity";
 import { useResource } from "../../hooks/use-resource";
 import { api } from "../../lib/data/api";
@@ -13,7 +13,16 @@ import type { Filters } from "../../lib/navigation/scope";
 import type { PlayerTableRow, Position } from "../../types/models";
 import { formatMarketValue, formatPlayerValue, formatSignedPoints } from "../../utils/format";
 
-export function PlayersView({ filters, seasonName, hasSeasonPoints, hasPreviousSeason, columnsMode, onColumnsMode, onPlayer }: { filters: Filters; seasonName: string; hasSeasonPoints: boolean; hasPreviousSeason: boolean; columnsMode: PlayerColumns; onColumnsMode: (mode: PlayerColumns) => void; onPlayer: (id: string) => void }) {
+export function PlayersView(props: { filters: Filters; seasonName: string; hasSeasonPoints: boolean; hasPreviousSeason: boolean; columnsMode: PlayerColumns; onColumnsMode: (mode: PlayerColumns) => void; onPlayer: (id: string) => void }) {
+  const { filters } = props;
+  const resource = useResource(useCallback(
+    (signal: AbortSignal) => api.players(new URLSearchParams({ league: filters.league, season: filters.season }), signal),
+    [filters.league, filters.season],
+  ));
+  return <ResourcePanel resource={resource} label="Spielerwertung">{(data) => <PlayerTable {...props} players={data} />}</ResourcePanel>;
+}
+
+function PlayerTable({ filters, seasonName, hasSeasonPoints, hasPreviousSeason, columnsMode, onColumnsMode, onPlayer, players }: { filters: Filters; seasonName: string; hasSeasonPoints: boolean; hasPreviousSeason: boolean; columnsMode: PlayerColumns; onColumnsMode: (mode: PlayerColumns) => void; onPlayer: (id: string) => void; players: PlayerTableRow[] }) {
   const [query, setQuery] = useState("");
   const [position, setPosition] = useState("");
   const [team, setTeam] = useState("");
@@ -25,11 +34,6 @@ export function PlayersView({ filters, seasonName, hasSeasonPoints, hasPreviousS
     setDirection("desc");
   }, [filters.league, filters.season, hasSeasonPoints, columnsMode]);
 
-  const { data: loadedPlayers, error, loading } = useResource(useCallback(
-    (signal: AbortSignal) => api.players(new URLSearchParams({ league: filters.league, season: filters.season }), signal),
-    [filters.league, filters.season],
-  ));
-  const players = loadedPlayers ?? [];
 
   function sortBy(column: PlayerSort) {
     if (column === sort) setDirection((value) => value === "asc" ? "desc" : "asc");
@@ -85,7 +89,7 @@ export function PlayersView({ filters, seasonName, hasSeasonPoints, hasPreviousS
 
   return (
     <section className="data-page-section">
-      {error ? <ErrorState message={error} /> : <DataTable
+      <DataTable
         ariaLabel="Spielerwertung"
         leading={<Segmented ariaLabel="Spielerstatistik" value={columnsMode} onChange={(value) => onColumnsMode(value as PlayerColumns)} options={[{ value: "season", label: "Saison" }, { value: "history", label: "Historie" }]} />}
         rows={visiblePlayers}
@@ -99,11 +103,10 @@ export function PlayersView({ filters, seasonName, hasSeasonPoints, hasPreviousS
         ]}
         countLabel={`${visiblePlayers.length} Spieler`}
         emptyMessage="Keine Spieler entsprechen diesen Filtern."
-        loading={loading}
         minWidth={columnsMode === "history" ? "1320px" : hasPreviousSeason ? "1120px" : "1020px"}
         mobileMinWidth={columnsMode === "history" ? "1000px" : hasPreviousSeason ? "700px" : "640px"}
         onRowClick={(player) => onPlayer(player.id)}
-      />}
+      />
       {columnsMode === "history" && <Notice className="top-players-note">Schnitt, Trend und Verlauf verwenden abgeschlossene Saisons vor {seasonName}. „Ø Pkt. / Mio. €“ teilt den historischen Saisonschnitt durch den Marktwert; die Saisonansicht verwendet die Punkte der gewählten Saison.</Notice>}
     </section>
   );

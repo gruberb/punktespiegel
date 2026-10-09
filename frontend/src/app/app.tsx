@@ -26,7 +26,7 @@ export default function App() {
     latestRound, overviewScope, setOverviewScope, overviewRound, catalogError,
     selectedSeason, openPlayer, openTeam, hasSeasonPoints, hasPreviousSeason,
     playerColumns, updatePlayerColumns, playerId, backLabel,
-    goBack, teamId, teamSelectionPending, openMatch, matchId,
+    goBack, teamId, openMatch, matchId,
     replaceMatch,
   } = useAppModel();
 
@@ -76,7 +76,7 @@ export default function App() {
             {view === "players" && <PlayersView filters={filters} seasonName={selectedSeason?.displayName ?? filters.season} hasSeasonPoints={hasSeasonPoints} hasPreviousSeason={hasPreviousSeason} columnsMode={playerColumns} onColumnsMode={updatePlayerColumns} onPlayer={openPlayer} />}
             {view === "player" && playerId && <PlayerDetailView key={playerId} filters={{ ...filters, league: selectedPlayerSeason?.leagueCode ?? filters.league, season: String(selectedPlayerSeason?.startYear ?? filters.season) }} playerId={playerId} backLabel={backLabel} onBack={() => goBack("players")} onTeam={openTeam} onSeason={(year) => updatePlayerSeason(String(year))} onMatch={openMatch} />}
             {view === "teams" && <TeamsView filters={filters} onTeam={openTeam} />}
-            {view === "team" && teamId && (teamSelectionPending ? <LoadingState /> : <TeamDetailView filters={filters} teamId={teamId} backLabel={backLabel} onBack={() => goBack("teams")} onPlayer={openPlayer} onTeam={openTeam} onMatch={openMatch} />)}
+            {view === "team" && teamId && <TeamDetailView key={teamId} filters={{ ...filters, league: selectedTeamSeason?.leagueCode ?? filters.league, season: String(selectedTeamSeason?.startYear ?? filters.season) }} teamId={teamId} backLabel={backLabel} onBack={() => goBack("teams")} onPlayer={openPlayer} onTeam={openTeam} onMatch={openMatch} />}
             {view === "match" && matchId && <MatchDetailView filters={filters} matchId={matchId} backLabel={backLabel} onBack={() => goBack("overview")} onPlayer={openPlayer} onTeam={openTeam} onMatch={replaceMatch} />}
             {view === "matchday" && <MatchdayView filters={filters} leagues={catalog.leagues} seasons={seasons} onFilter={updateFilter} onPlayer={openPlayer} onMatch={openMatch} />}
             {view === "overview" && <StandingsView filters={filters} leagues={catalog.leagues} seasons={seasons} onFilter={updateFilter} onTeam={openTeam} onPlayer={openPlayer} onMatch={openMatch} />}

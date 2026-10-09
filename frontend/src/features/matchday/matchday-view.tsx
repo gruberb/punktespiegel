@@ -1,6 +1,5 @@
 import { useCallback } from "react";
-import { ErrorState, LoadingState } from "../../components/feedback";
-import type { TileMatch } from "../../components/fixture-tiles";
+import { ResourcePanel } from "../../components/resource-panel";
 import { FixtureTiles } from "../../components/fixture-tiles";
 import { PageHeader, StepperSelect } from "../../components/page-controls";
 import { useResource } from "../../hooks/use-resource";
@@ -14,11 +13,10 @@ export function MatchdayView({ filters, leagues, seasons, onFilter, onPlayer, on
   const maximumRound = Math.max(1, selectedSeason?.latestRound ?? 0);
   const round = Math.min(maximumRound, Math.max(1, Number(filters.round) || 1));
   const leagueName = leagues.find((league) => league.code === filters.league)?.name ?? "Bundesliga";
-  const { data: standings, error } = useResource(useCallback(
+  const resource = useResource(useCallback(
     (signal: AbortSignal) => api.standings(new URLSearchParams({ league: filters.league, season: filters.season, round: String(round) }), signal),
     [filters.league, filters.season, round],
   ));
-  const matches: TileMatch[] = standings?.fixtures.map((fixture) => ({ id: fixture.id, scheduledAt: fixture.scheduledAt, home: fixture.home.team, away: fixture.away.team, homeScore: fixture.homeScore, awayScore: fixture.awayScore })) ?? [];
   return (
     <div className="tabelle-view">
       <PageHeader eyebrow={`${leagueName} · ${selectedSeason?.displayName ?? "Gewählte Saison"}`} title={`Spieltag ${round}`} controls={<div className="selectors">
@@ -26,13 +24,11 @@ export function MatchdayView({ filters, leagues, seasons, onFilter, onPlayer, on
         <StepperSelect label="Saison" value={filters.season} options={[...seasons].reverse().map((season) => ({ value: String(season.startYear), label: season.displayName }))} onChange={(value) => onFilter("season", value)} />
         <StepperSelect label="Spieltag" value={String(round)} options={Array.from({ length: maximumRound }, (_, index) => ({ value: String(index + 1), label: `Spieltag ${index + 1}` }))} onChange={(value) => onFilter("round", value)} />
       </div>} />
-      {error ? <ErrorState message={error} /> : !standings ? <LoadingState /> : <>
-        <section className="tabelle-block">
-          <div className="section-copy"><p className="fui-kicker">{matches.length} Spiele · antippen öffnet den Spielbericht</p><h2>Ergebnisse</h2></div>
-          <FixtureTiles matches={matches} onMatch={onMatch} />
-        </section>
-        {standings.context.playedMatchCount > 0 && <MatchdayReport filters={filters} round={round} onPlayer={onPlayer} />}
-      </>}
+      <ResourcePanel resource={resource} label="Ergebnisse">{standings => <section className="tabelle-block">
+        <div className="section-copy"><p className="fui-kicker">{standings.fixtures.length} Spiele · antippen öffnet den Spielbericht</p><h2>Ergebnisse</h2></div>
+        <FixtureTiles matches={standings.fixtures.map(fixture => ({ id: fixture.id, scheduledAt: fixture.scheduledAt, home: fixture.home.team, away: fixture.away.team, homeScore: fixture.homeScore, awayScore: fixture.awayScore }))} onMatch={onMatch} />
+      </section>}</ResourcePanel>
+      <MatchdayReport filters={filters} round={round} onPlayer={onPlayer} />
     </div>
   );
 }

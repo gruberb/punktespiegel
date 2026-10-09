@@ -236,8 +236,8 @@ von React StrictMode.
 | Keine vollständige beste Elf möglich | Ranglistenkarte zeigt den Hinweis; optionaler Spieltagsblock entfällt |
 
 Es gibt keine automatische Wiederholung oder zeitbasierte Cache-Invalidierung.
-Auch fehlgeschlagene Saison-Promises und optionale Fallbacks bleiben bis zum
-Neuladen gespeichert. Die bestehenden Artefakt-Typen sind keine vollständige
+Fehlgeschlagene Saison-Promises werden aus dem Cache entfernt und können bei
+einer späteren Auswahl erneut geladen werden. Optionale Fallbacks bleiben gespeichert. Die bestehenden Artefakt-Typen sind keine vollständige
 Laufzeitvalidierung: Der Generator prüft die Daten, der Browser prüft bei Saisons
 zusätzlich die Schema-Version. Eine neue externe Datenquelle benötigt eine
 passende Prüfung an ihrer Eingangsgrenze.
@@ -277,3 +277,32 @@ verzögerte Saisonwechsel, unveränderte DOM-Knoten für Profilkopf/Tabs/Histori
 Spielauswahl ohne auslösende Elternzeile und gespeicherte Sidebar-Präferenzen.
 `testing/register-ts.mjs` nutzt den bereits installierten TypeScript-Compiler für
 die Testimporte. Die Browserprüfung ergänzt Layout und responsive Navigation.
+
+## Ladebereiche aller Ansichten
+
+`useResource` liefert ausschließlich Daten zur aktuellen Abfrage. `ResourcePanel`
+behält die letzte erfolgreiche Darstellung während einer neuen Abfrage oder eines
+Fehlers bei. Ein sichtbarer Hinweis kennzeichnet diese Daten; `inert` sperrt Maus,
+Tastatur und Links im alten Inhalt. Dadurch können alte IDs nicht mit neuen Filtern
+navigieren. Nach Erfolg bleibt der Komponentenbaum erhalten, einschließlich lokaler
+Tabellensteuerung. Eine geänderte `identity` entfernt den vorherigen Inhalt sofort.
+Spieler- und Mannschaftsprofile sind zusätzlich nach ihrer Entity-ID gekeyt.
+
+| Ansicht | Unabhängige Ladebereiche | Bleibt verfügbar |
+| --- | --- | --- |
+| Tabelle | Spieltag-Einblicke; Tabellen, Form und Saisonverlauf | Liga-, Saison- und Spieltagswahl |
+| Ranglisten | Wertungen; beste Elf | Bereichsauswahl und bereits geladene Karten |
+| Spieltag | Ergebnisse; Wertungen; beste Elf | Filter und jeweils fertige Bereiche |
+| Spieler | Spielertabelle | Navigation; alte Tabelle sichtbar und gesperrt |
+| Mannschaften | Mannschaftstabelle | Navigation; alte Tabelle sichtbar und gesperrt |
+| Spielerprofil | Saisondaten; Historie; Profilzusätze | Profilkopf, Tabs, Historie und Zurück |
+| Mannschaftsprofil | Saisonspiele/Kader; Vereinsdaten/Transfers/Startelf | Tabs und Zurück; Spiele warten nicht auf Vereinszusätze |
+| Spielbericht | Bericht mit Aufstellung und Vergleich | Zurück; andere Spiel-ID zeigt keine alten Spieldaten |
+| Info | Keine Datenabfrage | Gesamter Inhalt |
+
+Eine Ladegrenze ist keine zusätzliche Netzwerkdatei: Saisonmodelle teilen sich
+`loadSeason` und dessen gecachtes Promise. Ein noch unbekanntes Saisonarchiv muss
+weiterhin vollständig heruntergeladen werden. Danach berechnet jeder Bereich sein
+Modell. Navigation und Filterwechsel bleiben React-Updates ohne Dokument-Neuladen.
+Der initiale Katalog wird einmal für die App-Navigation benötigt; dieser erste
+App-Start darf weiterhin einen zentralen Ladezustand zeigen.

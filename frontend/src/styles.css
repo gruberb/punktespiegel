@@ -732,3 +732,11 @@ button.transfer-row:hover strong { color: var(--accent); }
 
 .interactive-hover-card { pointer-events: auto; }
 .entity-row, .best-player, .report-spotlight { cursor: pointer; }
+
+/* Loading boundaries preserve layout and keep stale navigation inaccessible. */
+.resource-panel { min-width: 0; }
+.resource-content { min-width: 0; }
+.resource-content[inert] { opacity: .55; }
+.resource-status { padding: 1rem; color: var(--muted); }
+.resource-grid-contents, .resource-grid-contents > .resource-content { display: contents; }
+.resource-grid-contents > .resource-status, .resource-grid-contents > [role="alert"] { grid-column: 1 / -1; }

@@ -7,7 +7,7 @@ import { analyzePlayerHistory, previousSeasonPointsByPlayer } from "./player-tab
 import { latestImportedRound } from "./rounds";
 import { bestEleven, buildLeaderboards, buildTeamScores, selectedRound, summarizePlayers } from "./scoring";
 import { availabilitySignalsCache, catalogCache, currentSeasonStartYear, loadClubProfiles, loadInsights, loadPlayerCareers, loadSeason, newsCache, roleSignalsCache } from "./snapshots";
-import { teamDetail } from "./team-models";
+import { teamProfile, teamSeasonDetail } from "./team-models";
 
 export const api = {
   catalog: (signal?: AbortSignal) => abortable(catalogCache.then(({ leagues, seasons }) => ({ leagues, seasons })), signal),
@@ -40,10 +40,11 @@ export const api = {
     return abortable(Promise.all([loadSeason(params), newsCache, roleSignalsCache, availabilitySignalsCache, loadClubProfiles(league, season), loadPlayerCareers(league, season)]).then(([index, news, roleSignals, availabilitySignals, clubProfiles, playerCareers]) => playerProfile(index, playerId, news, roleSignals, availabilitySignals, clubProfiles, playerCareers)), signal);
   },
   teams: (params: URLSearchParams, signal?: AbortSignal) => abortable(loadSeason(params).then((index) => buildTeamScores(index, { kind: "all" })), signal),
-  team: (teamId: string, params: URLSearchParams, signal?: AbortSignal) => {
+  teamSeason: (teamId: string, params: URLSearchParams, signal?: AbortSignal) => abortable(loadSeason(params).then((index) => teamSeasonDetail(index, teamId)), signal),
+  teamProfile: (teamId: string, params: URLSearchParams, signal?: AbortSignal) => {
     const league = params.get("league") ?? "0001";
     const season = Number(params.get("season") ?? currentSeasonStartYear());
-    return abortable(Promise.all([loadSeason(params), roleSignalsCache, loadClubProfiles(league, season)]).then(([index, roleSignals, clubProfiles]) => teamDetail(index, teamId, roleSignals, clubProfiles)), signal);
+    return abortable(Promise.all([loadSeason(params), roleSignalsCache, loadClubProfiles(league, season)]).then(([index, roleSignals, clubProfiles]) => teamProfile(index, teamId, roleSignals, clubProfiles)), signal);
   },
   insights: (params: URLSearchParams, signal?: AbortSignal): Promise<RoundInsights | null> => abortable(Promise.all([loadInsights(params), loadSeason(params)]).then(([rounds, index]) => {
     const round = Number(params.get("round"));

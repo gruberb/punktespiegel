@@ -479,6 +479,9 @@ export type TeamDetail = {
   } | null;
 };
 
+export type TeamProfile = Pick<TeamDetail, "players" | "profile" | "likelyEleven" | "externalSources">;
+export type TeamSeasonDetail = Omit<TeamDetail, "profile" | "likelyEleven" | "externalSources">;
+
 export type BestElevenPlayer = {
   id: string;
   teamId: string;

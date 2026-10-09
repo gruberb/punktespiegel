@@ -2,6 +2,19 @@
 
 Alle wesentlichen Änderungen an Punktespiegel werden in dieser Datei dokumentiert.
 
+## [1.31.0] – 2026-10-09
+
+### Geändert
+
+- Alle Datenansichten verwenden lokale Lade- und Fehlerbereiche. Filter, Tabs und Zurück-Navigation bleiben verfügbar.
+- Tabellen und Ranglisten behalten vorherige Inhalte während eines Auswahlwechsels sichtbar, kennzeichnen sie als veraltet und deaktivieren deren Navigation bis zur neuen Antwort.
+- Mannschaftsprofile laden Saisonspiele und Vereinszusätze getrennt. Spieltag-Einblicke, Tabellen, Ranglisten und beste Elf blockieren sich nicht mehr gegenseitig.
+- Architektur-Dokumentation beschreibt Ladegrenzen für jede Ansicht und den gemeinsamen Download-Cache.
+
+### Geprüft
+
+- Zusätzliche React-Tests für erhaltene DOM-Knoten, deaktivierte alte Inhalte, Identitätswechsel, Fehlererholung und unabhängige Teilansichten.
+
 ## [1.30.0] – 2026-10-09
 
 ### Hinzugefügt

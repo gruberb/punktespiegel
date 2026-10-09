@@ -1,4 +1,4 @@
-import type { LikelyEleven, Position, TeamDetail, TeamDetailMatch, TeamDetailPlayer, TeamMatchContributor } from "../../types/models";
+import type { LikelyEleven, Position, TeamSeasonDetail, TeamProfile, TeamDetailMatch, TeamDetailPlayer, TeamMatchContributor } from "../../types/models";
 import type { SeasonIndex, StaticClubProfiles, StaticRoleSignals } from "./contracts";
 
 // Once matches have been played, the likely starting eleven is derived from
@@ -47,12 +47,7 @@ function likelyEleven(index: SeasonIndex, teamId: string, roleSignals: StaticRol
   return { formation: best.formation, evaluatedMatches: evaluatedMatches.size, source: useRoleSnapshot ? "roleSnapshot" : "seasonStarts", players: best.players };
 }
 
-export function teamDetail(index: SeasonIndex, teamId: string, roleSignals: StaticRoleSignals | null, clubProfiles: StaticClubProfiles | null): TeamDetail {
-  const team = index.teams.get(teamId);
-  if (!team) throw new Error("Mannschaft wurde in dieser Saison nicht gefunden.");
-  const snapshot = clubProfiles?.leagueCode === index.season.leagueCode && clubProfiles.season === index.season.startYear
-    ? clubProfiles.teams[teamId] ?? null
-    : null;
+function teamRoster(index: SeasonIndex, teamId: string, snapshot: StaticClubProfiles["teams"][string] | null) {
   const points = new Map<string, number>();
   for (const score of index.season.scores) {
     if (score.teamId === teamId) points.set(score.playerId, (points.get(score.playerId) ?? 0) + score.totalPoints);
@@ -67,6 +62,14 @@ export function teamDetail(index: SeasonIndex, teamId: string, roleSignals: Stat
     const player = index.players.get(id);
     return player ? [{ id, name: player.name, position: player.position, points: points.get(id) ?? 0, photoUrl: player.photoUrl }] : [];
   }).sort((left, right) => right.points - left.points || left.name.localeCompare(right.name, "de"));
+
+  return { players, rosterIds };
+}
+
+export function teamSeasonDetail(index: SeasonIndex, teamId: string): TeamSeasonDetail {
+  const team = index.teams.get(teamId);
+  if (!team) throw new Error("Mannschaft wurde in dieser Saison nicht gefunden.");
+  const { players } = teamRoster(index, teamId, null);
 
   const matches = index.season.matches.filter((match) => match.homeTeamId === teamId || match.awayTeamId === teamId).map((match): TeamDetailMatch => {
     const home = match.homeTeamId === teamId;
@@ -107,17 +110,21 @@ export function teamDetail(index: SeasonIndex, teamId: string, roleSignals: Stat
       players: contributors,
     };
   }).sort((left, right) => left.matchday - right.matchday);
+  return { id: team.id, name: team.name, code: team.code, startYear: index.season.startYear, logoUrl: team.logoUrl, players, matches };
+}
+
+export function teamProfile(index: SeasonIndex, teamId: string, roleSignals: StaticRoleSignals | null, clubProfiles: StaticClubProfiles | null): TeamProfile {
+  const team = index.teams.get(teamId);
+  if (!team) throw new Error("Mannschaft wurde in dieser Saison nicht gefunden.");
+  const snapshot = clubProfiles?.leagueCode === index.season.leagueCode && clubProfiles.season === index.season.startYear
+    ? clubProfiles.teams[teamId] ?? null
+    : null;
+  const { players, rosterIds } = teamRoster(index, teamId, snapshot);
   const source = roleSignals?.league === index.season.leagueCode && roleSignals.season === index.season.startYear
     ? roleSignals.teams[teamId]
     : null;
   return {
-    id: team.id,
-    name: team.name,
-    code: team.code,
-    startYear: index.season.startYear,
-    logoUrl: team.logoUrl,
     players,
-    matches,
     profile: snapshot ? {
       generatedAt: clubProfiles!.generatedAt,
       provider: clubProfiles!.provider,

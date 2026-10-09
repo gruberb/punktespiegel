@@ -177,3 +177,97 @@ test("ranking rows expose separate player and team links with readable labels", 
   await click(links.find((link) => link.textContent === "Team Name"));
   assert.deepEqual(calls, ["t"]);
 });
+
+const { ResourcePanel } = await import("../src/components/resource-panel.tsx");
+const { TeamDetailView } = await import("../src/features/teams/team-detail-view.tsx");
+const { MatchDetailView } = await import("../src/features/matches/match-detail-view.tsx");
+const { RankingsView } = await import("../src/features/rankings/rankings-view.tsx");
+
+test("resource boundaries retain DOM but disable stale content, recover, and clear changed identities", async () => {
+  const panel = (resource, identity = "a") => React.createElement(ResourcePanel, { resource, identity, label: "Section" }, data => React.createElement("button", null, data));
+  await render(panel({ data: "old", loading: false, error: null }));
+  const button = container.querySelector("button");
+  await render(panel({ data: null, loading: true, error: null }));
+  assert.equal(container.querySelector("button"), button);
+  assert.ok(button.closest("[inert]"));
+  assert.equal(container.querySelector("section").getAttribute("aria-busy"), "true");
+  await render(panel({ data: null, loading: false, error: "failed" }));
+  assert.match(container.textContent, /failed/);
+  assert.ok(button.closest("[inert]"));
+  await render(panel({ data: "new", loading: false, error: null }));
+  assert.equal(container.querySelector("button"), button);
+  assert.equal(button.closest("[inert]"), null);
+  assert.equal(button.textContent, "new");
+  await render(panel({ data: null, loading: true, error: null }, "b"));
+  assert.equal(container.querySelector("button"), null);
+  await render(panel({ data: "b", loading: false, error: null }, "b"));
+  await render(panel({ data: null, loading: false, error: null }, "b"));
+  assert.equal(container.querySelector("button"), null);
+});
+
+test("team games render before club supplements; errors and season changes preserve tabs", async () => {
+  const next = deferred();
+  api.teamSeason = async (_id, params) => params.get("season") === "2026" ? { id: "t", name: "Team ready", code: "T", players: [], matches: [] } : next.promise;
+  api.teamProfile = async () => { throw new Error("Club supplement unavailable"); };
+  const view = season => React.createElement(TeamDetailView, { teamId: "t", filters: { ...filters, season }, backLabel: "Back", onBack() {}, onTeam() {}, onPlayer() {}, onMatch() {} });
+  await render(view("2026"));
+  assert.match(container.textContent, /Team ready/);
+  assert.match(container.textContent, /Jedes Spiel im Detail/);
+  assert.match(container.textContent, /Club supplement unavailable/);
+  const tabs = container.querySelector('[role="tablist"]');
+  const header = container.querySelector(".team-profile");
+  await render(view("2025"));
+  assert.equal(container.querySelector('[role="tablist"]'), tabs);
+  assert.equal(container.querySelector(".team-profile"), header);
+  assert.ok(header.closest("[inert]"));
+  await act(async () => next.reject(new Error("Season unavailable")));
+  assert.match(container.textContent, /Season unavailable/);
+  assert.equal(container.querySelector('[role="tablist"]'), tabs);
+});
+
+test("rankings failure does not prevent the independent best eleven", async () => {
+  api.dashboard = async () => { throw new Error("Rankings unavailable"); };
+  api.bestEleven = async () => ({ points: 42, formation: "4-4-2", players: [] });
+  await render(React.createElement(RankingsView, { scope: "through", eleven: { league: "0001", season: "2026", round: 4 }, onView() {}, onPlayer() {}, onTeam() {} }));
+  assert.match(container.textContent, /Rankings unavailable/);
+  assert.match(container.textContent, /42/);
+  assert.ok(container.querySelector(".best-pitch"));
+});
+
+test("match failures leave the back navigation available", async () => {
+  api.match = async () => { throw new Error("Report unavailable"); };
+  let backs = 0;
+  await render(React.createElement(MatchDetailView, { filters, matchId: "m", backLabel: "Back", onBack() { backs++; }, onPlayer() {}, onTeam() {}, onMatch() {} }));
+  assert.match(container.textContent, /Report unavailable/);
+  await click(container.querySelector(".back-button"));
+  assert.equal(backs, 1);
+});
+
+const { MatchdayView } = await import("../src/features/matchday/matchday-view.tsx");
+const { TeamsView } = await import("../src/features/teams/teams-view.tsx");
+
+test("matchday results failure leaves filters and best eleven available", async () => {
+  api.standings = async () => { throw new Error("Fixtures unavailable"); };
+  api.dashboard = () => new Promise(() => {});
+  api.bestEleven = async () => ({ points: 77, formation: "4-4-2", players: [] });
+  await render(React.createElement(MatchdayView, { filters, leagues: [{code:"0001",name:"Liga"}], seasons: [{ startYear: 2026, displayName: "2026/27", latestRound: 4 }], onFilter() {}, onPlayer() {}, onMatch() {} }));
+  assert.match(container.textContent, /Fixtures unavailable/);
+  assert.match(container.textContent, /77/);
+  assert.ok(container.querySelector('select[aria-label="Saison"]'));
+  assert.ok(container.querySelector(".best-pitch"));
+});
+
+test("team table remains mounted across a delayed season change", async () => {
+  const next = deferred();
+  api.teams = (_params) => _params.get("season") === "2026" ? Promise.resolve([]) : next.promise;
+  const view = season => React.createElement(TeamsView, { filters: {...filters, season}, onTeam() {} });
+  await render(view("2026"));
+  const table = container.querySelector("table");
+  assert.ok(table);
+  await render(view("2025"));
+  assert.equal(container.querySelector("table"), table);
+  assert.ok(table.closest("[inert]"));
+  await act(async () => next.resolve([]));
+  assert.equal(container.querySelector("table"), table);
+  assert.equal(table.closest("[inert]"), null);
+});

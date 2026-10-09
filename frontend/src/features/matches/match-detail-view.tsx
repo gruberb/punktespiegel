@@ -1,22 +1,28 @@
+import { ResourcePanel } from "../../components/resource-panel";
 import { EntityLink } from "../../components/entity-link";
 import { LogoTile } from "@gruberb/fun-ui";
 import { useCallback } from "react";
-import { Empty, ErrorState, LoadingState } from "../../components/feedback";
+import { Empty } from "../../components/feedback";
 import { FixtureTiles } from "../../components/fixture-tiles";
 import { PlayerName, PlayerPortrait, PositionTag, positionName } from "../../components/player-identity";
 import { useResource } from "../../hooks/use-resource";
 import { api } from "../../lib/data/api";
 import type { Filters } from "../../lib/navigation/scope";
-import type { MatchPlayer, MatchSide, Position } from "../../types/models";
+import type { MatchDetail, MatchPlayer, MatchSide, Position } from "../../types/models";
 import { formatFixtureSlot, lastName } from "../../utils/format";
 
 export function MatchDetailView({ filters, matchId, backLabel, onBack, onPlayer, onTeam, onMatch }: { filters: Filters; matchId: string; backLabel: string; onBack: () => void; onPlayer: (id: string) => void; onTeam: (id: string) => void; onMatch: (id: string) => void }) {
-  const { data: detail, error } = useResource(useCallback(
+  const resource = useResource(useCallback(
     (signal: AbortSignal) => api.match(matchId, new URLSearchParams({ league: filters.league, season: filters.season }), signal),
     [filters.league, filters.season, matchId],
   ));
-  if (error) return <ErrorState message={error} />;
-  if (!detail || detail.id !== matchId) return <LoadingState />;
+  return <section className="match-view">
+    <button className="back-button" onClick={onBack}>← {backLabel}</button>
+    <ResourcePanel resource={resource} label="Spielbericht" identity={matchId}>{detail => <MatchReport detail={detail} onPlayer={onPlayer} onTeam={onTeam} onMatch={onMatch} />}</ResourcePanel>
+  </section>;
+}
+
+function MatchReport({detail, onPlayer, onTeam, onMatch}: {detail: MatchDetail; onPlayer: (id: string) => void; onTeam: (id: string) => void; onMatch: (id: string) => void}) {
   const { home, away } = detail;
   const played = detail.homeScore != null && detail.awayScore != null;
   const count = (side: MatchSide, pick: (player: MatchPlayer) => number) => side.players.reduce((sum, player) => sum + pick(player), 0);
@@ -31,8 +37,7 @@ export function MatchDetailView({ filters, matchId, backLabel, onBack, onPlayer,
   const allPlayers = [...home.players.map((player) => ({ player, team: home.team })), ...away.players.map((player) => ({ player, team: away.team }))]
     .sort((left, right) => right.player.points - left.player.points || left.player.name.localeCompare(right.player.name, "de"));
   return (
-    <section className="match-view">
-      <button className="back-button" onClick={onBack}>← {backLabel}</button>
+    <>
       <header className="match-hero fui-grid-paper">
         <p className="fui-kicker">{detail.leagueName} · {detail.season} · Spieltag {detail.round}{detail.scheduledAt ? ` · ${formatFixtureSlot(detail.scheduledAt)}` : ""}</p>
         <div className="match-scoreline">
@@ -115,7 +120,7 @@ export function MatchDetailView({ filters, matchId, backLabel, onBack, onPlayer,
           </div>
         </section>
       </>}
-    </section>
+    </>
   );
 }
 
