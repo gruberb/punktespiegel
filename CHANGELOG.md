@@ -2,6 +2,16 @@
 
 Alle wesentlichen Änderungen an Punktespiegel werden in dieser Datei dokumentiert.
 
+## [1.28.0] – 2026-10-09
+
+### Geändert
+
+- Neue Farbpalette „Welcome home“: Leinenpapier, Aubergine als Tinte, Azurblau als Akzent sowie Salbeigrün, Kadmiumrot und Chromgelb für Siege, Niederlagen und Positionen. Die Sticker im Überblick tragen Streifen im Regenbogen-Look.
+
+### Entfernt
+
+- Dunkles Design und der Umschalter in der Seitenleiste. Punktespiegel gibt es nur noch im hellen Design.
+
 ## [1.27.0] – 2026-10-07
 
 ### Hinzugefügt

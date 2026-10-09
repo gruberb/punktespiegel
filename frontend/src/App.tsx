@@ -53,9 +53,7 @@ type NavView = Exclude<View, "player" | "team" | "match">;
 type Filters = { league: string; season: string; round: string };
 type ViewLocation = { view: View; filters: Filters; playerId: string | null; teamId: string | null; matchId: string | null; scrollY: number };
 type TeamMetric = "overall" | "goalkeeper" | "defence" | "midfield" | "forward";
-type Theme = "light" | "dark";
 
-const themeStorageKey = "punktespiegel-theme";
 const siteBaseUrl = "https://punktespiegel.org/";
 
 const positionName: Record<Position, string> = {
@@ -101,7 +99,8 @@ const navMobile: Record<(typeof nav)[number]["id"], { label: string; icon: React
   },
 };
 const infoViews: InfoView[] = ["about", "methodology", "sources", "faq"];
-const themeColor: Record<Theme, string> = { light: "#eeeeeb", dark: "#0e0d10" };
+// Sap green, chrome yellow, red, cadmium, purple, azure at 55% over paper.
+const stickerBands = ["#a5b586", "#e7c576", "#e7ab81", "#da8a77", "#9d8a98", "#82a4b2"];
 const faqItems = [
   {
     question: "Welche Daten zeigt Punktespiegel?",
@@ -152,18 +151,6 @@ function initialFilters(): Filters {
 function requestedInitialRound() {
   const params = new URLSearchParams(window.location.search);
   return params.has("round") ? Number(params.get("round")) : null;
-}
-
-function initialTheme(): Theme {
-  const documentTheme = document.documentElement.dataset.theme;
-  if (documentTheme === "light" || documentTheme === "dark") return documentTheme;
-  try {
-    const storedTheme = window.localStorage.getItem(themeStorageKey);
-    if (storedTheme === "light" || storedTheme === "dark") return storedTheme;
-  } catch {
-    // Storage can be unavailable in privacy-restricted browser contexts.
-  }
-  return "light";
 }
 
 function initialView(): View {
@@ -255,7 +242,6 @@ function viewBackLabel(view: View) {
 }
 
 export default function App() {
-  const [theme, setTheme] = useState<Theme>(initialTheme);
   const [catalog, setCatalog] = useState<Catalog | null>(null);
   const [catalogError, setCatalogError] = useState<string | null>(null);
   const [filters, setFilters] = useState(initialFilters);
@@ -273,17 +259,6 @@ export default function App() {
   const initialSeasonRequest = useRef(new URLSearchParams(window.location.search).get("season"));
   const initialRoundRequest = useRef(requestedInitialRound());
   const initialSelectionResolved = useRef(false);
-
-  useLayoutEffect(() => {
-    document.documentElement.dataset.theme = theme;
-    document.documentElement.style.colorScheme = theme;
-    document.querySelector<HTMLMetaElement>('meta[name="theme-color"]')?.setAttribute("content", themeColor[theme]);
-    try {
-      window.localStorage.setItem(themeStorageKey, theme);
-    } catch {
-      // The selected theme still applies for this page view without persistence.
-    }
-  }, [theme]);
 
   useEffect(() => {
     const currentParams = new URLSearchParams(window.location.search);
@@ -669,15 +644,6 @@ export default function App() {
             </a>
           ))}
         </nav>
-        <button
-          className="theme-toggle"
-          aria-label={theme === "dark" ? "Zum hellen Design wechseln" : "Zum dunklen Design wechseln"}
-          title={theme === "dark" ? "Helles Design" : "Dunkles Design"}
-          onClick={() => setTheme((current) => current === "dark" ? "light" : "dark")}
-        >
-          <span className="theme-toggle-icon" aria-hidden="true">{theme === "dark" ? "☀" : "☾"}</span>
-          <span>{theme === "dark" ? "Hell" : "Dunkel"}</span>
-        </button>
       </header>
 
       <main>
@@ -1267,13 +1233,16 @@ function Sticker({ kind }: { kind: string }) {
   return (
     <svg className={`sticker sticker-${shape}`} viewBox="0 0 128 128" aria-hidden="true">
       <defs>
-        <linearGradient id={`${id}-holo`} x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="#ffb8dc" /><stop offset=".22" stopColor="#ffe9a6" /><stop offset=".42" stopColor="#b9f3d6" />
-          <stop offset=".62" stopColor="#a9dcff" /><stop offset=".82" stopColor="#cbb7ff" /><stop offset="1" stopColor="#ffb8dc" />
+        <linearGradient id={`${id}-bands`} x1="0" y1="0" x2="0" y2="1">
+          {/* Hard-stop bands echo the embroidered rainbow apple; palette hues mixed with paper so the ink glyphs stay legible. */}
+          {stickerBands.map((color, index) => [
+            <stop key={`${index}a`} offset={index / stickerBands.length} stopColor={color} />,
+            <stop key={`${index}b`} offset={(index + 1) / stickerBands.length} stopColor={color} />,
+          ])}
         </linearGradient>
       </defs>
       <g className="sticker-halo">{outline}</g>
-      <g className="sticker-body" fill={`url(#${id}-holo)`}>{outline}</g>
+      <g className="sticker-body" fill={`url(#${id}-bands)`}>{outline}</g>
       {shape === "trophy" && <path className="sticker-ink" d="m64 34 4 8.4 9.2 1.2-6.7 6.4 1.7 9.1L64 54.7l-8.2 4.4 1.7-9.1-6.7-6.4 9.2-1.2z" />}
       {shape === "ball" && <>
         <path className="sticker-ink" d="m64 46 17 12.4-6.5 20H53.5L47 58.4z" />
