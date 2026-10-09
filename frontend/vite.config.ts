@@ -26,6 +26,8 @@ function staticRouteEntrypoints() {
 export default defineConfig({
   base: "/",
   plugins: [react(), staticRouteEntrypoints()],
+  // A linked fun-ui (file: dependency) has its own node_modules/react; two copies break hooks.
+  resolve: { dedupe: ["react", "react-dom"] },
   server: {
     port: 5173,
   },

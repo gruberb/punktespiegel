@@ -1,5 +1,8 @@
 # Architektur
 
+Die [Frontend-Architektur](frontend-architecture.md) beschreibt die React-Module,
+Import-Grenzen, Zustandsverantwortung und den Datenfluss vom Klick zur Darstellung.
+
 Punktespiegel ist eine statische Datenanwendung. Die Build-Pipeline sammelt und normalisiert öffentliche kicker-Daten; die ausgelieferte React-Anwendung liest nur versionierte JSON-Verträge aus demselben Website-Artefakt. Im Produktionsbetrieb laufen weder Rust noch PostgreSQL noch eine API.
 
 ## Systemkontext

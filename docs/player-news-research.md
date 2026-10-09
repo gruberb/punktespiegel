@@ -108,7 +108,7 @@ Before the implementation above, the pipeline behaved as follows:
 
 The direct kicker player-news URL was already generated and displayed. It is an
 outbound link only; it is never used for ingestion
-([`api.ts`](../frontend/src/api.ts)).
+([`api.ts`](../frontend/src/lib/data/api.ts)).
 
 ### Live coverage on 14 August 2026
 

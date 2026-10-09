@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { computeTable, crossTable, formLastN, formPoints, positionsByRound, trendVsRound } from "./standings.ts";
 import type { StandingsMatch } from "./standings.ts";
+import { computeTable, crossTable, formLastN, formPoints, positionsByRound, trendVsRound } from "./standings.ts";
 
 const teamIds = ["a", "b", "c", "d"];
 const names: Record<string, string> = { a: "Aue", b: "Bochum", c: "Chemnitz", d: "Dresden" };

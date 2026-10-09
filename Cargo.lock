@@ -721,7 +721,7 @@ dependencies = [
 
 [[package]]
 name = "punktespiegel-data"
-version = "1.28.1"
+version = "1.29.0"
 dependencies = [
  "anyhow",
  "chrono",

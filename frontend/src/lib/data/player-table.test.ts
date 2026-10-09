@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import type { PlayerTableRow } from "../../types/models";
 import { analyzePlayerHistory, comparePlayerPositions, defaultPlayerSort, previousSeasonPointsByPlayer, shortSeasonLabel, sortPlayers } from "./player-table.ts";
-import type { PlayerTableRow } from "./types";
 
 const season = (startYear: number, players: { id: string; points: number }[]) => ({
   id: String(startYear),

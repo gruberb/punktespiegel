@@ -1,11 +1,10 @@
-import type {
-  ClubFeedStatus,
-  NewsArticle,
-  NewsFeedSummary,
-  NewsHealthStatus,
-  NewsRelation,
-  PlayerNews,
-} from "./types";
+import type { ClubFeedStatus,
+NewsArticle,
+NewsFeedSummary,
+NewsHealthStatus,
+NewsRelation,
+PlayerNews,
+} from "../../types/models";
 
 export type NewsFeedHealth = {
   id: string;

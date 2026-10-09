@@ -67,6 +67,7 @@ cargo clippy --workspace --all-targets --locked -- -D warnings
 cargo test --workspace --all-targets --locked
 cargo run --locked -p punktespiegel-data -- --validate-only
 npm run typecheck
+npm test --workspace frontend
 npm run test:club-profiles
 npm run build
 docker compose config --quiet
@@ -91,5 +92,6 @@ docker compose build web
 Weitere Details:
 
 - [Architektur](docs/architecture.md)
+- [React-Frontend: Struktur, Zustand und Datenfluss](docs/frontend-architecture.md)
 - [Betrieb und Datenpflege](docs/operations.md)
 - [ADR: statische Saisonartefakte](docs/adr/0001-static-season-artifacts.md)

@@ -2,6 +2,25 @@
 
 Alle wesentlichen Änderungen an Punktespiegel werden in dieser Datei dokumentiert.
 
+## [1.29.0] – 2026-10-09
+
+### Hinzugefügt
+
+- Dokumentation der React-Architektur mit Feature-Zuständigkeiten, Zustandsverantwortung, Datenflussdiagrammen und Anleitung für neue Ansichten und Abfragen.
+- Automatische Prüfungen der Import-Grenzen und Importzyklen sowie Tests für Abbruch und Fehler bei Datenabfragen.
+
+### Geändert
+
+- Frontend nach den Prinzipien von Bulletproof React in App-Komposition, eigenständige Features, gemeinsame Komponenten und Datenmodule aufgeteilt.
+- Generische UI-Bausteine wie AppShell, Tabellen, Popovers und Ladezustände verwenden die gemeinsame fun-ui-Bibliothek. Die Abhängigkeit ist auf einen veröffentlichten Git-Commit festgelegt und benötigt kein lokales Nachbarprojekt.
+- Datenabfragen nutzen einen gemeinsamen React-Hook; Snapshot-Cache und bestehende Berechnungen bleiben erhalten.
+
+### Behoben
+
+- Abgebrochene oder überholte Abfragen überschreiben weder Daten noch Ladezustand einer neueren Auswahl.
+- Direkte Spielbericht-Links behalten ihre Match-ID bei der initialen Saisonauflösung und beim Neuladen.
+- Transitive Build-Abhängigkeit `source-map-js` auf die gepatchte Version aktualisiert.
+
 ## [1.28.1] – 2026-10-09
 
 ### Geändert
@@ -509,3 +528,5 @@ Alle wesentlichen Änderungen an Punktespiegel werden in dieser Datei dokumentie
 [1.7.0]: https://github.com/gruberb/punktespiegel/releases/tag/v1.7.0
 [1.8.0]: https://github.com/gruberb/punktespiegel/releases/tag/v1.8.0
 [1.8.1]: https://github.com/gruberb/punktespiegel/releases/tag/v1.8.1
+
+[1.29.0]: https://github.com/gruberb/punktespiegel/releases/tag/v1.29.0

@@ -1,8 +1,8 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { buildPlayerNews, canonicalNewsUrl, clubFeedStatus, newsAttribution, newsHealthStatus, newsSourceLabel } from "./news.ts";
+import type { NewsArticle } from "../../types/models.ts";
 import type { NewsArtifact, NewsFeedHealth } from "./news.ts";
-import type { NewsArticle } from "./types.ts";
+import { buildPlayerNews, canonicalNewsUrl, clubFeedStatus, newsAttribution, newsHealthStatus, newsSourceLabel } from "./news.ts";
 
 function article(url: string, publishedAt: string, title = url): NewsArticle {
   return { source: "kicker", domain: "kicker.de", title, url, publishedAt };

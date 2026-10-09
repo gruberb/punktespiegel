@@ -1,4 +1,4 @@
-import type { Catalog, Player, PlayerHistory, PlayerTableRow, Position } from "./types";
+import type { Catalog, Player, PlayerHistory, PlayerTableRow, Position } from "../../types/models";
 
 const positionOrder: Record<Position, number> = { GK: 0, DEF: 1, MID: 2, FWD: 3 };
 
