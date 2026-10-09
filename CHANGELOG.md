@@ -2,6 +2,12 @@
 
 Alle wesentlichen Änderungen an Punktespiegel werden in dieser Datei dokumentiert.
 
+## [1.28.1] – 2026-10-09
+
+### Geändert
+
+- Favicon, Logo, App-Icons und Vorschaubild (Open Graph) nutzen die neue Palette „Welcome home“: Aubergine statt Schwarz, Leinenpapier als Fläche, Regenbogenstreifen statt Pastellverlauf. PNG-Dateien neu gerendert.
+
 ## [1.28.0] – 2026-10-09
 
 ### Geändert

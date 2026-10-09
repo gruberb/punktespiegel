@@ -2,23 +2,16 @@
   <title id="title">Punktespiegel</title>
   <!-- Maskable variant: no corner marks, mark kept inside the 80 % safe circle. -->
   <defs>
-    <linearGradient id="holo" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#ffb8dc"/><stop offset=".22" stop-color="#ffe9a6"/><stop offset=".42" stop-color="#b9f3d6"/>
-      <stop offset=".62" stop-color="#a9dcff"/><stop offset=".82" stop-color="#cbb7ff"/><stop offset="1" stop-color="#ffb8dc"/>
-    </linearGradient>
-    <radialGradient id="sheen" cx=".28" cy=".22" r=".7">
-      <stop offset="0" stop-color="#fff" stop-opacity=".75"/><stop offset="1" stop-color="#fff" stop-opacity="0"/>
-    </radialGradient>
+    <linearGradient id="holo" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#a5b586"/><stop offset="0.1667" stop-color="#a5b586"/><stop offset="0.1667" stop-color="#e7c576"/><stop offset="0.3333" stop-color="#e7c576"/><stop offset="0.3333" stop-color="#e7ab81"/><stop offset="0.5" stop-color="#e7ab81"/><stop offset="0.5" stop-color="#da8a77"/><stop offset="0.6667" stop-color="#da8a77"/><stop offset="0.6667" stop-color="#9d8a98"/><stop offset="0.8333" stop-color="#9d8a98"/><stop offset="0.8333" stop-color="#82a4b2"/><stop offset="1" stop-color="#82a4b2"/></linearGradient>
     <pattern id="grid" width="64" height="64" patternUnits="userSpaceOnUse">
-      <path d="M64 0H0V64" fill="none" stroke="#131215" stroke-opacity=".07" stroke-width="2"/>
+      <path d="M64 0H0V64" fill="none" stroke="#2a1f33" stroke-opacity=".07" stroke-width="2"/>
     </pattern>
   </defs>
   <rect width="1024" height="1024" fill="url(#holo)"/>
-  <rect width="1024" height="1024" fill="url(#sheen)"/>
   <rect width="1024" height="1024" fill="url(#grid)"/>
   <g transform="translate(224 224) scale(4.5)">
-    <path d="M20.2 107.8 107.8 20.2" fill="none" stroke="#131215" stroke-width="3" stroke-dasharray="7 6" opacity=".7"/>
-    <circle cx="44" cy="44" r="17" fill="#131215"/>
-    <circle cx="84" cy="84" r="14.5" fill="none" stroke="#131215" stroke-width="5"/>
+    <path d="M20.2 107.8 107.8 20.2" fill="none" stroke="#2a1f33" stroke-width="3" stroke-dasharray="7 6" opacity=".7"/>
+    <circle cx="44" cy="44" r="17" fill="#2a1f33"/>
+    <circle cx="84" cy="84" r="14.5" fill="none" stroke="#2a1f33" stroke-width="5"/>
   </g>
 </svg>

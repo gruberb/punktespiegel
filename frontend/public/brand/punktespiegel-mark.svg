@@ -1,8 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-labelledby="title desc">
   <title id="title">Punktespiegel</title>
   <desc id="desc">Ein gefüllter Punkt und seine gespiegelte Kontur, getrennt durch eine gestrichelte Spiegelachse.</desc>
-  <rect width="128" height="128" fill="#131215"/>
-  <path d="M20.2 107.8 107.8 20.2" fill="none" stroke="#F7F7F5" stroke-width="3" stroke-dasharray="7 6" opacity=".6"/>
-  <circle cx="44" cy="44" r="17" fill="#F7F7F5"/>
-  <circle cx="84" cy="84" r="14.5" fill="none" stroke="#F7F7F5" stroke-width="5"/>
+  <rect width="128" height="128" fill="#2a1f33"/>
+  <path d="M20.2 107.8 107.8 20.2" fill="none" stroke="#fdfaf2" stroke-width="3" stroke-dasharray="7 6" opacity=".6"/>
+  <circle cx="44" cy="44" r="17" fill="#fdfaf2"/>
+  <circle cx="84" cy="84" r="14.5" fill="none" stroke="#fdfaf2" stroke-width="5"/>
 </svg>

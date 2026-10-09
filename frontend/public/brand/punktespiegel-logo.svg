@@ -1,8 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 64" role="img" aria-labelledby="title">
   <title id="title">Punktespiegel</title>
-  <rect width="64" height="64" fill="#131215"/>
-  <path d="M10.1 53.9 53.9 10.1" fill="none" stroke="#F7F7F5" stroke-width="1.6" stroke-dasharray="3.5 3" opacity=".6"/>
-  <circle cx="22" cy="22" r="8.5" fill="#F7F7F5"/>
-  <circle cx="42" cy="42" r="7.2" fill="none" stroke="#F7F7F5" stroke-width="2.6"/>
-  <text x="88" y="43" fill="#131215" font-family="Archivo, 'Helvetica Neue', Arial, sans-serif" font-stretch="112%" font-size="30" font-weight="700" letter-spacing="2.2">PUNKTESPIEGEL</text>
+  <rect width="64" height="64" fill="#2a1f33"/>
+  <path d="M10.1 53.9 53.9 10.1" fill="none" stroke="#fdfaf2" stroke-width="1.6" stroke-dasharray="3.5 3" opacity=".6"/>
+  <circle cx="22" cy="22" r="8.5" fill="#fdfaf2"/>
+  <circle cx="42" cy="42" r="7.2" fill="none" stroke="#fdfaf2" stroke-width="2.6"/>
+  <text x="88" y="43" fill="#2a1f33" font-family="Archivo, 'Helvetica Neue', Arial, sans-serif" font-stretch="112%" font-size="30" font-weight="700" letter-spacing="2.2">PUNKTESPIEGEL</text>
 </svg>
