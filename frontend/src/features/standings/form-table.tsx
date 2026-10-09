@@ -1,5 +1,6 @@
+import { useHoverCard } from "../../components/hover-card";
 import type { DataTableColumn } from "@gruberb/fun-ui";
-import { DataTable, FormChip, FormChips, LogoTile, Segmented, TrendBadge, usePopoverHover } from "@gruberb/fun-ui";
+import { DataTable, FormChip, FormChips, LogoTile, Segmented, TrendBadge } from "@gruberb/fun-ui";
 import { useMemo, useState } from "react";
 import { MatchPopover } from "../../components/match-popover";
 import type { LeagueStandings, LeagueTableFormEntry, LeagueTableRow, LeagueTableTeam, VenueTableRow } from "../../types/models";
@@ -8,7 +9,7 @@ import { zoneForRank } from "./zones";
 
 type FormTableSort = "rank" | "form" | "difference";
 
-export function FormTableCard({ standings, league, onTeam }: { standings: LeagueStandings; league: string; onTeam: (id: string) => void }) {
+export function FormTableCard({ standings, league, onTeam, onMatch }: { standings: LeagueStandings; league: string; onMatch: (id: string) => void; onTeam: (id: string) => void }) {
   const [venue, setVenue] = useState<"all" | "home" | "away">("all");
   const [sort, setSort] = useState<FormTableSort>("rank");
   const [direction, setDirection] = useState<"asc" | "desc">("asc");
@@ -41,7 +42,7 @@ export function FormTableCard({ standings, league, onTeam }: { standings: League
     { id: "goals", label: "Tore", numeric: true, render: (row) => `${row.goalsFor}:${row.goalsAgainst}` },
     { id: "difference", label: "Tordifferenz", shortLabel: "TD", numeric: true, sort: sortProps("difference"), render: (row) => row.goalDifference > 0 ? `+${row.goalDifference}` : row.goalDifference },
     { id: "points", label: "Punkte", shortLabel: "Pkt", numeric: true, className: "fui-data-table__primary", render: (row) => row.points },
-    { id: "form", label: "Letzte 5", shortLabel: "Form", sort: sortProps("form"), render: (row) => <span className="form-cell"><FormChips>{row.form.map((entry) => <FormEntryChip key={entry.round} entry={entry} team={row.team} />)}</FormChips></span> },
+    { id: "form", label: "Letzte 5", shortLabel: "Form", sort: sortProps("form"), render: (row) => <span className="form-cell"><FormChips>{row.form.map((entry) => <FormEntryChip key={entry.round} entry={entry} team={row.team} onTeam={onTeam} onMatch={onMatch} matchId={standings.cross.cells[`${entry.home ? row.team.id : entry.opponent.id}|${entry.home ? entry.opponent.id : row.team.id}`]?.matchId} />)}</FormChips></span> },
     { id: "course", label: "Verlauf", render: (row) => <RankSparkline positions={row.positions} teamCount={standings.rows.length} /> },
   ];
 
@@ -84,17 +85,17 @@ function trendTitle(trend: number | null) {
   return trend == null ? "Noch kein Vergleich möglich" : "Plätze gewonnen oder verloren gegenüber dem Stand vor fünf Spieltagen";
 }
 
-function FormEntryChip({ entry, team }: { entry: LeagueTableFormEntry; team: LeagueTableTeam }) {
-  const hover = usePopoverHover<HTMLSpanElement>();
+function FormEntryChip({ entry, team, matchId, onTeam, onMatch }: { entry: LeagueTableFormEntry; team: LeagueTableTeam; matchId?: string; onTeam: (id: string) => void; onMatch: (id: string) => void }) {
+  const hover = useHoverCard<HTMLSpanElement>();
   // The entry's score is from this team's point of view; the popover shows it home side first.
   const [scored, conceded] = entry.score.split(":");
   const [home, away] = entry.home ? [team, entry.opponent] : [entry.opponent, team];
   const score = entry.home ? `${scored}:${conceded}` : `${conceded}:${scored}`;
   const outcome = entry.outcome === "S" ? "Sieg" : entry.outcome === "N" ? "Niederlage" : "Unentschieden";
   return (
-    <FormChip ref={hover.ref} outcome={formOutcome[entry.outcome]} tabIndex={0} aria-label={`Spieltag ${entry.round}: ${outcome}, ${home.name} ${score} ${away.name}`} {...hover.handlers}>
+    <FormChip role={matchId ? "button" : undefined} onClick={(event) => { event.stopPropagation(); if (matchId) onMatch(matchId); }} onKeyDown={(event) => { event.stopPropagation(); if (event.target === event.currentTarget && matchId && (event.key === "Enter" || event.key === " ")) { event.preventDefault(); onMatch(matchId); } }} ref={hover.ref} outcome={formOutcome[entry.outcome]} tabIndex={0} aria-label={`Spieltag ${entry.round}: ${outcome}, ${home.name} ${score} ${away.name}`} {...hover.handlers}>
       {entry.outcome}
-      <MatchPopover hover={hover} title={`Spieltag ${entry.round}`} status={`${outcome} · ${entry.home ? "Heim" : "Auswärts"}`} home={home} away={away} score={score} />
+      <MatchPopover hover={hover} title={`Spieltag ${entry.round}`} status={`${outcome} · ${entry.home ? "Heim" : "Auswärts"}`} home={home} away={away} score={score} onTeam={onTeam} onMatch={matchId ? () => onMatch(matchId) : undefined} />
     </FormChip>
   );
 }

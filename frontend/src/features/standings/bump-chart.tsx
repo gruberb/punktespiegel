@@ -12,7 +12,7 @@ function defaultBumpSelection(standings: LeagueStandings) {
     : [leader.team.id];
 }
 
-export function BumpChartCard({ standings, zones }: { standings: LeagueStandings; zones: LeagueZone[] }) {
+export function BumpChartCard({ standings, zones, onTeam }: { standings: LeagueStandings; zones: LeagueZone[]; onTeam: (id: string) => void }) {
   const rounds = standings.context.round;
   const teamCount = standings.rows.length;
   const [pinned, setPinned] = useState<string[]>(() => defaultBumpSelection(standings));
@@ -59,9 +59,9 @@ export function BumpChartCard({ standings, zones }: { standings: LeagueStandings
 
   return (
     <section className="detail-section bump-card">
-      <CardHead eyebrow="Saisonverlauf" title="Platzierung je Spieltag" subtitle="Der Weg jedes Teams durch die Tabelle · antippen hebt bis zu drei Teams hervor" action={zones.length ? <div className="bump-legend" aria-hidden="true">{zones.map((zone) => <span key={zone.label}><i className={`bump-legend-swatch bump-zone-${zone.tone}`} />{zone.label}</span>)}</div> : undefined} />
+      <CardHead eyebrow="Saisonverlauf" title="Platzierung je Spieltag" subtitle="Der Weg jedes Teams durch die Tabelle · Kurve antippen hebt Teams hervor · Vereinsname öffnet das Profil" action={zones.length ? <div className="bump-legend" aria-hidden="true">{zones.map((zone) => <span key={zone.label}><i className={`bump-legend-swatch bump-zone-${zone.tone}`} />{zone.label}</span>)}</div> : undefined} />
       <div className="bump-scroll" ref={scrollRef}>
-        <svg className="bump-chart" width={width} height={height} role="img" aria-label={`Platzierungsverlauf über ${rounds} Spieltage`}>
+        <svg className="bump-chart" width={width} height={height} role="group" aria-label={`Platzierungsverlauf über ${rounds} Spieltage`}>
           {zones.filter((zone) => zone.from <= teamCount).map((zone) => (
             <rect key={zone.label} className={`bump-zone bump-zone-${zone.tone}`} x="0" y={y(zone.from) - rowHeight / 2 + 2} width={width - labelGutter + 62} height={(Math.min(zone.to, teamCount) - zone.from + 1) * rowHeight - 4} rx="6" />
           ))}
@@ -87,7 +87,7 @@ export function BumpChartCard({ standings, zones }: { standings: LeagueStandings
             </circle>
           )))}
           {standings.rows.map((row) => (
-            <g key={row.team.id} className={`bump-label${emphasisClass(row.team.id)}`} transform={`translate(${x(rounds) + 12}, ${y(row.rank)})`} onMouseEnter={() => setHovered(row.team.id)} onMouseLeave={() => setHovered(null)} onClick={() => toggleTeam(row.team.id)}>
+            <g key={row.team.id} role="button" tabIndex={0} aria-label={`${row.team.name}: Mannschaftsprofil öffnen`} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); onTeam(row.team.id); } }} className={`bump-label${emphasisClass(row.team.id)}`} transform={`translate(${x(rounds) + 12}, ${y(row.rank)})`} onMouseEnter={() => setHovered(row.team.id)} onMouseLeave={() => setHovered(null)} onClick={() => onTeam(row.team.id)}>
               <rect className="bump-label-hit" x="-4" y={-rowHeight / 2} width={labelGutter - 10} height={rowHeight} fill="transparent" stroke="none" />
               <text className="bump-rank" x="0" y="3.5">{String(row.rank).padStart(2, "0")}</text>
               {row.team.logoUrl && <image href={row.team.logoUrl} x="22" y="-9" width="18" height="18" />}

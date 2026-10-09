@@ -2,6 +2,26 @@
 
 Alle wesentlichen Änderungen an Punktespiegel werden in dieser Datei dokumentiert.
 
+## [1.30.0] – 2026-10-09
+
+### Hinzugefügt
+
+- Einklappbare Desktop-Seitenleiste mit gespeicherter Auswahl und zugänglichen Icon-Links.
+- Direkte Navigation über Spielernamen, Vereinsnamen, Gegner, Ergebnisquadrate, Form-Chips und Spielergebnisse zum passenden Profil oder Spielbericht.
+- React-Interaktionstests für unabhängige Ladebereiche, schnelle Saisonwechsel, Navigation und Seitenleiste.
+
+### Geändert
+
+- Spielerprofil lädt Saisonverlauf, Saisonhistorie und Profilergänzungen unabhängig. Beim Saisonwechsel bleiben Profilkopf, Tabs und Historie sichtbar.
+- Gemeinsame Entity-Links erhalten Filter und IDs auch beim Öffnen in einem neuen Tab.
+- Frontend-Dokumentation beschreibt Ladegrenzen, Fehlerverhalten, Navigation und Sidebar-Zustand.
+
+### Behoben
+
+- Langsame oder fehlende Profil- und Archivdateien blockieren verfügbare Saisondaten nicht mehr.
+- Fehlgeschlagene Saison-Downloads können bei einer späteren Auswahl erneut geladen werden.
+- Klicks auf verschachtelte Team- oder Spiel-Links lösen keine zusätzliche Navigation der Elternzeile aus.
+
 ## [1.29.0] – 2026-10-09
 
 ### Hinzugefügt

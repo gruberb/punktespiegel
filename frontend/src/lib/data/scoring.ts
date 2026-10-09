@@ -114,6 +114,7 @@ export function summarizePlayers(index: SeasonIndex, round: number): { players: 
     return {
       id: player.id,
       name: player.name,
+      teamId: player.teamId,
       team: team?.name ?? "Unbekannter Verein",
       teamCode: team?.code ?? "—",
       logoUrl: team?.logoUrl ?? null,
@@ -271,7 +272,7 @@ export function bestEleven(index: SeasonIndex, scope: "matchday" | "season", rou
   const candidates = [...grouped].flatMap(([id, score]) => {
     const player = index.players.get(id);
     const team = index.teams.get(score.teamId);
-    return player?.selectable && team ? [{ id, name: player.name, team: team.name, teamCode: team.code, logoUrl: team.logoUrl, position: player.position, points: score.points }] : [];
+    return player?.selectable && team ? [{ id, teamId: team.id, name: player.name, team: team.name, teamCode: team.code, logoUrl: team.logoUrl, position: player.position, points: score.points }] : [];
   });
   const formations = [[3, 4, 3], [4, 3, 3], [3, 5, 2], [4, 4, 2], [4, 5, 1], [5, 3, 2], [5, 4, 1]] as const;
   let best: { points: number; formation: string; players: BestEleven["players"] } | null = null;

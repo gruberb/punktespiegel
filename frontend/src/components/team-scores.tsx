@@ -1,4 +1,6 @@
-import { LogoTile, Popover, TabNavigation, usePopoverHover } from "@gruberb/fun-ui";
+import { HoverCard, useHoverCard } from "./hover-card";
+import { EntityLink } from "./entity-link";
+import { LogoTile, TabNavigation } from "@gruberb/fun-ui";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { TeamLeaders, TeamPlayerScore, TeamScore } from "../types/models";
 import { positionName } from "./player-identity";
@@ -30,16 +32,16 @@ export function TeamRanking({ teams, matchday, scope, onTeam, expanded = false }
 }
 
 function TeamRankingRow({ team, index, metric, selectedMetric, matchday, scope, onTeam }: { team: TeamScore; index: number; metric: TeamMetric; selectedMetric: (typeof teamMetrics)[number]; matchday: number; scope: "through" | "matchday"; onTeam: (id: string) => void }) {
-  const hover = usePopoverHover<HTMLLIElement>();
+  const hover = useHoverCard<HTMLLIElement>();
   return (
-    <li ref={hover.ref} role="button" tabIndex={0} onClick={() => onTeam(team.id)} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") onTeam(team.id); }} {...hover.handlers}>
+    <li ref={hover.ref} role="button" tabIndex={0} onClick={() => onTeam(team.id)} onKeyDown={(event) => { if (event.target === event.currentTarget && (event.key === "Enter" || event.key === " ")) { event.preventDefault(); onTeam(team.id); } }} {...hover.handlers}>
       <span className="rank">{index + 1}</span>
       <LogoTile code={team.code} url={team.logoUrl} />
       <strong>{team.name}</strong>
       <span className="metric-number">{team[metric] || "—"} <small>Pkt.</small></span>
-      <Popover anchorRef={hover.ref} open={hover.open} id={hover.id} preferredWidth={410}>
+      <HoverCard hover={hover} label={team.name} preferredWidth={410}>
         <PlayerScoreList title={team.name} note={`${selectedMetric.label} · ${scope === "through" ? `bis Spieltag ${matchday}` : `nur Spieltag ${matchday}`}`} players={team.topPlayers[selectedMetric.leaders]} />
-      </Popover>
+      </HoverCard>
     </li>
   );
 }
@@ -47,18 +49,18 @@ function TeamRankingRow({ team, index, metric, selectedMetric, matchday, scope, 
 function PlayerScoreList({ title, note, players }: { title: string; note: string; players: TeamPlayerScore[] }) {
   return <>
     <div className="fui-popover__header"><strong className="fui-popover__title">{title}</strong><span className="fui-popover__meta">{note}</span></div>
-    <ol className="score-popover">{players.map((player, playerIndex) => <li key={player.id}><span>{playerIndex + 1}</span><strong>{player.name}</strong><small>{positionName[player.position]}</small><b>{player.points}</b></li>)}</ol>
+    <ol className="score-popover">{players.map((player, playerIndex) => <li key={player.id}><span>{playerIndex + 1}</span><strong><EntityLink kind="player" id={player.id}>{player.name}</EntityLink></strong><small>{positionName[player.position]}</small><b>{player.points}</b></li>)}</ol>
   </>;
 }
 
 export function TeamMetricCell({ value, label, players, contextLabel = "Saisonpunkte" }: { value: number; label: string; players: TeamPlayerScore[]; contextLabel?: string }) {
-  const hover = usePopoverHover<HTMLDivElement>();
+  const hover = useHoverCard<HTMLDivElement>();
   return (
     <div ref={hover.ref} className="team-metric-cell" tabIndex={0} {...hover.handlers}>
       <div className="team-score"><strong>{value || "—"}</strong><span>Pkt.</span></div>
-      <Popover anchorRef={hover.ref} open={hover.open} id={hover.id} preferredWidth={315}>
+      <HoverCard hover={hover} label={label} preferredWidth={315}>
         <PlayerScoreList title={label} note={contextLabel} players={players} />
-      </Popover>
+      </HoverCard>
     </div>
   );
 }

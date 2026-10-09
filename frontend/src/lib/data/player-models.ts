@@ -1,4 +1,4 @@
-import type { PlayerDetail, PlayerGame, PlayerSeasonSummary } from "../../types/models";
+import type { PlayerGame, PlayerSeasonSummary, PlayerSeasonDetail, PlayerProfile } from "../../types/models";
 import type { SeasonIndex, StaticAvailabilitySignals, StaticCatalog, StaticClubProfiles, StaticPlayerCareers, StaticRoleSignals, StaticSeason } from "./contracts";
 import { kickerPlayerNewsLink } from "./kicker-links";
 import type { NewsArtifact } from "./news";
@@ -6,21 +6,14 @@ import { buildPlayerNews } from "./news";
 import { scoreCountsAsAppearance } from "./scoring";
 import { loadSeason } from "./snapshots";
 
-export async function playerDetail(
+export function playerSeasonDetail(
   index: SeasonIndex,
   playerId: string,
-  catalog: StaticCatalog,
-  news: NewsArtifact,
-  roleSignals: StaticRoleSignals | null,
-  availabilitySignals: StaticAvailabilitySignals | null,
-  clubProfiles: StaticClubProfiles | null,
-  playerCareers: StaticPlayerCareers | null,
-): Promise<PlayerDetail> {
+): PlayerSeasonDetail {
   const player = index.players.get(playerId);
   if (!player) throw new Error("Spieler wurde in dieser Saison nicht gefunden.");
   const team = index.teams.get(player.teamId);
   if (!team) throw new Error("Verein des Spielers wurde nicht gefunden.");
-  const kickerNews = kickerPlayerNewsLink(player.id, player.name);
   const games = index.season.scores.filter((score) => score.playerId === playerId).flatMap((score): PlayerGame[] => {
     const match = index.matches.get(score.matchId);
     if (!match) return [];
@@ -28,6 +21,7 @@ export async function playerDetail(
     const opponent = index.teams.get(home ? match.awayTeamId : match.homeTeamId);
     if (!opponent) return [];
     return [{
+      matchId: match.id,
       matchday: match.round,
       scheduledAt: match.scheduledAt,
       opponentId: opponent.id,
@@ -52,15 +46,6 @@ export async function playerDetail(
     }];
   }).sort((left, right) => left.matchday - right.matchday);
   const seasonPoints = games.reduce((sum, game) => sum + game.points, 0);
-  const seasons = await playerSeasonHistory(catalog, playerId);
-  const availability = availabilitySignals?.season === index.season.startYear
-    ? availabilitySignals.leagues[index.season.leagueCode]?.players[playerId]
-    : null;
-  const currentSnapshot = clubProfiles?.leagueCode === index.season.leagueCode && clubProfiles.season === index.season.startYear ? clubProfiles : null;
-  const bio = currentSnapshot?.teams[player.teamId]?.squad[playerId] ?? null;
-  const careerEntry = playerCareers?.leagueCode === index.season.leagueCode && playerCareers.season === index.season.startYear
-    ? playerCareers.players[playerId] ?? null
-    : null;
   return {
     id: player.id,
     name: player.name,
@@ -73,16 +58,43 @@ export async function playerDetail(
     logoUrl: team.logoUrl,
     photoUrl: player.photoUrl,
     kickerUrl: kickerProfileUrl(index.season, player.name, team.name),
+    position: player.position,
+    priceM: player.priceM,
+    seasonPoints,
+    value: player.priceM > 0 && player.priceM < 999 ? seasonPoints / player.priceM : null,
+    games,
+  };
+}
+
+export function playerProfile(
+  index: SeasonIndex,
+  playerId: string,
+  news: NewsArtifact,
+  roleSignals: StaticRoleSignals | null,
+  availabilitySignals: StaticAvailabilitySignals | null,
+  clubProfiles: StaticClubProfiles | null,
+  playerCareers: StaticPlayerCareers | null,
+): PlayerProfile {
+  const player = index.players.get(playerId);
+  if (!player) throw new Error("Spieler wurde in dieser Saison nicht gefunden.");
+  const team = index.teams.get(player.teamId);
+  if (!team) throw new Error("Verein des Spielers wurde nicht gefunden.");
+  const kickerNews = kickerPlayerNewsLink(player.id, player.name);
+  const availability = availabilitySignals?.season === index.season.startYear
+    ? availabilitySignals.leagues[index.season.leagueCode]?.players[playerId]
+    : null;
+  const currentSnapshot = clubProfiles?.leagueCode === index.season.leagueCode && clubProfiles.season === index.season.startYear ? clubProfiles : null;
+  const bio = currentSnapshot?.teams[player.teamId]?.squad[playerId] ?? null;
+  const careerEntry = playerCareers?.leagueCode === index.season.leagueCode && playerCareers.season === index.season.startYear
+    ? playerCareers.players[playerId] ?? null
+    : null;
+  return {
     kickerNewsUrl: kickerNews.url,
     kickerNewsDirect: kickerNews.direct,
     transfermarktUrl: bio?.tmUrl ?? `https://www.transfermarkt.de/schnellsuche/ergebnis/schnellsuche?query=${encodeURIComponent(player.name)}`,
     ligaInsiderUrl: roleSignals?.league === index.season.leagueCode && roleSignals.season === index.season.startYear
       ? roleSignals.players[player.id]?.sourceUrl ?? null
       : null,
-    position: player.position,
-    priceM: player.priceM,
-    seasonPoints,
-    value: player.priceM > 0 && player.priceM < 999 ? seasonPoints / player.priceM : null,
     bio,
     career: careerEntry ? {
       generatedAt: playerCareers!.generatedAt,
@@ -92,8 +104,6 @@ export async function playerDetail(
       clubs: careerEntry.clubs,
       seasons: careerEntry.seasons ?? [],
     } : null,
-    seasons,
-    games,
     news: buildPlayerNews(news, player.id, team.id),
     availability: availability ? {
       status: availability.status,
@@ -107,7 +117,7 @@ export async function playerDetail(
   };
 }
 
-async function playerSeasonHistory(catalog: StaticCatalog, playerId: string): Promise<PlayerSeasonSummary[]> {
+export async function playerSeasonHistory(catalog: StaticCatalog, playerId: string): Promise<PlayerSeasonSummary[]> {
   const candidates = catalog.seasons.flatMap((season) => {
     const membership = season.players.find((player) => player.id === playerId);
     if (!membership) return [];

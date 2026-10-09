@@ -38,10 +38,10 @@ export function StandingsView({ filters, leagues, seasons, onFilter, onTeam, onP
         : loading || !standings ? <LoadingState />
           : standings.context.playedMatchCount < 1 ? <section className="detail-section"><Empty message="Für diese Auswahl liegen noch keine gespielten Partien vor." /></section>
             : <>
-              {insights && insights.cards.length > 0 && <InsightCards cards={insights.cards} onTeam={onTeam} onPlayer={onPlayer} />}
+              {insights && insights.cards.length > 0 && <InsightCards cards={insights.cards} onTeam={onTeam} onPlayer={onPlayer} onMatch={onMatch} />}
               {insights && insights.facts.length > 0 && <InsightFacts round={round} facts={insights.facts} onTeam={onTeam} onPlayer={onPlayer} />}
-              <FormTableCard standings={standings} league={filters.league} onTeam={onTeam} />
-              <BumpChartCard standings={standings} zones={leagueZones[filters.league] ?? []} />
+              <FormTableCard standings={standings} league={filters.league} onTeam={onTeam} onMatch={onMatch} />
+              <BumpChartCard standings={standings} onTeam={onTeam} zones={leagueZones[filters.league] ?? []} />
               <CrossTableCard standings={standings} onTeam={onTeam} onMatch={onMatch} />
             </>}
     </div>

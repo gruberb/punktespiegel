@@ -1,3 +1,5 @@
+import { useState } from "react";
+import { EntityNavigationContext } from "../components/entity-link";
 import { AppShell, Segmented } from "@gruberb/fun-ui";
 import { Empty, ErrorState, LoadingState } from "../components/feedback";
 import { PageHeader, StepperSelect } from "../components/page-controls";
@@ -23,22 +25,34 @@ export default function App() {
     updateTeamSeason, selectedPlayerSeason, playerSeasons, updatePlayerSeason, seasons,
     latestRound, overviewScope, setOverviewScope, overviewRound, catalogError,
     selectedSeason, openPlayer, openTeam, hasSeasonPoints, hasPreviousSeason,
-    playerColumns, updatePlayerColumns, playerId, playerSelectionPending, backLabel,
+    playerColumns, updatePlayerColumns, playerId, backLabel,
     goBack, teamId, teamSelectionPending, openMatch, matchId,
     replaceMatch,
   } = useAppModel();
 
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
+    try { return localStorage.getItem("punktespiegel.sidebarCollapsed") === "true"; }
+    catch { return false; }
+  });
+  function toggleSidebar() {
+    const next = !sidebarCollapsed;
+    setSidebarCollapsed(next);
+    // Storage can be unavailable in private or embedded browsing contexts.
+    try { localStorage.setItem("punktespiegel.sidebarCollapsed", String(next)); } catch { /* Keep the in-memory preference. */ }
+  }
+
   return (
+    <EntityNavigationContext value={{ filters, onPlayer: openPlayer, onTeam: openTeam }}>
     <AppShell
-      className={`view-${view}`}
+      className={`view-${view}${sidebarCollapsed ? " sidebar-collapsed" : ""}`}
       navLabel="Bereiche"
       activeId={navActive}
       onNavigate={(id) => setView(id as NavView)}
-      brand={<a href={viewHref("overview", filters)} onClick={(event) => { event.preventDefault(); setView("overview"); }} aria-label="Punktespiegel Startseite">
+      brand={<><a href={viewHref("overview", filters)} onClick={(event) => { event.preventDefault(); setView("overview"); }} aria-label="Punktespiegel Startseite">
         <img src={`${import.meta.env.BASE_URL}brand/punktespiegel-mark.svg`} alt="" aria-hidden="true" />
         <span>Punktespiegel</span>
-      </a>}
-      nav={nav.map((item) => ({ id: item.id, label: item.label, mobileLabel: navMobile[item.id].label, href: viewHref(item.id, filters), icon: navMobile[item.id].icon }))}
+      </a><button className="sidebar-toggle" onClick={toggleSidebar} aria-expanded={!sidebarCollapsed} aria-label={sidebarCollapsed ? "Seitenleiste ausklappen" : "Seitenleiste einklappen"} title={sidebarCollapsed ? "Seitenleiste ausklappen" : "Seitenleiste einklappen"}>{sidebarCollapsed ? "»" : "«"}</button></>}
+      nav={nav.map((item) => ({ id: item.id, label: item.label, mobileLabel: navMobile[item.id].label, href: viewHref(item.id, filters), icon: <span title={item.label}>{navMobile[item.id].icon}</span> }))}
     >
         {!isInfoView(view) && view !== "overview" && view !== "matchday" && view !== "match" && <PageHeader title={title ?? ""} description={description} controls={<div className="selectors">
             {view !== "team" && view !== "player" && <StepperSelect label="Liga" value={filters.league} options={(catalog?.leagues ?? []).map((league) => ({ value: league.code, label: league.name }))} onChange={(value) => updateFilter("league", value)} />}
@@ -60,7 +74,7 @@ export default function App() {
                 : <RankingsView scope={overviewScope} eleven={{ league: filters.league, season: String(selectedSeason?.startYear ?? filters.season), round: overviewRound }} onView={setView} onPlayer={openPlayer} onTeam={openTeam} />
             )}
             {view === "players" && <PlayersView filters={filters} seasonName={selectedSeason?.displayName ?? filters.season} hasSeasonPoints={hasSeasonPoints} hasPreviousSeason={hasPreviousSeason} columnsMode={playerColumns} onColumnsMode={updatePlayerColumns} onPlayer={openPlayer} />}
-            {view === "player" && playerId && (playerSelectionPending ? <LoadingState /> : <PlayerDetailView filters={filters} playerId={playerId} backLabel={backLabel} onBack={() => goBack("players")} onTeam={openTeam} onSeason={(year) => updatePlayerSeason(String(year))} />)}
+            {view === "player" && playerId && <PlayerDetailView key={playerId} filters={{ ...filters, league: selectedPlayerSeason?.leagueCode ?? filters.league, season: String(selectedPlayerSeason?.startYear ?? filters.season) }} playerId={playerId} backLabel={backLabel} onBack={() => goBack("players")} onTeam={openTeam} onSeason={(year) => updatePlayerSeason(String(year))} onMatch={openMatch} />}
             {view === "teams" && <TeamsView filters={filters} onTeam={openTeam} />}
             {view === "team" && teamId && (teamSelectionPending ? <LoadingState /> : <TeamDetailView filters={filters} teamId={teamId} backLabel={backLabel} onBack={() => goBack("teams")} onPlayer={openPlayer} onTeam={openTeam} onMatch={openMatch} />)}
             {view === "match" && matchId && <MatchDetailView filters={filters} matchId={matchId} backLabel={backLabel} onBack={() => goBack("overview")} onPlayer={openPlayer} onTeam={openTeam} onMatch={replaceMatch} />}
@@ -70,5 +84,6 @@ export default function App() {
         )}
         <SiteFooter currentView={view} filters={filters} onView={setView} />
     </AppShell>
+    </EntityNavigationContext>
   );
 }

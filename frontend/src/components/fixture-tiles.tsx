@@ -1,4 +1,5 @@
-import { LogoTile, MatchTile, MatchTiles } from "@gruberb/fun-ui";
+import { EntityLink } from "./entity-link";
+import { LogoTile, MatchTiles } from "@gruberb/fun-ui";
 import type { LeagueTableTeam } from "../types/models";
 
 export type TileMatch = { id: string; scheduledAt: string | null; home: LeagueTableTeam; away: LeagueTableTeam; homeScore: number | null; awayScore: number | null };
@@ -10,15 +11,20 @@ export function FixtureTiles({ matches, currentId, onMatch }: { matches: TileMat
     <MatchTiles>
       {matches.map((match) => {
         const played = match.homeScore != null && match.awayScore != null;
-        return <MatchTile
-          key={match.id}
-          time={formatTileSlot(match.scheduledAt)}
-          home={{ name: match.home.name, label: match.home.code, logo: <LogoTile code={match.home.code} url={match.home.logoUrl} />, score: match.homeScore }}
-          away={{ name: match.away.name, label: match.away.code, logo: <LogoTile code={match.away.code} url={match.away.logoUrl} />, score: match.awayScore }}
-          current={match.id === currentId}
-          onSelect={() => onMatch(match.id)}
-          ariaLabel={`${match.home.name} ${played ? `${match.homeScore}:${match.awayScore}` : "gegen"} ${match.away.name}: Spielbericht öffnen`}
-        />;
+        const label = `${match.home.name} ${played ? `${match.homeScore}:${match.awayScore}` : "gegen"} ${match.away.name}: Spielbericht öffnen`;
+        return <li key={match.id}><div className="fui-match-tile" aria-current={match.id === currentId ? "true" : undefined}>
+          <button className="text-link fui-match-tile__time" onClick={() => onMatch(match.id)} aria-label={label}>{formatTileSlot(match.scheduledAt)}</button>
+          {(["home", "away"] as const).map((side) => {
+            const team = match[side];
+            const score = side === "home" ? match.homeScore : match.awayScore;
+            const opponentScore = side === "home" ? match.awayScore : match.homeScore;
+            return <span key={side} className={`fui-match-tile__team${score != null && opponentScore != null && score > opponentScore ? " is-winner" : ""}`}>
+              <LogoTile code={team.code} url={team.logoUrl} />
+              <EntityLink kind="team" id={team.id}>{team.code}</EntityLink>
+              <b><button className="text-link" onClick={() => onMatch(match.id)} aria-label={label}>{played ? score : "–"}</button></b>
+            </span>;
+          })}
+        </div></li>;
       })}
     </MatchTiles>
   );

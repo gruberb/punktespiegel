@@ -1,3 +1,4 @@
+import { EntityLink } from "../../components/entity-link";
 import { LogoTile } from "@gruberb/fun-ui";
 import { PlayerPortrait, positionName } from "../../components/player-identity";
 import type { Position, TeamDetailMatch, TeamMatchContributor } from "../../types/models";
@@ -26,7 +27,7 @@ export function TeamMatchCard({ match, onTeam, onPlayer, onMatch }: { match: Tea
     <details className="team-match-card">
       <summary>
         <span className="matchday-badge">Spieltag {match.matchday}</span>
-        <span className="team-match-opponent"><LogoTile code={match.opponentCode} url={match.opponentLogoUrl} /><span><strong>{match.opponent}</strong><small>{formatDate(match.scheduledAt)} · {formatVenue(match.venue)}</small></span></span>
+        <span className="team-match-opponent"><LogoTile code={match.opponentCode} url={match.opponentLogoUrl} /><span><strong><EntityLink kind="team" id={match.opponentId}>{match.opponent}</EntityLink></strong><small>{formatDate(match.scheduledAt)} · {formatVenue(match.venue)}</small></span></span>
         <span className="team-match-result"><strong>{result}</strong></span>
         <span className="team-match-total"><strong>{match.totalPoints}</strong><small>Punkte</small></span>
         <span className="team-match-toggle" aria-hidden="true">⌄</span>

@@ -78,7 +78,7 @@ export function TeamDetailView({ filters, teamId, backLabel, onBack, onPlayer, o
         </div>}
         {tab === "transfers" && <div className="player-tab-panel" id="team-transfers-panel" role="tabpanel" aria-labelledby="team-transfers-tab">
           {profile && (profile.arrivals.length > 0 || profile.departures.length > 0)
-            ? <TeamTransferLedger profile={profile} onPlayer={onPlayer} />
+            ? <TeamTransferLedger profile={profile} />
             : <Empty message="Für diese Saison sind keine Transfers erfasst." />}
         </div>}
       </section>

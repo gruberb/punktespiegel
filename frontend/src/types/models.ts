@@ -17,6 +17,7 @@ export type Catalog = {
 
 export type Player = {
   id: string;
+  teamId: string;
   name: string;
   team: string;
   teamCode: string;
@@ -200,6 +201,7 @@ export type Dashboard = {
 };
 
 export type PlayerGame = {
+  matchId: string;
   matchday: number;
   scheduledAt: string | null;
   opponentId: string;
@@ -250,6 +252,9 @@ export type PlayerDetail = {
   news: PlayerNews;
   availability: PlayerAvailability | null;
 };
+
+export type PlayerProfile = Pick<PlayerDetail, "bio" | "career" | "news" | "availability" | "kickerNewsUrl" | "kickerNewsDirect" | "transfermarktUrl" | "ligaInsiderUrl">;
+export type PlayerSeasonDetail = Omit<PlayerDetail, keyof PlayerProfile | "seasons">;
 
 export type PlayerAvailability = {
   status: "injured" | "rehab" | "suspended" | "not_considered" | "unavailable";
@@ -476,6 +481,7 @@ export type TeamDetail = {
 
 export type BestElevenPlayer = {
   id: string;
+  teamId: string;
   name: string;
   team: string;
   teamCode: string;
@@ -518,9 +524,9 @@ export type InsightSubject = {
 };
 
 export type InsightVisual =
-  | { type: "results"; label: string; summary: string; rows: { round: number; outcome: "S" | "U" | "N"; score: string; opponent: string; home: boolean }[] }
-  | { type: "roundValues"; label: string; unit: string; summary: string; rows: { round: number; value: number; opponent: string | null }[] }
-  | { type: "outcomes"; label: string; values: ("H" | "U" | "A")[]; matches?: { home: InsightSubject; away: InsightSubject; score: string }[] };
+  | { type: "results"; label: string; summary: string; rows: { matchId?: string; opponentId?: string; round: number; outcome: "S" | "U" | "N"; score: string; opponent: string; home: boolean }[] }
+  | { type: "roundValues"; label: string; unit: string; summary: string; rows: { matchId?: string; opponentId?: string; round: number; value: number; opponent: string | null }[] }
+  | { type: "outcomes"; label: string; values: ("H" | "U" | "A")[]; matches?: { matchId?: string; home: InsightSubject; away: InsightSubject; score: string }[] };
 
 export type InsightCard = {
   id: string;

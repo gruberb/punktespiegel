@@ -1,3 +1,4 @@
+import { EntityLink } from "../../components/entity-link";
 import { LogoTile } from "@gruberb/fun-ui";
 import { useCallback } from "react";
 import { Empty, ErrorState, LoadingState } from "../../components/feedback";
@@ -53,7 +54,7 @@ export function MatchDetailView({ filters, matchId, backLabel, onBack, onPlayer,
             <div className="match-subs">
               {[home, away].map((side) => (
                 <div key={side.team.id}>
-                  <h4>Eingewechselt · {side.team.code}</h4>
+                  <h4>Eingewechselt · <EntityLink kind="team" id={side.team.id}>{side.team.code}</EntityLink></h4>
                   {side.players.filter((player) => !player.starter).length
                     ? <ul>{side.players.filter((player) => !player.starter).map((player) => <li key={player.id}><button onClick={() => onPlayer(player.id)}>{player.name}</button><span>{formatGrade(player.grade)}</span></li>)}</ul>
                     : <p>keine gewerteten Einwechslungen</p>}
@@ -64,7 +65,7 @@ export function MatchDetailView({ filters, matchId, backLabel, onBack, onPlayer,
           <aside className="match-aside">
             <div className="section-copy"><p className="fui-kicker">Mannschaften</p><h2>Vergleich</h2></div>
             <div className="match-compare">
-              <header><span>{home.team.code}</span><span>{away.team.code}</span></header>
+              <header><span><EntityLink kind="team" id={home.team.id}>{home.team.code}</EntityLink></span><span><EntityLink kind="team" id={away.team.id}>{away.team.code}</EntityLink></span></header>
               {comparison.map((row) => {
                 const total = Math.abs(row.home ?? 0) + Math.abs(row.away ?? 0);
                 const homeShare = total ? Math.abs(row.home ?? 0) / total : .5;
@@ -80,18 +81,18 @@ export function MatchDetailView({ filters, matchId, backLabel, onBack, onPlayer,
                 );
               })}
             </div>
-            {detail.mvp && <button className="report-spotlight match-mvp" onClick={() => onPlayer(detail.mvp!.id)}>
+            {detail.mvp && <div className="report-spotlight match-mvp" onClick={() => onPlayer(detail.mvp!.id)}>
               <span className="fui-kicker">Spieler des Spiels</span>
               <PlayerPortrait name={detail.mvp.name} url={detail.mvp.photoUrl} teamCode={detail.mvp.team.code} teamLogoUrl={detail.mvp.team.logoUrl} large />
-              <strong>{detail.mvp.name}</strong>
-              <small>{detail.mvp.team.name} · {positionName[detail.mvp.position]}</small>
+              <strong><EntityLink kind="player" id={detail.mvp.id}>{detail.mvp.name}</EntityLink></strong>
+              <small><EntityLink kind="team" id={detail.mvp.team.id}>{detail.mvp.team.name}</EntityLink> · {positionName[detail.mvp.position]}</small>
               <dl>
                 <div><dt>Note</dt><dd>{formatGrade(detail.mvp.grade)}</dd></div>
                 <div><dt>Punkte</dt><dd>{detail.mvp.points}</dd></div>
                 <div><dt>Tore</dt><dd>{detail.mvp.goals}</dd></div>
                 <div><dt>Vorl.</dt><dd>{detail.mvp.assists}</dd></div>
               </dl>
-            </button>}
+            </div>}
           </aside>
         </div>
         <section className="tabelle-block">
@@ -101,7 +102,7 @@ export function MatchDetailView({ filters, matchId, backLabel, onBack, onPlayer,
               <thead><tr><th>Spieler</th><th>Position</th><th className="fui-num">Note</th><th className="fui-num">Tore</th><th className="fui-num">Vorl.</th><th>Rolle</th><th className="fui-num">Punkte</th></tr></thead>
               <tbody>{allPlayers.map(({ player, team }) => (
                 <tr key={player.id} className="clickable-row" tabIndex={0} onClick={() => onPlayer(player.id)} onKeyDown={(event) => { if (event.key === "Enter") onPlayer(player.id); }}>
-                  <td><span className="squad-player"><PlayerPortrait name={player.name} url={player.photoUrl} teamCode={team.code} teamLogoUrl={team.logoUrl} /><span><PlayerName name={player.name} /><small>{team.name}</small></span></span></td>
+                  <td><span className="squad-player"><PlayerPortrait name={player.name} url={player.photoUrl} teamCode={team.code} teamLogoUrl={team.logoUrl} /><span><PlayerName name={player.name} /><small><EntityLink kind="team" id={team.id}>{team.name}</EntityLink></small></span></span></td>
                   <td><PositionTag position={player.position} /></td>
                   <td className="fui-num">{formatGrade(player.grade)}</td>
                   <td className="fui-num">{player.goals}</td>
@@ -123,7 +124,7 @@ function LineupHalf({ side, reversed = false, onPlayer }: { side: MatchSide; rev
   const starters = side.players.filter((player) => player.starter);
   return (
     <div className={`pitch-half ${reversed ? "away" : "home"}`}>
-      <span className="pitch-team"><LogoTile code={side.team.code} url={side.team.logoUrl} />{side.team.code}{side.averageGrade != null && <small>Ø {side.averageGrade.toFixed(2).replace(".", ",")}</small>}</span>
+      <span className="pitch-team"><LogoTile code={side.team.code} url={side.team.logoUrl} /><EntityLink kind="team" id={side.team.id}>{side.team.code}</EntityLink>{side.averageGrade != null && <small>Ø {side.averageGrade.toFixed(2).replace(".", ",")}</small>}</span>
       {order.map((position) => {
         const players = starters.filter((player) => player.position === position);
         return players.length ? <div className="pitch-row" key={position}>{players.map((player) => (

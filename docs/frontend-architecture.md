@@ -68,6 +68,61 @@ AppShell. `components` ergänzt projektspezifische Bausteine wie Spielerporträt
 und Spielkacheln. Eine nur im Spielerprofil verwendete Karriereansicht bleibt
 dagegen in `features/players`.
 
+## Unabhängige Ladebereiche im Spielerprofil
+
+Ein Saisonwechsel ersetzt nur saisonabhängige Inhalte. `App` hält
+`PlayerDetailView` für dieselbe Spieler-ID gemountet und übergibt die aufgelöste
+Liga und Saison direkt. Ein anderer Spieler erhält über `key={playerId}` einen
+neuen Komponentenbaum.
+
+| Abfrage | Abhängigkeiten | Darstellung |
+| --- | --- | --- |
+| `api.playerSeason` | Spieler-ID, Liga, Saison | Profilkopf, Saisonpunkte und Spiele; benötigt nur den Saison-Snapshot |
+| `api.playerHistory` in `PlayerSeasons` | Spieler-ID | Gesamte Saisontabelle; bleibt bei Saisonwechseln erhalten |
+| `api.playerProfile` | Spieler-ID, Liga, Saison | Bio, Marktwert-Ergänzung, Karriere, News und Verfügbarkeit; blockiert weder Spiele noch Historie |
+
+```mermaid
+flowchart LR
+  Auswahl[Saisonwahl] --> Saison[playerSeason]
+  Auswahl --> Profil[playerProfile]
+  Spieler[Spieler-ID] --> Historie[playerHistory]
+  Saison --> Kopf[Profilkopf und Saisonverlauf]
+  Profil --> Extras[Profil und Karriere]
+  Historie --> Tabelle[Punkte nach Saison]
+```
+
+Der letzte erfolgreiche Profilkopf bleibt während des Ladens mit seiner alten
+Saisonbeschriftung sichtbar. Ein Statushinweis kennzeichnet diesen Zustand.
+Spiele und Profilergänzungen verwenden ausschließlich die aktuell angeforderten
+Daten. Ladefehler bleiben im jeweiligen Bereich. Ein fehlender Archiv-Snapshot
+blockiert damit keine verfügbaren Spiele. Fehlgeschlagene Saison-Downloads werden
+aus dem Promise-Cache entfernt, damit eine spätere Auswahl erneut laden kann.
+Die Dateien bleiben Saison-Snapshots; dies ist keine zusätzliche Backend-API.
+
+## Navigation und Seitenleiste
+
+`EntityLink` verwendet die von `App` bereitgestellten Filter und Navigationsaktionen.
+Ein normaler Klick wechselt die React-Ansicht. Der echte `href` erhält Liga,
+Saison und ID für neue Tabs und kopierte Links. Ereignisse aus einem Team-Link
+lösen nicht zusätzlich die Spieleraktion einer umgebenden Zeile aus.
+
+`linkInsights` ergänzt ältere Insight-Dateien um kanonische Spiel- und Gegner-IDs.
+Die Zuordnung nutzt Spieltag und Vereins-IDs beziehungsweise die Wertungen des
+Spielers. Anzeigenamen und die Reihenfolge der Spielkacheln sind keine Schlüssel.
+Fehlende oder mehrdeutige Partien erhalten keinen geratenen Link. Transfernamen
+ohne interne ID verweisen auf Transfermarkt; ein Verein ohne ID auf dessen Suche.
+
+`HoverCard` ersetzt die nicht interaktiven Tooltip-Panels der UI-Bibliothek dort,
+wo Navigation im Panel nötig ist. Eine kurze, konfigurierbare Schließverzögerung
+überbrückt den Abstand zwischen Auslöser und Panel. Fokus hält die Karte offen;
+Pfeil-ab am Auslöser fokussiert den ersten Link, Escape schließt die Karte und
+gibt den Fokus zurück. Layout und Farben verwenden weiter fun-ui-Klassen.
+
+Die Desktop-Seitenleiste lässt sich auf eine Icon-Leiste reduzieren. `App` hält
+den Zustand und speichert ihn unter `punktespiegel.sidebarCollapsed`. Ohne Zugriff
+auf `localStorage` funktioniert der Schalter weiterhin für die Sitzung. Unter
+861 Pixeln bleibt die mobile Navigation unabhängig davon vollständig sichtbar.
+
 ## Datenfluss vom Klick zur Darstellung
 
 ```mermaid
@@ -213,3 +268,12 @@ Modul; der Testbefehl findet sie rekursiv. Die Architekturprüfung verwendet den
 bereits installierten TypeScript-Parser und benötigt keine weitere Abhängigkeit.
 Im Browser zusätzlich Einstieg per URL, Filterwechsel, Liste zu Detail und
 Zurück sowie den betroffenen Fehler- oder Leerzustand prüfen.
+
+## Interaktionstests
+
+`npm test --workspace frontend` prüft zusätzlich mit React DOM und jsdom:
+verzögerte Saisonwechsel, unveränderte DOM-Knoten für Profilkopf/Tabs/Historie,
+überholte Antworten, getrennte Fehler, Spielerwechsel, Entity-Links,
+Spielauswahl ohne auslösende Elternzeile und gespeicherte Sidebar-Präferenzen.
+`testing/register-ts.mjs` nutzt den bereits installierten TypeScript-Compiler für
+die Testimporte. Die Browserprüfung ergänzt Layout und responsive Navigation.

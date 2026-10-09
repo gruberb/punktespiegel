@@ -50,6 +50,7 @@ export function loadSeason(params: URLSearchParams): Promise<SeasonIndex> {
       };
     });
     seasonCache.set(id, pending);
+    void pending.catch(() => { if (seasonCache.get(id) === pending) seasonCache.delete(id); });
   }
   return pending;
 }

@@ -1,5 +1,6 @@
+import { useHoverCard } from "../../components/hover-card";
 import type { StickerShape } from "@gruberb/fun-ui";
-import { Crosshair, FormChip, LogoTile, Sticker, usePopoverHover } from "@gruberb/fun-ui";
+import { Crosshair, FormChip, LogoTile, Sticker } from "@gruberb/fun-ui";
 import type { PopoverTeam } from "../../components/match-popover";
 import { MatchPopover } from "../../components/match-popover";
 import { PlayerPortrait } from "../../components/player-identity";
@@ -7,7 +8,7 @@ import type { InsightCard as InsightCardData, InsightFact, InsightSubject, Insig
 import { formOutcome } from "../../utils/football";
 import { initialsOf } from "../../utils/format";
 
-export function InsightCards({ cards, onTeam, onPlayer }: { cards: InsightCardData[]; onTeam: (id: string) => void; onPlayer: (id: string) => void }) {
+export function InsightCards({ cards, onTeam, onPlayer, onMatch }: { cards: InsightCardData[]; onMatch: (id: string) => void; onTeam: (id: string) => void; onPlayer: (id: string) => void }) {
   return (
     <section className="insight-band fui-grid-paper" aria-label="Spieltag auf einen Blick">
       {cards.map((card) => (
@@ -17,10 +18,10 @@ export function InsightCards({ cards, onTeam, onPlayer }: { cards: InsightCardDa
             <div className="insight-beside-sticker"><dt>Frage</dt><dd className="insight-question">{card.question}</dd></div>
             <div className="insight-beside-sticker"><dt>Ergebnis</dt><dd className="insight-answer">
               {card.subject && <SubjectMedia subject={card.subject} onTeam={onTeam} onPlayer={onPlayer} />}
-              <span>{card.answer}</span>
+              {card.subject ? <button className="text-link" onClick={() => (card.subject!.kind === "team" ? onTeam : onPlayer)(card.subject!.id)}>{card.answer}</button> : <span>{card.answer}</span>}
             </dd></div>
             <div><dt>{card.detailLabel}</dt><dd>{card.detail}</dd></div>
-            <div><dt>{card.visual.label}</dt><dd><InsightVisual visual={card.visual} /></dd></div>
+            <div><dt>{card.visual.label}</dt><dd><InsightVisual visual={card.visual} onTeam={onTeam} onMatch={onMatch} /></dd></div>
           </dl>
           <Sticker shape={stickerShapes[card.kind] ?? "trophy"} />
           <Crosshair />
@@ -30,12 +31,12 @@ export function InsightCards({ cards, onTeam, onPlayer }: { cards: InsightCardDa
   );
 }
 
-function InsightVisual({ visual }: { visual: InsightVisualData }) {
+function InsightVisual({ visual, onTeam, onMatch }: { visual: InsightVisualData; onTeam: (id: string) => void; onMatch: (id: string) => void }) {
   if (visual.type === "results") {
     return <>
       {visual.summary && <p className="insight-summary">{visual.summary}</p>}
       <ol className="insight-rows">{visual.rows.map((row) => (
-        <li key={row.round}><span>ST {row.round}</span><FormChip outcome={formOutcome[row.outcome]}>{row.outcome}</FormChip><b>{row.score}</b><span>{row.home ? "gegen" : "bei"} {row.opponent}</span></li>
+        <li key={row.round}><span>ST {row.round}</span><FormChip outcome={formOutcome[row.outcome]}>{row.outcome}</FormChip><b>{row.matchId ? <button className="text-link" onClick={() => onMatch(row.matchId!)} aria-label={`Spieltag ${row.round}: Spielbericht öffnen`}>{row.score}</button> : row.score}</b><span>{row.home ? "gegen" : "bei"} {row.opponentId ? <button className="text-link" onClick={() => onTeam(row.opponentId!)}>{row.opponent}</button> : row.opponent}</span></li>
       ))}</ol>
     </>;
   }
@@ -43,24 +44,24 @@ function InsightVisual({ visual }: { visual: InsightVisualData }) {
     return <>
       {visual.summary && <p className="insight-summary">{visual.summary}</p>}
       <ol className="insight-rows">{visual.rows.map((row) => (
-        <li key={row.round}><span>ST {row.round}</span><b>{row.value}</b><small>{visual.unit}</small><span>{row.opponent ? `gegen ${row.opponent}` : ""}</span></li>
+        <li key={row.round}><span>{row.matchId ? <button className="text-link" onClick={() => onMatch(row.matchId!)} aria-label={`Spieltag ${row.round}: Spielbericht öffnen`}>ST {row.round}</button> : `ST ${row.round}`}</span><b>{row.value}</b><small>{visual.unit}</small><span>{row.opponent && <>gegen {row.opponentId ? <button className="text-link" onClick={() => onTeam(row.opponentId!)}>{row.opponent}</button> : row.opponent}</>}</span></li>
       ))}</ol>
     </>;
   }
   if (visual.type !== "outcomes") return null;
-  return <span className="insight-outcomes">{visual.values.map((value, index) => <OutcomeSquare key={index} value={value} match={visual.matches?.[index]} />)}</span>;
+  return <span className="insight-outcomes">{visual.values.map((value, index) => <OutcomeSquare key={index} value={value} match={visual.matches?.[index]} onMatch={onMatch} onTeam={onTeam} />)}</span>;
 }
 
 const outcomeName = { H: "Heimsieg", U: "Unentschieden", A: "Auswärtssieg" } as const;
 
-function OutcomeSquare({ value, match }: { value: "H" | "U" | "A"; match?: { home: InsightSubject; away: InsightSubject; score: string } }) {
-  const hover = usePopoverHover<HTMLElement>();
-  const team = (subject: InsightSubject): PopoverTeam => ({ name: subject.name, code: subject.short ?? initialsOf(subject.name), logoUrl: subject.imageUrl ?? null });
+function OutcomeSquare({ value, match, onMatch, onTeam }: { value: "H" | "U" | "A"; match?: { matchId?: string; home: InsightSubject; away: InsightSubject; score: string }; onMatch: (id: string) => void; onTeam: (id: string) => void }) {
+  const hover = useHoverCard<HTMLElement>();
+  const team = (subject: InsightSubject): PopoverTeam => ({ id: subject.id, name: subject.name, code: subject.short ?? initialsOf(subject.name), logoUrl: subject.imageUrl ?? null });
   if (!match) return <i className={`outcome-${value.toLowerCase()}`} title={outcomeName[value]}>{value}</i>;
   return (
-    <i ref={hover.ref} className={`outcome-${value.toLowerCase()}`} tabIndex={0} aria-label={`${outcomeName[value]}: ${match.home.name} ${match.score} ${match.away.name}`} {...hover.handlers}>
+    <i role={match.matchId ? "button" : undefined} onClick={() => match.matchId && onMatch(match.matchId)} onKeyDown={(event) => { if (event.target === event.currentTarget && match.matchId && (event.key === "Enter" || event.key === " ")) { event.preventDefault(); onMatch(match.matchId); } }} ref={hover.ref} className={`outcome-${value.toLowerCase()}`} tabIndex={0} aria-label={`${outcomeName[value]}: ${match.home.name} ${match.score} ${match.away.name}`} {...hover.handlers}>
       {value}
-      <MatchPopover hover={hover} title={outcomeName[value]} status="Spiel des Spieltags" home={team(match.home)} away={team(match.away)} score={match.score} />
+      <MatchPopover hover={hover} title={outcomeName[value]} status="Spiel des Spieltags" home={team(match.home)} away={team(match.away)} score={match.score} onMatch={match.matchId ? () => onMatch(match.matchId!) : undefined} onTeam={onTeam} />
     </i>
   );
 }

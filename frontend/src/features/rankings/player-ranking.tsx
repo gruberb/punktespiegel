@@ -1,3 +1,4 @@
+import { EntityLink } from "../../components/entity-link";
 import type { DataTableColumn } from "@gruberb/fun-ui";
 import { DataTable } from "@gruberb/fun-ui";
 import { Empty } from "../../components/feedback";
@@ -44,12 +45,12 @@ export function PlayerRanking({ players, metric, onPlayer, scrollable = false, s
     <ol className={`player-ranking ${scrollable ? "scrollable" : ""}`}>
       {players.map((player, index) => (
         <li key={player.id}>
-          <button onClick={() => onPlayer(player.id)}>
+          <div className="entity-row" onClick={() => onPlayer(player.id)}>
             <span className="rank">{index + 1}</span>
             <PlayerPortrait name={player.name} url={player.photoUrl} teamCode={player.teamCode} teamLogoUrl={player.logoUrl} />
-            <span className="player-identity"><strong>{player.name}</strong><small>{metric === "cardDeductions" ? `${player.team} · ${formatCardCounts(scope === "matchday" ? player.roundRedCards : player.redCards, scope === "matchday" ? player.roundYellowRedCards : player.yellowRedCards)}` : `${player.team} · ${positionName[player.position]}`}</small></span>
+            <span className="player-identity"><strong><EntityLink kind="player" id={player.id}>{player.name}</EntityLink></strong><small><EntityLink kind="team" id={player.teamId}>{player.team}</EntityLink> · {metric === "cardDeductions" ? formatCardCounts(scope === "matchday" ? player.roundRedCards : player.redCards, scope === "matchday" ? player.roundYellowRedCards : player.yellowRedCards) : positionName[player.position]}</small></span>
             <span className="ranking-value"><strong>{playerRankingValue(player, metric, scope)}</strong><small>{suffix}</small></span>
-          </button>
+          </div>
         </li>
       ))}
     </ol>
@@ -68,7 +69,7 @@ export function OverviewPlayerTable({ players, metric, scope = "season", onPlaye
         <span><PlayerName name={player.name} /></span>
       </div>,
     },
-    { id: "team", label: "Team", width: "28%", render: (player) => <span className="overview-table-text" title={player.team}>{player.team}</span> },
+    { id: "team", label: "Team", width: "28%", render: (player) => <span className="overview-table-text" title={player.team}><EntityLink kind="team" id={player.teamId}>{player.team}</EntityLink></span> },
     { id: "position", label: "Position", shortLabel: "Pos.", width: "17%", render: (player) => <span className="overview-table-text" title={positionName[player.position]}>{positionName[player.position]}</span> },
     {
       id: "value",

@@ -1,3 +1,4 @@
+import { EntityLink } from "../../components/entity-link";
 import type { DataTableColumn } from "@gruberb/fun-ui";
 import { DataTable, Notice, Segmented } from "@gruberb/fun-ui";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -46,7 +47,7 @@ export function PlayersView({ filters, seasonName, hasSeasonPoints, hasPreviousS
   ), sort, direction);
   const sortProps = (column: PlayerSort) => ({ active: sort === column, direction, onSort: () => sortBy(column) });
   const identityColumns: DataTableColumn<PlayerTableRow>[] = [
-    { id: "player", label: "Spieler", width: "29%", sort: sortProps("name"), render: (player, index) => <div className="table-player"><span className="rank">{index + 1}</span><PlayerPortrait name={player.name} url={player.photoUrl} teamCode={player.teamCode} teamLogoUrl={player.logoUrl} /><span><PlayerName name={player.name} /><small>{player.team}</small></span></div> },
+    { id: "player", label: "Spieler", width: "29%", sort: sortProps("name"), render: (player, index) => <div className="table-player"><span className="rank">{index + 1}</span><PlayerPortrait name={player.name} url={player.photoUrl} teamCode={player.teamCode} teamLogoUrl={player.logoUrl} /><span><PlayerName name={player.name} /><small><EntityLink kind="team" id={player.teamId}>{player.team}</EntityLink></small></span></div> },
     { id: "position", label: "Position", shortLabel: "Pos.", sort: sortProps("position"), render: (player) => <PositionTag position={player.position} /> },
     { id: "price", label: "Marktwert", shortLabel: "Wert", numeric: true, sort: sortProps("price"), render: (player) => formatMarketValue(player.priceM) },
   ];

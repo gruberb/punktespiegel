@@ -53,8 +53,7 @@ export function useAppModel() {
   const overviewRound = Math.min(Math.max(1, Number(filters.round) || 1), Math.max(1, latestRound));
   const teamSelectionPending = Boolean(selectedTeamSeason)
     && (filters.league !== selectedTeamSeason?.leagueCode || filters.season !== String(selectedTeamSeason?.startYear));
-  const playerSelectionPending = Boolean(selectedPlayerSeason)
-    && (filters.league !== selectedPlayerSeason?.leagueCode || filters.season !== String(selectedPlayerSeason?.startYear));
+
 
   usePageMetadata({ catalog, filters, matchId, playerId, teamId, view, seasonName: selectedSeason?.displayName });
 
@@ -291,7 +290,7 @@ export function useAppModel() {
     updateTeamSeason, selectedPlayerSeason, playerSeasons, updatePlayerSeason, seasons,
     latestRound, overviewScope, setOverviewScope, overviewRound, catalogError,
     selectedSeason, openPlayer, openTeam, hasSeasonPoints, hasPreviousSeason,
-    playerColumns, updatePlayerColumns, playerId, playerSelectionPending, backLabel,
+    playerColumns, updatePlayerColumns, playerId, backLabel,
     goBack, teamId, teamSelectionPending, openMatch, matchId,
     replaceMatch,
   };

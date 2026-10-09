@@ -1,3 +1,4 @@
+import { EntityLink } from "../../components/entity-link";
 import { SimpleCardHead } from "@gruberb/fun-ui";
 import { useCallback } from "react";
 import { BestPlayerCard, groupBestEleven } from "../../components/best-eleven";
@@ -35,21 +36,21 @@ export function MatchdayReport({ filters, round, onPlayer }: { filters: Filters;
       <div className="section-copy"><p className="fui-kicker">Spieltag {round} · Noten und Ranglisten</p><h2>Spieltag kompakt</h2></div>
       <div className="report-top">
         <div className="report-side">
-          {spotlight && <button className="report-spotlight" onClick={() => onPlayer(spotlight.id)}>
+          {spotlight && <div className="report-spotlight" onClick={() => onPlayer(spotlight.id)}>
             <span className="fui-kicker">Spieler des Tages</span>
             <PlayerPortrait name={spotlight.name} url={spotlight.photoUrl} teamCode={spotlight.teamCode} teamLogoUrl={spotlight.logoUrl} large />
-            <strong>{spotlight.name}</strong>
-            <small>{spotlight.team} · {positionName[spotlight.position]}</small>
+            <strong><EntityLink kind="player" id={spotlight.id}>{spotlight.name}</EntityLink></strong>
+            <small><EntityLink kind="team" id={spotlight.teamId}>{spotlight.team}</EntityLink> · {positionName[spotlight.position]}</small>
             <dl>
               <div><dt>Note</dt><dd>{spotlight.roundGrade?.toLocaleString("de-DE", { minimumFractionDigits: 1, maximumFractionDigits: 2 }) ?? "—"}</dd></div>
               <div><dt>Punkte</dt><dd>{spotlight.roundPoints}</dd></div>
               <div><dt>Tore</dt><dd>{spotlight.roundGoals}</dd></div>
               <div><dt>Vorl.</dt><dd>{spotlight.roundAssists}</dd></div>
             </dl>
-          </button>}
+          </div>}
           <div className="report-cards">
             <span className="fui-kicker">Platzverweise · Saison</span>
-            {sentOff.length ? <ol>{sentOff.map((player) => <li key={player.id}><button onClick={() => onPlayer(player.id)}><strong>{player.name}</strong><small>{player.team} · {formatCardCounts(player.redCards, player.yellowRedCards)}</small></button></li>)}</ol> : <p>niemand</p>}
+            {sentOff.length ? <ol>{sentOff.map((player) => <li key={player.id}><div className="entity-row" onClick={() => onPlayer(player.id)}><strong><EntityLink kind="player" id={player.id}>{player.name}</EntityLink></strong><small><EntityLink kind="team" id={player.teamId}>{player.team}</EntityLink> · {formatCardCounts(player.redCards, player.yellowRedCards)}</small></div></li>)}</ol> : <p>niemand</p>}
           </div>
         </div>
         {grouped && eleven && <div className="report-eleven dashboard-card">
@@ -76,12 +77,12 @@ function RankList({ title, note, rows, onPlayer }: { title: string; note: string
     <article className="rank-list dashboard-card">
       <header><h3>{title}</h3><span>{note}</span></header>
       {rows.length ? <ol>{rows.map(({ player, value, extra }, index) => (
-        <li key={player.id}><button onClick={() => onPlayer(player.id)}>
+        <li key={player.id}><div className="entity-row" onClick={() => onPlayer(player.id)}>
           <span className="rank">{index + 1}</span>
           <PlayerPortrait name={player.name} url={player.photoUrl} teamCode={player.teamCode} teamLogoUrl={player.logoUrl} />
-          <span className="player-identity"><strong>{player.name}</strong><small>{player.team}</small></span>
+          <span className="player-identity"><strong><EntityLink kind="player" id={player.id}>{player.name}</EntityLink></strong><small><EntityLink kind="team" id={player.teamId}>{player.team}</EntityLink></small></span>
           <span className="rank-list-value"><b>{value}</b><small>{extra}</small></span>
-        </button></li>
+        </div></li>
       ))}</ol> : <p className="rank-list-empty">Noch keine Einträge.</p>}
     </article>
   );
