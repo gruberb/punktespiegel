@@ -27,12 +27,12 @@ export function TeamDetailView({ filters, teamId, backLabel, onBack, onPlayer, o
   ));
   return <div className="team-detail-view"><section className="detail-section team-detail-section">
     <button className="back-button" onClick={onBack}>← {backLabel}</button>
-    <ResourcePanel resource={season} label="Mannschaftsprofil" identity={teamId}>{(detail) => <TeamHeader detail={detail} />}</ResourcePanel>
-    <ResourcePanel resource={supplement} label="Vereinsdaten" identity={teamId}>{(detail) => <ClubFacts detail={detail} onPlayer={onPlayer} />}</ResourcePanel>
+    <ResourcePanel feedback="quiet" resource={season} label="Mannschaftsprofil" identity={teamId}>{(detail) => <TeamHeader detail={detail} />}</ResourcePanel>
+    <ResourcePanel feedback="quiet" resource={supplement} label="Vereinsdaten" identity={teamId}>{(detail) => <ClubFacts detail={detail} onPlayer={onPlayer} />}</ResourcePanel>
         <Segmented role="tablist" className="profile-tabs" ariaLabel="Mannschaftsprofil-Bereiche" value={tab} onChange={(value) => setTab(value as TeamTab)}
           options={([["matches", "Spiele"], ["squad", "Kader"], ["transfers", "Transfers"]] as [TeamTab, string][]).map(([id, label]) => ({ value: id, label, id: `team-${id}-tab`, controls: `team-${id}-panel` }))} />
     {tab === "matches" && <div className="player-tab-panel" id="team-matches-panel" role="tabpanel" aria-labelledby="team-matches-tab">
-      <ResourcePanel resource={season} label="Mannschaftsspiele" identity={teamId}>{(detail) => (
+      <ResourcePanel feedback="overlay" resource={season} label="Mannschaftsspiele" identity={teamId}>{(detail) => (
           <section className="team-season-summary">
             <CardHead eyebrow="Saisonverlauf" title="Jedes Spiel im Detail" subtitle="Punkte nach Mannschaftsteil und Aktion" />
             <div className="team-match-list">
@@ -40,7 +40,7 @@ export function TeamDetailView({ filters, teamId, backLabel, onBack, onPlayer, o
             </div>
           </section>
       )}</ResourcePanel>
-      <ResourcePanel resource={supplement} label="Mannschaftsthemen" identity={teamId}>{(detail) => <>
+      <ResourcePanel feedback="overlay" resource={supplement} label="Mannschaftsthemen" identity={teamId}>{(detail) => <>
         {detail.externalSources && (
           <section className="player-news team-source-news" aria-labelledby="team-news-title">
             <div className="section-copy news-heading">
@@ -53,11 +53,11 @@ export function TeamDetailView({ filters, teamId, backLabel, onBack, onPlayer, o
       </>}</ResourcePanel>
     </div>}
     {tab === "squad" && <div className="player-tab-panel" id="team-squad-panel" role="tabpanel" aria-labelledby="team-squad-tab">
-      <ResourcePanel resource={season} label="Kader" identity={teamId}>{(detail) => <TeamSquadByPosition detail={{ ...detail, profile: null, likelyEleven: null, externalSources: null, ...supplement.data }} onPlayer={onPlayer} />}</ResourcePanel>
-      <ResourcePanel resource={supplement} label="Mögliche Startelf" identity={teamId}>{(detail) => detail.likelyEleven && season.data && <TeamLikelyEleven eleven={detail.likelyEleven} teamCode={season.data.code} teamLogoUrl={season.data.logoUrl} onPlayer={onPlayer} />}</ResourcePanel>
+      <ResourcePanel feedback="overlay" resource={season} label="Kader" identity={teamId}>{(detail) => <TeamSquadByPosition detail={{ ...detail, profile: null, likelyEleven: null, externalSources: null, ...supplement.data }} onPlayer={onPlayer} />}</ResourcePanel>
+      <ResourcePanel feedback="overlay" resource={supplement} label="Mögliche Startelf" identity={teamId}>{(detail) => detail.likelyEleven && season.data && <TeamLikelyEleven eleven={detail.likelyEleven} teamCode={season.data.code} teamLogoUrl={season.data.logoUrl} onPlayer={onPlayer} />}</ResourcePanel>
     </div>}
     {tab === "transfers" && <div className="player-tab-panel" id="team-transfers-panel" role="tabpanel" aria-labelledby="team-transfers-tab">
-      <ResourcePanel resource={supplement} label="Transfers" identity={teamId}>{({ profile }) => profile && (profile.arrivals.length > 0 || profile.departures.length > 0)
+      <ResourcePanel feedback="overlay" resource={supplement} label="Transfers" identity={teamId}>{({ profile }) => profile && (profile.arrivals.length > 0 || profile.departures.length > 0)
         ? <TeamTransferLedger profile={profile} /> : <Empty message="Für diese Saison sind keine Transfers erfasst." />}</ResourcePanel>
     </div>}
   </section></div>;

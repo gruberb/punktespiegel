@@ -282,8 +282,9 @@ die Testimporte. Die Browserprüfung ergänzt Layout und responsive Navigation.
 
 `useResource` liefert ausschließlich Daten zur aktuellen Abfrage. `ResourcePanel`
 behält die letzte erfolgreiche Darstellung während einer neuen Abfrage oder eines
-Fehlers bei. Ein sichtbarer Hinweis kennzeichnet diese Daten; `inert` sperrt Maus,
-Tastatur und Links im alten Inhalt. Dadurch können alte IDs nicht mit neuen Filtern
+Fehlers bei. Ein Spinner erscheint innerhalb der bisherigen Inhaltsfläche. Alte Inhalte
+reservieren weiterhin ihre Höhe, bleiben aber unsichtbar; `inert` sperrt Maus,
+Tastatur und Links. Dadurch können alte IDs nicht mit neuen Filtern
 navigieren. Nach Erfolg bleibt der Komponentenbaum erhalten, einschließlich lokaler
 Tabellensteuerung. Eine geänderte `identity` entfernt den vorherigen Inhalt sofort.
 Spieler- und Mannschaftsprofile sind zusätzlich nach ihrer Entity-ID gekeyt.
@@ -306,3 +307,11 @@ weiterhin vollständig heruntergeladen werden. Danach berechnet jeder Bereich se
 Modell. Navigation und Filterwechsel bleiben React-Updates ohne Dokument-Neuladen.
 Der initiale Katalog wird einmal für die App-Navigation benötigt; dieser erste
 App-Start darf weiterhin einen zentralen Ladezustand zeigen.
+
+`ResourcePanel` nutzt in allen Datenansichten zwei Feedback-Modi: `quiet` hält
+Profilköpfe und Vereinsdaten ohne sichtbaren Ladehinweis an ihrer Position;
+`overlay` zeigt einen Spinner innerhalb der bestehenden Inhaltsfläche. Alte
+Inhalte bleiben zur Höhenreservierung montiert, sind aber unsichtbar und `inert`.
+Statusmeldungen bleiben für Screenreader verfügbar. So erzeugt das Laden keine
+zusätzlichen Textzeilen oberhalb der Tabs, insbesondere auf schmalen Displays. Auch Spielerhistorie und Spielberichte
+verwenden dieselbe Ladeanzeige. Neue Entity-IDs entfernen alte Inhalte sofort.

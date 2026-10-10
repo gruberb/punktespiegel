@@ -52,7 +52,7 @@ test("season changes preserve header, tabs and history; stale responses and loca
   assert.match(container.textContent, /Saison fehlt/);
   assert.equal(container.querySelector(".player-season-table"), table);
   assert.equal(historyCalls, 1);
-  assert.equal(container.querySelector(".game-table"), null);
+  assert.ok(container.querySelector(".game-table")?.closest("[inert]"));
 });
 
 test("a failed history request does not block games or the profile header", async () => {
@@ -270,4 +270,30 @@ test("team table remains mounted across a delayed season change", async () => {
   await act(async () => next.resolve([]));
   assert.equal(container.querySelector("table"), table);
   assert.equal(table.closest("[inert]"), null);
+});
+
+test("team season loading keeps header and tabs and confines spinners to content", async () => {
+  const next = deferred();
+  const profile = deferred();
+  api.teamSeason = (_id, params) => params.get("season") === "2026"
+    ? Promise.resolve({ id: "t", name: "Stable team", code: "T", players: [], matches: [] }) : next.promise;
+  api.teamProfile = (_id, params) => params.get("season") === "2026"
+    ? Promise.resolve({ players: [], profile: null, likelyEleven: null, externalSources: null }) : profile.promise;
+  const view = season => React.createElement(TeamDetailView, { teamId: "t", filters: { ...filters, season }, backLabel: "Back", onBack() {}, onTeam() {}, onPlayer() {}, onMatch() {} });
+  await render(view("2026"));
+  const header = container.querySelector(".team-profile");
+  const tabs = container.querySelector('[role="tablist"]');
+  const games = container.querySelector(".team-season-summary");
+  await render(view("2025"));
+  assert.equal(container.querySelector(".team-profile"), header);
+  assert.equal(container.querySelector('[role="tablist"]'), tabs);
+  assert.equal(container.querySelector(".team-season-summary"), games);
+  assert.equal(container.querySelector(".resource-status"), null);
+  assert.equal(header.closest(".resource-panel").querySelector(".resource-spinner"), null);
+  assert.ok(games.closest(".resource-feedback-overlay").querySelector(".resource-spinner"));
+  assert.ok(games.closest("[inert]"));
+  await act(async () => next.resolve({ id: "t", name: "Stable team", code: "T", players: [], matches: [] }));
+  assert.equal(games.closest("[inert]"), null);
+  assert.equal(games.closest(".resource-panel").querySelector(".resource-spinner"), null);
+  assert.equal(container.querySelector(".team-profile"), header);
 });

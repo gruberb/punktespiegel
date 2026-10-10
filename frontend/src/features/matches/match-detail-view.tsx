@@ -18,11 +18,27 @@ export function MatchDetailView({ filters, matchId, backLabel, onBack, onPlayer,
   ));
   return <section className="match-view">
     <button className="back-button" onClick={onBack}>← {backLabel}</button>
-    <ResourcePanel resource={resource} label="Spielbericht" identity={matchId}>{detail => <MatchReport detail={detail} onPlayer={onPlayer} onTeam={onTeam} onMatch={onMatch} />}</ResourcePanel>
+    <ResourcePanel resource={resource} label="Spielübersicht" identity={matchId} feedback="quiet">{detail => <MatchHeader detail={detail} onTeam={onTeam} />}</ResourcePanel>
+    <ResourcePanel resource={resource} label="Spielbericht" identity={matchId}>{detail => <MatchReport detail={detail} onPlayer={onPlayer} onMatch={onMatch} />}</ResourcePanel>
   </section>;
 }
 
-function MatchReport({detail, onPlayer, onTeam, onMatch}: {detail: MatchDetail; onPlayer: (id: string) => void; onTeam: (id: string) => void; onMatch: (id: string) => void}) {
+function MatchHeader({ detail, onTeam }: { detail: MatchDetail; onTeam: (id: string) => void }) {
+  const { home, away } = detail;
+  const played = detail.homeScore != null && detail.awayScore != null;
+  return (
+      <header className="match-hero fui-grid-paper">
+        <p className="fui-kicker">{detail.leagueName} · {detail.season} · Spieltag {detail.round}{detail.scheduledAt ? ` · ${formatFixtureSlot(detail.scheduledAt)}` : ""}</p>
+        <div className="match-scoreline">
+          <button className="match-team home" onClick={() => onTeam(home.team.id)}><span><strong>{home.team.name}</strong>{home.rankAfter != null && <small>Platz {home.rankAfter} nach dem Spiel</small>}</span><LogoTile code={home.team.code} url={home.team.logoUrl} size="lg" /></button>
+          <span className={`match-score ${played ? "" : "is-open"}`}>{played ? `${detail.homeScore} : ${detail.awayScore}` : "– : –"}</span>
+          <button className="match-team" onClick={() => onTeam(away.team.id)}><LogoTile code={away.team.code} url={away.team.logoUrl} size="lg" /><span><strong>{away.team.name}</strong>{away.rankAfter != null && <small>Platz {away.rankAfter} nach dem Spiel</small>}</span></button>
+        </div>
+      </header>
+  );
+}
+
+function MatchReport({detail, onPlayer, onMatch}: {detail: MatchDetail; onPlayer: (id: string) => void; onMatch: (id: string) => void}) {
   const { home, away } = detail;
   const played = detail.homeScore != null && detail.awayScore != null;
   const count = (side: MatchSide, pick: (player: MatchPlayer) => number) => side.players.reduce((sum, player) => sum + pick(player), 0);
@@ -38,14 +54,7 @@ function MatchReport({detail, onPlayer, onTeam, onMatch}: {detail: MatchDetail; 
     .sort((left, right) => right.player.points - left.player.points || left.player.name.localeCompare(right.player.name, "de"));
   return (
     <>
-      <header className="match-hero fui-grid-paper">
-        <p className="fui-kicker">{detail.leagueName} · {detail.season} · Spieltag {detail.round}{detail.scheduledAt ? ` · ${formatFixtureSlot(detail.scheduledAt)}` : ""}</p>
-        <div className="match-scoreline">
-          <button className="match-team home" onClick={() => onTeam(home.team.id)}><span><strong>{home.team.name}</strong>{home.rankAfter != null && <small>Platz {home.rankAfter} nach dem Spiel</small>}</span><LogoTile code={home.team.code} url={home.team.logoUrl} size="lg" /></button>
-          <span className={`match-score ${played ? "" : "is-open"}`}>{played ? `${detail.homeScore} : ${detail.awayScore}` : "– : –"}</span>
-          <button className="match-team" onClick={() => onTeam(away.team.id)}><LogoTile code={away.team.code} url={away.team.logoUrl} size="lg" /><span><strong>{away.team.name}</strong>{away.rankAfter != null && <small>Platz {away.rankAfter} nach dem Spiel</small>}</span></button>
-        </div>
-      </header>
+
       <nav aria-label="Weitere Spiele des Spieltags"><FixtureTiles matches={detail.roundMatches} currentId={detail.id} onMatch={onMatch} /></nav>
       {!played || !allPlayers.length ? <Empty message="Für dieses Spiel liegen noch keine Noten und Wertungen vor." /> : <>
         <div className="match-grid">

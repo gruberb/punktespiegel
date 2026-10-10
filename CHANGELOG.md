@@ -2,6 +2,12 @@
 
 Alle wesentlichen Änderungen an Punktespiegel werden in dieser Datei dokumentiert.
 
+## [1.31.1] – 2026-10-09
+
+### Behoben
+
+- Einheitliche Ladeanzeige in allen Datenansichten: Profilköpfe und Tabs bleiben stehen, Inhaltsbereiche zeigen einen Spinner innerhalb ihrer bisherigen Fläche. Alte Ergebnisse sind unsichtbar und gesperrt; zusätzliche Ladebanner verschieben das Layout nicht mehr.
+
 ## [1.31.0] – 2026-10-09
 
 ### Geändert

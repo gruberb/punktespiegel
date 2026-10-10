@@ -1,15 +1,13 @@
 import { LogoTile } from "@gruberb/fun-ui";
 import { useCallback } from "react";
-import { ErrorState } from "../../components/feedback";
+import { ResourcePanel } from "../../components/resource-panel";
 import { useResource } from "../../hooks/use-resource";
 import { api } from "../../lib/data/api";
 
 export function PlayerSeasons({ playerId, selectedYear, onSeason, onTeam }: { playerId: string; selectedYear: number; onSeason: (year: number) => void; onTeam: (id: string) => void }) {
-  const { data: seasons, error } = useResource(useCallback((signal: AbortSignal) => api.playerHistory(playerId, signal), [playerId]));
-  if (error) return <ErrorState message={error} />;
-  if (!seasons) return <p role="status">Saisonhistorie wird geladen …</p>;
+  const resource = useResource(useCallback((signal: AbortSignal) => api.playerHistory(playerId, signal), [playerId]));
   return (
-          <section className="player-seasons">
+          <ResourcePanel resource={resource} label="Saisonhistorie" identity={playerId}>{seasons => <section className="player-seasons">
             <div className="section-copy"><h3>Punkte nach Saison</h3><p>Verein, Einsätze, Tore und benotete Spiele je Saison im Archiv.</p></div>
             <div className="table-shell player-season-table">
               <table><thead><tr><th>Jahr</th><th>Verein</th><th>Liga</th><th className="fui-num">Einsätze</th><th className="fui-num">Benotet</th><th className="fui-num">Tore</th><th className="fui-num">Vorlagen</th><th className="fui-num">Gesamtpunkte</th></tr></thead>
@@ -35,6 +33,6 @@ export function PlayerSeasons({ playerId, selectedYear, onSeason, onTeam }: { pl
                 </tr></tfoot>}
               </table>
             </div>
-          </section>
+          </section>}</ResourcePanel>
   );
 }
