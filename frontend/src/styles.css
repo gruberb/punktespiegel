@@ -181,6 +181,8 @@ tr.selected td:first-child { box-shadow: inset 3px 0 var(--accent); }
 .insight-answer .fui-portrait { --fui-portrait-width: 34px; --fui-portrait-height: 40px; }
 .insight-answer .fui-logo-tile { --fui-logo-size: 34px; }
 
+/* Band and facts render as siblings inside one resource panel, outside the view gap. */
+.insight-band + .tabelle-block { margin-top: 32px; }
 .insight-facts { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border: 1px solid var(--line); background: var(--raised); }
 .insight-fact { min-width: 0; display: flex; flex-direction: column; gap: 6px; padding: 22px clamp(16px, 1.8vw, 26px); }
 .insight-fact + .insight-fact { border-left: 1px solid var(--line); }
@@ -696,9 +698,28 @@ button.transfer-row:hover strong { color: var(--accent); }
   .match-team:not(.home) { flex-direction: column; }
   .pitch-player { min-width: 64px; padding: 4px 6px; }
   .pitch-name { max-width: 76px; font-size: 12px; }
-  .insight-facts { grid-template-columns: 1fr; }
-  .insight-fact + .insight-fact { border-left: 0; border-top: 1px solid var(--line); }
-  .insight-beside-sticker { padding-right: 84px; }
+  /* Two compact columns keep the 4 facts within one screen. */
+  .insight-fact { gap: 4px; padding: 14px 12px; }
+  .insight-fact h3 { font-size: 13px; }
+  .insight-fact-value { font-size: 26px; }
+  .insight-fact-value small { font-size: 10px; }
+  .insight-subjects .fui-logo-tile { --fui-logo-size: 24px; }
+  .insight-subjects .fui-portrait { --fui-portrait-width: 24px; --fui-portrait-height: 29px; }
+  .insight-fact p { font-size: 13px; line-height: 1.4; }
+  /* Phones: insight cards become a swipe row with the next card peeking in, so the
+     overview's tables start one card height down instead of six. */
+  .insight-band { grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: 85%; overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x mandatory; scrollbar-width: none; }
+  .insight-band::-webkit-scrollbar { display: none; }
+  .insight-card { scroll-snap-align: start; gap: 10px; padding: 16px; }
+  .insight-card h2 { font-size: 20px; }
+  .insight-card dl { gap: 8px; }
+  .insight-card dl > div:first-child dt { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  .insight-card dd { font-size: 12px; }
+  .insight-answer > span, .insight-answer > button { font-size: 14px; }
+  .insight-answer .fui-logo-tile { --fui-logo-size: 28px; }
+  .insight-answer .fui-portrait { --fui-portrait-width: 28px; --fui-portrait-height: 34px; }
+  .insight-beside-sticker { padding-right: 60px; }
+  .insight-card .fui-sticker { --fui-sticker-size: 56px; --fui-sticker-top: 40px; --fui-sticker-right: 4px; }
   .player-profile, .team-profile { grid-template-columns: 1fr; }
   .team-profile > .fui-logo-tile { --fui-logo-size: 72px; }
   .method-steps li { grid-template-columns: 1fr; gap: 6px; }

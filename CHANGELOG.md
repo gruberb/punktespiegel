@@ -2,6 +2,17 @@
 
 Alle wesentlichen Änderungen an Punktespiegel werden in dieser Datei dokumentiert.
 
+## [1.32.2] – 2026-10-12
+
+### Geändert
+
+- Überblick auf Telefonen: Die Einblick-Karten sind kompakter und lassen sich seitlich wischen; die nächste Karte ist angeschnitten sichtbar. Tabellen und Zahlen folgen direkt darunter statt nach sechs ganzen Karten.
+- „Der Spieltag in Zahlen“ zeigt auf Telefonen zwei kompakte Kacheln pro Zeile.
+
+### Behoben
+
+- Abstand zwischen den Einblick-Karten und dem folgenden Abschnitt auf allen Bildschirmgrößen.
+
 ## [1.32.1] – 2026-10-12
 
 ### Behoben
