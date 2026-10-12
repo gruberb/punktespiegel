@@ -314,10 +314,15 @@ test("scope controls render steppers on wide screens and a chip row with working
   try {
     await render(React.createElement(ScopeControls, { fields }));
     assert.equal(container.querySelectorAll(".fui-stepper-select").length, 0);
-    assert.equal(container.querySelector(".scope-chip").textContent, "Bundesliga · Spieltag 2");
+    assert.equal(container.querySelector(".scope-chip small").textContent, "Bundesliga");
+    assert.equal(container.querySelector(".scope-chip strong").textContent, "Spieltag 2");
     await click(container.querySelector('[aria-label="Spieltag weiter"]'));
     await click(container.querySelector('[aria-label="Spieltag zurück"]'));
     assert.deepEqual(picks, [["tag", "3"], ["tag", "1"]]);
+    // Initial focus must not land on a <select>: iOS opens its picker on focus.
+    const autofocus = container.querySelector(".sheet [autofocus]");
+    assert.equal(autofocus?.tagName, "H2");
+    assert.equal(container.querySelector(".sheet").getAttribute("aria-labelledby"), autofocus.id);
   } finally { window.matchMedia = saved; }
 });
 
@@ -341,21 +346,20 @@ test("the phone menu lists every section and is absent on wide screens", async (
   } finally { window.matchMedia = saved; }
 });
 
-test("scroll direction is mirrored on the root element, ignores the top of the page, and is removed on unmount", async () => {
-  const { useScrollDirection } = await import("../src/hooks/use-scroll-direction.ts");
-  const Probe = ({ enabled }) => { useScrollDirection(enabled); return null; };
-  const scrollTo = async (y) => { await act(async () => { Object.defineProperty(window, "scrollY", { value: y, configurable: true }); window.dispatchEvent(new window.Event("scroll")); }); };
-  const root = document.documentElement;
-  await render(React.createElement(Probe, { enabled: true }));
-  await scrollTo(40);
-  assert.equal(root.dataset.scroll, "up");
-  await scrollTo(400);
-  assert.equal(root.dataset.scroll, "down");
-  await scrollTo(398);
-  assert.equal(root.dataset.scroll, "down", "jitter below the threshold keeps the direction");
-  await scrollTo(300);
-  assert.equal(root.dataset.scroll, "up");
-  await render(React.createElement(Probe, { enabled: false }));
-  assert.equal(root.dataset.scroll, undefined);
-  await scrollTo(0);
+test("the compact scope row renders into the app-bar slot while toggles stay in the page", async () => {
+  const { ScopeControls, ScopeSlotContext } = await import("../src/components/scope-controls.tsx");
+  const slot = document.createElement("div");
+  document.body.append(slot);
+  const fields = [
+    { label: "Saison", value: "2026", options: [{ value: "2026", label: "2026/27" }], onChange() {} },
+    { kind: "toggle", label: "Zeitraum", value: "through", options: [{ value: "through", label: "Gesamt" }, { value: "matchday", label: "Nur Spieltag" }], onChange() {} },
+  ];
+  const saved = window.matchMedia;
+  window.matchMedia = () => ({ matches: true, addEventListener() {}, removeEventListener() {} });
+  try {
+    await render(React.createElement(ScopeSlotContext, { value: slot }, React.createElement(ScopeControls, { fields })));
+    assert.ok(slot.querySelector(".scope-chip"));
+    assert.equal(container.querySelector(".scope-chip"), null);
+    assert.ok(container.querySelector(".fui-segmented"));
+  } finally { window.matchMedia = saved; slot.remove(); }
 });

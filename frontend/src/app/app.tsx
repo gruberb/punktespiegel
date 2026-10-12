@@ -3,7 +3,7 @@ import { EntityNavigationContext } from "../components/entity-link";
 import { AppShell } from "@gruberb/fun-ui";
 import { Empty, ErrorState, LoadingState } from "../components/feedback";
 import { PageHeader } from "../components/page-controls";
-import { ScopeControls } from "../components/scope-controls";
+import { ScopeControls, ScopeSlotContext } from "../components/scope-controls";
 import type { ScopeField } from "../components/scope-controls";
 import { InfoPage } from "../features/info/info-page";
 import { MatchdayView } from "../features/matchday/matchday-view";
@@ -16,8 +16,6 @@ import { TeamDetailView } from "../features/teams/team-detail-view";
 import { TeamsView } from "../features/teams/teams-view";
 import type { NavView } from "../lib/navigation/scope";
 import { isInfoView, viewHref } from "../lib/navigation/scope";
-import { useMediaQuery } from "../hooks/use-media-query";
-import { useScrollDirection } from "../hooks/use-scroll-direction";
 import { MobileMenu } from "./mobile-menu";
 import { nav, navMobile } from "./navigation-items";
 import { SiteFooter } from "./site-footer";
@@ -35,9 +33,7 @@ export default function App() {
     replaceMatch,
   } = useAppModel();
 
-  // Phone only: the sticky page header slides away while reading down and returns on scroll up.
-  useScrollDirection(useMediaQuery("(max-width: 600px)"));
-
+  const [scopeSlot, setScopeSlot] = useState<HTMLElement | null>(null);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
     try { return localStorage.getItem("punktespiegel.sidebarCollapsed") === "true"; }
     catch { return false; }
@@ -62,6 +58,7 @@ export default function App() {
 
   return (
     <EntityNavigationContext value={{ filters, onPlayer: openPlayer, onTeam: openTeam }}>
+    <ScopeSlotContext value={scopeSlot}>
     <AppShell
       className={`view-${view}${sidebarCollapsed ? " sidebar-collapsed" : ""}`}
       navLabel="Bereiche"
@@ -70,7 +67,7 @@ export default function App() {
       brand={<><a href={viewHref("overview", filters)} onClick={(event) => { event.preventDefault(); setView("overview"); }} aria-label="Punktespiegel Startseite">
         <img src={`${import.meta.env.BASE_URL}brand/punktespiegel-mark.svg`} alt="" aria-hidden="true" />
         <span>Punktespiegel</span>
-      </a><button className="sidebar-toggle" onClick={toggleSidebar} aria-expanded={!sidebarCollapsed} aria-label={sidebarCollapsed ? "Seitenleiste ausklappen" : "Seitenleiste einklappen"} title={sidebarCollapsed ? "Seitenleiste ausklappen" : "Seitenleiste einklappen"}>{sidebarCollapsed ? "»" : "«"}</button><MobileMenu activeId={navActive} filters={filters} onNavigate={setView} /></>}
+      </a><button className="sidebar-toggle" onClick={toggleSidebar} aria-expanded={!sidebarCollapsed} aria-label={sidebarCollapsed ? "Seitenleiste ausklappen" : "Seitenleiste einklappen"} title={sidebarCollapsed ? "Seitenleiste ausklappen" : "Seitenleiste einklappen"}>{sidebarCollapsed ? "»" : "«"}</button><div className="app-bar-scope" ref={setScopeSlot} /><MobileMenu activeId={navActive} filters={filters} onNavigate={setView} /></>}
       nav={nav.map((item) => ({ id: item.id, label: item.label, mobileLabel: navMobile[item.id].label, href: viewHref(item.id, filters), icon: <span title={item.label}>{navMobile[item.id].icon}</span> }))}
     >
         {!isInfoView(view) && view !== "overview" && view !== "matchday" && view !== "match" && <PageHeader eyebrow={`${catalog?.leagues.find((league) => league.code === filters.league)?.name ?? "Bundesliga"} · ${selectedSeason?.displayName ?? "Gewählte Saison"}`} title={title ?? ""} description={description} controls={<ScopeControls fields={scopeFields} />} />}
@@ -92,6 +89,7 @@ export default function App() {
         )}
         <SiteFooter currentView={view} filters={filters} onView={setView} />
     </AppShell>
+    </ScopeSlotContext>
     </EntityNavigationContext>
   );
 }

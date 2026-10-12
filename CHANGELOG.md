@@ -2,6 +2,18 @@
 
 Alle wesentlichen Änderungen an Punktespiegel werden in dieser Datei dokumentiert.
 
+## [1.33.0] – 2026-10-12
+
+### Geändert
+
+- Telefone: Liga-, Saison- und Spieltagsauswahl sitzen jetzt in der Kopfleiste zwischen Logo und Menü. Der Chip zeigt den gewählten Spieltag (bzw. die Saison) mit Liga und Saison darüber; die Pfeile schalten weiter.
+- Die Kopfleiste zeigt auf Telefonen nur das Logo-Zeichen. Seitenköpfe verlieren die doppelte Überzeile; Spieler- und Mannschaftsprofile beginnen direkt unter der Kopfleiste.
+- Der mitlaufende Seitenkopf entfällt, da die Auswahl dauerhaft in der Kopfleiste steht.
+
+### Behoben
+
+- iPhone: Das Auswahlblatt öffnet nicht mehr sofort die Ligaliste. Der Titel des Blatts erhält den Fokus statt des ersten Auswahlfelds.
+
 ## [1.32.2] – 2026-10-12
 
 ### Geändert
