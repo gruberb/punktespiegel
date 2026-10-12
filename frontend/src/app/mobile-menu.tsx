@@ -1,4 +1,5 @@
 import { useRef } from "react";
+import { createPortal } from "react-dom";
 import type { MouseEvent as ReactMouseEvent } from "react";
 import { useMediaQuery } from "../hooks/use-media-query";
 import type { Filters, NavView } from "../lib/navigation/scope";
@@ -29,7 +30,8 @@ export function MobileMenu({ activeId, filters, onNavigate }: { activeId: string
     <button className="menu-button" type="button" aria-haspopup="dialog" aria-label="Menü öffnen" onClick={() => drawer.current?.showModal()}>
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" /></svg>
     </button>
-    <dialog ref={drawer} className="drawer" aria-label="Menü" onClick={(event) => { if (event.target === event.currentTarget) event.currentTarget.close(); }}>
+    {/* Portaled out of the shell brand block so its link styles cannot leak into the drawer. */}
+    {createPortal(<dialog ref={drawer} className="drawer" aria-label="Menü" onClick={(event) => { if (event.target === event.currentTarget) event.currentTarget.close(); }}>
       <div className="drawer-head">
         <strong>Punktespiegel</strong>
         <button type="button" className="menu-button" aria-label="Menü schließen" onClick={() => drawer.current?.close()}>
@@ -38,6 +40,6 @@ export function MobileMenu({ activeId, filters, onNavigate }: { activeId: string
       </div>
       <nav aria-label="Bereiche">{nav.map((item) => link(item.id, item.label, navMobile[item.id].icon))}</nav>
       <nav className="drawer-minor" aria-label="Weitere Seiten">{infoLinks.map((item) => link(item.view, item.label))}</nav>
-    </dialog>
+    </dialog>, document.body)}
   </>;
 }

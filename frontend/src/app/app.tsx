@@ -73,7 +73,7 @@ export default function App() {
       </a><button className="sidebar-toggle" onClick={toggleSidebar} aria-expanded={!sidebarCollapsed} aria-label={sidebarCollapsed ? "Seitenleiste ausklappen" : "Seitenleiste einklappen"} title={sidebarCollapsed ? "Seitenleiste ausklappen" : "Seitenleiste einklappen"}>{sidebarCollapsed ? "»" : "«"}</button><MobileMenu activeId={navActive} filters={filters} onNavigate={setView} /></>}
       nav={nav.map((item) => ({ id: item.id, label: item.label, mobileLabel: navMobile[item.id].label, href: viewHref(item.id, filters), icon: <span title={item.label}>{navMobile[item.id].icon}</span> }))}
     >
-        {!isInfoView(view) && view !== "overview" && view !== "matchday" && view !== "match" && <PageHeader title={title ?? ""} description={description} controls={<ScopeControls fields={scopeFields} />} />}
+        {!isInfoView(view) && view !== "overview" && view !== "matchday" && view !== "match" && <PageHeader eyebrow={`${catalog?.leagues.find((league) => league.code === filters.league)?.name ?? "Bundesliga"} · ${selectedSeason?.displayName ?? "Gewählte Saison"}`} title={title ?? ""} description={description} controls={<ScopeControls fields={scopeFields} />} />}
 
         {isInfoView(view) ? <InfoPage view={view} filters={filters} onView={setView} /> : catalogError ? <ErrorState message={catalogError} /> : !catalog ? <LoadingState /> : (
           <>

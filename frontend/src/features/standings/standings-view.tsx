@@ -31,7 +31,7 @@ export function StandingsView({ filters, leagues, seasons, onFilter, onTeam, onP
 
   return (
     <div className="tabelle-view">
-      <PageHeader hero eyebrow={`${leagueName} · ${selectedSeason?.displayName ?? "Gewählte Saison"} · Stand nach`} title={`Spieltag ${round}`} controls={<ScopeControls fields={[
+      <PageHeader eyebrow={`${leagueName} · ${selectedSeason?.displayName ?? "Gewählte Saison"}`} title={`Spieltag ${round}`} description="Stand nach diesem Spieltag" controls={<ScopeControls fields={[
         { label: "Liga", value: filters.league, options: leagues.map((league) => ({ value: league.code, label: league.name })), onChange: (value) => onFilter("league", value) },
         { label: "Saison", value: filters.season, options: [...seasons].reverse().map((season) => ({ value: String(season.startYear), label: season.displayName })), onChange: (value) => onFilter("season", value) },
         { label: "Spieltag", value: String(round), options: Array.from({ length: maximumRound }, (_, index) => ({ value: String(index + 1), label: `Spieltag ${index + 1}` })), onChange: (value) => onFilter("round", value) },

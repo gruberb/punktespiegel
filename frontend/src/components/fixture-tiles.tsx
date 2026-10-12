@@ -32,5 +32,5 @@ export function FixtureTiles({ matches, currentId, onMatch }: { matches: TileMat
 
 function formatTileSlot(value: string | null) {
   if (!value) return "Termin offen";
-  return new Intl.DateTimeFormat("de-DE", { weekday: "short", day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" }).format(new Date(value)).replace(",", "");
+  return new Intl.DateTimeFormat("de-DE", { weekday: "short", day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" }).format(new Date(value)).replaceAll(",", "");
 }

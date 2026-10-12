@@ -2,6 +2,14 @@
 
 Alle wesentlichen Änderungen an Punktespiegel werden in dieser Datei dokumentiert.
 
+## [1.32.1] – 2026-10-12
+
+### Behoben
+
+- Der aktive Eintrag im mobilen Menü füllt die ganze Breite.
+- Einheitlicher Seitenkopf auf allen Datenseiten: Liga und Saison als Überzeile, gleiche Ausrichtung der Auswahl am Titel und gleicher Abstand zum Inhalt. Der Überblick verwendet keinen abweichenden Rasterkopf mehr.
+- Spielkacheln zeigen die Anstoßzeit wieder in kleiner Monoschrift und ohne Zeilenumbruch. Auf Telefonen sind die Kacheln kompakter, ohne Vereinslogos und drei pro Zeile.
+
 ## [1.32.0] – 2026-10-12
 
 ### Geändert

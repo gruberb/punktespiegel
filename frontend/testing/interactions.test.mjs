@@ -333,10 +333,10 @@ test("the phone menu lists every section and is absent on wide screens", async (
   window.matchMedia = () => ({ matches: true, addEventListener() {}, removeEventListener() {} });
   try {
     await render(React.createElement(MobileMenu, props));
-    const links = [...container.querySelectorAll(".drawer a")].map((a) => a.textContent);
+    const links = [...document.querySelectorAll(".drawer a")].map((a) => a.textContent);
     assert.deepEqual(links, ["Überblick", "Spieltag", "Tabellen", "Spieler", "Mannschaften", "Über Punktespiegel", "Daten & Methodik", "Quellen", "FAQ"]);
-    assert.equal(container.querySelector('.drawer a[aria-current="page"]').textContent, "Spieltag");
-    await click(container.querySelectorAll(".drawer a")[2]);
+    assert.equal(document.querySelector('.drawer a[aria-current="page"]').textContent, "Spieltag");
+    await click(document.querySelectorAll(".drawer a")[2]);
     assert.deepEqual(views, ["table"]);
   } finally { window.matchMedia = saved; }
 });

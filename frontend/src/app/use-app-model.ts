@@ -265,14 +265,14 @@ export function useAppModel() {
   const title = isInfoView(view) ? infoTitle[view] : view === "overview" ? "Überblick" : view === "player" ? "Spielerprofil" : view === "team" ? "Mannschaftsprofil" : view === "match" ? "Spielbericht" : nav.find((item) => item.id === view)?.label;
   const description = view === "table"
     ? latestRound > 0
-      ? `${selectedSeason?.displayName ?? "Gewählte Saison"} · ${overviewScope === "matchday" ? `nur Spieltag ${overviewRound}` : `kumuliert bis Spieltag ${overviewRound}`}`
-      : `${selectedSeason?.displayName ?? "Gewählte Saison"} · noch ohne abgeschlossenen Spieltag`
+      ? overviewScope === "matchday" ? `Nur Spieltag ${overviewRound}` : `Kumuliert bis Spieltag ${overviewRound}`
+      : "Noch ohne abgeschlossenen Spieltag"
     : view === "teams"
-      ? `${selectedSeason?.displayName ?? "Gewählte Saison"} · gesamte Saison`
+      ? "Gesamte Saison"
       : view === "players"
         ? latestRound > 0
-          ? `${selectedSeason?.displayName ?? "Gewählte Saison"} · kumuliert bis Spieltag ${latestRound}`
-          : `${selectedSeason?.displayName ?? "Gewählte Saison"} · Saisonkader vor dem ersten Spieltag`
+          ? `Kumuliert bis Spieltag ${latestRound}`
+          : "Saisonkader vor dem ersten Spieltag"
       : view === "team"
         ? "Kader und Saisonverlauf"
       : view === "overview"

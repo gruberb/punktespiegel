@@ -48,8 +48,19 @@
 
 
 /* Page header ------------------------------------------------------------- */
+/* The intro's children join the header grid so the controls always align to the title,
+   whether or not a description follows. */
+.fui-page-header { grid-template-rows: auto auto auto; gap: 0 28px; }
+.fui-page-header__intro { display: contents; }
+.fui-page-header .fui-kicker { grid-column: 1; grid-row: 1; margin: 0 0 8px; }
+.fui-page-header__title { grid-column: 1; grid-row: 2; }
+.fui-page-header__description { grid-column: 1; grid-row: 3; }
+.fui-page-header > .selectors { grid-column: 2; grid-row: 1 / 3; align-self: end; }
+/* Views stack sections with their own gap; the header keeps the same 32px to content everywhere. */
+.tabelle-view > .fui-page-header { margin-bottom: -16px; }
 .view-player .fui-page-header__intro, .view-team .fui-page-header__intro { display: none; }
 .view-player .fui-page-header, .view-team .fui-page-header { grid-template-columns: 1fr; justify-items: end; padding-top: 20px; margin-bottom: 0; }
+.view-player .fui-page-header > .selectors, .view-team .fui-page-header > .selectors { grid-column: 1; grid-row: auto; }
 
 .selectors { display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: stretch; gap: 8px; }
 
@@ -135,7 +146,6 @@ tr.selected td:first-child { box-shadow: inset 3px 0 var(--accent); }
 /* Überblick: hero cards --------------------------------------------------- */
 .tabelle-view { display: flex; flex-direction: column; gap: 48px; }
 .tabelle-view > * { min-width: 0; }
-.fui-page-header--hero + .insight-band { margin-top: -48px; }
 .insight-band {
   margin-inline: calc(-1 * var(--gutter)); display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
 }
@@ -188,6 +198,8 @@ tr.selected td:first-child { box-shadow: inset 3px 0 var(--accent); }
 .fixture-score-open { background: none; color: var(--muted); box-shadow: inset 0 0 0 1px var(--line-strong); }
 
 .fui-match-tile__team .fui-logo-tile { --fui-logo-size: 22px; }
+/* `.text-link` resets font to inherit; restore the tile's mono time label. */
+.fui-match-tile .fui-match-tile__time { font-family: var(--font-mono); font-size: 10px; letter-spacing: .06em; text-transform: uppercase; }
 
 /* Überblick: form table, bump chart, cross table ------------------------- */
 .tabelle-block .fui-data-table th, .tabelle-block .fui-data-table td { padding-inline: 12px; }
@@ -654,6 +666,8 @@ button.transfer-row:hover strong { color: var(--accent); }
 }
 
 @media (max-width: 1080px) {
+  /* Explicit row: auto-placement would fill row 1 whenever the eyebrow is hidden. */
+  .fui-page-header > .selectors { grid-column: 1; grid-row: 4; margin-top: 16px; }
   .match-grid, .report-top { grid-template-columns: 1fr; }
   .overview-grid { grid-template-columns: 1fr; }
   .selectors { justify-content: flex-start; }
@@ -798,14 +812,24 @@ dialog.drawer { height: 100dvh; width: min(320px, 84vw); margin: 0 0 0 auto; bor
 @media (max-width: 600px) {
   .fui-page-header { padding-top: 14px; margin-bottom: 14px; gap: 10px; }
   .fui-page-header__title { font-size: 32px; }
-  .fui-page-header--hero { padding-block: 20px 18px; }
-  .fui-page-header--hero .fui-page-header__title { font-size: 44px; }
-  /* The chip row already states league and season. The hero eyebrow completes its sentence ("Stand nach"), so it stays. */
-  .fui-page-header:not(.fui-page-header--hero) .fui-kicker { display: none; }
+  .fui-page-header__description { margin-top: 4px; font-size: 13px; }
+  .fui-page-header > .selectors { margin-top: 10px; }
+  /* The chip row already states league and season. */
+  .fui-page-header:has(.selectors-compact) .fui-kicker { display: none; }
   .tabelle-view { gap: 32px; }
-  /* Title and chip row stay reachable below the app bar; the hero band scrolls away like any section. */
-  .fui-page-header:not(.fui-page-header--hero):has(.selectors-compact) { position: sticky; top: calc(52px + env(safe-area-inset-top)); z-index: 20; margin-inline: calc(-1 * var(--gutter)); padding: 10px var(--gutter) 10px; margin-bottom: 14px; background: var(--paper); border-bottom: 1px solid var(--line); }
-  html[data-scroll="down"] .fui-page-header:not(.fui-page-header--hero):has(.selectors-compact) { transform: translateY(calc(-100% - 52px - env(safe-area-inset-top))); }
+  .tabelle-view > .fui-page-header { margin-bottom: -18px; }
+  /* Title and chip row stay reachable below the app bar. */
+  .fui-page-header:has(.selectors-compact) { position: sticky; top: calc(52px + env(safe-area-inset-top)); z-index: 20; margin-inline: calc(-1 * var(--gutter)); padding: 10px var(--gutter); background: var(--paper); border-bottom: 1px solid var(--line); }
+  html[data-scroll="down"] .fui-page-header:has(.selectors-compact) { transform: translateY(calc(-100% - 52px - env(safe-area-inset-top))); }
+
+  /* Three logo-free tiles per row on phones; auto-fill drops to two on very narrow screens. */
+  .fui-match-tiles { grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); gap: 6px; }
+  .fui-match-tile { gap: 4px; padding: 8px; }
+  .fui-match-tile .fui-match-tile__time { font-size: 9.5px; letter-spacing: 0; white-space: nowrap; }
+  .fui-match-tile__team { grid-template-columns: minmax(0, 1fr) auto; gap: 4px; font-size: 12.5px; }
+  .fui-match-tile__team .fui-logo-tile { display: none; }
+  .fui-match-tile__team > :nth-child(2) { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .fui-match-tile__team b { min-width: 20px; font-size: 12px; }
 
   .selectors-compact { display: grid; justify-content: stretch; gap: 8px; }
   .scope-bar { display: grid; grid-template-columns: 44px minmax(0, 1fr) 44px; gap: 6px; height: 44px; }
