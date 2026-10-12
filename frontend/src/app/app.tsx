@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { EntityNavigationContext } from "../components/entity-link";
-import { AppShell, Segmented } from "@gruberb/fun-ui";
+import { AppShell } from "@gruberb/fun-ui";
 import { Empty, ErrorState, LoadingState } from "../components/feedback";
-import { PageHeader, StepperSelect } from "../components/page-controls";
+import { PageHeader } from "../components/page-controls";
+import { ScopeControls } from "../components/scope-controls";
+import type { ScopeField } from "../components/scope-controls";
 import { InfoPage } from "../features/info/info-page";
 import { MatchdayView } from "../features/matchday/matchday-view";
 import { MatchDetailView } from "../features/matches/match-detail-view";
@@ -14,6 +16,9 @@ import { TeamDetailView } from "../features/teams/team-detail-view";
 import { TeamsView } from "../features/teams/teams-view";
 import type { NavView } from "../lib/navigation/scope";
 import { isInfoView, viewHref } from "../lib/navigation/scope";
+import { useMediaQuery } from "../hooks/use-media-query";
+import { useScrollDirection } from "../hooks/use-scroll-direction";
+import { MobileMenu } from "./mobile-menu";
 import { nav, navMobile } from "./navigation-items";
 import { SiteFooter } from "./site-footer";
 import { useAppModel } from "./use-app-model";
@@ -30,6 +35,9 @@ export default function App() {
     replaceMatch,
   } = useAppModel();
 
+  // Phone only: the sticky page header slides away while reading down and returns on scroll up.
+  useScrollDirection(useMediaQuery("(max-width: 600px)"));
+
   const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
     try { return localStorage.getItem("punktespiegel.sidebarCollapsed") === "true"; }
     catch { return false; }
@@ -39,6 +47,17 @@ export default function App() {
     setSidebarCollapsed(next);
     // Storage can be unavailable in private or embedded browsing contexts.
     try { localStorage.setItem("punktespiegel.sidebarCollapsed", String(next)); } catch { /* Keep the in-memory preference. */ }
+  }
+
+  const seasonOptions = (list: typeof seasons) => [...list].reverse().map((season) => ({ value: String(season.startYear), label: season.displayName }));
+  const scopeFields: ScopeField[] = [];
+  if (view !== "team" && view !== "player") scopeFields.push({ label: "Liga", value: filters.league, options: (catalog?.leagues ?? []).map((league) => ({ value: league.code, label: league.name })), onChange: (value) => updateFilter("league", value) });
+  if (view === "team") scopeFields.push({ label: "Saison", value: String(selectedTeamSeason?.startYear ?? filters.season), options: seasonOptions(teamSeasons), onChange: updateTeamSeason });
+  else if (view === "player") scopeFields.push({ label: "Saison", value: String(selectedPlayerSeason?.startYear ?? filters.season), options: seasonOptions(playerSeasons), onChange: updatePlayerSeason });
+  else if (view !== "table") scopeFields.push({ label: "Saison", value: filters.season, options: seasonOptions(seasons), onChange: (value) => updateFilter("season", value) });
+  if (view === "table" && latestRound > 0) {
+    scopeFields.push({ kind: "toggle", label: "Zeitraum", value: overviewScope, options: [{ value: "through", label: "Gesamt" }, { value: "matchday", label: "Nur Spieltag" }], onChange: (value) => setOverviewScope(value as typeof overviewScope) });
+    scopeFields.push({ label: "Spieltag", value: String(overviewRound), options: Array.from({ length: Math.max(1, latestRound) }, (_, index) => ({ value: String(index + 1), label: `Spieltag ${index + 1}` })), onChange: (value) => updateFilter("round", value) });
   }
 
   return (
@@ -51,21 +70,10 @@ export default function App() {
       brand={<><a href={viewHref("overview", filters)} onClick={(event) => { event.preventDefault(); setView("overview"); }} aria-label="Punktespiegel Startseite">
         <img src={`${import.meta.env.BASE_URL}brand/punktespiegel-mark.svg`} alt="" aria-hidden="true" />
         <span>Punktespiegel</span>
-      </a><button className="sidebar-toggle" onClick={toggleSidebar} aria-expanded={!sidebarCollapsed} aria-label={sidebarCollapsed ? "Seitenleiste ausklappen" : "Seitenleiste einklappen"} title={sidebarCollapsed ? "Seitenleiste ausklappen" : "Seitenleiste einklappen"}>{sidebarCollapsed ? "»" : "«"}</button></>}
+      </a><button className="sidebar-toggle" onClick={toggleSidebar} aria-expanded={!sidebarCollapsed} aria-label={sidebarCollapsed ? "Seitenleiste ausklappen" : "Seitenleiste einklappen"} title={sidebarCollapsed ? "Seitenleiste ausklappen" : "Seitenleiste einklappen"}>{sidebarCollapsed ? "»" : "«"}</button><MobileMenu activeId={navActive} filters={filters} onNavigate={setView} /></>}
       nav={nav.map((item) => ({ id: item.id, label: item.label, mobileLabel: navMobile[item.id].label, href: viewHref(item.id, filters), icon: <span title={item.label}>{navMobile[item.id].icon}</span> }))}
     >
-        {!isInfoView(view) && view !== "overview" && view !== "matchday" && view !== "match" && <PageHeader title={title ?? ""} description={description} controls={<div className="selectors">
-            {view !== "team" && view !== "player" && <StepperSelect label="Liga" value={filters.league} options={(catalog?.leagues ?? []).map((league) => ({ value: league.code, label: league.name }))} onChange={(value) => updateFilter("league", value)} />}
-            {view === "team"
-              ? <StepperSelect label="Saison" value={String(selectedTeamSeason?.startYear ?? filters.season)} options={[...teamSeasons].reverse().map((season) => ({ value: String(season.startYear), label: season.displayName }))} onChange={updateTeamSeason} />
-              : view === "player"
-                ? <StepperSelect label="Saison" value={String(selectedPlayerSeason?.startYear ?? filters.season)} options={[...playerSeasons].reverse().map((season) => ({ value: String(season.startYear), label: season.displayName }))} onChange={updatePlayerSeason} />
-                : view !== "table" && <StepperSelect label="Saison" value={filters.season} options={[...seasons].reverse().map((season) => ({ value: String(season.startYear), label: season.displayName }))} onChange={(value) => updateFilter("season", value)} />}
-            {view === "table" && latestRound > 0 && <>
-              <Segmented ariaLabel="Zeitraum" size="lg" stretch value={overviewScope} onChange={(value) => setOverviewScope(value as typeof overviewScope)} options={[{ value: "through", label: "Gesamt" }, { value: "matchday", label: "Nur Spieltag" }]} />
-              <StepperSelect label="Spieltag" value={String(overviewRound)} options={Array.from({ length: Math.max(1, latestRound) }, (_, index) => ({ value: String(index + 1), label: `Spieltag ${index + 1}` }))} onChange={(value) => updateFilter("round", value)} />
-            </>}
-          </div>} />}
+        {!isInfoView(view) && view !== "overview" && view !== "matchday" && view !== "match" && <PageHeader title={title ?? ""} description={description} controls={<ScopeControls fields={scopeFields} />} />}
 
         {isInfoView(view) ? <InfoPage view={view} filters={filters} onView={setView} /> : catalogError ? <ErrorState message={catalogError} /> : !catalog ? <LoadingState /> : (
           <>

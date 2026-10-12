@@ -1,7 +1,8 @@
 import { ResourcePanel } from "../../components/resource-panel";
 import { useCallback } from "react";
 import { Empty } from "../../components/feedback";
-import { PageHeader, StepperSelect } from "../../components/page-controls";
+import { PageHeader } from "../../components/page-controls";
+import { ScopeControls } from "../../components/scope-controls";
 import { useResource } from "../../hooks/use-resource";
 import { api } from "../../lib/data/api";
 import type { Filters } from "../../lib/navigation/scope";
@@ -30,11 +31,11 @@ export function StandingsView({ filters, leagues, seasons, onFilter, onTeam, onP
 
   return (
     <div className="tabelle-view">
-      <PageHeader hero eyebrow={`${leagueName} · ${selectedSeason?.displayName ?? "Gewählte Saison"} · Stand nach`} title={`Spieltag ${round}`} controls={<div className="selectors">
-        <StepperSelect label="Liga" value={filters.league} options={leagues.map((league) => ({ value: league.code, label: league.name }))} onChange={(value) => onFilter("league", value)} />
-        <StepperSelect label="Saison" value={filters.season} options={[...seasons].reverse().map((season) => ({ value: String(season.startYear), label: season.displayName }))} onChange={(value) => onFilter("season", value)} />
-        <StepperSelect label="Spieltag" value={String(round)} options={Array.from({ length: maximumRound }, (_, index) => ({ value: String(index + 1), label: `Spieltag ${index + 1}` }))} onChange={(value) => onFilter("round", value)} />
-      </div>} />
+      <PageHeader hero eyebrow={`${leagueName} · ${selectedSeason?.displayName ?? "Gewählte Saison"} · Stand nach`} title={`Spieltag ${round}`} controls={<ScopeControls fields={[
+        { label: "Liga", value: filters.league, options: leagues.map((league) => ({ value: league.code, label: league.name })), onChange: (value) => onFilter("league", value) },
+        { label: "Saison", value: filters.season, options: [...seasons].reverse().map((season) => ({ value: String(season.startYear), label: season.displayName })), onChange: (value) => onFilter("season", value) },
+        { label: "Spieltag", value: String(round), options: Array.from({ length: maximumRound }, (_, index) => ({ value: String(index + 1), label: `Spieltag ${index + 1}` })), onChange: (value) => onFilter("round", value) },
+      ]} />} />
       <ResourcePanel resource={insightResource} label="Spieltag-Einblicke">{insights => <>
         {insights.cards.length > 0 && <InsightCards cards={insights.cards} onTeam={onTeam} onPlayer={onPlayer} onMatch={onMatch} />}
         {insights.facts.length > 0 && <InsightFacts round={round} facts={insights.facts} onTeam={onTeam} onPlayer={onPlayer} />}

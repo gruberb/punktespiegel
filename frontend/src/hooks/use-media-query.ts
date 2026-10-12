@@ -1,0 +1,11 @@
+import { useCallback, useSyncExternalStore } from "react";
+
+/** False on the server and before hydration, so the desktop layout is the baseline. */
+export function useMediaQuery(query: string) {
+  const subscribe = useCallback((notify: () => void) => {
+    const list = window.matchMedia(query);
+    list.addEventListener("change", notify);
+    return () => list.removeEventListener("change", notify);
+  }, [query]);
+  return useSyncExternalStore(subscribe, () => window.matchMedia(query).matches, () => false);
+}

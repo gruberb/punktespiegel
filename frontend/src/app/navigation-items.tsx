@@ -9,6 +9,13 @@ export const nav = [
   { id: "teams", label: "Mannschaften" },
 ] satisfies { id: NavView; label: string }[];
 
+export const infoLinks: { view: NavView; label: string }[] = [
+  { view: "about", label: "Über Punktespiegel" },
+  { view: "methodology", label: "Daten & Methodik" },
+  { view: "sources", label: "Quellen" },
+  { view: "faq", label: "FAQ" },
+];
+
 export const navMobile: Record<(typeof nav)[number]["id"], { label: string; icon: ReactNode }> = {
   overview: {
     label: "Überblick",

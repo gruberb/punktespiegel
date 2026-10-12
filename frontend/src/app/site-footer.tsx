@@ -2,13 +2,11 @@ import { Footer } from "@gruberb/fun-ui";
 import type { MouseEvent as ReactMouseEvent } from "react";
 import type { Filters, NavView, View } from "../lib/navigation/scope";
 import { viewHref } from "../lib/navigation/scope";
+import { infoLinks } from "./navigation-items";
 
 export function SiteFooter({ currentView, filters, onView }: { currentView: View; filters: Filters; onView: (view: NavView) => void }) {
   const links: { view: NavView; label: string }[] = [
-    { view: "about", label: "Über Punktespiegel" },
-    { view: "methodology", label: "Daten & Methodik" },
-    { view: "sources", label: "Quellen" },
-    { view: "faq", label: "FAQ" },
+    ...infoLinks,
     { view: "table", label: "Tabellen" },
     { view: "players", label: "Spieler" },
     { view: "teams", label: "Mannschaften" },

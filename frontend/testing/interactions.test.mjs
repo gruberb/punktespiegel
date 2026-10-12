@@ -297,3 +297,65 @@ test("team season loading keeps header and tabs and confines spinners to content
   assert.equal(games.closest(".resource-panel").querySelector(".resource-spinner"), null);
   assert.equal(container.querySelector(".team-profile"), header);
 });
+
+test("scope controls render steppers on wide screens and a chip row with working arrows on phones", async () => {
+  const { ScopeControls } = await import("../src/components/scope-controls.tsx");
+  const picks = [];
+  const fields = [
+    { label: "Liga", value: "a", options: [{ value: "a", label: "Bundesliga" }], onChange: (v) => picks.push(["liga", v]) },
+    { label: "Spieltag", value: "2", options: ["1", "2", "3"].map((v) => ({ value: v, label: `Spieltag ${v}` })), onChange: (v) => picks.push(["tag", v]) },
+  ];
+  await render(React.createElement(ScopeControls, { fields }));
+  assert.equal(container.querySelectorAll(".fui-stepper-select").length, 2);
+  assert.equal(container.querySelector(".scope-chip"), null);
+
+  const saved = window.matchMedia;
+  window.matchMedia = () => ({ matches: true, addEventListener() {}, removeEventListener() {} });
+  try {
+    await render(React.createElement(ScopeControls, { fields }));
+    assert.equal(container.querySelectorAll(".fui-stepper-select").length, 0);
+    assert.equal(container.querySelector(".scope-chip").textContent, "Bundesliga · Spieltag 2");
+    await click(container.querySelector('[aria-label="Spieltag weiter"]'));
+    await click(container.querySelector('[aria-label="Spieltag zurück"]'));
+    assert.deepEqual(picks, [["tag", "3"], ["tag", "1"]]);
+  } finally { window.matchMedia = saved; }
+});
+
+test("the phone menu lists every section and is absent on wide screens", async () => {
+  const { MobileMenu } = await import("../src/app/mobile-menu.tsx");
+  const views = [];
+  window.HTMLDialogElement.prototype.close ??= () => {}; // jsdom has no dialog support
+  const props = { activeId: "matchday", filters, onNavigate: (view) => views.push(view) };
+  await render(React.createElement(MobileMenu, props));
+  assert.equal(container.querySelector(".menu-button"), null);
+
+  const saved = window.matchMedia;
+  window.matchMedia = () => ({ matches: true, addEventListener() {}, removeEventListener() {} });
+  try {
+    await render(React.createElement(MobileMenu, props));
+    const links = [...container.querySelectorAll(".drawer a")].map((a) => a.textContent);
+    assert.deepEqual(links, ["Überblick", "Spieltag", "Tabellen", "Spieler", "Mannschaften", "Über Punktespiegel", "Daten & Methodik", "Quellen", "FAQ"]);
+    assert.equal(container.querySelector('.drawer a[aria-current="page"]').textContent, "Spieltag");
+    await click(container.querySelectorAll(".drawer a")[2]);
+    assert.deepEqual(views, ["table"]);
+  } finally { window.matchMedia = saved; }
+});
+
+test("scroll direction is mirrored on the root element, ignores the top of the page, and is removed on unmount", async () => {
+  const { useScrollDirection } = await import("../src/hooks/use-scroll-direction.ts");
+  const Probe = ({ enabled }) => { useScrollDirection(enabled); return null; };
+  const scrollTo = async (y) => { await act(async () => { Object.defineProperty(window, "scrollY", { value: y, configurable: true }); window.dispatchEvent(new window.Event("scroll")); }); };
+  const root = document.documentElement;
+  await render(React.createElement(Probe, { enabled: true }));
+  await scrollTo(40);
+  assert.equal(root.dataset.scroll, "up");
+  await scrollTo(400);
+  assert.equal(root.dataset.scroll, "down");
+  await scrollTo(398);
+  assert.equal(root.dataset.scroll, "down", "jitter below the threshold keeps the direction");
+  await scrollTo(300);
+  assert.equal(root.dataset.scroll, "up");
+  await render(React.createElement(Probe, { enabled: false }));
+  assert.equal(root.dataset.scroll, undefined);
+  await scrollTo(0);
+});

@@ -2,6 +2,20 @@
 
 Alle wesentlichen Änderungen an Punktespiegel werden in dieser Datei dokumentiert.
 
+## [1.32.0] – 2026-10-12
+
+### Geändert
+
+- Mobile Navigation: Auf Bildschirmen bis 860 px ersetzt eine schmale Kopfleiste mit Menü-Schaltfläche die untere Tab-Leiste. Das Menü öffnet sich als Seitenleiste mit allen Bereichen sowie Über Punktespiegel, Daten & Methodik, Quellen und FAQ.
+- Auf Telefonen (bis 600 px) ersetzt eine einzelne Zeile aus Zurück, Auswahl-Chip und Weiter die gestapelten Auswahlfelder. Die Pfeile schalten den Spieltag (bzw. die Saison) weiter; das Chip öffnet ein Auswahlblatt für Liga, Saison und Spieltag.
+- Kompakterer Seitenkopf auf Telefonen. Titel und Auswahl bleiben unter der Kopfleiste haften, blenden sich beim Abwärtsscrollen aus und beim Aufwärtsscrollen wieder ein.
+- Die Fußzeile blendet auf kleinen Bildschirmen die Seitenlinks aus, da das Menü sie enthält.
+- Desktop-Layout und Seitenleiste bleiben unverändert.
+
+### Geprüft
+
+- Neue React-Tests für Auswahlzeile, Menü und Scrollrichtung.
+
 ## [1.31.1] – 2026-10-09
 
 ### Behoben
