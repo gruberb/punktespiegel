@@ -2,6 +2,12 @@
 
 Alle wesentlichen Änderungen an Punktespiegel werden in dieser Datei dokumentiert.
 
+## [1.33.1] – 2026-10-13
+
+### Geändert
+
+- Die Oberfläche nutzt `@gruberb/fun-ui` 1.0.1 aus der npm-Registry statt eines Git-Commits. Keine sichtbare Änderung.
+
 ## [1.33.0] – 2026-10-12
 
 ### Geändert
