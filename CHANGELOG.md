@@ -2,6 +2,12 @@
 
 Alle wesentlichen Änderungen an Punktespiegel werden in dieser Datei dokumentiert.
 
+## [1.33.3] – 2026-10-13
+
+### Geändert
+
+- Die Oberfläche nutzt `@gruberb/fun-ui` 1.0.2, das den Hover-Fehler der Umschalter selbst behebt. Die lokale CSS-Korrektur entfällt.
+
 ## [1.33.2] – 2026-10-13
 
 ### Behoben

@@ -62,8 +62,6 @@
 .view-player .fui-page-header, .view-team .fui-page-header { grid-template-columns: 1fr; justify-items: end; padding-top: 20px; margin-bottom: 0; }
 .view-player .fui-page-header > .selectors, .view-team .fui-page-header > .selectors { grid-column: 1; grid-row: auto; }
 
-/* fun-ui's :hover:not(:disabled) rule outranks .is-selected and wipes the ink block on hover. */
-.fui-segmented__item.is-selected:hover:not(:disabled) { color: var(--on-ink); background: var(--ink); }
 .selectors { display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: stretch; gap: 8px; }
 
 /* Tabs ---------------------------------------------------------------------- */
