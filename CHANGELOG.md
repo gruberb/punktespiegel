@@ -2,6 +2,13 @@
 
 Alle wesentlichen Änderungen an Punktespiegel werden in dieser Datei dokumentiert.
 
+## [1.33.2] – 2026-10-13
+
+### Behoben
+
+- Umschalter (z. B. Gesamt/Heim/Auswärts): Der schwarze Hintergrund der gewählten Option bleibt beim Darüberfahren erhalten.
+- Tabellenart in der Formtabelle: Die Auswahl springt sofort um, die Tabelle zieht danach nach.
+
 ## [1.33.1] – 2026-10-13
 
 ### Geändert

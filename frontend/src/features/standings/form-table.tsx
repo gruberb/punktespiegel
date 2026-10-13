@@ -1,7 +1,7 @@
 import { useHoverCard } from "../../components/hover-card";
 import type { DataTableColumn } from "@gruberb/fun-ui";
 import { DataTable, FormChip, FormChips, LogoTile, Segmented, TrendBadge } from "@gruberb/fun-ui";
-import { useMemo, useState } from "react";
+import { useDeferredValue, useMemo, useState } from "react";
 import { MatchPopover } from "../../components/match-popover";
 import type { LeagueStandings, LeagueTableFormEntry, LeagueTableRow, LeagueTableTeam, VenueTableRow } from "../../types/models";
 import { formOutcome } from "../../utils/football";
@@ -10,7 +10,9 @@ import { zoneForRank } from "./zones";
 type FormTableSort = "rank" | "form" | "difference";
 
 export function FormTableCard({ standings, league, onTeam, onMatch }: { standings: LeagueStandings; league: string; onMatch: (id: string) => void; onTeam: (id: string) => void }) {
-  const [venue, setVenue] = useState<"all" | "home" | "away">("all");
+  const [selectedVenue, setVenue] = useState<"all" | "home" | "away">("all");
+  // The toggle follows the click immediately; the heavy table re-render may lag behind it.
+  const venue = useDeferredValue(selectedVenue);
   const [sort, setSort] = useState<FormTableSort>("rank");
   const [direction, setDirection] = useState<"asc" | "desc">("asc");
 
@@ -50,7 +52,7 @@ export function FormTableCard({ standings, league, onTeam, onMatch }: { standing
     <section className="tabelle-block">
       <div className="section-copy cross-copy">
         <div><p className="fui-kicker">Stand nach Spieltag {standings.context.round}</p><h2>{venue === "all" ? "Formtabelle" : venue === "home" ? "Heimtabelle" : "Auswärtstabelle"}</h2></div>
-        <Segmented ariaLabel="Tabellenart" value={venue} onChange={(id) => setVenue(id as typeof venue)} options={[{ value: "all", label: "Gesamt" }, { value: "home", label: "Heim" }, { value: "away", label: "Auswärts" }]} />
+        <Segmented ariaLabel="Tabellenart" value={selectedVenue} onChange={(id) => setVenue(id as typeof venue)} options={[{ value: "all", label: "Gesamt" }, { value: "home", label: "Heim" }, { value: "away", label: "Auswärts" }]} />
       </div>
       {venue !== "all" ? <VenueTable rows={standings.venues[venue]} league={league} leagueName={standings.context.leagueName} venue={venue} onTeam={onTeam} /> : <DataTable
         ariaLabel={`Tabelle der ${standings.context.leagueName}`}
